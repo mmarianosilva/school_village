@@ -1,15 +1,8 @@
-Install dependencies
+# school_village
 
-```npm install```
+School Village
 
-Start App
+## Getting Started
 
-```npm start```
-
-To run iOS
-
-```react-native run-ios```
-
-To run Android (with emulator running)
-
-```react-native run-android ```
+For help getting started with Flutter, view our online
+[documentation](https://flutter.io/).
