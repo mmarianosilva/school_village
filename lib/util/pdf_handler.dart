@@ -40,7 +40,6 @@ class PdfHandler {
     Future<Null> _showPdf() async {
       try {
         final int result = await platform.invokeMethod('viewPdf', path);
-//        final int result = await platform.invokeMethod('viewPdf', "assets/pdf/safety.pdf");
       } on PlatformException catch (e) {
       }
     }

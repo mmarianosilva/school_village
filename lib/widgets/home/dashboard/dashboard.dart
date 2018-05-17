@@ -69,36 +69,5 @@ class _DashboardState extends State<Dashboard> {
                     itemCount: snapshot.data.data["Documents"].length);
           }
         });
-
-//      return new Material(
-//        child: new CustomScrollView(
-//          primary: false,
-//          slivers: <Widget>[
-//            new SliverGrid(
-//              gridDelegate: new SliverGridDelegateWithMaxCrossAxisExtent(
-//                maxCrossAxisExtent: 200.0,
-//                mainAxisSpacing: 10.0,
-//                crossAxisSpacing: 10.0,
-//                childAspectRatio: 1.0,
-//              ),
-//              delegate: new SliverChildBuilderDelegate(
-//                    (BuildContext context, int index) {
-//                  return new Container(
-//                    alignment: Alignment.center,
-//                    color: Colors.teal[100 * (index % 9)],
-//                    child: new Column(
-//                      children: <Widget>[
-//                        new IconButton(icon: icons[index]['icon'], iconSize: 72.0, onPressed: () => showSafety(context, index)),
-//                        new Text(icons[index]['text'], textDirection: TextDirection.ltr,)
-//                      ],
-//                    ),
-//                  );
-//                },
-//                childCount: icons.length,
-//              ),
-//            ),
-//          ],
-//        ),
-//      );
   }
 }
