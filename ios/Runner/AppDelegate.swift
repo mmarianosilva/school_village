@@ -26,7 +26,7 @@ import Flutter
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
 //        controller.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "webViewController") as! WebViewController
-        newViewController.url  = key
+        newViewController.url  = path
 //        controller.navigationController.pushViewController(newViewController, animated: true)
         self.window?.rootViewController?.present(newViewController, animated: true, completion: nil)
     });

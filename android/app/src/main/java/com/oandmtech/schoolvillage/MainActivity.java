@@ -28,7 +28,8 @@ public class MainActivity extends FlutterActivity {
               @Override
               public void onMethodCall(MethodCall call, MethodChannel.Result result) {
                 // TODO
-                  String key = getFlutterView().getLookupKeyForAsset(call.arguments.toString());
+                  String key = call.arguments.toString();
+//                  String key = getFlutterView().getLookupKeyForAsset(call.arguments.toString());
                   Toast.makeText(getApplicationContext(),key, Toast.LENGTH_SHORT).show();
                   getApplicationContext().startActivity(new Intent(getApplicationContext(), PdfViewerActivity.class).putExtra("URL", key));
 

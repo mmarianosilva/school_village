@@ -1,56 +1,104 @@
 import 'package:flutter/material.dart';
 import '../../../util/pdf_handler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
+  @override
+  _DashboardState createState() => new _DashboardState();
+}
 
-  showSafety(context, index) {
-    debugPrint("$index");
-    switch(index) {
-      case 0 :
-        PdfHandler.showPdfFromUrl(context, "https://schoolvillage-38a50.firebaseapp.com/Safety_Plan_Centennial_H_S_20171218.pdf");
-        break;
-    }
+class _DashboardState extends State<Dashboard> {
+
+  showSafety(context, url) {
+    print(url);
+    PdfHandler.showPdfFromUrl(context, url);
   }
 
   @override
   Widget build(BuildContext context) {
+    var ref = "schools/eH0twSteQXFpNYRi9nzU";
 
     var icons = [
-      {
-        'icon': new Icon(Icons.book),
-        'text': "Safety Instructions"
-      }
+      {'icon': new Icon(Icons.book), 'text': "Safety Instructions"}
     ];
 
-      return new Material(
-        child: new CustomScrollView(
-          primary: false,
-          slivers: <Widget>[
-            new SliverGrid(
-              gridDelegate: new SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200.0,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 1.0,
-              ),
-              delegate: new SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                  return new Container(
-                    alignment: Alignment.center,
-                    color: Colors.teal[100 * (index % 9)],
-                    child: new Column(
-                      children: <Widget>[
-                        new IconButton(icon: icons[index]['icon'], iconSize: 72.0, onPressed: () => showSafety(context, index)),
-                        new Text(icons[index]['text'], textDirection: TextDirection.ltr,)
-                      ],
-                    ),
-                  );
-                },
-                childCount: icons.length,
-              ),
-            ),
-          ],
-        ),
-      );
+    return new FutureBuilder(
+        future: Firestore.instance.document(ref).get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return new Text('Loading...');
+            case ConnectionState.waiting:
+              return new Text('Loading...');
+            case ConnectionState.active:
+              return new Text('Loading...');
+            default:
+              if (snapshot.hasError)
+                return new Text('Error: ${snapshot.error}');
+              else
+                return new ListView.builder(
+                    padding: new EdgeInsets.all(22.0),
+//                    itemExtent: 20.0,
+                    itemBuilder: (BuildContext context, int index) {
+                      return new Column(
+                        children: <Widget>[
+                          const SizedBox(height: 22.0),
+                          new FlatButton(
+
+                              onPressed: () {
+                                showSafety(
+                                    context,
+                                    snapshot.data.data[
+                                    "Documents"][index]
+                                    ["Location"]);
+                              },
+                              child: new Text(
+                                snapshot.data.data["Documents"][index]["Type"],
+                                textAlign: TextAlign.left,
+                                style: new TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0
+                                ),
+                              )
+                          )
+                        ],
+                      );
+
+                    },
+                    itemCount: snapshot.data.data["Documents"].length);
+          }
+        });
+
+//      return new Material(
+//        child: new CustomScrollView(
+//          primary: false,
+//          slivers: <Widget>[
+//            new SliverGrid(
+//              gridDelegate: new SliverGridDelegateWithMaxCrossAxisExtent(
+//                maxCrossAxisExtent: 200.0,
+//                mainAxisSpacing: 10.0,
+//                crossAxisSpacing: 10.0,
+//                childAspectRatio: 1.0,
+//              ),
+//              delegate: new SliverChildBuilderDelegate(
+//                    (BuildContext context, int index) {
+//                  return new Container(
+//                    alignment: Alignment.center,
+//                    color: Colors.teal[100 * (index % 9)],
+//                    child: new Column(
+//                      children: <Widget>[
+//                        new IconButton(icon: icons[index]['icon'], iconSize: 72.0, onPressed: () => showSafety(context, index)),
+//                        new Text(icons[index]['text'], textDirection: TextDirection.ltr,)
+//                      ],
+//                    ),
+//                  );
+//                },
+//                childCount: icons.length,
+//              ),
+//            ),
+//          ],
+//        ),
+//      );
   }
 }

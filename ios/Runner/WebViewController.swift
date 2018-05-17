@@ -21,13 +21,14 @@ class WebViewController: UIViewController {
         super.viewDidLoad()
 
         do {
-            let pdf = Bundle.main.path(forResource: self.url, ofType: "")!
-            if let resourceUrl = Bundle.main.url(forResource: pdf, withExtension: "pdf") {
-                if FileManager.default.fileExists(atPath: resourceUrl.path) {
-                    print("file found")
-                }
-            }
-            let pdfURL = NSURL.fileURL(withPath: pdf)
+//            let pdf = Bundle.main.path(forResource: self.url, ofType: "")!
+//            if let resourceUrl = Bundle.main.url(forResource: url, withExtension: "pdf") {
+//                if FileManager.default.fileExists(atPath: resourceUrl.path) {
+//                    print("file found")
+//                }
+//            }
+            let pdfURL = NSURL.fileURL(withPath: url)
+//            let pdfURL = NSURL.fileURL(withPath: pdf)
             let data = try Data(contentsOf: pdfURL)
             self.webView?.scalesPageToFit=true;
             self.webView?.load(data, mimeType: "application/pdf", textEncodingName:"", baseURL: (pdfURL.deletingLastPathComponent()))

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './dashboard/dashboard.dart';
+import './settings/settings.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,11 +32,7 @@ class _HomeState extends State<Home> {
             offstage: index != 1,
             child: new TickerMode(
               enabled: index == 1,
-              child: new Material(
-                child: new Center(
-                  child: new Text("Coming soon"),
-                ),
-              )
+              child: new Settings()
             ),
           ),
         ],

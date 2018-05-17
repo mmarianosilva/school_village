@@ -12,3 +12,5 @@ Run `flutter build ios --release` and then archive from xCode
 
 ## Android Release Build
 Run `flutter build apk --release --target-platform=android-arm64`
+
+Use NDK 16c to Build Android
