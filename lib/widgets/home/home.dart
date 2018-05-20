@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './dashboard/dashboard.dart';
-import './settings/settings.dart';
+import '../settings/settings.dart';
+import '../../util/user_helper.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -10,47 +11,40 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   int index = 0;
+  String title = "School Village";
+
+  openSettings() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Settings()),
+    );
+  }
+
+  updateSchool() async {
+    title = await UserHelper.getSchoolName();
+  }
 
   @override
   Widget build(BuildContext context) {
 
+    updateSchool();
+
     return new Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: new AppBar(
-        title: new Text("School Village")
-      ),
-      body: new Stack(
-        children: <Widget>[
-          new Offstage(
-            offstage: index != 0,
-            child: new TickerMode(
-              enabled: index == 0,
-              child: new MaterialApp(home: new Dashboard()),
-            ),
-          ),
-          new Offstage(
-            offstage: index != 1,
-            child: new TickerMode(
-              enabled: index == 1,
-              child: new Settings()
-            ),
-          ),
+        title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+        leading: new Image.asset('assets/images/logo.png'),
+        backgroundColor: Colors.grey.shade400,
+        elevation: 0.0,
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.settings, color: Colors.grey.shade800),
+            tooltip: 'Settings',
+            onPressed: openSettings,
+          )
         ],
       ),
-      bottomNavigationBar: new BottomNavigationBar(
-        currentIndex: index,
-        onTap: (int index) { setState((){ this.index = index; }); },
-        items: <BottomNavigationBarItem>[
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.home),
-            title: new Text("Home"),
-          ),
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.settings),
-            title: new Text("Settings"),
-          ),
-        ],
-      ),
+      body: new Dashboard(),
     );
   }
 }

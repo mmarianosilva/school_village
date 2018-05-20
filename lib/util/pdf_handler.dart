@@ -19,7 +19,7 @@ class PdfHandler {
     var bytes = utf8.encode(url); // data being hashed
     var digest = sha256.convert(bytes);
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
-    final path = "${systemTempDir.path}/24$digest.pdf";
+    final path = "${systemTempDir.path}/$digest.pdf";
     print(path);
 
     final File tempFile = new File(path);
@@ -49,7 +49,13 @@ class PdfHandler {
   static void showLoading(BuildContext context) {
     var alert = new AlertDialog(
       title: new Text("Downloading Document"),
-      content: new CircularProgressIndicator(),
+      content: new Row(
+        children: <Widget>[
+          new CircularProgressIndicator(),
+          new SizedBox(width: 12.0),
+          new Expanded(child: new Text("Please wait.."))
+        ],
+      ),
     );
     showDialog(context: context, child: alert);
     // TODO Move to builder

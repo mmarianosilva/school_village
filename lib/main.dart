@@ -11,10 +11,11 @@ FirebaseAnalytics analytics = new FirebaseAnalytics();
 void main() => runApp(new MaterialApp(
     home: Splash(),
     theme: new ThemeData(
-      primaryColor: Colors.black,
-      accentColor: Colors.blue.shade900,
-      brightness: Brightness.dark,
-      primaryColorDark: Colors.blue.shade900
+      primaryColor: Colors.grey.shade900,
+      accentColor: Colors.blue,
+      brightness: Brightness.light,
+      primaryColorDark: Colors.white10,
+      primaryColorLight: Colors.white
     ),
     routes: <String, WidgetBuilder> {
         '/home': (BuildContext context) => new Home(),

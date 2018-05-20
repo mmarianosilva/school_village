@@ -8,7 +8,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-
   showSafety(context, url) {
     print(url);
     PdfHandler.showPdfFromUrl(context, url);
@@ -38,33 +37,36 @@ class _DashboardState extends State<Dashboard> {
                 return new Text('Error: ${snapshot.error}');
               else
                 return new ListView.builder(
-                    padding: new EdgeInsets.all(22.0),
+                    padding: new EdgeInsets.all(8.0),
 //                    itemExtent: 20.0,
                     itemBuilder: (BuildContext context, int index) {
                       return new Column(
                         children: <Widget>[
-                          const SizedBox(height: 22.0),
-                          new FlatButton(
-
-                              onPressed: () {
-                                showSafety(
-                                    context,
-                                    snapshot.data.data[
-                                    "Documents"][index]
-                                    ["Location"]);
-                              },
-                              child: new Text(
-                                snapshot.data.data["Documents"][index]["Type"],
-                                textAlign: TextAlign.left,
-                                style: new TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0
-                                ),
-                              )
+                          const SizedBox(height: 28.0),
+                          new GestureDetector(
+                            onTap: () {
+                              showSafety(
+                                  context,
+                                  snapshot.data.data["Documents"][index]
+                                      ["Location"]);
+                            },
+                            child: new Row(
+                              children: <Widget>[
+                                new Image.asset('assets/images/logo.png',
+                                    width: 48.0),
+                                new Expanded(
+                                    child: new Text(
+                                  snapshot.data.data["Documents"][index]
+                                      ["Type"],
+                                  textAlign: TextAlign.left,
+                                  style: new TextStyle(fontSize: 16.0),
+                                )),
+                                new Icon(Icons.chevron_right)
+                              ],
+                            ),
                           )
                         ],
                       );
-
                     },
                     itemCount: snapshot.data.data["Documents"].length);
           }

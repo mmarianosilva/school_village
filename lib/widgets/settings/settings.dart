@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../schoollist/school_list.dart';
-import '../../../util/user_helper.dart';
+import '../schoollist/school_list.dart';
+import '../../util/user_helper.dart';
 
 class Settings extends StatefulWidget {
 
@@ -15,15 +15,20 @@ class _SettingsState extends State<Settings> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _email = '';
+  String name = '';
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
+    print("User ID");
+    print(user.uid);
     _email = user.email;
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
+      name = "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
+      print(name);
     });
   }
 
@@ -32,24 +37,32 @@ class _SettingsState extends State<Settings> {
 
     getUserDetails();
 
-    return new Material(
-      child: new Column(
+    return new Scaffold(
+      backgroundColor: Colors.grey.shade200,
+      appBar: new AppBar(
+        title: new Text('Settings', textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+        backgroundColor: Colors.grey.shade400,
+        elevation: 0.0,
+        leading: new BackButton(color: Colors.grey.shade800),
+      ),
+      body: new Column(
         children: <Widget>[
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 24.0),
           new Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new FlatButton(
-                child: new Text(_userSnapshot == null ? '' : "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}", style: new TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold
-                )),
-                onPressed: null,
+              new Container(
+                padding: EdgeInsets.all(8.0),
               ),
+              new Text(name, style: new TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800
+              )),
 
             ],
           ),
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 24.0),
           new Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -65,32 +78,26 @@ class _SettingsState extends State<Settings> {
                       context,
                       new MaterialPageRoute(builder: (context) => new SchoolList()),
                     );
-//                    Navigator.of(context).pushNamedAndRemoveUntil(
-//                        '/schools', (Route<dynamic> route) => false);
                   });
                 },
               ),
 
             ],
           ),
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 24.0),
           new Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new FlatButton.icon(
                 icon: const Icon(Icons.exit_to_app, size: 32.0),
                 label: new Text('Logout', style: new TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold
                 )),
                 onPressed: () {
                   UserHelper.logout();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/login', (Route<dynamic> route) => false);
-//                  _auth.signOut().then((nothing){
-//                    Navigator.of(context).pushNamedAndRemoveUntil(
-//                        '/login', (Route<dynamic> route) => false);
-//                  });
                 },
               ),
 

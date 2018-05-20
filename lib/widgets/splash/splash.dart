@@ -28,7 +28,7 @@ class Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     startTimeout(context);
     return new Material(
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).primaryColorLight,
       child: new Center(
         child: new Text("School Village",
             textDirection: TextDirection.ltr,

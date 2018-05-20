@@ -13,6 +13,7 @@ class _LoginState extends State<Login> {
   final emailController = new TextEditingController();
   final passwordController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  String title = "School Village";
 
   onLogin() {
     _scaffoldKey.currentState.showSnackBar(
@@ -58,8 +59,15 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
       key: _scaffoldKey,
+      appBar: new AppBar(
+        leading: new Image.asset('assets/images/logo.png'),
+        title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+        backgroundColor: Colors.grey.shade400,
+        elevation: 0.0,
+      ),
       body: new Center(
         child: new Container(
           padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
@@ -72,7 +80,8 @@ class _LoginState extends State<Login> {
                     controller: emailController,
                     decoration: new InputDecoration(
                         border: const UnderlineInputBorder(),
-                        hintText: 'Email', icon: new Icon(Icons.email)),
+                        hintText: 'Email',
+                        icon: new Icon(Icons.email)),
                   )
               ),
               const SizedBox(height: 12.0),
@@ -82,16 +91,18 @@ class _LoginState extends State<Login> {
                     obscureText: true,
                     decoration: new InputDecoration(
                         border: const UnderlineInputBorder(),
-                        hintText: 'Password', icon: new Icon(Icons.lock)),
+                        hintText: 'Password',
+                        labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
+                        icon: new Icon(Icons.lock)),
                   )
               ),
               const SizedBox(height: 32.0),
-              new OutlineButton(
+              new MaterialButton(
+                  minWidth: 200.0,
+                  color: Theme.of(context).accentColor,
                   onPressed: onLogin,
                   textColor: Colors.white,
-                  child: new Text("LOGIN"),
-                  highlightedBorderColor: Colors.blue.shade900,
-                  borderSide: new BorderSide(color: Colors.blue.shade900, width: 5.0)
+                  child: new Text("LOGIN")
               ),
               const SizedBox(height: 18.0),
               new FlatButton(

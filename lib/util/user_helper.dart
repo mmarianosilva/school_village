@@ -61,12 +61,25 @@ class UserHelper {
   }
 
   static getSelectedSchoolID() async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
     return _prefs.getString("school_id");
   }
 
   static setSelectedSchool({schoolId: String, schoolName: String, schoolRole: String}) async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
     _prefs.setString("school_id", schoolId);
     _prefs.setString("school_name", schoolName);
     _prefs.setString("school_role", schoolRole);
+  }
+
+  static getSchoolName() async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    return _prefs.getString("school_name");
   }
 }
