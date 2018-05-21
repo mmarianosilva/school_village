@@ -1,0 +1,20 @@
+service cloud.firestore {
+
+	function isOwner() {
+    return get(/databases/$(database)/documents/users/$(request.auth.uid)).role == 'Owner';
+  }
+
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, update: if request.auth.uid == userId;
+      allow create, delete: if isOwner();
+    }
+  }
+
+  match /databases/{database}/documents {
+    match /schools/{schoolId} {
+      allow read, update: if request.auth.uid != null;
+      allow create, delete: if isOwner();
+    }
+  }
+}

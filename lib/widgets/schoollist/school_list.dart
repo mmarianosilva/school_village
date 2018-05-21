@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../util/user_helper.dart';
 import '../../model/school_ref.dart';
@@ -11,6 +12,7 @@ class SchoolList extends StatefulWidget {
 
 class _SchoolListState extends State<SchoolList> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   bool _isLoading = true;
   BuildContext _context;
 
@@ -62,7 +64,20 @@ class _SchoolListState extends State<SchoolList> {
                             default:
                               if (snapshot.hasError)
                                 return new Text('Error: ${snapshot.error}');
-                              else
+                              else {
+                                var id = snapshot.data[index]['ref'].split("/")[1];
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-medical");
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-fight");
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-armed");
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-fire");
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-intruder");
+                                _firebaseMessaging.subscribeToTopic(
+                                    "$id-other");
                                 return new FlatButton(
                                     child: new Text(schoolSnapshot.data == null
                                         ? ''
@@ -70,10 +85,11 @@ class _SchoolListState extends State<SchoolList> {
                                     onPressed: () {
                                       selectSchool(
                                           schoolName:
-                                              schoolSnapshot.data["Name"],
+                                          schoolSnapshot.data["Name"],
                                           schoolId: snapshot.data[index]['ref'],
                                           role: snapshot.data[index]['role']);
                                     });
+                              }
                           }
                         },
                       );

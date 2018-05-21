@@ -5,19 +5,17 @@ import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 
 class Settings extends StatefulWidget {
-
   @override
   _SettingsState createState() => new _SettingsState();
-
 }
 
 class _SettingsState extends State<Settings> {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _email = '';
   String name = '';
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
+  bool isLoaded = false;
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -27,20 +25,27 @@ class _SettingsState extends State<Settings> {
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
-      name = "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
+      setState(() {
+        name =
+        "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
+        isLoaded = true;
+      });
       print(name);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    getUserDetails();
+    if (!isLoaded) {
+      getUserDetails();
+    }
 
     return new Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: new AppBar(
-        title: new Text('Settings', textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+        title: new Text('Settings',
+            textAlign: TextAlign.center,
+            style: new TextStyle(color: Colors.black)),
         backgroundColor: Colors.grey.shade400,
         elevation: 0.0,
         leading: new BackButton(color: Colors.grey.shade800),
@@ -54,12 +59,11 @@ class _SettingsState extends State<Settings> {
               new Container(
                 padding: EdgeInsets.all(8.0),
               ),
-              new Text(name, style: new TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey.shade800
-              )),
-
+              new Text(name,
+                  style: new TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade800)),
             ],
           ),
           const SizedBox(height: 24.0),
@@ -68,20 +72,19 @@ class _SettingsState extends State<Settings> {
             children: <Widget>[
               new FlatButton.icon(
                 icon: const Icon(Icons.school, size: 32.0),
-                label: new Text('Change School', style: new TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold
-                )),
+                label: new Text('Change School',
+                    style: new TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  _auth.signOut().then((nothing){
+                  _auth.signOut().then((nothing) {
                     Navigator.push(
                       context,
-                      new MaterialPageRoute(builder: (context) => new SchoolList()),
+                      new MaterialPageRoute(
+                          builder: (context) => new SchoolList()),
                     );
                   });
                 },
               ),
-
             ],
           ),
           const SizedBox(height: 24.0),
@@ -90,17 +93,15 @@ class _SettingsState extends State<Settings> {
             children: <Widget>[
               new FlatButton.icon(
                 icon: const Icon(Icons.exit_to_app, size: 32.0),
-                label: new Text('Logout', style: new TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold
-                )),
+                label: new Text('Logout',
+                    style: new TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.bold)),
                 onPressed: () {
                   UserHelper.logout();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/login', (Route<dynamic> route) => false);
                 },
               ),
-
             ],
           )
         ],

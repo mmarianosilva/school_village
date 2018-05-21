@@ -73,7 +73,7 @@ class _LoginState extends State<Login> {
           padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
           child: new Column(
             children: <Widget>[
-              const SizedBox(height: 72.0),
+              const SizedBox(height: 18.0),
               new Image.asset('assets/images/logo.png'),
               new Flexible(
                   child: new TextField(
