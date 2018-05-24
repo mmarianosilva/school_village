@@ -29,7 +29,7 @@ exports.schoolNotificationWrite = functions.firestore
                 body : body['body'],
                 title: body['title']
               }
-            };
-            const topic = schoolId+"-"+body["type"];
-            return admin.messaging().sendToTopic(topic, payload);
+             };
+             const topic = schoolId+"-"+body["type"];
+             return admin.messaging().sendToTopic(topic, payload);
            });

@@ -81,11 +81,11 @@ class _SchoolListState extends State<SchoolList> {
                                 return new FlatButton(
                                     child: new Text(schoolSnapshot.data == null
                                         ? ''
-                                        : schoolSnapshot.data["Name"]),
+                                        : schoolSnapshot.data["name"]),
                                     onPressed: () {
                                       selectSchool(
                                           schoolName:
-                                          schoolSnapshot.data["Name"],
+                                          schoolSnapshot.data["name"],
                                           schoolId: snapshot.data[index]['ref'],
                                           role: snapshot.data[index]['role']);
                                     });

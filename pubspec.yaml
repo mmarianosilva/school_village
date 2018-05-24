@@ -18,6 +18,7 @@ dependencies:
   shared_preferences: "^0.4.1"
   crypto: any
   path_provider: "^0.4.0"
+  url_launcher: "^3.0.1"
 
 
 dev_dependencies:

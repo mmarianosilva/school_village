@@ -3,6 +3,10 @@ import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
 import '../../alert/alert.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../util/file_helper.dart';
+import 'dart:io';
+
 
 class Dashboard extends StatefulWidget {
   @override
@@ -15,9 +19,17 @@ class _DashboardState extends State<Dashboard> {
   bool isLoaded = false;
   String ref = "";
 
-  showSafety(context, url) {
+  _showPDF(context, url) {
     print(url);
     PdfHandler.showPdfFromUrl(context, url);
+  }
+
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   _getSchoolId() async{
@@ -101,19 +113,33 @@ class _DashboardState extends State<Dashboard> {
                           const SizedBox(height: 28.0),
                           new GestureDetector(
                             onTap: () {
-                              showSafety(
-                                  context,
-                                  snapshot.data.data["Documents"][index - 1]
-                                      ["Location"]);
+                              if(snapshot.data.data["documents"][index - 1]["type"] == "pdf") {
+                                _showPDF(
+                                    context,
+                                    snapshot.data.data["documents"][index - 1]
+                                    ["location"]);
+                              } else {
+                                _launchURL(snapshot.data.data["documents"][index - 1]
+                                ["location"]);
+                              }
                             },
                             child: new Row(
                               children: <Widget>[
-                                new Image.asset('assets/images/logo.png',
-                                    width: 48.0),
+//                                new Image.asset('assets/images/logo.png', width: 48.0),
+                                new FutureBuilder(
+                                    future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 1]
+                                    ["icon"], context: context),
+                                    builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+                                      if(snapshot.data == null) {
+                                        return new Image.asset('assets/images/logo.png', width: 48.0);
+                                      }
+                                      return new Image.file(snapshot.data, width: 48.0);
+                                    }),
+                                new SizedBox(width: 12.0),
                                 new Expanded(
                                     child: new Text(
-                                  snapshot.data.data["Documents"][index - 1]
-                                      ["Type"],
+                                  snapshot.data.data["documents"][index - 1]
+                                      ["title"],
                                   textAlign: TextAlign.left,
                                   style: new TextStyle(fontSize: 16.0),
                                 )),
@@ -124,7 +150,7 @@ class _DashboardState extends State<Dashboard> {
                         ],
                       );
                     },
-                    itemCount: snapshot.data.data["Documents"].length + 1);
+                    itemCount: snapshot.data.data["documents"].length + 1);
           }
         });
   }

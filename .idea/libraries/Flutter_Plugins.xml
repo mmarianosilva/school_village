@@ -9,6 +9,7 @@
       <root url="file://$PROJECT_DIR$/../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/cloud_firestore-0.7.2" />
       <root url="file://$PROJECT_DIR$/../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_storage-0.3.5" />
       <root url="file://$PROJECT_DIR$/../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.0" />
+      <root url="file://$PROJECT_DIR$/../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.1" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

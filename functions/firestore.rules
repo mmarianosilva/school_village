@@ -17,4 +17,11 @@ service cloud.firestore {
       allow create, delete: if isOwner();
     }
   }
+
+  match /databases/{database}/documents {
+      match /schools/{schoolId}/notifications/{notificationId} {
+        allow read, create, update: if request.auth.uid != null;
+        allow delete: if isOwner();
+      }
+    }
 }

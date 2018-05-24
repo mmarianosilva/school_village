@@ -11,6 +11,9 @@ class Alert extends StatefulWidget {
 
 class _AlertState extends State<Alert> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  String _schoolId = '';
+  String _schoolName = '';
+  String _userId = '';
   String _email = '';
   String name = '';
   DocumentReference _user;
@@ -22,9 +25,12 @@ class _AlertState extends State<Alert> {
     print("User ID");
     print(user.uid);
     _email = user.email;
+    _schoolId = await UserHelper.getSelectedSchoolID();
+    _schoolName = await UserHelper.getSchoolName();
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
+      _userId = user.documentID;
       setState(() {
         name =
             "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
@@ -33,6 +39,80 @@ class _AlertState extends State<Alert> {
       print(name);
     });
   }
+
+
+  _sendAlert(alertType, alertTitle, alertBody, context) {
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('Are you sure you want to send this alert?'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text('This cannot be undone')
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _saveAlert(alertTitle, alertBody, alertType, context);
+              },
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  _saveAlert(alertTitle, alertBody, alertType, context) {
+    CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
+    final DocumentReference document = collection.document();
+    document.setData(<String, dynamic>{
+      'title': alertTitle,
+      'body': alertBody,
+      'type': alertType,
+      'createdById': _userId,
+      'createdBy' : name,
+      'createdAt' : new DateTime.now().millisecondsSinceEpoch
+    });
+    print("Added Alert");
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            title: new Text('Alert Sent'),
+            content: new SingleChildScrollView(
+              child: new ListBody(
+                children: <Widget>[
+                  new Text('')
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        }
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +152,11 @@ class _AlertState extends State<Alert> {
                       flex: 1,
                         child: new Container(
                       margin: EdgeInsets.all(8.0),
+
                       child: new GestureDetector(
+                          onTap: () {
+                            _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
+                            },
                           child: new Column(children: [
                             new Image.asset('assets/images/alert_armed.png',
                                 width: 48.0, height: 48.0),
@@ -84,6 +168,7 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
+                              onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_fight.png',
                                     width: 48.0, height: 48.0),
@@ -95,6 +180,7 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
+                              onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emrgency has been reported at $_schoolName", context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_medical.png',
                                     width: 48.0, height: 48.0),
@@ -111,10 +197,11 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
+                              onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_fire.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Fiew", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Fire", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
                               ])),
                         )),
                     new Expanded(
@@ -122,6 +209,7 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
+                              onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_intruder.png',
                                     width: 48.0, height: 48.0),
@@ -133,6 +221,7 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
+                              onTap: () {_sendAlert("other", "Alert!", "An alert has been reported at $_schoolName", context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_other.png',
                                     width: 48.0, height: 48.0),

@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
     }
 
       return new Scaffold(
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: Colors.white,
         appBar: new AppBar(
           title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
           leading: new Image.asset('assets/images/logo.png'),

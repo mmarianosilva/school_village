@@ -28,10 +28,6 @@ class _LoginState extends State<Login> {
         )
     );
 
-//    UserHelper.signIn(
-//        email: emailController.text.trim().toLowerCase(),
-//        password: passwordController.text).
-
     UserHelper.signIn(
         email: emailController.text.trim().toLowerCase(),
         password: passwordController.text).then((user) {
@@ -74,7 +70,7 @@ class _LoginState extends State<Login> {
           child: new Column(
             children: <Widget>[
               const SizedBox(height: 18.0),
-              new Image.asset('assets/images/logo.png'),
+//              new Image.asset('assets/images/logo.png'),
               new Flexible(
                   child: new TextField(
                     controller: emailController,
