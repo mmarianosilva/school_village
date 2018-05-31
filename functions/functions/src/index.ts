@@ -2,7 +2,22 @@
 
 import * as functions from 'firebase-functions'
 const admin = require('firebase-admin');
+const firebase = require('firebase');
 admin.initializeApp();
+
+
+const config = {
+  apiKey: "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI",
+  authDomain: "schoolvillage-1.firebaseapp.com",
+  databaseURL: "https://schoolvillage-1.firebaseio.com",
+  projectId: "schoolvillage-1",
+  storageBucket: "schoolvillage-1.appspot.com",
+  messagingSenderId: "801521806783"
+};
+firebase.initializeApp(config);
+
+const firestore = admin.firestore();
+const auth = admin.auth();
 
 exports.schoolNotificationWrite = functions.firestore
     .document('schools/{schoolId}/notifications/{notificationId}')
@@ -33,3 +48,22 @@ exports.schoolNotificationWrite = functions.firestore
              const topic = schoolId+"-"+body["type"];
              return admin.messaging().sendToTopic(topic, payload);
            });
+
+
+exports.onUserCreate = functions.auth.user().onCreate((user) => {
+            console.log(user);
+
+            const userRef = firestore.doc(`users/${user.uid}`);
+            let name = user.displayName;
+            if (name === null ) {
+              name = "";
+            }
+            
+            return userRef.set({
+              email: user.email,
+              displayName: name
+            }).then(() => {
+              return firebase.auth().sendPasswordResetEmail(user.email)
+            });
+
+          });
