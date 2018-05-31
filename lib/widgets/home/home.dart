@@ -109,6 +109,11 @@ class _HomeState extends State<Home> {
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
         schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
+      var isOwner = false;
+      if(schools[0]['role'] == 'SiteAdmin' || schools[0]['role'] == 'Owner') {
+        isOwner = true;
+      }
+      UserHelper.subscribeToSchoolTopics(schools[0]['ref'], isOwner);
       return true;
     }
     return false;
