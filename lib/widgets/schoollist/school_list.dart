@@ -42,7 +42,8 @@ class _SchoolListState extends State<SchoolList> {
               default:
                 if (snapshot.hasError)
                   return new Text('Error: ${snapshot.error}');
-                else
+                else {
+
                   return new ListView.builder(
                     padding: new EdgeInsets.all(22.0),
                     itemExtent: 20.0,
@@ -65,19 +66,27 @@ class _SchoolListState extends State<SchoolList> {
                               if (snapshot.hasError)
                                 return new Text('Error: ${snapshot.error}');
                               else {
-                                var id = snapshot.data[index]['ref'].split("/")[1];
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-medical");
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-fight");
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-armed");
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-fire");
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-intruder");
-                                _firebaseMessaging.subscribeToTopic(
-                                    "$id-other");
+                                var isOwner = false;
+                                if(snapshot.data[index]['role'] == 'SiteAdmin' || snapshot.data[index]['role'] == 'Owner') {
+                                  isOwner = true;
+                                }
+
+                                UserHelper.subscribeToSchoolTopics(snapshot.data[index]['ref'], isOwner);
+//                                var id = snapshot.data[index]['ref'].split(
+//                                    "/")[1];
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-medical");
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-fight");
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-armed");
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-fire");
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-intruder");
+//                                _firebaseMessaging.subscribeToTopic(
+//                                    "$id-other");
+
                                 return new FlatButton(
                                     child: new Text(schoolSnapshot.data == null
                                         ? ''
@@ -96,6 +105,7 @@ class _SchoolListState extends State<SchoolList> {
                     },
                     itemCount: snapshot.data.length,
                   );
+                }
             }
           }),
     );

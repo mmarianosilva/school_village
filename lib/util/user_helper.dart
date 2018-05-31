@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:school_village/model/school_ref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -7,6 +8,7 @@ import 'dart:async';
 class UserHelper {
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   static final Future<SharedPreferences> _prefsFuture = SharedPreferences.getInstance();
   static SharedPreferences _prefs;
 
@@ -67,6 +69,20 @@ class UserHelper {
     return _prefs.getString("school_id");
   }
 
+  static setIsOwner(isOwner) async{
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    _prefs.setBool("is_owner", isOwner);
+  }
+
+  static getIsOwner() async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    return _prefs.getBool("is_owner");
+  }
+
   static setSelectedSchool({schoolId: String, schoolName: String, schoolRole: String}) async {
     if(_prefs == null) {
       _prefs = await _prefsFuture;
@@ -81,5 +97,26 @@ class UserHelper {
       _prefs = await _prefsFuture;
     }
     return _prefs.getString("school_name");
+  }
+
+  static subscribeToSchoolTopics(schoolId, isOwner) {
+    var id = schoolId.split(
+        "/")[1];
+    _firebaseMessaging.subscribeToTopic(
+        "$id-medical");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-fight");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-armed");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-fire");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-intruder");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-other");
+    if(isOwner) {
+      _firebaseMessaging.subscribeToTopic(
+          "$id-test");
+    }
   }
 }

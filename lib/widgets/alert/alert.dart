@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 
@@ -8,6 +9,17 @@ class Alert extends StatefulWidget {
   @override
   _AlertState createState() => new _AlertState();
 }
+
+class Choice {
+  const Choice({this.title, this.icon});
+
+  final String title;
+  final IconData icon;
+}
+
+const List<Choice> choices = const <Choice>[
+  const Choice(title: 'Test Notifications', icon: Icons.notifications)
+];
 
 class _AlertState extends State<Alert> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -19,6 +31,7 @@ class _AlertState extends State<Alert> {
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
+  Location _location = new Location();
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -75,16 +88,37 @@ class _AlertState extends State<Alert> {
     );
   }
 
-  _saveAlert(alertTitle, alertBody, alertType, context) {
+  _getLocation() async {
+    Map<String, double> location;
+    String error;
+    try {
+      location = await _location.getLocation;
+      error = null;
+    } catch (e) {
+//      if (e.code == 'PERMISSION_DENIED') {
+//        error = 'Permission denied';
+//      } else if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
+//        error = 'Permission denied - please ask the user to enable it from the app settings';
+//      }
+
+      location = null;
+    }
+    return location;
+  }
+
+  _saveAlert(alertTitle, alertBody, alertType, context) async{
     CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.document();
+
+
     document.setData(<String, dynamic>{
       'title': alertTitle,
       'body': alertBody,
       'type': alertType,
       'createdById': _userId,
       'createdBy' : name,
-      'createdAt' : new DateTime.now().millisecondsSinceEpoch
+      'createdAt' : new DateTime.now().millisecondsSinceEpoch,
+      'location' : await _getLocation()
     });
     print("Added Alert");
 
@@ -113,6 +147,10 @@ class _AlertState extends State<Alert> {
     );
   }
 
+  _select(Choice choice) {
+    _saveAlert("Test Notification", "Test Notification for $_schoolName", "test", context);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +167,28 @@ class _AlertState extends State<Alert> {
         backgroundColor: Colors.grey.shade400,
         elevation: 0.0,
         leading: new BackButton(color: Colors.grey.shade800),
+        actions: <Widget>[
+          new PopupMenuButton<Choice>(
+            onSelected: _select,
+            icon: new Icon(Icons.more_vert, color: Colors.grey.shade800),
+            itemBuilder: (BuildContext context) {
+              return choices.map((Choice choice) {
+                return new PopupMenuItem<Choice>(
+                  value: choice,
+                  child: new Row(
+                    children: <Widget>[
+                      new Icon(choice.icon, color: Colors.grey.shade800),
+                      new SizedBox(width: 8.0),
+                      new Text(choice.title)
+                    ],
+                  ),
+                );
+              }).toList();
+            },
+          ),
+        ]
       ),
+
       body: new Column(
         children: <Widget>[
           new SizedBox(height: 32.0),

@@ -109,6 +109,8 @@ PODS:
     - gRPC-RxLibrary (= 1.12.0)
   - GTMSessionFetcher/Core (1.1.15)
   - leveldb-library (1.20)
+  - location (0.0.1):
+    - Flutter
   - nanopb (0.3.8):
     - nanopb/decode (= 0.3.8)
     - nanopb/encode (= 0.3.8)
@@ -129,7 +131,8 @@ DEPENDENCIES:
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `Pods/.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - location (from `Pods/.symlinks/plugins/location/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
   - url_launcher (from `Pods/.symlinks/plugins/url_launcher/ios`)
@@ -170,7 +173,9 @@ EXTERNAL SOURCES:
   firebase_storage:
     :path: Pods/.symlinks/plugins/firebase_storage/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-release
+    :path: Pods/.symlinks/flutter/ios
+  location:
+    :path: Pods/.symlinks/plugins/location/ios
   path_provider:
     :path: Pods/.symlinks/plugins/path_provider/ios
   shared_preferences:
@@ -203,6 +208,7 @@ SPEC CHECKSUMS:
   gRPC-RxLibrary: 1ed5314e8b38cd6e55c9bfa048387136ae925ce9
   GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
+  location: 26c90953ad5916331d0d1d913898779910416487
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   path_provider: 09407919825bfe3c2deae39453b7a5b44f467873
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03

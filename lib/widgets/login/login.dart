@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../util/user_helper.dart';
+import '../contact/contact.dart';
+import '../forgot/forgot.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -50,7 +52,17 @@ class _LoginState extends State<Login> {
   }
 
   onForgot() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Forgot()),
+    );
+  }
 
+  createAccount() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Contact()),
+    );
   }
 
   @override
@@ -59,7 +71,10 @@ class _LoginState extends State<Login> {
     return new Scaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
-        leading: new Image.asset('assets/images/logo.png'),
+        leading: new Container(
+          padding: new EdgeInsets.all(8.0),
+          child: new Image.asset('assets/images/logo.png'),
+        ),
         title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
         backgroundColor: Colors.grey.shade400,
         elevation: 0.0,
@@ -104,6 +119,11 @@ class _LoginState extends State<Login> {
               new FlatButton(
                   onPressed: onForgot,
                   child: new Text("Forgot Password?")
+              ),
+              const SizedBox(height: 18.0),
+              new FlatButton(
+                  onPressed: createAccount,
+                  child: new Text("Create Account")
               )
             ],
           ),

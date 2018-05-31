@@ -19,7 +19,7 @@ void main() => runApp(new MaterialApp(
     ),
     routes: <String, WidgetBuilder> {
         '/home': (BuildContext context) => new Home(),
-        '/login': (BuildContext context) => new Login()
+        '/login': (BuildContext context) => new Login(),
     },
     navigatorObservers: [
         new FirebaseAnalyticsObserver(analytics: analytics),
