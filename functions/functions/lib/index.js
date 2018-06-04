@@ -4,6 +4,9 @@ const functions = require("firebase-functions");
 const admin = require('firebase-admin');
 const firebase = require('firebase');
 admin.initializeApp();
+const express = require('express');
+const cors = require('cors')({ origin: true });
+const app = express();
 const config = {
     apiKey: "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI",
     authDomain: "schoolvillage-1.firebaseapp.com",
@@ -15,6 +18,10 @@ const config = {
 firebase.initializeApp(config);
 const firestore = admin.firestore();
 const auth = admin.auth();
+const api_key = 'key-861655fab39100239813b724618e190d-b892f62e-f2a64b99';
+const domain = 'schoolvillage.org';
+const mailgun = require('mailgun-js')({ apiKey: api_key, domain: domain });
+const bodyParser = require('body-parser');
 exports.schoolNotificationWrite = functions.firestore
     .document('schools/{schoolId}/notifications/{notificationId}')
     .onWrite((change, context) => {
@@ -56,4 +63,51 @@ exports.onUserCreate = functions.auth.user().onCreate((user) => {
         return firebase.auth().sendPasswordResetEmail(user.email);
     });
 });
+app.use(cors);
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.post('/contact', (req, res) => {
+    console.log("Adding new contact entry");
+    const body = {
+        firstName: req.body.firstName ? req.body.firstName : "",
+        lastName: req.body.lastName ? req.body.lastName : "",
+        email: req.body.email ? req.body.email : "",
+        phone: req.body.phone ? req.body.phone : "",
+        schoolDistrict: req.body.schoolDistrict ? req.body.schoolDistrict : "",
+        comments: req.body.comments ? req.body.comments : ""
+    };
+    console.log(body);
+    const collectionRef = firestore.collection("requests");
+    collectionRef.add(body).then(documentReference => {
+        const mail = {
+            from: 'School Village Owner <schoolvillageowner@gmail.com>',
+            to: 'schoolvillageowner@gmail.com',
+            subject: 'New Contact Submission',
+            text: `
+      First Name: ${body.firstName} <br>
+      Last Name:  ${body.lastName} <br>
+      Email:  ${body.email} <br>
+      Phone:  ${body.phone} <br>
+      School District:  ${body.schoolDistrict} <br>
+      Comments:  ${body.comments} <br>
+      `
+        };
+        mailgun.messages().send(mail, function (error, mailResp) {
+            console.log(mailResp);
+            if (!error) {
+                res.send("Success");
+            }
+            else {
+                console.error(error);
+                res.status(500).send('Server Error');
+            }
+        });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).send('Server Error');
+    });
+});
+exports.api = functions.https.onRequest(app);
 //# sourceMappingURL=index.js.map
