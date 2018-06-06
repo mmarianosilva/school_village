@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Recent Posts</h4>
+        <h6 class="card-subtitle">Venenatis portauam Inceptos ameteiam</h6>
+    </div>
+
+    <div class="listview listview--hover">
+        <a *ngFor="let recentPostData of recentPostData" class="listview__item listview__item--hover">
+            <img [src]="recentPostData.avatar" class="listview__img" alt="">
+
+            <div class="listview__content">
+                <h3 class="listview__heading">{{ recentPostData.user }}</h3>
+                <p>{{ recentPostData.post }}</p>
+            </div>
+        </a>
+
+        <a href="" class="view-more">View All Posts</a>
+    </div>
+</div>

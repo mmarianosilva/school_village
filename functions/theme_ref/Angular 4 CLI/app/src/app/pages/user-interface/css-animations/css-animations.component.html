@@ -1,0 +1,371 @@
+<section class="content">
+  <header class="content__title">
+    <h1>CSS Animations</h1>
+    <small>animate.css is a bunch of cool, fun, and cross-browser animations for you to use in your projects. Great for emphasis, home pages, sliders, and general just-add-water-awesomeness.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/user-interface/css-animations']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/user-interface/css-animations']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/user-interface/css-animations']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/user-interface/css-animations']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/user-interface/css-animations']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="row">
+    <div class="col-md-4 col-sm-6">
+      <div class="card animation-demo">
+        
+        <div class="card-body">
+          <h4 class="card-title">Attention Seekers</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/1.png" alt="" [ngClass]="animationClasses.attentionSeekers">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'bounce')">bounce</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'flash')">flash</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'pulse')">pulse</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'rubberBand')">rubberBand</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'shake')">shake</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'swing')">swing</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'tada')">tada</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('attentionSeekers', 'wobble')">wobble</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Flippers</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/6.png" alt="" [ngClass]="animationClasses.flippers">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('flippers', 'flip')">flip</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('flippers', 'flipInX')">flipInX</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('flippers', 'flipInY')">flipInY</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('flippers', 'flipOutX')">flipOutX</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('flippers', 'flipOutY')">flipOutY</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Light Speed</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/7.png" alt="" [ngClass]="animationClasses.lightSpeed">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('lightSpeed', 'lightSpeedIn')">lightSpeedIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('lightSpeed', 'lightSpeedOut')">lightSpeedOut</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Specials</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/1.png" alt="" [ngClass]="animationClasses.specials">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('specials', 'hinge')">hinge</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('specials', 'rollIn')">rollIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('specials', 'rollOut')">rollOut</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Bouncing Entrances</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/2.png" alt="" [ngClass]="animationClasses.bouncingEntrances">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingEntrances', 'bounceIn')">bounceIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingEntrances', 'bounceInDown')">bounceInDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingEntrances', 'bounceInLeft')">bounceInLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingEntrances', 'bounceInRight')">bounceInRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingEntrances', 'bounceInUp')">bounceInUp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Bouncing Exits</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/3.png" alt="" [ngClass]="animationClasses.bouncingExits">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingExits', 'bounceOut')">bounceOut</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingExits', 'bounceOutDown')">bounceOutDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingExits', 'bounceOutLeft')">bounceOutLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingExits', 'bounceOutRight')">bounceOutRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('bouncingExits', 'bounceOutUp')">bounceOutUp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Rotating Entrances</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/8.png" alt="" [ngClass]="animationClasses.rotatingEntrances">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingEntrances', 'rotateIn')">rotateIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingEntrances', 'rotateInDownLeft')">rotateInDownLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingEntrances', 'rotateInDownRight')">rotateInDownRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingEntrances', 'rotateInUpLeft')">rotateInUpLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingEntrances', 'rotateInUpRight')">rotateInUpRight</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Rotating Exits</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/9.png" alt="" [ngClass]="animationClasses.rotatingExits">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingExits', 'rotateOut')">rotateOut</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingExits', 'rotateOutDownLeft')">rotateOutDownLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingExits', 'rotateOutDownRight')">rotateOutDownRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingExits', 'rotateOutUpLeft')">rotateOutUpLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('rotatingExits', 'rotateOutUpRight')">rotateOutUpRight</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Fading Entrances</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/4.png" alt="" [ngClass]="animationClasses.fadingEntrances">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeIn')">fadeIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInDown')">fadeInDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInDownBig')">fadeInDownBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInLeft')">fadeInLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInLeftBig')">fadeInLeftBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInRight')">fadeInRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInRightBig')">fadeInRightBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInUp')">fadeInUp</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingEntrances', 'fadeInUpBig')">fadeInUpBig</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Fading Exits</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/5.png" alt="" [ngClass]="animationClasses.fadingExits">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOut')">fadeOut</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutDown')">fadeOutDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutDownBig')">fadeOutDownBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutLeft')">fadeOutLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutLeftBig')">fadeOutLeftBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutRight')">fadeOutRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutRightBig')">fadeOutRightBig</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutUp')">fadeOutUp</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('fadingExits', 'fadeOutUpBig')">fadeOutUpBig</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Zoom Entrances</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/4.png" alt="" [ngClass]="animationClasses.zoomEntrances">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomEntrances', 'zoomIn')">zoomIn</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomEntrances', 'zoomInDown')">zoomInDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomEntrances', 'zoomInLeft')">zoomInLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomEntrances', 'zoomInRight')">zoomInRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomEntrances', 'zoomInUp')">zoomInUp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card animation-demo">
+        <div class="card-body">
+          <h4 class="card-title">Zoom Exits</h4>
+          <h6 class="card-subtitle">Click on the buttons below to start the animation</h6>
+
+          <img class="animated" src="./assets/demo/img/headers/sm/3.png" alt="" [ngClass]="animationClasses.zoomExits">
+
+          <div class="row">
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomExits', 'zoomOut')">zoomOut</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomExits', 'zoomOutDown')">zoomOutDown</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomExits', 'zoomOutLeft')">zoomOutLeft</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomExits', 'zoomOutRight')">zoomOutRight</button>
+            </div>
+            <div class="col-sm-6">
+              <button class="btn btn-info" (click)="setAnimation('zoomExits', 'zoomOutUp')">zoomOutUp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,71 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Time Picker</h1>
+        <small>A lightweight & configurable timepicker directive.</small>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/time-picker']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/pagination']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/components/time-picker']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/components/time-picker']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/components/time-picker']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Basic example</h4>
+                    <h6 class="card-subtitle">Basic timepicker with least configurations.</h6>
+
+                    <timepicker [(ngModel)]="timePickerValue" [readonlyInput]="!isTimePickerEnabled" class="timepicker"></timepicker>
+
+                    <div class="form-group mt-4">
+                        <input type="text" value="{{timePickerValue | date:'shortTime'}}" class="form-control">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Meridian</h4>
+                    <h6 class="card-subtitle">24 Hour mode.</h6>
+
+                    <timepicker [(ngModel)]="timePickerMeridianValue" [readonlyInput]="!isTimePickerEnabled" class="timepicker" [showMeridian]="false"></timepicker>
+
+                    <div class="form-group mt-4">
+                        <input type="text" value="{{timePickerMeridianValue | date: 'HH:mm'}}" class="form-control">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Custom steps</h4>
+                    <h6 class="card-subtitle">Custom step for hours and minutes.</h6>
+
+                    <timepicker [(ngModel)]="timePickerValue" [readonlyInput]="!isTimePickerEnabled" [hourStep]="2" [minuteStep]="1" class="timepicker"></timepicker>
+
+                    <div class="form-group mt-4">
+                        <input type="text" value="{{timePickerValue | date:'shortTime'}}" class="form-control">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-danger" (click)="isTimePickerEnabled=!isTimePickerEnabled">Enable/Disable all timepickers</button>
+</section>

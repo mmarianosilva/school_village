@@ -1,0 +1,80 @@
+<section class="content">
+    <header class="content__title">
+        <h1>jQuery Sparkline</h1>
+        <small>This plugin generates sparklines (small inline charts) directly in the browser using data supplied either
+            inline in the HTML, or via javascript.
+        </small>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/charts/sparklines']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/charts/sparklines']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/charts/sparklines']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/charts/sparklines']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/charts/sparklines']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-md-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Bar Chart</h4>
+
+                    <sparkline [dataset]="sparklineBarData" [options]="sparklineBarOptions"></sparkline>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Bullet Chart</h4>
+
+                    <sparkline [dataset]="sparklineBulletData" [options]="sparklineBulletOptions"></sparkline>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Tristate Chart</h4>
+
+                    <sparkline [dataset]="sparklineTristateData" [options]="sparklineTristateOptions"></sparkline>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Line Chart</h4>
+
+                    <sparkline [dataset]="sparklineLineData" [options]="sparklineLineOptions"></sparkline>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Discrete Chart</h4>
+
+                    <sparkline [dataset]="sparklineDiscreteData" [options]="sparklineDiscreteOptions"></sparkline>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sparkline Pie Charts</h4>
+
+                    <sparkline [dataset]="sparklinePieData[1]" [options]="sparklinePieOptions"></sparkline>
+                    <sparkline [dataset]="sparklinePieData[2]" [options]="sparklinePieOptions"></sparkline>
+                    <sparkline [dataset]="sparklinePieData[3]" [options]="sparklinePieOptions"></sparkline>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

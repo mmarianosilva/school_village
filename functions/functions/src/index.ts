@@ -24,7 +24,7 @@ firebase.initializeApp(config);
 const firestore = admin.firestore();
 const auth = admin.auth();
 
-const api_key = 'key-861655fab39100239813b724618e190d-b892f62e-f2a64b99';
+const api_key = '861655fab39100239813b724618e190d-b892f62e-f2a64b99';
 const domain = 'schoolvillage.org';
 const mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
 const bodyParser = require('body-parser')
@@ -52,7 +52,9 @@ exports.schoolNotificationWrite = functions.firestore
               },
               data: {
                 body : body['body'],
-                title: body['title']
+                title: body['title'],
+                notificationId: notificationId,
+                schoolId: schoolId
               }
              };
              const topic = schoolId+"-"+body["type"];
@@ -79,6 +81,14 @@ exports.onUserCreate = functions.auth.user().onCreate((user) => {
           });
 
 app.use(cors);
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
@@ -102,10 +112,10 @@ app.post('/contact', (req, res) => {
   
   collectionRef.add(body).then(documentReference => {
     const mail = {
-      from: 'School Village Owner <schoolvillageowner@gmail.com>',
-      to: 'schoolvillageowner@gmail.com',
+      from: 'schoolvillageowner@gmail.com',
+      to: 'mwiggins@schoolvillage.org',
       subject: 'New Contact Submission',
-      text: 
+      html: 
       `
       First Name: ${body.firstName} <br>
       Last Name:  ${body.lastName} <br>

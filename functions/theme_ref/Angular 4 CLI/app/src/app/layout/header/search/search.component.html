@@ -1,0 +1,4 @@
+<div class="search" [class.search--focus]="searchFocused">
+  <input type="text" placeholder="Search for people, files, documents..." class="search__text" [(ngModel)]="searchValue" (focus)="searchFocused = true" (blur)="closeSearch()">
+  <i class="zmdi zmdi-search search__helper" (click)="closeSearch()"></i>
+</div>

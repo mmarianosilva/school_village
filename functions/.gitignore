@@ -1,0 +1,35 @@
+
+.DS_STORE
+
+/ui/dist/
+/ui/bazel-*
+/ui/e2e_test.*
+/ui/node_modules
+/ui/bower_components
+
+# Include when developing application packages.
+/ui/pubspec.lock
+/ui/.c9
+/ui/.idea/
+/ui/.settings/
+*.swo
+/ui/modules/.settings
+.vscode
+modules/.vscode
+
+# Don't check in secret files
+/ui/*secret.js
+/ui/src/environments/environment.ts
+/ui/src/environments/environment.prod.ts
+
+# Ignore npm/yarn debug log
+/ui/npm-debug.log
+/ui/yarn-error.log
+
+# build-analytics
+/ui/.build-analytics
+
+# rollup-test output
+/ui/modules/rollup-test/dist/
+
+/functions/node_modules

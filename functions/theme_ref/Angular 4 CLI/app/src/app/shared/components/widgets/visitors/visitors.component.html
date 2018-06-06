@@ -1,0 +1,35 @@
+<div class="card widget-visitors">
+    <div class="card-body">
+        <h4 class="card-title">Realtime Visitors</h4>
+        <h6 class="card-subtitle">Nullam dolor isnibh ultricies vehicula adipiscing</h6>
+
+        <div class="widget-visitors__stats">
+            <div>
+                <strong>23528</strong>
+                <small>Visitor for last 24 hours</small>
+            </div>
+            <div>
+                <strong>746</strong>
+                <small>Visitors last 30 minutes</small>
+            </div>
+        </div>
+
+        <div JqvMap [options]="visitorsMap" [height]="250"></div>
+    </div>
+
+    <div class="listview listview--bordered">
+        <div *ngFor="let visitorData of visitorsData" class="listview__item">
+            <div class="listview__content">
+                <p>{{ visitorData.date }}</p>
+
+                <div class="listview__attrs">
+                    <span><img class="widget-visitors__country" [src]="visitorData.img" alt=""> {{ visitorData.country }}</span>
+                    <span>{{ visitorData.browser }}</span>
+                    <span>{{ visitorData.os }}</span>
+                </div>
+            </div>
+        </div>
+
+        <a href="" class="view-more">View All</a>
+    </div>
+</div>

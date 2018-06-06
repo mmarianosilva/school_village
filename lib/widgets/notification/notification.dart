@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart' ;
 
 class NotificationDetail extends StatelessWidget {
   final DocumentSnapshot notification;
@@ -11,14 +12,54 @@ class NotificationDetail extends StatelessWidget {
 
   NotificationDetail({Key key, this.notification}) : super(key: key);
 
+  _showCallOptions(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            title: new Text('Contact Reporter'),
+            content: new Text("Do you want to contact ${notification['reportedByPhone']} ?"),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('SMS'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  launch(Uri.encodeFull("sms:${notification['reportedByPhone']}"));
+                },
+              ),
+              new FlatButton(
+                child: new Text('Phone'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  launch(Uri.encodeFull("tel:${notification['reportedByPhone']}"));
+                },
+              )
+            ],
+          );
+        }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = new List();
 
     if(notification["location"] != null) {
       widgets.add(
-          new Image.network(
-              "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&size=640x400&key=$_staticMapKey")
+        new GestureDetector(
+          onTap: () {
+            launch("https://www.google.com/maps/@?api=1&map_action=map&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
+          },
+          child: new Image.network(
+              "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=640x400&maptype=hybrid&key=$_staticMapKey"),
+        )
+          
       );
     }
     widgets.add(
@@ -34,7 +75,13 @@ class NotificationDetail extends StatelessWidget {
               new SizedBox(height: 8.0,),
               new Text("Reported by ${notification['createdBy']}"),
               new SizedBox(height: 8.0,),
-              new Text("Reported at ${new DateTime.fromMillisecondsSinceEpoch(notification['createdAt'])}")
+              new Text("Reported at ${new DateTime.fromMillisecondsSinceEpoch(notification['createdAt'])}"),
+              new SizedBox(height: 16.0,),
+              (notification['reportedByPhone'] != null ? new GestureDetector(
+                  onTap: () => _showCallOptions(context),
+                  child: new Text("Contact", style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
+              ) : new SizedBox()),
+
             ],
           ),
         )

@@ -1,0 +1,14 @@
+// Import Bootstrap and App variables and mixins
+@import "../../../../../assets/scss/inner-imports";
+
+
+.widget-contacts__map {
+  display: block;
+  padding: 3px;
+
+  img {
+    width: 100%;
+    border-radius: $border-radius;
+    margin: -10px 0 -1px;
+  }
+}

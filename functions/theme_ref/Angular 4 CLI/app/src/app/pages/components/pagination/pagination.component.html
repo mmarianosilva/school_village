@@ -1,0 +1,103 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Pagination</h1>
+    <small>Provide pagination links for your site or app with the multi-page pagination component, or the simpler pager alternative..</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/pagination']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/pagination']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/components/pagination']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/pagination']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/pagination']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic examples</h4>
+      <h6 class="card-subtitle">Bootstrap's pagination is highly customized in Material Admin to match the overall look and feel of the template thus most of it's Bootstrap customization such as sizing, custom texts would not work here.</h6>
+
+      <h3 class="card-body__title">Complete</h3>
+      <br>
+
+      <pagination [boundaryLinks]="true"
+                  [totalItems]="paginTotalItems"
+                  [(ngModel)]="paginCurrentPage">
+      </pagination>
+
+      <br>
+      <br>
+      <h3 class="card-body__title">Boundary links disabled</h3>
+      <br>
+
+      <pagination [totalItems]="paginTotalItems"
+                  [(ngModel)]="paginCurrentPage"
+                  (pageChanged)="pageChanged($event)">
+      </pagination>
+
+      <br>
+      <br>
+      <h3 class="card-body__title">Direction links disabled</h3>
+      <br>
+
+      <pagination [directionLinks]="false"
+                  [boundaryLinks]="true"
+                  [totalItems]="paginTotalItems"
+                  [(ngModel)]="paginCurrentPage">
+      </pagination>
+
+      <br>
+      <br>
+      <h3 class="card-body__title">Number only</h3>
+      <br>
+
+      <pagination [directionLinks]="false"
+                  [totalItems]="paginTotalItems"
+                  [(ngModel)]="paginCurrentPage"
+                  (numPages)="paginNumPages = $event">
+      </pagination>
+
+      <br>
+      <br>
+
+      <pre>The selected page no: {{paginCurrentPage}}/{{paginNumPages}}</pre>
+
+      <br>
+
+      <button type="button" class="btn btn-primary" (click)="setPage(3)">Set current page to: 3</button>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">States & Limits</h4>
+      <h6 class="card-subtitle">Limit the maximum visible buttons</h6>
+
+      <pagination [totalItems]="paginBigTotalItems"
+                  [(ngModel)]="paginBigCurrentPage"
+                  [maxSize]="paginMaxSize"
+                  [boundaryLinks]="true">
+      </pagination>
+
+      <br>
+
+      <pagination [totalItems]="paginBigTotalItems"
+                  [(ngModel)]="paginBigCurrentPage"
+                  [maxSize]="paginMaxSize"
+                  [boundaryLinks]="true"
+                  [rotate]="false" (numPages)="paginNumPages = $event">
+      </pagination>
+
+      <br>
+      <br>
+
+      <pre>Page: {{paginBigCurrentPage}} / {{paginNumPages}}</pre>
+    </div>
+  </div>
+</section>

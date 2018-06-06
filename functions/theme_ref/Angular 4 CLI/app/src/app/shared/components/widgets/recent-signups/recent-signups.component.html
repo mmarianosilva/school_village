@@ -1,0 +1,28 @@
+<div class="card card--inverse widget-signups">
+  <div class="card-body">
+    <h4 class="card-title">Most Recent Signups</h4>
+    <h6 class="card-subtitle">Magna cursus malesuada lacinia</h6>
+
+    <div class="actions actions--inverse">
+      <div dropdown class="actions__item">
+        <i dropdownToggle class="zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/widgets']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/widgets']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/widgets']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget-signups__chart mt-2">
+      <sparkline [options]="signupChartOptions" [dataset]="signupChartData"></sparkline>
+    </div>
+  </div>
+
+  <div class="widget-signups__list">
+    <a *ngFor="let signupData of signupData" [routerLink]="['/widgets']" >
+      <div *ngIf="!signupData.avatar" class="avatar-char">{{ signupData.letter }}</div>
+      <img *ngIf="signupData.avatar" class="avatar-img" [src]="signupData.avatar" alt="">
+    </a>
+  </div>
+</div>

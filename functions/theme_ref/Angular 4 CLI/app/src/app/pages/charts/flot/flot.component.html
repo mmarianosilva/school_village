@@ -1,0 +1,65 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Flot</h1>
+        <small>Flot is a pure JavaScript plotting library for jQuery, with a focus on simple usage, attractive looks and
+            interactive features.
+        </small>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/charts/flot']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/charts/flot']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/charts/flot']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/charts/flot']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/charts/flot']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Line Chart with curved edges</h4>
+                    <h6 class="card-subtitle">Curved edges made possible with the help of curvedLines Flot plugin.</h6>
+
+                    <div flot [options]="curvedEdgeChartOptions" [dataset]="curvedEdgeChartData" [height]="200"></div>
+                    <div class="flot-chart-legends flot-chart-legends--curved"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Bar Chart</h4>
+                    <h6 class="card-subtitle">flot-orderBars plugin is used to stack the bars.</h6>
+
+                    <div flot [options]="barChartOptions" [dataset]="barChartData" [height]="200"></div>
+                    <div class="flot-chart-legends flot-chart-legends--bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Line Chart</h4>
+
+                    <div flot [options]="lineChartOptions" [dataset]="lineChartData" [height]="200"></div>
+                    <div class="flot-chart-legends flot-chart-legends--lines"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Pie Chart</h4>
+
+                    <div flot [options]="pieChartOptions" [dataset]="pieChartData" [height]="250"></div>
+                    <div class="flot-chart-legends flot-chart-legends--pie"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

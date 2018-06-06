@@ -1,0 +1,12 @@
+<div class="card widget-pictures">
+  <div class="card-header">
+    <h2 class="card-title">Augue laoreet rutrum</h2>
+    <small class="card-subtitle">Cras congue nec lorem eget posuere</small>
+  </div>
+
+  <div class="widget-pictures__body row">
+    <a class="col-4" *ngFor="let pictureData of picturesData" href="">
+      <img [src]="pictureData" alt="">
+    </a>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+.accordion {
+  .card {
+    box-shadow: none;
+    border: 1px solid $input-border-color;
+    margin-bottom: -1px;
+  }
+
+  .card-header {
+    border-bottom: 1px solid $input-border-color;
+    margin-bottom: -1px;
+    padding: 0;
+
+    & > a {
+      color: $headings-color;
+      display: block;
+      padding: $card-spacer-y/2 $card-spacer-x;
+
+      &:hover {
+        background-color: $gray-50;
+      }
+    }
+  }
+}

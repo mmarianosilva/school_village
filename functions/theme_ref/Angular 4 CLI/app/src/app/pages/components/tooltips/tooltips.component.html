@@ -1,0 +1,68 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Tooltips</h1>
+        <small>Inspired by the excellent Tipsy jQuery plugin written by Jason Frame. Tooltips are an updated version,
+            which don’t rely on images, use CSS3 for animations, and much more.
+        </small>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/tooltips']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/tooltips']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/components/tooltips']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/components/tooltips']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/components/tooltips']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Examples</h4>
+            <h6 class="card-subtitle">Hover over the links below to see tooltips.</h6>
+
+            Tight pants next level <a [routerLink]="['/components/tooltips']" tooltip="Default tooltip">keffiyeh</a> you probably haven't heard of them. Photo booth beard raw denim letterpress
+            vegan messenger bag <a [routerLink]="['/components/tooltips']" tooltip="Another tooltip">stumptown</a>. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american
+            apparel have a terry richardson vinyl chambray. Beard stumptown, cardigans banh mi lomo <a [routerLink]="['/components/tooltips']" tooltip="Another one here">thundercats</a>. Tofu
+            biodiesel williamsburg marfa, four loko mcsweeney's cleanse vegan chambray. A really ironic artisan whatever
+            keytar, scenester farm-to-table <a [routerLink]="['/components/tooltips']" tooltip="Last one">banksy Austin twitter</a> handle freegan cred raw denim single-origin coffee
+            viral.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">All four directions</h4>
+            <h6 class="card-subtitle">Four positioning options are available: top, right, bottom, and left aligned.</h6>
+
+            <div class="btn-demo">
+                <button type="button" class="btn btn-primary"
+                        tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                        placement="left">
+                    Tooltip on left
+                </button>
+
+                <button type="button" class="btn btn-primary"
+                        tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                        placement="top">
+                    Tooltip on top
+                </button>
+
+                <button type="button" class="btn btn-primary"
+                        tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                        placement="bottom">
+                    Tooltip on bottom
+                </button>
+
+                <button type="button" class="btn btn-primary"
+                        tooltip="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                        placement="right">
+                    Tooltip on right
+                </button>
+            </div>
+        </div>
+    </div>
+</section>

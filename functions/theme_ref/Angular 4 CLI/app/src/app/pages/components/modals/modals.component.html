@@ -1,0 +1,181 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Modals</h1>
+    <small>Modals are streamlined, but flexible, dialog prompts with the minimum required functionality and smart defaults.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/modals']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/modals']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/components/modals']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/modals']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/modals']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <p>Below is a static modal example (meaning its position and display have been overridden). Included are the modal header, modal body (required for padding), and modal footer (optional). We ask that you include modal headers with dismiss actions whenever possible, or provide another explicit dismiss action.</p>
+
+      <br>
+
+      <div class="modal-demo">
+        <div class="modal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+              </div>
+              <div class="modal-body">
+                <p>Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis..</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-link">Save changes</button>
+                <button type="button" class="btn btn-link">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <br>
+
+      <h3 class="card-body__title">Modal sizes</h3>
+      <p>Modals have two optional sizes available via modifier classes.</p>
+
+      <br>
+
+      <div class="btn-demo">
+        <button class="btn btn-light" (click)="ModalDefault.show()">Default modal</button>
+        <button class="btn btn-light" (click)="ModalLarge.show()">Large modal</button>
+        <button class="btn btn-light" (click)="ModalSmall.show()">Small modal</button>
+      </div>
+
+      <!-- Default -->
+      <div bsModal #ModalDefault="bs-modal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Default modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalDefault.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Large -->
+      <div bsModal #ModalLarge="bs-modal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Large modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalLarge.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Small -->
+      <div bsModal #ModalSmall="bs-modal" class="modal fade">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Small modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalSmall.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+      <br>
+
+      <h3 class="card-body__title">Other examples</h3>
+
+      <br>
+
+      <div class="btn-demo">
+        <button class="btn btn-light" (click)="ModalBackdropDisabled.show()">Backdrop disabled</button>
+        <button class="btn btn-light" (click)="ModalIgnoreBackdropClick.show()">Ignore backdrop click</button>
+        <button class="btn btn-light" (click)="ModalKeyboardDisabled.show()">Keyboard disabled</button>
+      </div>
+
+      <!-- Backdrop disabled -->
+      <div bsModal #ModalBackdropDisabled="bs-modal" class="modal fade" [config]="{ backdrop: false }">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Default modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalBackdropDisabled.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ignore backdrop click -->
+      <div bsModal #ModalIgnoreBackdropClick="bs-modal" class="modal fade" [config]="{ ignoreBackdropClick: true }">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Default modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalIgnoreBackdropClick.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Keyboard disabled -->
+      <div bsModal #ModalKeyboardDisabled="bs-modal" class="modal fade" [config]="{ keyboard: false }">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title pull-left">Default modal</h5>
+            </div>
+            <div class="modal-body">
+              Curabitur blandit mollis lacus. Nulla sit amet est. Suspendisse nisl elit, rhoncus eget, elementum ac, condimentum eget, diam. Donec mi odio, faucibus at, scelerisque quis, convallis in, nisi. Cras sagittis.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link">Save changes</button>
+              <button type="button" class="btn btn-link" (click)="ModalKeyboardDisabled.hide()">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

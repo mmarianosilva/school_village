@@ -1,0 +1,136 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Buttons</h1>
+    <small>Buttons can also behave like a set of checkboxes, radio buttons, or a hybrid where radio buttons can be unchecked.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/buttons']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/buttons']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <a [routerLink]="['/components/buttons']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/buttons']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/buttons']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Single button</h4>
+      <h6 class="card-subtitle">Default static button with two states.</h6>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary"
+                [(ngModel)]="buttonSingleModel"
+                btnCheckbox
+                btnCheckboxTrue="1"
+                btnCheckboxFalse="0">
+          Single Toggle
+        </button>
+
+        <button type="button" class="btn btn-success"
+                [(ngModel)]="buttonSingleModel"
+                btnCheckbox
+                btnCheckboxTrue="1"
+                btnCheckboxFalse="0">
+          Single Toggle
+        </button>
+
+        <button type="button" class="btn btn-danger"
+                [(ngModel)]="buttonSingleModel"
+                btnCheckbox
+                btnCheckboxTrue="1"
+                btnCheckboxFalse="0">
+          Single Toggle
+        </button>
+      </div>
+
+      <br>
+
+      <pre>{{buttonSingleModel}}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Checkbox</h4>
+      <h6 class="card-subtitle">Checkbox-like buttons set with variable states.</h6>
+
+      <div class="btn-demo">
+        <div class="btn-group">
+          <label class="btn btn-primary" [(ngModel)]="buttonCheckModel.left" btnCheckbox>Left</label>
+          <label class="btn btn-primary" [(ngModel)]="buttonCheckModel.middle" btnCheckbox>Middle</label>
+          <label class="btn btn-primary" [(ngModel)]="buttonCheckModel.right" btnCheckbox>Right</label>
+        </div>
+
+        <div class="btn-group">
+          <label class="btn btn-success" [(ngModel)]="buttonCheckModel.left" btnCheckbox>Left</label>
+          <label class="btn btn-success" [(ngModel)]="buttonCheckModel.middle" btnCheckbox>Middle</label>
+          <label class="btn btn-success" [(ngModel)]="buttonCheckModel.right" btnCheckbox>Right</label>
+        </div>
+
+        <div class="btn-group">
+          <label class="btn btn-danger" [(ngModel)]="buttonCheckModel.left" btnCheckbox>Left</label>
+          <label class="btn btn-danger" [(ngModel)]="buttonCheckModel.middle" btnCheckbox>Middle</label>
+          <label class="btn btn-danger" [(ngModel)]="buttonCheckModel.right" btnCheckbox>Right</label>
+        </div>
+      </div>
+
+      <br>
+
+      <pre>
+Left: {{buttonCheckModel.left}}
+Middle: {{buttonCheckModel.middle}}
+Right: {{buttonCheckModel.right}}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Radio & Uncheckable Radio</h4>
+      <h6 class="card-subtitle">Radio buttons with checked/unchecked states.</h6>
+
+      <div class="demo-inline-wrapper">
+        <h3 class="card-body__title mb-3">Radio</h3>
+
+        <div class="btn-group">
+          <label class="btn btn-primary" [(ngModel)]="buttonRadioModel" btnRadio="Left">Left</label>
+          <label class="btn btn-primary" [(ngModel)]="buttonRadioModel" btnRadio="Middle">Middle</label>
+          <label class="btn btn-primary" [(ngModel)]="buttonRadioModel" btnRadio="Right">Right</label>
+        </div>
+      </div>
+
+      <div class="demo-inline-wrapper">
+        <h3 class="card-body__title mb-3">Uncheckable Radio</h3>
+
+        <div class="btn-group">
+          <label class="btn btn-success" [(ngModel)]="buttonRadioModel" btnRadio="Left" uncheckable>Left</label>
+          <label class="btn btn-success" [(ngModel)]="buttonRadioModel" btnRadio="Middle" uncheckable>Middle</label>
+          <label class="btn btn-success" [(ngModel)]="buttonRadioModel" btnRadio="Right" uncheckable>Right</label>
+        </div>
+      </div>
+
+      <br>
+
+      <pre>{{ buttonRadioModel || 'null' }}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Disabled Buttons</h4>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary" [disabled]="true">Disabled</button>
+        <button type="button" class="btn btn-secondary" [disabled]="true">Disabled</button>
+        <button type="button" class="btn btn-success" [disabled]="true">Disabled</button>
+        <button type="button" class="btn btn-info" [disabled]="true">Disabled</button>
+        <button type="button" class="btn btn-warning" [disabled]="true">Disabled</button>
+        <button type="button" class="btn btn-danger" [disabled]="true">Disabled</button>
+      </div>
+    </div>
+  </div>
+</section>

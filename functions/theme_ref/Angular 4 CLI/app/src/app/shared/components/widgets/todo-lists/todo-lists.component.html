@@ -1,0 +1,36 @@
+<div class="card todo">
+    <div class="card-body">
+        <h4 class="card-title">Todo lists</h4>
+        <h6 class="card-subtitle">Venenatis portauam Inceptos ameteiam</h6>
+    </div>
+
+    <div class="listview">
+        <div *ngFor="let todoListData of todoListData" class="listview__item">
+            <label class="custom-control custom-control--char todo__item">
+                <input class="custom-control-input" type="checkbox" value="" checked="{{ todoListData.checked }}">
+                <span class="custom-control--char__helper"><i class="{{ todoListData.color }}">{{ todoListData.letter }}</i></span>
+                <div class="todo__info">
+                    <span>{{ todoListData.todo }}</span>
+                    <small>{{ todoListData.venue }}</small>
+                </div>
+
+                <div class="listview__attrs">
+                    <span>{{ todoListData.category }}</span>
+                    <span>{{ todoListData.priority }}</span>
+                </div>
+            </label>
+
+            <div class="actions listview__actions">
+                <div dropdown class="actions__item">
+                    <i dropdownToggle class="zmdi zmdi-more-vert"></i>
+                    <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" [routerLink]="['/home']">Mark as completed</a>
+                        <a class="dropdown-item" [routerLink]="['/home']">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="" class="view-more">View More</a>
+    </div>
+</div>

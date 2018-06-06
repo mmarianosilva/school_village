@@ -1,0 +1,72 @@
+.dropzone {
+    border: 0;
+    background-color: rgba(255,255,255,.04);
+    border-radius: 2px;
+
+    .dz-preview {
+        background-color: transparent !important;
+
+        .dz-image {
+            border-radius: 2px !important;
+        }
+
+        .dz-remove {
+            position: absolute;
+            top: -3px;
+            right: -4px;
+            z-index: 20;
+            font-size: 0;
+            width: 20px;
+            height: 20px;
+            background-color: @m-red;
+            border-radius: 50%;
+
+            &:hover {
+                background-color: darken(@m-red, 5%);
+                text-decoration: none;
+            }
+
+            &:before {
+                content: '\f136';
+                font-size: 11px;
+                font-family: @font-icon-md;
+                color: #fff;
+                font-weight: bold;
+                line-height: 20px;
+            }
+        }
+    }
+
+    .dz-message {
+        span {
+            font-size: 20px;
+            color: rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,.04);
+            padding: 15px 20px;
+            display: inline-block;
+            border-radius: 5px;
+            .transition(all);
+            .transition-duration(300ms);
+
+            &:before {
+                content: '\f21e';
+                font-family: @font-icon-md;
+                margin: -6px 10px 0 0;
+                font-size: 25px;
+                display: inline-block;
+                position: relative;
+                top: 2px;
+            }
+        }
+    }
+
+    &:hover {
+        .dz-message {
+            span {
+                border-color: rgba(255,255,255,0.1);
+                color: rgba(255,255,255,0.5)
+            }
+        }
+    }
+
+}

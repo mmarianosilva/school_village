@@ -1,0 +1,38 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Collapse</h1>
+    <small>Collapse component allows you to toggle content on your pages with a bit of JavaScript and some classes. Flexible component that utilizes a handful of classes for easy toggle behavior.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/collapse']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/collapse']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <a [routerLink]="['/components/collapse']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/collapse']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/collapse']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic example</h4>
+      <h6 class="card-subtitle">Click on the button below to toggle the content.</h6>
+
+      <button type="button" class="btn btn-primary"
+              (click)="isCollapsed = !isCollapsed">Toggle collapse
+      </button>
+
+      <hr class="mt-4 mb-4">
+
+      <div [collapse]="isCollapsed">
+        <p>Etiam porta sem malesuada magna mollis euismod. Sed posuere consectetur est at lobortis. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis.</p>
+        <p>Nulla vitae elit libero, a pharetra augue. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Etiam porta sem malesuada magna mollis euismod. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.</p>
+      </div>
+
+    </div>
+  </div>
+</section>

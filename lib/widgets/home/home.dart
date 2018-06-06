@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
 import '../notifications/notifications.dart';
@@ -6,6 +7,7 @@ import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,6 +33,7 @@ class _HomeState extends State<Home> {
   String title = "School Village";
   bool isLoaded = false;
   final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  Location _location = new Location();
 
   @override
   void initState() {
@@ -57,7 +60,14 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _showItemDialog(Map<String, dynamic> message) {
+  _showItemDialog(Map<String, dynamic> message) async{
+    var notificationId = message['notificationId'];
+    var schoolId = message['schoolId'];
+    debugPrint(message['notificationId']);
+    DocumentSnapshot notification;
+    Firestore.instance.document("/schools/$schoolId/notifications/$notificationId").get().then((document) {
+      notification = document;
+    });
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -72,6 +82,17 @@ class _HomeState extends State<Home> {
             ),
           ),
           actions: <Widget>[
+            new FlatButton(
+              child: new Text('View Details'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new NotificationDetail(notification: notification),
+                  ),
+                );
+              },
+            ),
             new FlatButton(
               child: new Text('Close Alert'),
               onPressed: () {
@@ -154,6 +175,11 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+
+    try {
+      _location.getLocation.then((location) {}).catchError((error) {});
+    } catch (e) {
+    }
 
     if(!isLoaded) {
       updateSchool();

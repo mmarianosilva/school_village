@@ -1,0 +1,47 @@
+.modal-content {
+  text-align: left;
+  box-shadow: $modal-content-box-shadow-sm-up;
+}
+
+.modal-dialog {
+  width: calc(100% - 1rem);
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+.modal-footer {
+  padding-top: 0.8rem;
+
+  & > .btn-link {
+    color: $headings-color;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    border-radius: $border-radius;
+
+    &:hover,
+    &:focus {
+      background-color: $gray-100;
+    }
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .modal {
+    text-align: center;
+
+    &:before {
+      content: '';
+      height: 100%;
+      width: 1px;
+    }
+
+    &:before,
+    .modal-dialog {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}

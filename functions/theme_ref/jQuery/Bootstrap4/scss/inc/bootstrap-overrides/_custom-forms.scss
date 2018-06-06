@@ -1,0 +1,147 @@
+.custom-control-input {
+  top: 0;
+  left: 0;
+  width: $custom-control-indicator-size;
+  height: $custom-control-indicator-size;
+  z-index: 1;
+
+  &:checked {
+    & ~ .custom-control-label {
+      &:after {
+        transform: scale3d(1,1,1);
+        opacity: 1;
+      }
+
+      &:before {
+        border-color: $custom-control-indicator-checked-bg;
+      }
+    }
+  }
+
+  &:disabled {
+    & ~ .custom-control-label {
+      opacity: 0.5;
+    }
+  }
+}
+
+.custom-control-label {
+  &:before,
+  &:after {
+    top: 2px;
+    transition: transform 200ms, opacity 200ms;
+  }
+
+  &:after {
+    transform: scale3d(0,0,0);
+    opacity: 0;
+  }
+}
+
+.custom-control-label {
+  &:before {
+    content: '';
+    border: 2px solid $custom-control-indicator-color;
+    transition: background-color 200ms, border-color 200ms;
+    background-color: transparent;
+
+  }
+}
+
+.custom-checkbox {
+  .custom-control-label {
+    &:after {
+      @include font-icon('\f26b', 1.35rem);
+      line-height: 18px;
+      text-align: center;
+      color: $white;
+    }
+  }
+}
+
+.custom-radio {
+  .custom-control-label {
+    &:after {
+      width: 14px;
+      height: 14px;
+      border: 3px solid $custom-control-indicator-bg;
+      border-radius: 50%;
+      top: 4px;
+      left: 2px;
+    }
+  }
+}
+
+
+// Checkbox Char
+.custom-control--char {
+  border-radius: 50%;
+  position: relative;
+
+  &:hover {
+    .custom-control-label-char {
+      & > i {
+        font-size: 0;
+
+        &:before {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .custom-control-input {
+    &:checked {
+      & ~ .custom-control-label-char {
+        & > i {
+          font-size: 0;
+
+          &:before {
+            opacity: 0;
+          }
+
+          &:after {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .custom-control-label-char {
+    & > i {
+      font-size: 1.25rem;
+      color: $white;
+      font-weight: $font-weight-bold;
+      @include transition(font-size 100ms);
+      font-style: normal;
+      text-align: center;
+
+      &, &:before, &:after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        @include size(100%, 100%);
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        line-height: 3rem;
+      }
+
+      &:before,
+      &:after {
+        opacity: 0;
+        @include transition(opacity 150ms);
+        line-height: 3.15rem;
+      }
+
+      &:before {
+        @include font-icon('\f279', 1.5rem);
+      }
+
+      &:after {
+        @include font-icon('\f26b', 1.5rem);
+      }
+    }
+  }
+}

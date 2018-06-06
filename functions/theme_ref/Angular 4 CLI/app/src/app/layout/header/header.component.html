@@ -1,0 +1,153 @@
+<header class="header">
+  <navigation-trigger></navigation-trigger>
+
+  <div class="header__logo">
+    <h1><a [routerLink]="['']">Material Admin 2.0</a></h1>
+  </div>
+
+  <header-search #search class="toggled" [class.toggled]="search.searchActive"></header-search>
+
+  <ul class="top-nav">
+    <li class="d-xl-none"><a (click)="search.searchActive = true"><i class="zmdi zmdi-search"></i></a></li>
+
+    <li dropdown>
+      <a dropdownToggle><i class="zmdi zmdi-email"></i></a>
+      <div *dropdownMenu class="dropdown-menu dropdown-menu-right dropdown-menu--block" role="menu">
+        <div class="listview listview--hover">
+          <div class="listview__header">
+            Messages
+
+            <div class="actions">
+              <a href="messages.html" class="actions__item zmdi zmdi-plus"></a>
+            </div>
+          </div>
+
+          <a *ngFor="let message of messagesData" href="" class="listview__item">
+            <img [src]="message.image" class="listview__img" alt="">
+
+            <div class="listview__content">
+              <h3 class="listview__heading">
+                {{ message.name }}
+                <small>{{ message.date }}</small>
+              </h3>
+              <p>{{ message.message }}</p>
+            </div>
+          </a>
+
+          <a href="" class="view-more">See All Messages</a>
+        </div>
+      </div>
+    </li>
+
+    <li dropdown>
+      <a dropdownToggle class="top-nav__notify"><i class="zmdi zmdi-notifications"></i></a>
+
+      <div *dropdownMenu class="dropdown-menu dropdown-menu-right dropdown-menu--block" role="menu">
+        <div class="listview listview--hover">
+          <div class="listview__header">
+            Notifications
+
+            <div class="actions">
+              <a href="" class="actions__item zmdi zmdi-check-all" data-ma-action="notifications-clear"></a>
+            </div>
+          </div>
+
+          <a *ngFor="let message of messagesData" href="" class="listview__item">
+            <img [src]="message.image" class="listview__img" alt="">
+
+            <div class="listview__content">
+              <h3 class="listview__heading">{{ message.name }}</h3>
+              <p>{{ message.message }}</p>
+            </div>
+          </a>
+
+          <a href="" class="view-more">See All Notifications</a>
+        </div>
+      </div>
+    </li>
+
+    <li dropdown class="d-none d-sm-inline-block">
+      <a dropdownToggle><i class="zmdi zmdi-apps"></i></a>
+
+      <div *dropdownMenu class="dropdown-menu dropdown-menu-right dropdown-menu--block" role="menu">
+        <div class="row app-shortcuts">
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-calendar bg-red"></i>
+            <small class="">Calendar</small>
+          </a>
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-file-text bg-blue"></i>
+            <small class="">Files</small>
+          </a>
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-email bg-teal"></i>
+            <small class="">Email</small>
+          </a>
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-trending-up bg-blue-grey"></i>
+            <small class="">Reports</small>
+          </a>
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-view-headline bg-orange"></i>
+            <small class="">News</small>
+          </a>
+          <a class="col-4 app-shortcuts__item" href="">
+            <i class="zmdi zmdi-image bg-light-green"></i>
+            <small class="">Gallery</small>
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <li dropdown class="d-none d-sm-inline-block">
+      <a dropdownToggle=""><i class="zmdi zmdi-check-circle"></i></a>
+
+      <div *dropdownMenu class="dropdown-menu dropdown-menu-right dropdown-menu--block" role="menu">
+        <div class="listview listview--hover">
+          <div class="listview__header">Tasks</div>
+
+          <a *ngFor="let task of tasksData" class="listview__item">
+            <div class="listview__content">
+              <div class="listview__heading mb-2">{{ task.name }}</div>
+
+              <div class="progress">
+                <div [ngClass]="['progress-bar bg-'+ task.color]" [ngStyle]="{ 'width': task.completed+'%' }" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </a>
+
+          <a href="" class="view-more">View All Tasks</a>
+        </div>
+      </div>
+    </li>
+
+    <li dropdown class="d-none d-sm-inline-block">
+      <a dropdownToggle=""><i class="zmdi zmdi-more-vert"></i></a>
+
+      <div *dropdownMenu class="dropdown-menu dropdown-menu-right dropdown-menu--icon" role="menu">
+        <div class="dropdown-item theme-switch">
+          Theme Switch
+
+          <div class="btn-group btn-group--colors mt-2 d-block">
+            <label class="btn bg-green" [(ngModel)]="maThemeModel" btnRadio="green" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-blue" [(ngModel)]="maThemeModel" btnRadio="blue" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-red" [(ngModel)]="maThemeModel" btnRadio="red" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-orange" [(ngModel)]="maThemeModel" btnRadio="orange" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-teal" [(ngModel)]="maThemeModel" btnRadio="teal" uncheckable (click)="setTheme()"></label>
+
+            <br>
+
+            <label class="btn bg-cyan" [(ngModel)]="maThemeModel" btnRadio="cyan" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-blue-grey" [(ngModel)]="maThemeModel" btnRadio="blue-grey" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-purple" [(ngModel)]="maThemeModel" btnRadio="purple" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-indigo" [(ngModel)]="maThemeModel" btnRadio="indigo" uncheckable (click)="setTheme()"></label>
+            <label class="btn bg-lime" [(ngModel)]="maThemeModel" btnRadio="lime" uncheckabl (click)="setTheme()"e></label>
+          </div>
+        </div>
+        <a href="" class="dropdown-item">Fullscreen</a>
+        <a href="" class="dropdown-item">Clear Local Storage</a>
+      </div>
+    </li>
+  </ul>
+
+</header>

@@ -1,0 +1,96 @@
+<aside class="sidebar" [class.toggled]="sidebarVisible">
+    <perfect-scrollbar>
+
+        <div class="user" dropdown>
+            <div class="user__info" dropdownToggle>
+                <img class="user__img" src="./assets/demo/img/profile-pics/8.jpg" alt="">
+                <div>
+                    <div class="user__name">Malinda Hollaway</div>
+                    <div class="user__email">malinda-h@gmail.com</div>
+                </div>
+            </div>
+
+            <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="">View Profile</a>
+                <a class="dropdown-item" href="">Settings</a>
+                <a class="dropdown-item" href="">Logout</a>
+            </div>
+        </div>
+
+        <ul class="navigation">
+            <li routerLinkActive="navigation__active"><a [routerLink]="['/home']"><i class="zmdi zmdi-home"></i> Home</a></li>
+            <li routerLinkActive="navigation__active"><a [routerLink]="['/typography']"><i class="zmdi zmdi-format-underlined"></i> Typography</a></li>
+            <li routerLinkActive="navigation__active"><a [routerLink]="['/widgets']"><i class="zmdi zmdi-widgets"></i> Widgets</a></li>
+            <li routerLinkActive="navigation__sub--active" class="navigation__sub">
+                <a (click)="toggleNavigationSub('Tables', $event)"><i class="zmdi zmdi-view-list"></i> Tables</a>
+
+                <ul [@toggleHeight]="navigationSubState.Tables">
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/table/table']">HTML Table</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/table/data-table']">Data Table</a></li>
+                </ul>
+            </li>
+            <li routerLinkActive="navigation__sub--active" class="navigation__sub">
+                <a (click)="toggleNavigationSub('Forms', $event)"><i class="zmdi zmdi-collection-text"></i> Forms</a>
+
+                <ul [@toggleHeight]="navigationSubState.Forms">
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/form/form-elements']">Form Elements</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/form/form-components']">Form Components</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/form/form-validation']">Form Validation</a></li>
+                </ul>
+            </li>
+            <li routerLinkActive="navigation__sub--active" class="navigation__sub">
+                <a (click)="toggleNavigationSub('UserInterface', $event)"><i class="zmdi zmdi-swap-alt"></i> User Interface</a>
+
+                <ul [@toggleHeight]="navigationSubState.UserInterface">
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/colors']">Colors</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/css-animations']">CSS Animations</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/buttons']">Buttons</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/icons']">Icons</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/cards']">Cards</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/alerts']">Alerts</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/badges']">Badges</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/breadcrumbs']">Bredcrumbs</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/jumbotron']">Jumbotron</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/navs']">Navs</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/user-interface/pagination']">Pagination</a></li>
+                </ul>
+            </li>
+            <li routerLinkActive="navigation__sub--active" class="navigation__sub">
+                <a (click)="toggleNavigationSub('Components', $event)"><i class="zmdi zmdi-view-compact"></i> ngx-bootstrap Components</a>
+
+                <ul [@toggleHeight]="navigationSubState.Components">
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/accordion']">Accordion</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/alerts']">Alerts</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/buttons']">Buttons</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/carousel']">Carousel</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/collapse']">Collapse</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/datepicker']">DatePicker</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/dropdowns']">Dropdowns</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/modals']">Modals</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/pagination']">Pagination</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/popover']">Popover</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/progressbar']">Progressbar</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/rating']">Rating</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/sortable']">Sortable</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/tabs']">Tabs</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/time-picker']">Timepicker</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/tooltips']">Tooltips</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/components/typeahead']">Typeahead</a></li>
+                </ul>
+            </li>
+
+            <li routerLinkActive="navigation__sub--active" class="navigation__sub">
+                <a (click)="toggleNavigationSub('Charts', $event)"><i class="zmdi zmdi-trending-up"></i> Charts</a>
+
+                <ul [@toggleHeight]="navigationSubState.Charts">
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/charts/flot']">Flot</a></li>
+                    <li routerLinkActive="navigation__active"><a [routerLink]="['/charts/sparklines']">Sparklines</a></li>
+                </ul>
+            </li>
+
+            <li routerLinkActive="navigation__active"><a [routerLink]="['/calendar']"><i class="zmdi zmdi-calendar"></i> Calendar</a></li>
+
+            <li routerLinkActive="navigation__active"><a [routerLink]="['/sample-pages']"><i class="zmdi zmdi-collection-item"></i> Sample Pages</a></li>
+        </ul>
+    </perfect-scrollbar>
+</aside>

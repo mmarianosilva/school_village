@@ -1,0 +1,478 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Form Components</h1>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/form/form-components']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/form/form-components']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/form/form-components']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/form/form-components']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/form/form-components']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Input group</h4>
+            <h6 class="card-subtitle">Easily extend form controls by adding text, buttons, or button groups on either side of textual <code>&#x3C;input&#x3E;</code>s.</h6>
+
+            <h3 class="card-body__title">Basic example</h3>
+            <p>Place one add-on or button on either side of an input. You may also place one on both sides of an input.</p>
+
+            <br>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-addon">@</span>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Username">
+                            <i class="form-group__bar"></i>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">https://example.com/users/</span>
+                        <div class="form-group">
+                            <input type="text" class="form-control">
+                            <i class="form-group__bar"></i>
+                        </div>
+                    </div>
+
+                    <br>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <span class="input-group-addon">0.00</span>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Discounted price">
+                            <i class="form-group__bar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="input-group">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Recipient's username">
+                            <i class="form-group__bar"></i>
+                        </div>
+                        <span class="input-group-addon">@example.com</span>
+                    </div>
+
+                    <br>
+
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Enter amount">
+                            <i class="form-group__bar"></i>
+                        </div>
+                        <span class="input-group-addon">.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <br>
+
+            <h3 class="card-body__title">Sizing</h3>
+            <p>Add the relative form sizing classes to the <code>.input-group</code> itself and contents within will automatically resize. No need for repeating the form control size classes on each element.</p>
+
+            <br>
+
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon">@</span>
+                <span class="input-group-addon">@</span>
+                <span class="input-group-addon">@</span>
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-lg" placeholder="Large">
+                    <i class="form-group__bar"></i>
+                </div>
+                <span class="input-group-addon">@</span>
+                <span class="input-group-addon">@</span>
+                <span class="input-group-addon">@</span>
+            </div>
+
+            <br>
+
+            <div class="input-group">
+                <span class="input-group-addon">@</span>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Default">
+                    <i class="form-group__bar"></i>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="input-group input-group-sm">
+                <span class="input-group-addon">@</span>
+                <div class="form-group">
+                    <input type="text" class="form-control form-control-sm" placeholder="Small">
+                    <i class="form-group__bar"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Input Test Masking</h4>
+            <h6 class="card-subtitle">Angular 2 directive for input text masking</h6>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskDate}" placeholder="eg: 23/02/2017">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskPhone}" placeholder="eg: 000-00-0000000">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Money</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskMoney}" placeholder="eg: 000.000.000.000.000,00">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CEP</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskCEP}" placeholder="eg: 00000-000">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Time</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskTime}" placeholder="eg: 23:06:55">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone with odd</label>
+
+                        <br>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskPhoneOdd}" placeholder="eg: (00)0000-0000">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>IP Address</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskIP}" placeholder="eg: 192.168.100.100">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CPF</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskCPF}" placeholder="eg: 000.000.000-00">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Date Time</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskDateTime}" placeholder="eg: 23:06:2017 12:05:33">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>US Phone Number</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskPhoneUS}" placeholder="eg: (000) 000-0000">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Percentage</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskPercentage}" placeholder="eg: 98.45%">
+                        <i class="form-group__bar"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Credit Card</label>
+
+                        <input type="text" class="form-control" [textMask]="{mask: maskCreditCard}" placeholder="eg: 0000 0000 0000 0000">
+                        <i class="form-group__bar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Select2</h4>
+            <h6 class="card-subtitle">Native Angular2 directive for Select2</h6>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Basic Example</label>
+
+                        <select2 [data]="select2Data" [options]="options"></select2>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Custom Placeholder</label>
+
+                        <select2 [data]="select2DataPlaceholder" [options]="placeholderOptions"></select2>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Disabled Select</label>
+
+                        <select2 [data]="select2Data" [disabled]="true" [options]="options"></select2>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Disabled Options</label>
+
+                        <select2 [data]="select2DataDisabled" [options]="options"></select2>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Disable Search</label>
+
+                        <select2 [data]="select2Data" [options]="disableSearchOptions"></select2>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Multiple</label>
+
+                        <select2 [data]="select2Data" [options]="multipleOptions"></select2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Drag and drop file upload</h4>
+            <h6 class="card-subtitle">DropzoneJS is an open source library that provides drag’n’drop file uploads with image previews.</h6>
+
+            <form dropzone [posturl]="dropzonePostUrl" class="dropzone"></form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Date Picker</h4>
+            <h6 class="card-subtitle">Datepicker is a highly configurable component that adds datepicker functionality to your pages. You can customize the date format and language, restrict the selectable date ranges.</h6>
+
+            Please go to <a [routerLink]="['/components/datepicker']">Datepicker</a> page to check Datepicker demos.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Timepickers</h4>
+
+            Please go to <a [routerLink]="['/components/time-picker']">Timepicker</a> page to check Timepicker demos.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Toggle Switch</h4>
+            <h6 class="card-subtitle">Material design look alike Toggle Switches based on Radio Boxes</h6>
+
+            <div class="row">
+                <div class="col-sm-4 col-md-3">
+                    <h3 class="card-body__title">Basic Example</h3>
+
+                    <br>
+
+                    <div class="form-group">
+                        <div class="toggle-switch">
+                            <input type="checkbox" class="toggle-switch__checkbox">
+                            <i class="toggle-switch__helper"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-md-3">
+                    <h3 class="card-body__title">Active State</h3>
+
+                    <br>
+
+                    <div class="form-group">
+                        <div class="toggle-switch">
+                            <input type="checkbox" class="toggle-switch__checkbox" checked>
+                            <i class="toggle-switch__helper"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-md-3">
+                    <h3 class="card-body__title">Disabled</h3>
+
+                    <br>
+
+                    <div class="form-group">
+                        <div class="toggle-switch">
+                            <input type="checkbox" class="toggle-switch__checkbox" disabled>
+                            <i class="toggle-switch__helper"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="card-body__title">Color variants</h3>
+            <p>Optional color variants can be added using modifier classes</p>
+
+            <br>
+
+            <div class="d-inline-block mr-4">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--red">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-inline-block mr-4">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--blue">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-inline-block mr-4">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--green">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-inline-block mr-4">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--cyan">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-inline-block mr-4">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--purple">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="d-inline-block">
+                <div class="form-group">
+                    <div class="toggle-switch toggle-switch--amber">
+                        <input type="checkbox" class="toggle-switch__checkbox">
+                        <i class="toggle-switch__helper"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Input Sliders</h4>
+            <h6 class="card-subtitle">noUiSlider is a lightweight JavaScript range slider with tons of customizaion</h6>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-body__title">Single slider</h3>
+
+                    <br>
+
+                    <nouislider [connect]="[true, false]" [min]="-10" [max]="10" [(ngModel)]="inputSliderSingleValue"></nouislider>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Value" [(ngModel)]="inputSliderSingleValue">
+                                <i class="form-group__bar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h3 class="card-body__title">Range Slider</h3>
+
+                    <br>
+
+                    <nouislider [connect]="true" [min]="0" [max]="20" [behaviour]="'drag'" [(ngModel)]="inputSliderRangeValue"></nouislider>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Value" [(ngModel)]="inputSliderRangeValue">
+                                <i class="form-group__bar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+
+            <h3 class="card-body__title">Color variants</h3>
+            <p>Optional color variants can be added using modifier classes</p>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    <nouislider class="input-slider input-slider--blue" [connect]="[true, false]" [min]="-10" [max]="10" [(ngModel)]="inputSliderSingleValue"></nouislider>
+                </div>
+
+                <div class="col-md-6">
+                    <nouislider class="input-slider input-slider--red" [connect]="[true, false]" [min]="-10" [max]="10" [(ngModel)]="inputSliderSingleValue"></nouislider>
+                </div>
+
+                <div class="col-md-6">
+                    <nouislider class="input-slider input-slider--amber" [connect]="[true, false]" [min]="-10" [max]="10" [(ngModel)]="inputSliderSingleValue"></nouislider>
+                </div>
+
+                <div class="col-md-6">
+                    <nouislider class="input-slider input-slider--green" [connect]="[true, false]" [min]="-10" [max]="10" [(ngModel)]="inputSliderSingleValue"></nouislider>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

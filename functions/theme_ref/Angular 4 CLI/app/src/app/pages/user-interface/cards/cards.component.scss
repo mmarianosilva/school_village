@@ -1,0 +1,11 @@
+// Following styles are only for demo purposes. You can remove these anytime and DO NOT use these styles in your project
+
+@import "../../../../assets/scss/inner-imports";
+
+.card-demo {
+  vertical-align: top;
+  max-width: 450px;
+  width: 100%;
+  margin: 0 $grid-gutter-width 0 0;
+  display: inline-block;
+}

@@ -1,0 +1,30 @@
+// Following styles are only for demo purposes. You can remove these anytime and DO NOT use these styles in your project
+
+@import "../../../../assets/scss/inner-imports";
+
+.animation-demo {
+  .row {
+    margin: 1.9rem -0.76rem 0;
+  }
+
+  .col-sm-6 {
+    padding: 0 0.76rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .card-body {
+    padding-bottom: 1.15rem;
+
+    & > img {
+      position: relative;
+      width: 100%;
+      z-index: 1;
+      border-radius: $border-radius;
+      box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
+}

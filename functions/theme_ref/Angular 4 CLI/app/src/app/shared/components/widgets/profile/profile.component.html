@@ -1,0 +1,70 @@
+<div class="card card--inverse widget-profile">
+  <div class="card-body">
+    <div class="text-center">
+      <img src="./assets/demo/img/profile-pics/profile-pic.jpg" class="widget-profile__img" alt="">
+
+      <h4 class="card-title">Malinda Hollway</h4>
+    </div>
+
+    <div class="actions actions--inverse">
+      <div dropdown class="actions__item">
+        <i dropdownToggle class="zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/widgets']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/widgets']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/widgets']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-profile__list">
+    <div class="media">
+      <div class="media-left">
+        <div class="avatar-char"><i class="zmdi zmdi-phone"></i></div>
+      </div>
+      <div class="media-body">
+        <strong>011 55694785</strong>
+        <small>Home</small>
+      </div>
+    </div>
+    <div class="media">
+      <div class="media-left">
+        <div class="avatar-char"><i class="zmdi zmdi-email"></i></div>
+      </div>
+      <div class="media-body">
+        <strong>m-hollaway@gmail.com</strong>
+        <small>Email</small>
+      </div>
+    </div>
+    <div class="media">
+      <div class="media-left">
+        <div class="avatar-char"><i class="zmdi zmdi-twitter"></i></div>
+      </div>
+      <div class="media-body">
+        <strong>@m-hollaway</strong>
+        <small>Twitter</small>
+      </div>
+    </div>
+    <div class="media">
+      <div class="media-left">
+        <div class="avatar-char"><i class="zmdi zmdi-facebook"></i></div>
+      </div>
+      <div class="media-body">
+        <strong>facebook/hollaway</strong>
+        <small>Facebook</small>
+      </div>
+    </div>
+    <div class="media">
+      <div class="media-left">
+        <div class="avatar-char"><i class="zmdi zmdi-github"></i></div>
+      </div>
+      <div class="media-body">
+        <strong>github.com/hollaway</strong>
+        <small>Github</small>
+      </div>
+
+      <br>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="card widget-contacts">
+  <div class="card-body">
+    <h4 class="card-title">Contact Information</h4>
+    <h6 class="card-subtitle">Fusce eget dolor id justo luctus commodo vel pharetra nisi</h6>
+
+    <ul class="icon-list">
+      <li><i class="zmdi zmdi-phone"></i> {{ contactData.phone }}</li>
+      <li><i class="zmdi zmdi-email"></i> {{ contactData.email }}</li>
+      <li><i class="zmdi zmdi-facebook-box"></i> {{ contactData.facebook }}</li>
+      <li><i class="zmdi zmdi-twitter"></i> {{ contactData.twitter }}</li>
+      <li><i class="zmdi zmdi-pin"></i>
+        <address>
+          {{ contactData.address }}
+        </address>
+      </li>
+    </ul>
+  </div>
+
+  <a class="widget-contacts__map" href="">
+    <img [src]="contactData.map" alt="">
+  </a>
+</div>

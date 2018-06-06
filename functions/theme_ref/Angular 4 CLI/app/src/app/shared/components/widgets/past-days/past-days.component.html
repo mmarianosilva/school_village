@@ -1,0 +1,23 @@
+<figure class="card card--inverse widget-past-days">
+  <div class="card-body">
+    <h4 class="card-title">For the past 30 days</h4>
+    <h6 class="card-subtitle">Pellentesque ornare sem lacinia quam</h6>
+  </div>
+
+  <div class="widget-past-days__main">
+    <div flot [options]="pastDaysChartOptions" [dataset]="pastDaysChartData" [height]="100"></div>
+  </div>
+
+  <div class="listview listview--inverse listview--striped">
+    <div *ngFor="let pastDaysData of pastDaysData" class="listview__item">
+      <div class="widget-past-days__info">
+        <small>{{ pastDaysData.title }}</small>
+        <h3>{{ pastDaysData.value }}</h3>
+      </div>
+
+      <div class="widget-past-days__chart hidden-sm">
+        <sparkline [dataset]="pastDaysData.chartData" [options]="pastDaysSubChartDataOptions"></sparkline>
+      </div>
+    </div>
+  </div>
+</figure>

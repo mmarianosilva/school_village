@@ -1,0 +1,69 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Carousel</h1>
+    <small>A slide show component for cycling through element-images or slides of text-like a carousel. Nested carousels are not supported.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/accordion']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/accordion']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <a [routerLink]="['/components/accordion']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/accordion']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/accordion']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic example</h4>
+      <h6 class="card-subtitle">Basic carousel with controls and indicators.</h6>
+
+      <carousel>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-1.jpg" alt="First slide">
+        </slide>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-2.jpg" alt="First slide">
+        </slide>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-3.jpg" alt="First slide">
+        </slide>
+      </carousel>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Optional captions</h4>
+      <h6 class="card-subtitle">Add captions to your slides easily with the .carousel-caption element within any &#x3C;slide&#x3E;. Place just about any optional HTML within there and it will be automatically aligned and formatted.</h6>
+
+      <carousel>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-1.jpg" alt="First slide">
+          <div class="carousel-caption">
+            <h3>First slide label</h3>
+            <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+          </div>
+        </slide>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-2.jpg" alt="First slide">
+          <div class="carousel-caption">
+            <h3>Second slide label</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          </div>
+        </slide>
+        <slide>
+          <img src="./assets/demo/img/carousel/c-3.jpg" alt="First slide">
+          <div class="carousel-caption">
+            <h3>Third slide label</h3>
+            <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+          </div>
+        </slide>
+      </carousel>
+    </div>
+  </div>
+</section>

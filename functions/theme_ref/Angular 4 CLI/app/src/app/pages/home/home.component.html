@@ -1,0 +1,61 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Dashboard</h1>
+        <small>Welcome to the unique Material Design admin web app experience!</small>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/home']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/home']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/home']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/home']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/home']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <quick-stats></quick-stats>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Sales Statistics</h4>
+                    <h6 class="card-subtitle">Vestibulum purus quam scelerisque, mollis nonummy metus</h6>
+
+                    <div flot [options]="salesStatChartOptions" [dataset]="salesStatChartData" [height]="200"></div>
+                    <div class="flot-chart-legends flot-chart-legends--curved"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Growth Rate</h4>
+                    <h6 class="card-subtitle">Commodo luctus nisi erat porttitor ligula eget lacinia odio semnec elit</h6>
+
+                    <div flot [options]="lineChartOptions" [dataset]="lineChartData" [height]="200"></div>
+                    <div class="flot-chart-legends flot-chart-legends--lines"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="widget-lists card-columns">
+        <widget-past-days></widget-past-days>
+
+        <widget-random-post></widget-random-post>
+
+        <widget-visitors></widget-visitors>
+
+        <widget-pie-charts></widget-pie-charts>
+
+        <widget-recent-posts></widget-recent-posts>
+
+        <widget-todo-lists></widget-todo-lists>
+    </div>
+</section>

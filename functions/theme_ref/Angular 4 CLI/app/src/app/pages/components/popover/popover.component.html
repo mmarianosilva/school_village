@@ -1,0 +1,80 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Popover</h1>
+    <small>Add small overlay content, like those found in iOS, to any element for housing secondary information.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/popover']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/popover']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/components/popover']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/popover']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/popover']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic example</h4>
+      <h6 class="card-subtitle">Click on the button below to toggle the Popover</h6>
+
+      <button type="button" class="btn btn-primary" popover="Vivamus sagittis lacus vel augue laoreet rutrum faucibus.">
+        Toggle Popover
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">All four directions</h4>
+      <h6 class="card-subtitle">Four positioning options are available: top, right, bottom, and left aligned.</h6>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary"
+                popover="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                popoverTitle="Popover on left"
+                placement="left">
+          Popover on left
+        </button>
+
+        <button type="button" class="btn btn-primary"
+                popover="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                popoverTitle="Popover on top"
+                placement="top">
+          Popover on top
+        </button>
+
+        <button type="button" class="btn btn-primary"
+                popover="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                popoverTitle="Popover on bottom"
+                placement="bottom">
+          Popover on bottom
+        </button>
+
+        <button type="button" class="btn btn-primary"
+                popover="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."
+                popoverTitle="Popover on right"
+                placement="right">
+          Popover on right
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Custom triggers</h4>
+      <h6 class="card-subtitle">Custom trigger such as mouseenter:mouseleave also can be set.</h6>
+
+      <button type="button" class="btn btn-primary"
+              popover="I will hide on blur"
+              triggers="mouseenter:mouseleave">
+        Hover over me!
+      </button>
+    </div>
+  </div>
+</section>

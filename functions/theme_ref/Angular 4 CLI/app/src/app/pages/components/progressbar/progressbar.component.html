@@ -1,0 +1,81 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Progressbar</h1>
+    <small>Provide up-to-date feedback on the progress of a workflow or action with simple yet flexible progress bars.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/components/progressbar']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/components/progressbar']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/components/progressbar']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/components/progressbar']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/components/progressbar']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Static examples</h4>
+      <h6 class="card-subtitle">Basic progress bars will have style <code>primary</code> by default.</h6>
+
+      <progressbar class="progress" value="0" max="100"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="25" max="100"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="50" max="100"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="75" max="100"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="100" max="100"></progressbar>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Backgrounds</h4>
+      <h6 class="card-subtitle">Use <code>type</code> attribute to change the background of the progress bar</h6>
+
+      <progressbar class="progress" value="25" max="100" type="success"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="50" max="100" type="warning"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="75" max="100" type="info"></progressbar>
+
+      <br>
+
+      <progressbar class="progress" value="100" max="100" type="danger"></progressbar>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Multiple bars</h4>
+      <h6 class="card-subtitle">Click on the button below to add multiple bars</h6>
+
+      <progressbar class="progress" [value]="stacked" max="100"></progressbar>
+
+      <br>
+      <hr>
+      <br>
+
+      <button type="button" class="btn btn-primary" (click)="randomStacked()">Randomize</button>
+
+    </div>
+  </div>
+</section>

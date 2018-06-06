@@ -1,0 +1,12 @@
+<div class="row quick-stats">
+  <div *ngFor="let quickStatData of quickStatChartData" class="col-sm-6 col-md-3">
+    <div class="quick-stats__item bg-{{ quickStatData.color }}">
+      <div class="quick-stats__info">
+        <h2>{{ quickStatData.value }}</h2>
+        <small>{{ quickStatData.title }}</small>
+      </div>
+
+      <sparkline class="quick-stats__chart" [dataset]="quickStatData.data" [options]="quickStatChartOptions"></sparkline>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Pagination</h1>
+    <small>Pagination links indicate a series of related content exists across multiple pages. Typically these are used where a multi-page approach to long lists of content improves general performance, such as in search results or inboxes.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/user-interface/pagination']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/user-interface/pagination']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/user-interface/pagination']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/user-interface/pagination']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/user-interface/pagination']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic example</h4>
+
+      <h3 class="card-body__title">Numbers only</h3>
+
+      <br>
+
+      <nav>
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+        </ul>
+      </nav>
+
+      <br>
+
+      <h3 class="card-body__title">Numbers with direction links</h3>
+
+      <br>
+
+      <nav>
+        <ul class="pagination">
+          <li class="page-item pagination-prev"><a class="page-link" href="#"></a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+          <li class="page-item pagination-next"><a class="page-link" href="#"></a></li>
+        </ul>
+      </nav>
+
+      <br>
+
+      <h3 class="card-body__title">Numbers, direction links and boundary links</h3>
+
+      <br>
+
+      <nav>
+        <ul class="pagination">
+          <li class="page-item pagination-first"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-prev"><a class="page-link" href="#"></a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+          <li class="page-item pagination-next"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-last"><a class="page-link" href="#"></a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Disabled and active states</h4>
+      <h6 class="card-subtitle">Pagination links are customizable for different circumstances. Use <code>.disabled</code> for links that appear un-clickable and <code>.active</code> to indicate the current page.</h6>
+
+      <nav>
+        <ul class="pagination">
+          <li class="page-item pagination-first disabled"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-prev disabled"><a class="page-link" href="#"></a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+          <li class="page-item pagination-next"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-last"><a class="page-link" href="#"></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Alignment</h4>
+      <h6 class="card-subtitle">Change the alignment of pagination components with <a target="_blank" href="https://getbootstrap.com/docs/4.0/utilities/flex/">flexbox utilities</a>.</h6>
+
+      <h3 class="card-body__title">Centered</h3>
+
+      <br>
+
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item pagination-first"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-prev"><a class="page-link" href="#"></a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+          <li class="page-item pagination-next"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-last"><a class="page-link" href="#"></a></li>
+        </ul>
+      </nav>
+
+      <h3 class="card-body__title">Right aligned</h3>
+
+      <br>
+
+      <nav>
+        <ul class="pagination justify-content-end">
+          <li class="page-item pagination-first"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-prev"><a class="page-link" href="#"></a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">6</a></li>
+          <li class="page-item pagination-next"><a class="page-link" href="#"></a></li>
+          <li class="page-item pagination-last"><a class="page-link" href="#"></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>

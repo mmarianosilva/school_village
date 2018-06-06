@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
+import '../../util/constants.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -100,6 +101,19 @@ class _SettingsState extends State<Settings> {
                   UserHelper.logout();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/login', (Route<dynamic> route) => false);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 24.0),
+          new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new FlatButton(
+                child: new Text('Version ${Constants.version}',
+                    style: new TextStyle(
+                        fontSize: 8.0, fontWeight: FontWeight.bold)),
+                onPressed: () {
                 },
               ),
             ],

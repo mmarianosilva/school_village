@@ -1,0 +1,28 @@
+// Import Bootstrap and App variables and mixins
+@import "../../../../../assets/scss/inner-imports";
+
+.widget-signups {
+  background-color: $blue-grey;
+}
+
+.widget-signups__list {
+  text-align: center;
+  padding: 2rem;
+  background-color: rgba($white, 0.05);
+
+  & > a {
+    vertical-align: top;
+    margin: 4px 2px;
+    display: inline-block;
+  }
+
+  .avatar-img,
+  .avatar-char {
+    margin: 0;
+  }
+
+  .avatar-char {
+    background-color: rgba($white, 0.1);
+    color: $white;
+  }
+}

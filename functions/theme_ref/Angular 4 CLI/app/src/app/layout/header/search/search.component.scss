@@ -1,0 +1,107 @@
+// Import Bootstrap and App variables and mixins
+@import "../../../../assets/scss/inner-imports";
+
+
+@mixin search-float($bg-color, $color, $placeholder-color) {
+  background-color: $bg-color;
+  color: $color;
+
+  &::placeholder {
+    color: $placeholder-color;
+    opacity: 1;
+  }
+}
+
+:host {
+  flex: 1;
+  margin-right: 2.5rem;
+  position: relative;
+
+  @include media-breakpoint-down(lg) {
+    padding: 0 1.5rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: $white;
+    z-index: $header-z-index + 1;
+    display: flex;
+    align-items: center;
+    @include transition(transform 300ms);
+
+    &:not(.toggled) {
+      transform: translate3d(0,-105%,0);
+    }
+  }
+}
+
+.search {
+  position: relative;
+
+  @include media-breakpoint-down(lg) {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+.search__text {
+  border: 0;
+  border-radius: $border-radius;
+  height: 2.9rem;
+  padding: 0 1rem 0 3rem;
+  width: 100%;
+  @include transition(background-color 300ms, color 300ms);
+
+  @include media-breakpoint-up(lg) {
+    @include search-float(rgba($white, 0.2), $white, $white);
+
+    &:focus {
+      @include search-float($gray-100, $input-color, lighten($input-color, 10%));
+    }
+  }
+
+  @include media-breakpoint-down(lg) {
+    @include search-float($gray-100, $input-color, lighten($input-color, 10%));
+  }
+}
+
+.search__helper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.3rem;
+  height: 100%;
+  width: 3rem;
+  text-align: center;
+  line-height: 3rem;
+  cursor: pointer;
+  @include transition(color 300ms, transform 400ms);
+
+  @include media-breakpoint-down(lg) {
+    color: $input-color;
+    transform: rotate(180deg);
+    line-height: 2.9rem;
+
+    &:before {
+      content: '\f301';
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+.search--focus {
+  .search__helper {
+    color: lighten($input-color, 10%);
+    transform: rotate(180deg);
+    line-height: 2.9rem;
+
+    &:before {
+      content: '\f301';
+    }
+  }
+}

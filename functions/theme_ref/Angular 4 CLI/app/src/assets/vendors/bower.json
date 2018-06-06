@@ -1,0 +1,22 @@
+{
+  "name": "Material Admin",
+  "authors": [
+    "rushenn <rushenn123@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "http://bootstrapsale.com/",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "flot.curvedlines": "^1.1.1",
+    "flot.orderbars": "^1.0.0"
+  }
+}

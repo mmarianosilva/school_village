@@ -30,13 +30,16 @@ class Splash extends StatelessWidget {
     return new Material(
       color: Theme.of(context).primaryColorLight,
       child: new Center(
-        child: new Text("School Village",
-            textDirection: TextDirection.ltr,
-            style: new TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 36.0
-            )
-        ),
+        child: new Container(
+          padding: const EdgeInsets.all(40.0),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Image.asset('assets/images/splash_text.png'),
+              new Image.asset('assets/images/logo.png', width: 44.0)
+            ],
+          ),
+        )
       ),
     );
   }

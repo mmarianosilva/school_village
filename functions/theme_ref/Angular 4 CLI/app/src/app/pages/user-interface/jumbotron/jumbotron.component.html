@@ -1,0 +1,49 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Jumbotron</h1>
+    <small>A lightweight, flexible component that can optionally extend the entire viewport to showcase key marketing messages on your site.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/user-interface/jumbotron']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/user-interface/jumbotron']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+          <a [routerLink]="['/user-interface/jumbotron']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/user-interface/jumbotron']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/user-interface/jumbotron']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h3 class="card-body__title">Basic example</h3>
+
+      <br>
+
+      <div class="jumbotron">
+        <h1 class="display-3">Hello, world!</h1>
+        <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+
+        <hr class="my-4">
+
+        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+        <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+      </div>
+
+      <br>
+
+      <h3 class="card-body__title">Fluid width</h3>
+      <p>To make the jumbotron full width, and without rounded corners, add the <code>.jumbotron-fluid</code> modifier class and add a <code>.container</code> or <code>.container-fluid</code> within.</p>
+
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <h1 class="display-3">Fluid jumbotron</h1>
+          <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

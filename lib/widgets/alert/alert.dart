@@ -28,10 +28,12 @@ class _AlertState extends State<Alert> {
   String _userId = '';
   String _email = '';
   String name = '';
+  String phone = '';
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
   Location _location = new Location();
+  final customAlertController = new TextEditingController();
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -47,10 +49,50 @@ class _AlertState extends State<Alert> {
       setState(() {
         name =
             "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
+        phone = _userSnapshot.data['phone'];
         isLoaded = true;
       });
       print(name);
     });
+  }
+
+  _sendCustomAlert(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+            title: new Text('Send Alert'),
+            content: new SingleChildScrollView(
+              child: new ListBody(
+                children: <Widget>[
+                  TextField(
+                    controller: customAlertController,
+                    decoration: new InputDecoration(
+                        border: const UnderlineInputBorder(),
+                        hintText: 'What is the emergency?'),
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: new Text('Send'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _sendAlert("other", "Alert!", "${customAlertController.text} at $_schoolName", context);
+                  customAlertController.text = "";
+                },
+              )
+            ],
+          );
+        }
+    );
   }
 
 
@@ -118,7 +160,8 @@ class _AlertState extends State<Alert> {
       'createdById': _userId,
       'createdBy' : name,
       'createdAt' : new DateTime.now().millisecondsSinceEpoch,
-      'location' : await _getLocation()
+      'location' : await _getLocation(),
+      'reportedByPhone' : phone,
     });
     print("Added Alert");
 
@@ -280,7 +323,7 @@ class _AlertState extends State<Alert> {
                         child: new Container(
                           margin: EdgeInsets.all(8.0),
                           child: new GestureDetector(
-                              onTap: () {_sendAlert("other", "Alert!", "An alert has been reported at $_schoolName", context);},
+                              onTap: () {_sendCustomAlert(context);},
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_other.png',
                                     width: 48.0, height: 48.0),

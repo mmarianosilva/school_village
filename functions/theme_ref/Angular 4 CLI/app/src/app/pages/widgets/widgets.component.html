@@ -1,0 +1,44 @@
+<section class="content">
+    <header class="content__title">
+        <h1>Widgets</h1>
+
+        <div class="actions">
+            <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/widgets']"></a>
+            <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/widgets']"></a>
+            <div dropdown>
+                <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+                <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+                    <a [routerLink]="['/widgets']" class="dropdown-item">Refresh</a>
+                    <a [routerLink]="['/widgets']" class="dropdown-item">Manage Widgets</a>
+                    <a [routerLink]="['/widgets']" class="dropdown-item">Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="widget-lists card-columns">
+        <widget-photos></widget-photos>
+
+        <widget-recent-posts></widget-recent-posts>
+
+        <widget-past-days></widget-past-days>
+
+        <widget-ratings></widget-ratings>
+
+        <widget-random-post></widget-random-post>
+
+        <widget-pie-charts></widget-pie-charts>
+
+        <widget-tasks></widget-tasks>
+
+        <widget-profile></widget-profile>
+
+        <widget-todo-lists></widget-todo-lists>
+
+        <widget-visitors></widget-visitors>
+
+        <widget-contacts></widget-contacts>
+
+        <widget-recent-signups></widget-recent-signups>
+    </div>
+</section>

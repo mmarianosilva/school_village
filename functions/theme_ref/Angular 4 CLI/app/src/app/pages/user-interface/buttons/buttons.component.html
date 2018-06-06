@@ -1,0 +1,342 @@
+<section class="content">
+  <header class="content__title">
+    <h1>Buttons</h1>
+    <small>Use Bootstrap’s custom button styles for actions in forms, dialogs, and more. Includes support for a handful of contextual variations, sizes, states, and more.</small>
+
+    <div class="actions">
+      <a class="actions__item zmdi zmdi-trending-up" [routerLink]="['/user-interface/buttons']"></a>
+      <a class="actions__item zmdi zmdi-check-all" [routerLink]="['/user-interface/buttons']"></a>
+      <div dropdown>
+        <i dropdownToggle class="actions__item zmdi zmdi-more-vert"></i>
+        <div *dropdownMenu class="dropdown-menu dropdown-menu-right">
+          <a [routerLink]="['/user-interface/buttons']" class="dropdown-item">Refresh</a>
+          <a [routerLink]="['/user-interface/buttons']" class="dropdown-item">Manage Widgets</a>
+          <a [routerLink]="['/user-interface/buttons']" class="dropdown-item">Settings</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Basic Examples</h4>
+      <h6 class="card-subtitle">Bootstrap includes several predefined button styles, each serving its own semantic purpose, with a few extras thrown in for more control.</h6>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary">Primary</button>
+        <button type="button" class="btn btn-secondary">Secondary</button>
+        <button type="button" class="btn btn-success">Success</button>
+        <button type="button" class="btn btn-danger">Danger</button>
+        <button type="button" class="btn btn-warning">Warning</button>
+        <button type="button" class="btn btn-info">Info</button>
+        <button type="button" class="btn btn-light">Light</button>
+        <button type="button" class="btn btn-dark">Dark</button>
+        <button type="button" class="btn btn-link">Link</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Button Tags</h4>
+      <h6 class="card-subtitle">The <code>.btn</code> classes are designed to be used with the <code>&#x3C;button&#x3E;</code> element. However, you can also use these classes on <code>&#x3C;a&#x3E;</code> or <code>&#x3C;input&#x3E;</code> elements (though some browsers may apply a slightly different rendering).</h6>
+
+      <div class="btn-demo">
+        <a class="btn btn-light" href="#" role="button">Link</a>
+        <button class="btn btn-light" type="submit">Button</button>
+        <input class="btn btn-light" type="button" value="Input">
+        <input class="btn btn-light" type="submit" value="Submit">
+        <input class="btn btn-light" type="reset" value="Reset">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Outline buttons</h4>
+      <h6 class="card-subtitle">In need of a button, but not the hefty background colors they bring? Replace the default modifier classes with the <code>.btn-outline-*</code> ones to remove all background images and colors on any button.</h6>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-outline-primary">Primary</button>
+        <button type="button" class="btn btn-outline-secondary">Secondary</button>
+        <button type="button" class="btn btn-outline-success">Success</button>
+        <button type="button" class="btn btn-outline-danger">Danger</button>
+        <button type="button" class="btn btn-outline-warning">Warning</button>
+        <button type="button" class="btn btn-outline-info">Info</button>
+        <button type="button" class="btn btn-outline-dark">Dark</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Icon buttons</h4>
+      <h6 class="card-subtitle">You can refer the Icons page for the complete list of Font Icons which are inspired by Material Design</h6>
+
+      <div class="btn-demo">
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-home"></i> Home</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-search"></i> Search</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-more-vert"></i> More</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-arrow-forward"></i> Forward</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-arrow-back"></i> Back</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-refresh"></i> Sync</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-check"></i> Check</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-close"></i> Check</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-menu"></i> Menu</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-apps"></i> Apps</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-check-all"></i> Done</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-trending-up"></i> Up</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-apps"></i> Get</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-phone"></i> Call</button>
+
+        <br/>
+        <br/>
+
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-home"></i> Home</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-search"></i> Search</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-more-vert"></i> More</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-arrow-forward"></i> Forward</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-arrow-back"></i> Back</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-refresh"></i> Sync</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-check"></i> Check</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-close"></i> Check</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-menu"></i> Menu</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-apps"></i> Apps</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-check-all"></i> Done</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-trending-up"></i> Up</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-apps"></i> Get</button>
+        <button class="btn btn-light btn--icon-text"><i class="zmdi zmdi-phone"></i> Call</button>
+
+        <br/>
+        <br/>
+
+        <button class="btn btn-primary btn--icon-text"><i class="zmdi zmdi-home"></i> Home</button>
+        <button class="btn btn-secondary btn--icon-text"><i class="zmdi zmdi-search"></i> Search</button>
+        <button class="btn btn-success btn--icon-text"><i class="zmdi zmdi-more-vert"></i> More</button>
+        <button class="btn btn-danger btn--icon-text"><i class="zmdi zmdi-arrow-forward"></i> Forward</button>
+        <button class="btn btn-warning btn--icon-text"><i class="zmdi zmdi-arrow-back"></i> Back</button>
+        <button class="btn btn-info btn--icon-text"><i class="zmdi zmdi-refresh"></i> Sync</button>
+        <button class="btn btn-dark btn--icon-text"><i class="zmdi zmdi-check"></i> Check</button>
+
+        <br/>
+        <br/>
+        <br/>
+
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-home"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-search"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-more-vert"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-arrow-forward"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-arrow-back"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-refresh"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-check"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-close"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-menu"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-apps"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-check-all"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-trending-up"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-apps"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-phone"></i></button>
+
+        <br/>
+        <br/>
+
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-home"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-search"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-more-vert"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-arrow-forward"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-arrow-back"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-refresh"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-check"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-close"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-menu"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-apps"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-check-all"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-trending-up"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-apps"></i></button>
+        <button class="btn btn-light btn--icon"><i class="zmdi zmdi-phone"></i></button>
+
+        <br/>
+        <br/>
+
+        <button class="btn btn-primary btn--icon"><i class="zmdi zmdi-home"></i></button>
+        <button class="btn btn-secondary btn--icon"><i class="zmdi zmdi-search"></i></button>
+        <button class="btn btn-success btn--icon"><i class="zmdi zmdi-more-vert"></i></button>
+        <button class="btn btn-danger btn--icon"><i class="zmdi zmdi-arrow-forward"></i></button>
+        <button class="btn btn-warning btn--icon"><i class="zmdi zmdi-arrow-back"></i></button>
+        <button class="btn btn-info btn--icon"><i class="zmdi zmdi-refresh"></i></button>
+        <button class="btn btn-dark btn--icon"><i class="zmdi zmdi-check"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Sizes</h4>
+      <h6 class="card-subtitle">Fancy larger or smaller buttons? Add <code>.btn-lg</code> or <code>.btn-sm</code> for additional sizes.</h6>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary btn-lg">Large</button>
+        <button type="button" class="btn btn-primary">Default</button>
+        <button type="button" class="btn btn-primary btn-sm">Small</button>
+      </div>
+
+      <br>
+
+      <p>Create block level buttons—those that span the full width of a parent—by adding <code>.btn-block</code></p>
+
+      <button type="button" class="btn btn-primary btn-block">Block level button</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Button State</h4>
+
+      <h3 class="card-body__title">Active state</h3>
+      <p>Buttons will appear pressed (with a darker background, darker border, and inset shadow) when active. There’s no need to add a class to <code>&#x3C;button&#x3E;</code>s as they use a pseudo-class. However, you can still force the same active appearance with <code>.active</code> (and include the aria-pressed="true" attribute) should you need to replicate the state programmatically.</p>
+
+      <br>
+
+      <div class="btn-demo">
+        <a href="#" class="btn btn-primary active" role="button" aria-pressed="true">Primary</a>
+        <a href="#" class="btn btn-success active" role="button" aria-pressed="true">Success</a>
+        <a href="#" class="btn btn-info active" role="button" aria-pressed="true">Info</a>
+        <a href="#" class="btn btn-warning active" role="button" aria-pressed="true">Warning</a>
+        <a href="#" class="btn btn-danger active" role="button" aria-pressed="true">Danger</a>
+      </div>
+
+      <br>
+      <br>
+
+      <h3 class="card-body__title">Disabled state</h3>
+      <p>Make buttons look inactive by adding the disabled boolean attribute to any <code>&#x3C;button&#x3E;</code> element.</p>
+
+      <div class="btn-demo">
+        <button type="button" class="btn btn-primary" disabled>Primary</button>
+        <button type="button" class="btn btn-secondary" disabled>Secondary</button>
+        <button type="button" class="btn btn-success" disabled>Success</button>
+        <button type="button" class="btn btn-info" disabled>Info</button>
+        <button type="button" class="btn btn-warning" disabled>Warning</button>
+        <button type="button" class="btn btn-danger" disabled>Danger</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Button group</h4>
+      <h6 class="card-subtitle">Group a series of buttons together on a single line with the button group</h6>
+
+      <h3 class="card-body__title">Basic example</h3>
+      <p>Wrap a series of buttons with <code>.btn</code> in <code>.btn-group</code></p>
+
+      <div class="btn-demo">
+        <div class="btn-group">
+          <button type="button" class="btn btn-light">Left</button>
+          <button type="button" class="btn btn-light">Middle</button>
+          <button type="button" class="btn btn-light">Right</button>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary">Left</button>
+          <button type="button" class="btn btn-primary">Middle</button>
+          <button type="button" class="btn btn-primary">Right</button>
+        </div>
+      </div>
+
+      <br>
+      <br>
+
+      <h3 class="card-body__title">Button toolbar</h3>
+      <p>Combine sets of button groups into button toolbars for more complex components. Use utility classes as needed to space out groups, buttons, and more.</p>
+
+      <div class="btn-toolbar">
+        <div class="btn-group mr-1">
+          <button type="button" class="btn btn-light">1</button>
+          <button type="button" class="btn btn-light">2</button>
+          <button type="button" class="btn btn-light">3</button>
+          <button type="button" class="btn btn-light">4</button>
+        </div>
+        <div class="btn-group mr-1">
+          <button type="button" class="btn btn-light">5</button>
+          <button type="button" class="btn btn-light">6</button>
+          <button type="button" class="btn btn-light">7</button>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-light">8</button>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="btn-toolbar">
+        <div class="btn-group mr-1">
+          <button type="button" class="btn btn-primary">1</button>
+          <button type="button" class="btn btn-primary">2</button>
+          <button type="button" class="btn btn-primary">3</button>
+          <button type="button" class="btn btn-primary">4</button>
+        </div>
+        <div class="btn-group mr-1">
+          <button type="button" class="btn btn-primary">5</button>
+          <button type="button" class="btn btn-primary">6</button>
+          <button type="button" class="btn btn-primary">7</button>
+        </div>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary">8</button>
+        </div>
+      </div>
+
+      <br>
+      <br>
+
+      <h3 class="card-body__title">Sizing</h3>
+      <p>Instead of applying button sizing classes to every button in a group, just add <code>.btn-group-*</code> to each <code>.btn-group</code>, including each one when nesting multiple groups.</p>
+
+      <div class="btn-group btn-group-lg">
+        <button type="button" class="btn btn-light">Left</button>
+        <button type="button" class="btn btn-light">Middle</button>
+        <button type="button" class="btn btn-light">Right</button>
+      </div>
+
+      <br>
+      <br>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary">Left</button>
+        <button type="button" class="btn btn-primary">Middle</button>
+        <button type="button" class="btn btn-primary">Right</button>
+      </div>
+
+      <br>
+      <br>
+
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-primary">Left</button>
+        <button type="button" class="btn btn-primary">Middle</button>
+        <button type="button" class="btn btn-primary">Right</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Nesting</h4>
+      <h6 class="card-subtitle">Place a <code>.btn-group</code> within another <code>.btn-group</code> when you want dropdown menus mixed with a series of buttons.</h6>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-light">1</button>
+        <button type="button" class="btn btn-light">2</button>
+
+        <div class="btn-group" dropdown>
+          <button dropdownToggle type="button" class="btn btn-light">
+            Dropdown
+          </button>
+          <div *dropdownMenu class="dropdown-menu">
+            <a class="dropdown-item" href="#">Dropdown link</a>
+            <a class="dropdown-item" href="#">Dropdown link</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

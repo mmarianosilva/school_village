@@ -1,0 +1,8 @@
+// Following styles are only for demo purposes. You can remove these anytime and DO NOT use these styles in your project
+
+.btn-demo {
+  & > .btn,
+  & > .btn-group {
+    margin: 0 5px 10px 0;
+  }
+}

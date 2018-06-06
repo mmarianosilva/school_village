@@ -1,0 +1,54 @@
+.todo__item {
+  padding-left: 4.5rem;
+  display: block;
+
+  small {
+    display: block;
+    font-size: 0.95rem;
+    margin-top: 0.2rem;
+  }
+
+  .custom-control-input {
+    &:checked {
+      & ~ .custom-control-label-char {
+        text-decoration: line-through;
+      }
+
+      & ~ .custom-control-label-char {
+        & > i {
+          background-color: $gray-200 !important;
+
+          &:after {
+            color: $headings-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+.todo__info {
+  & > span {
+    color: $headings-color;
+  }
+
+  & > small {
+    color: $text-muted;
+  }
+}
+
+.todo__labels {
+  & > a {
+    color: $orange;
+    border: 2px solid lighten($orange, 20%);
+    border-radius: $border-radius;
+    padding: 0.55rem 0.8rem;
+    display: inline-block;
+    margin: 0 0.1rem 0.4rem;
+    @include transition(color 300ms, border-color 300ms);
+
+    &:hover {
+      color: darken($orange, 5%);
+    }
+  }
+}
