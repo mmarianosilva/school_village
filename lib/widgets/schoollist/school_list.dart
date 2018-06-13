@@ -34,6 +34,7 @@ class _SchoolListState extends State<SchoolList> {
       body: new FutureBuilder(
           future: UserHelper.getSchools(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            print(snapshot.data);
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 return new Text('Loading...');
@@ -70,22 +71,6 @@ class _SchoolListState extends State<SchoolList> {
                                 if(snapshot.data[index]['role'] == 'SiteAdmin' || snapshot.data[index]['role'] == 'Owner') {
                                   isOwner = true;
                                 }
-
-                                UserHelper.subscribeToSchoolTopics(snapshot.data[index]['ref'], isOwner);
-//                                var id = snapshot.data[index]['ref'].split(
-//                                    "/")[1];
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-medical");
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-fight");
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-armed");
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-fire");
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-intruder");
-//                                _firebaseMessaging.subscribeToTopic(
-//                                    "$id-other");
 
                                 return new FlatButton(
                                     child: new Text(schoolSnapshot.data == null

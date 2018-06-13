@@ -202,12 +202,12 @@ class _AlertState extends State<Alert> {
     }
 
     return new Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       appBar: new AppBar(
         title: new Text('Alert',
             textAlign: TextAlign.center,
             style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade400,
+        backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
         leading: new BackButton(color: Colors.grey.shade800),
         actions: <Widget>[
@@ -241,6 +241,9 @@ class _AlertState extends State<Alert> {
                   color: Colors.red,
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold)),
+          new SizedBox(height: 32.0),
+          new Image.asset('assets/images/alert_hand_icon.png',
+              width: 48.0, height: 48.0),
           new SizedBox(height: 32.0),
           new Card(
             margin: EdgeInsets.all(8.0),

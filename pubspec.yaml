@@ -47,6 +47,9 @@ flutter:
     - assets/images/alert_medical.png
     - assets/images/alert_fight.png
     - assets/images/splash_text.png
+    - assets/images/broadcast_btn.png
+    - assets/images/security_btn.png
+    - assets/images/alert_hand_icon.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

@@ -39,12 +39,12 @@ class _NotificationsState extends State<Notifications> {
     }
     print("/$_schoolId/notifications");
     return new Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       appBar: new AppBar(
         title: new Text('Notifications',
             textAlign: TextAlign.center,
             style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade400,
+        backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
         leading: new BackButton(color: Colors.grey.shade800),
       ),
@@ -85,10 +85,6 @@ class _NotificationsState extends State<Notifications> {
                   ]
                 ),
               );
-//              return new ListTile(
-//                title: new Text(document['title'] ?? '<No message retrieved>'),
-//                subtitle: new Text('Message ${index + 1} of $messageCount'),
-//              );
             },
           );
         }

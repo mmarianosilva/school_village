@@ -87,12 +87,12 @@ class NotificationDetail extends StatelessWidget {
         )
     );
     return new Scaffold(
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: Colors.grey.shade100,
         appBar: new AppBar(
         title: new Text('Notification',
         textAlign: TextAlign.center,
         style: new TextStyle(color: Colors.black)),
-    backgroundColor: Colors.grey.shade400,
+    backgroundColor: Colors.grey.shade200,
     elevation: 0.0,
     leading: new BackButton(color: Colors.grey.shade800),
     ),

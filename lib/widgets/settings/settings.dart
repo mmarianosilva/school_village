@@ -47,7 +47,7 @@ class _SettingsState extends State<Settings> {
         title: new Text('Settings',
             textAlign: TextAlign.center,
             style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade400,
+        backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
         leading: new BackButton(color: Colors.grey.shade800),
       ),

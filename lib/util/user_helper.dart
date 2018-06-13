@@ -56,10 +56,37 @@ class UserHelper {
     print(currentUser);
     DocumentReference userRef = Firestore.instance.document(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-    List<dynamic> schools = userSnapshot['schools'];
+    List<dynamic> schools = [];
+    Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
+    setIsOwner(userSnapshot['owner'] ? true : false);
+    print("Schools");
+    for(int i = 0; i < keys.length; i++) {
+      schools.add({
+        "ref" : "schools/${keys.elementAt(i).toString().trim()}",
+        "role" : userSnapshot['associatedSchools'][keys.elementAt(i)]["role"]
+      });
+    }
+    print(schools);
     print("UID:");
     print(currentUser.uid);
     return schools;
+  }
+
+  static getSchoolAllGroups() async {
+    final String selectedSchool = await getSelectedSchoolID();
+    print(selectedSchool);
+    DocumentReference schoolRef = Firestore.instance.document(selectedSchool);
+    DocumentSnapshot schoolSnapshot = await schoolRef.get();
+    List<dynamic> groups = [];
+    Iterable<dynamic> keys = schoolSnapshot['groups'].keys;
+    print("Groups");
+    for(int i = 0; i < keys.length; i++) {
+      groups.add({
+        "name" : keys.elementAt(i).toString().trim(),
+      });
+    }
+    print(groups);
+    return groups;
   }
 
   static getSelectedSchoolID() async {
@@ -67,6 +94,13 @@ class UserHelper {
       _prefs = await _prefsFuture;
     }
     return _prefs.getString("school_id");
+  }
+
+  static getSelectedSchoolRole() async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    return _prefs.getString("school_role");
   }
 
   static setIsOwner(isOwner) async{
@@ -80,7 +114,7 @@ class UserHelper {
     if(_prefs == null) {
       _prefs = await _prefsFuture;
     }
-    return _prefs.getBool("is_owner");
+    return _prefs.getBool("is_owner") == null ? false : _prefs.getBool("is_owner");
   }
 
   static setSelectedSchool({schoolId: String, schoolName: String, schoolRole: String}) async {

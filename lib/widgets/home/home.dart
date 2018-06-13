@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
   }
 
   checkIfOnlyOneSchool() async {
-    var schools = await UserHelper.getSchools();
+    var schools = await UserHelper.getSchools().keys;
     if(schools.length == 1) {
       print("Only 1 School");
       var school = await Firestore.instance
@@ -193,7 +193,7 @@ class _HomeState extends State<Home> {
             padding: new EdgeInsets.all(8.0),
             child: new Image.asset('assets/images/logo.png'),
           ),
-          backgroundColor: Colors.grey.shade400,
+          backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           actions: <Widget>[
             new PopupMenuButton<Choice>(
@@ -219,4 +219,6 @@ class _HomeState extends State<Home> {
         body: new Dashboard(),
       );
   }
+
+
 }
