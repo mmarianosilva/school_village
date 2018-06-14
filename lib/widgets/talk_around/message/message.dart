@@ -22,7 +22,7 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(child: new Text(initial), backgroundColor: Theme.of(context).accentColor),
+            child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.redAccent),
           ),
           new Flexible(child: new Container(
             child: new Column(
@@ -40,7 +40,7 @@ class ChatMessage extends StatelessWidget {
               ],
             ),
             decoration: new BoxDecoration(
-              color: Colors.blue.shade200,
+              color: Colors.redAccent,
               borderRadius: BorderRadius.circular(10.0),
             ),
             padding: new EdgeInsets.all(8.0),
@@ -77,7 +77,7 @@ class ChatMessage extends StatelessWidget {
               ],
             ),
             decoration: new BoxDecoration(
-              color: Colors.grey.shade300,
+              color: Colors.green,
               borderRadius: BorderRadius.circular(10.0),
             ),
             padding: new EdgeInsets.all(8.0),
@@ -85,7 +85,7 @@ class ChatMessage extends StatelessWidget {
           ),
           new Container(
             margin: const EdgeInsets.only(left: 16.0),
-            child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.grey.shade700),
+            child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.green),
           ),
         ],
       ),

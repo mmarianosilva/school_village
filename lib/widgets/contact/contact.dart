@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../util/user_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class Contact extends StatefulWidget {
   @override
@@ -14,9 +16,9 @@ class _ContactState extends State<Contact> {
   final fNameController = new TextEditingController();
   final lNameController = new TextEditingController();
   final schoolController = new TextEditingController();
+  final phoneController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String title = "School Village";
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   onRequest() {
     _scaffoldKey.currentState.showSnackBar(
@@ -27,33 +29,28 @@ class _ContactState extends State<Contact> {
             new Text("Requesting in")
           ],
         ),
-          duration: new Duration(milliseconds: 1000),
+          duration: new Duration(milliseconds: 30000),
         )
     );
 
     var email = emailController.text.trim().toLowerCase();
-    var fName = emailController.text.trim().toLowerCase();
-    var lName = emailController.text.trim().toLowerCase();
-    var school = emailController.text.trim().toLowerCase();
+    var fName = fNameController.text.trim().toLowerCase();
+    var lName = lNameController.text.trim().toLowerCase();
+    var school = schoolController.text.trim().toLowerCase();
+    var phone = phoneController.text.trim().toLowerCase();
 
-    CollectionReference collection  = Firestore.instance.collection('requests');
-    final DocumentReference document = collection.document();
-
-
-    document.setData(<String, dynamic>{
+    var url = "https://us-central1-schoolvillage-1.cloudfunctions.net/api/contact";
+    http.post(url, body: {
       'email': email,
       'firstName': fName,
       'lastName': lName,
-      'school': school,
-      'createdAt' : new DateTime.now().millisecondsSinceEpoch
+      'schoolDistrict': school
+    })
+        .then((response) {
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+      Navigator.of(context).pop();
     });
-    print("Added Request " + document.documentID);
-
-    Navigator.of(context).pop();
-  }
-
-  onForgot() {
-
   }
 
   @override
@@ -64,15 +61,16 @@ class _ContactState extends State<Contact> {
         appBar: new AppBar(
 
           title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-          backgroundColor: Colors.grey.shade400,
+          backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
+          leading: new BackButton(color: Colors.grey.shade800)
         ),
         body: new Center(
           child: new Container(
-            padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+            padding: new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
             child: new Column(
               children: <Widget>[
-                const SizedBox(height: 18.0),
+                const SizedBox(height: 8.0),
 //              new Image.asset('assets/images/logo.png'),
                 new Flexible(
                     child: new TextField(
@@ -99,6 +97,16 @@ class _ContactState extends State<Contact> {
                       decoration: new InputDecoration(
                           border: const UnderlineInputBorder(),
                           hintText: 'Last Name',
+                          labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
+                    )
+                ),
+                const SizedBox(height: 12.0),
+                new Flexible(
+                    child: new TextField(
+                      controller: phoneController,
+                      decoration: new InputDecoration(
+                          border: const UnderlineInputBorder(),
+                          hintText: 'Phone',
                           labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
                     )
                 ),

@@ -42,7 +42,7 @@ class _SettingsState extends State<Settings> {
     }
 
     return new Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Colors.grey.shade100,
       appBar: new AppBar(
         title: new Text('Settings',
             textAlign: TextAlign.center,

@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:school_village/model/school_ref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 class UserHelper {
 
@@ -56,6 +57,7 @@ class UserHelper {
     print(currentUser);
     DocumentReference userRef = Firestore.instance.document(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
+    subscribeToAllTopics(userSnapshot);
     List<dynamic> schools = [];
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
     setIsOwner(userSnapshot['owner'] ? true : false);
@@ -131,6 +133,60 @@ class UserHelper {
       _prefs = await _prefsFuture;
     }
     return _prefs.getString("school_name");
+  }
+
+  static updateTopicSubscription() async {
+    print("Subscribing all");
+    final FirebaseUser currentUser = await getUser();
+    if(currentUser == null) {
+      return null;
+    }
+    String userPath = "/users/${currentUser.uid}";
+    print(currentUser);
+    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentSnapshot userSnapshot = await userRef.get();
+    subscribeToAllTopics(userSnapshot);
+  }
+
+  static subscribeToAllTopics(user) async {
+    print("Subscribing to topics");
+    print(user["associatedSchools"]);
+    var schools = user["associatedSchools"].keys;
+    bool owner = false;
+    if(user["owner"] != null) {
+      owner = user["owner"];
+    }
+    for(int i = 0; i<schools.length; i++) {
+      subscribeToSchoolAlerts(schools.elementAt(i), owner);
+      var groups = user["associatedSchools"][schools.elementAt(i)].containsKey("groups") ?  user["associatedSchools"][schools.elementAt(i)]["groups"].keys : [];
+      print("subscribing to groups $groups");
+      for(int j =0; j<groups.length; j ++) {
+        print("${schools.elementAt(i)}-grp-${groups.elementAt(j)}");
+        _firebaseMessaging.subscribeToTopic(
+            "${schools.elementAt(i)}-grp-${groups.elementAt(j)}");
+      }
+    }
+  }
+
+  static subscribeToSchoolAlerts(schoolId, isOwner) {
+    print("Subscribung to alerts");
+    var id = schoolId;
+    _firebaseMessaging.subscribeToTopic(
+        "$id-medical");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-fight");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-armed");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-fire");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-intruder");
+    _firebaseMessaging.subscribeToTopic(
+        "$id-other");
+    if(isOwner) {
+      _firebaseMessaging.subscribeToTopic(
+          "$id-test");
+    }
   }
 
   static subscribeToSchoolTopics(schoolId, isOwner) {

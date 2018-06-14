@@ -27,6 +27,7 @@ class _BroadcastState extends State<Broadcast> {
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
+  int numCharacters = 0;
   final customAlertController = new TextEditingController();
 
   getUserDetails() async {
@@ -52,7 +53,7 @@ class _BroadcastState extends State<Broadcast> {
 
   _sendMessage(context) {
     var text = customAlertController.text;
-    if(text.length < 3) return;
+    if(text.length < 20) return;
     _sendBroadcast(text, context);
   }
 
@@ -110,11 +111,11 @@ class _BroadcastState extends State<Broadcast> {
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(
-            title: new Text('Alert Sent'),
+            title: new Text('Sent'),
             content: new SingleChildScrollView(
               child: new ListBody(
                 children: <Widget>[
-                  new Text('')
+                  new Text('Your message has been sent')
                 ],
               ),
             ),
@@ -153,12 +154,21 @@ class _BroadcastState extends State<Broadcast> {
     widgets.add(new TextField(
       maxLines: 6,
       controller: customAlertController,
+      onChanged: (String text) {
+        setState(() {
+          numCharacters = customAlertController.text.length;
+        });
+      },
       decoration: new InputDecoration(
           border: const OutlineInputBorder(),
-
           hintText: 'Message'),
     ));
-
+    widgets.add(new SizedBox(height: 12.0));
+    widgets.add(new Text("$numCharacters characters (minimun 20)",
+      style: new TextStyle(
+          fontSize: 12.0
+      ),
+    ));
     widgets.add(new SizedBox(height: 12.0));
 
     widgets.add(new Container(
@@ -166,9 +176,10 @@ class _BroadcastState extends State<Broadcast> {
       child: new MaterialButton(
         color: Theme.of(context).accentColor,
         child: new Text("Send"),
-        onPressed: () {_sendMessage(context);},
+        onPressed: numCharacters >= 20 ?() {_sendMessage(context);} : null,
       ),
     ));
+
 
     return new Scaffold(
         backgroundColor: Colors.grey.shade100,

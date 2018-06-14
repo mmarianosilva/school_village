@@ -51,8 +51,9 @@ class _ForgotState extends State<Forgot> {
         appBar: new AppBar(
 
           title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-          backgroundColor: Colors.grey.shade400,
+          backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
+          leading: new BackButton(color: Colors.grey.shade800)
         ),
         body: new Center(
           child: new Container(

@@ -8,6 +8,7 @@ import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
+import '../messages/messages.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -38,18 +39,26 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _firebaseMessaging.subscribeToTopic("eH0twSteQXFpNYRi9nzU-medical");
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print("onMessage: $message");
+        if(message["type"] == "broadcast") {
+         return  _showBroadcastDialog(message);
+        }
         _showItemDialog(message);
       },
       onLaunch: (Map<String, dynamic> message) {
         print("onLaunch: $message");
+        if(message["type"] == "broadcast") {
+          return  _showBroadcastDialog(message);
+        }
         _showItemDialog(message);
       },
       onResume: (Map<String, dynamic> message) {
         print("onResume: $message");
+        if(message["type"] == "broadcast") {
+          return  _showBroadcastDialog(message);
+        }
         _showItemDialog(message);
       },
     );
@@ -58,6 +67,45 @@ class _HomeState extends State<Home> {
     _firebaseMessaging.getToken().then((token){
       print(token);
     });
+  }
+
+  _showBroadcastDialog(Map<String, dynamic> message) async {
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text(message['title']),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text(message['body'])
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('View All'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new Messages(),
+                  ),
+                );
+              },
+            ),
+            new FlatButton(
+              child: new Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _showItemDialog(Map<String, dynamic> message) async{
@@ -85,6 +133,7 @@ class _HomeState extends State<Home> {
             new FlatButton(
               child: new Text('View Details'),
               onPressed: () {
+                Navigator.of(context).pop();
                 Navigator.push(
                   context,
                   new MaterialPageRoute(
@@ -121,7 +170,7 @@ class _HomeState extends State<Home> {
   }
 
   checkIfOnlyOneSchool() async {
-    var schools = await UserHelper.getSchools().keys;
+    var schools = await UserHelper.getSchools();
     if(schools.length == 1) {
       print("Only 1 School");
       var school = await Firestore.instance
@@ -130,11 +179,6 @@ class _HomeState extends State<Home> {
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
         schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
-      var isOwner = false;
-      if(schools[0]['role'] == 'SiteAdmin' || schools[0]['role'] == 'Owner') {
-        isOwner = true;
-      }
-      UserHelper.subscribeToSchoolTopics(schools[0]['ref'], isOwner);
       return true;
     }
     return false;
@@ -142,6 +186,7 @@ class _HomeState extends State<Home> {
 
   updateSchool() async {
     print("updating schools");
+    UserHelper.updateTopicSubscription();
     String schoolId = await UserHelper.getSelectedSchoolID();
     if(schoolId == null || schoolId == '') {
       if((await checkIfOnlyOneSchool())) {
@@ -176,13 +221,14 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
 
-    try {
-      _location.getLocation.then((location) {}).catchError((error) {});
-    } catch (e) {
-    }
+
 
     if(!isLoaded) {
       updateSchool();
+      try {
+        _location.getLocation.then((location) {}).catchError((error) {});
+      } catch (e) {
+      }
     }
 
       return new Scaffold(

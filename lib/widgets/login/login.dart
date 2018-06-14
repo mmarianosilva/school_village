@@ -76,7 +76,7 @@ class _LoginState extends State<Login> {
           child: new Image.asset('assets/images/logo.png'),
         ),
         title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade400,
+        backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
       ),
       body: new Center(

@@ -29,7 +29,9 @@ class _SchoolListState extends State<SchoolList> {
     return new Scaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
-        title: new Text("Select School"),
+        title: new Text("Select School", style: new TextStyle(color: Colors.black)),
+        leading: new BackButton(color: Colors.grey.shade800),
+        backgroundColor: Colors.grey.shade200,
       ),
       body: new FutureBuilder(
           future: UserHelper.getSchools(),

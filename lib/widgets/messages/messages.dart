@@ -81,42 +81,46 @@ class _MessagesState extends State<Messages> {
                 if(!belongsToGroup(document['groups'].keys)) {
                   return SizedBox(width: 0.0, height: 0.0);
                 }
-                return new Column(
+                return new Container(child: new Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       new Container(
                         padding: EdgeInsets.only(
-                          left: 8.0,
-                          right: 8.0,
-                          top: 8.0
+                            left: 8.0,
+                            right: 8.0,
+                            top: 8.0
                         ),
                         alignment: Alignment.centerLeft,
                         child: new Text(document['createdBy'] + "", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
                       ),
                       new Container(
                         padding: EdgeInsets.only(
-                          left: 8.0,
-                          right: 8.0,
-                          top: 2.0
+                            left: 8.0,
+                            right: 8.0,
+                            top: 2.0
                         ),
                         alignment: Alignment.centerLeft,
                         child: new Text(document['body'] + ""),
                       ),
                       new Container(
                         padding: EdgeInsets.only(
-                          left: 8.0,
-                          right: 8.0,
-                          top: 2.0
+                            left: 8.0,
+                            right: 8.0,
+                            top: 2.0,
+                            bottom: 8.0
                         ),
                         alignment: Alignment.centerLeft,
-                        child: new Text("${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}"),
+                        child: new Text("${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
-                      new Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.centerLeft,
-                      )
                     ]
+                  ),
+                  decoration: new BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  margin: new EdgeInsets.all(8.0),
                 );
+
               },
             );
           }
