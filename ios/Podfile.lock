@@ -131,7 +131,7 @@ DEPENDENCIES:
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `Pods/.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
   - location (from `Pods/.symlinks/plugins/location/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
@@ -173,7 +173,7 @@ EXTERNAL SOURCES:
   firebase_storage:
     :path: Pods/.symlinks/plugins/firebase_storage/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-release
+    :path: Pods/.symlinks/flutter/ios
   location:
     :path: Pods/.symlinks/plugins/location/ios
   path_provider:

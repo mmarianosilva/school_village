@@ -235,12 +235,15 @@ class _AlertState extends State<Alert> {
       body: new Column(
         children: <Widget>[
           new SizedBox(height: 32.0),
-          new Text("TAP AN ICON BELOW TO SEND AN ALERT",
-              textAlign: TextAlign.center,
-              style: new TextStyle(
-                  color: Colors.red,
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold)),
+          new Container(
+            padding: EdgeInsets.all(12.0),
+            child: new Text("TAP AN ICON BELOW TO SEND AN ALERT",
+                textAlign: TextAlign.center,
+                style: new TextStyle(
+                    color: Colors.red,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold),
+          )),
           new SizedBox(height: 32.0),
           new Image.asset('assets/images/alert_hand_icon.png',
               width: 48.0, height: 48.0),
@@ -265,7 +268,7 @@ class _AlertState extends State<Alert> {
                           child: new Column(children: [
                             new Image.asset('assets/images/alert_armed.png',
                                 width: 48.0, height: 48.0),
-                            new Text("Armed Assailant", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                            new Text("Armed Assailant", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                           ])),
                     )),
                     new Expanded(
@@ -277,7 +280,7 @@ class _AlertState extends State<Alert> {
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_fight.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Fight", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Fight", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                               ])),
                         )),
                     new Expanded(
@@ -289,7 +292,7 @@ class _AlertState extends State<Alert> {
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_medical.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Medical Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Medical Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                               ])),
                         ))
                   ],
@@ -306,7 +309,7 @@ class _AlertState extends State<Alert> {
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_fire.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Fire", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Fire", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                               ])),
                         )),
                     new Expanded(
@@ -318,7 +321,7 @@ class _AlertState extends State<Alert> {
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_intruder.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Intruder", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Intruder", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                               ])),
                         )),
                     new Expanded(
@@ -330,7 +333,7 @@ class _AlertState extends State<Alert> {
                               child: new Column(children: [
                                 new Image.asset('assets/images/alert_other.png',
                                     width: 48.0, height: 48.0),
-                                new Text("Other Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold))
+                                new Text("Other Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
                               ])),
                         ))
                   ],

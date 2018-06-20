@@ -50,14 +50,31 @@ class NotificationDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> widgets = new List();
 
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    print("Width: $width Height: $height");
+
+    if(height < width) {
+      height = height/3;
+    } else {
+      height = height/2;
+    }
+
+    int iwidth = width.ceil();
+    int iheight = height.ceil();
+
+    print("Width: $iwidth Height: $iheight");
+    print("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
+
     if(notification["location"] != null) {
       widgets.add(
         new GestureDetector(
           onTap: () {
-            launch("https://www.google.com/maps/@?api=1&map_action=map&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
+            launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
           },
           child: new Image.network(
-              "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=640x400&maptype=hybrid&key=$_staticMapKey"),
+              "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
         )
           
       );

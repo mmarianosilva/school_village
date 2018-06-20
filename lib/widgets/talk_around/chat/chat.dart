@@ -23,6 +23,9 @@ class _ChatState extends State<Chat> {
   _ChatState(this.conversation, this.user);
 
   void _handleSubmitted(String text) {
+    if(text == null || text.trim() == '') {
+      return;
+    }
     CollectionReference collection  = Firestore.instance.collection('$conversation/messages');
     final DocumentReference document = collection.document();
     document.setData(<String, dynamic>{
@@ -79,10 +82,15 @@ class _ChatState extends State<Chat> {
                       padding: new EdgeInsets.all(8.0),
                       itemBuilder: (_, int index) {
                         final DocumentSnapshot document = snapshot.data.documents[index];
+                        var createdBy = document['createdBy'].split(" ");
+                        var initial =  createdBy[0].length > 0 ? createdBy[0][0] : '';
+                        if(createdBy.length > 1) {
+                          initial = createdBy[1].length > 0 ? "$initial${createdBy[1][0]}" : "$initial";
+                        }
                         return new ChatMessage(
                             text: document['body'],
-                            name: "${user.data['firstName']} ${user.data['lastName']}",
-                            initial: "${user.data['firstName'].length > 0 ? user.data['firstName'][0] : ''} ${user.data['lastName'].length > 0 ? user.data['lastName'][0] : ''}",
+                            name: "${document['createdBy']}",
+                            initial: "$initial",
                             timestamp: document['createdAt'],
                             self: document['createdById'] == user.documentID,
                         );

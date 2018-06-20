@@ -75,61 +75,81 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  checkNewSchool() async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    if(schoolId != ref) {
+      String schoolName = await UserHelper.getSchoolName();
+      setState(() {
+        isLoaded = false;
+        ref = schoolId;
+      });
+    }
+  }
+
+  sendAlert() {
+    print("Sending Alert");
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Alert()),
+    );
+  }
+
+  openSettings() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Settings()),
+    );
+  }
+
+  openNotifications() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Notifications()),
+    );
+  }
+
+  openMessages() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Messages()),
+    );
+  }
+
+  openTalk() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new TalkAround()),
+    );
+  }
+
+  sendBroadcast() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new SelectGroups()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("Rendering Dashboard");
     if(!isLoaded) {
       _getSchoolId();
+    } else {
+      checkNewSchool();
     }
 
-    if(!hasSchool && isLoaded) {
-      _updateSchool();
-    }
+
+//    if(!hasSchool && isLoaded) {
+//      _updateSchool();
+//    } else {
+//      checkNewSchool();
+//    }
+
     var icons = [
       {'icon': new Icon(Icons.book), 'text': "Safety Instructions"}
     ];
 
-    sendAlert() {
-      print("Sending Alert");
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new Alert()),
-      );
-    }
 
-    openSettings() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new Settings()),
-      );
-    }
-
-    openNotifications() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new Notifications()),
-      );
-    }
-
-    openMessages() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new Messages()),
-      );
-    }
-
-    openTalk() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new TalkAround()),
-      );
-    }
-
-    sendBroadcast() {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new SelectGroups()),
-      );
-    }
 
     if(!isLoaded || !hasSchool) {
       return new Material(
@@ -167,22 +187,24 @@ class _DashboardState extends State<Dashboard> {
                         List<Widget> widgets = new List();
                         List<String> securityRoles = ["school_admin", "school_security"];
                         print("Owner $isOwner Role $role");
-                        if(isOwner || securityRoles.contains(role)) {
+                        if(securityRoles.contains(role)) {
                           widgets.add(
                             new GestureDetector(
                               child: new Image.asset('assets/images/security_btn.png', width: 48.0),
                               onTap: openTalk,
                             )
                           );
-                          widgets.add(new SizedBox(width: 20.0));
                         }
-
-                        widgets.add(
-                            new GestureDetector(
-                              child: new Image.asset('assets/images/broadcast_btn.png', width: 48.0),
-                              onTap: sendBroadcast,
-                            )
-                        );
+                        if(role == "school_admin") {
+                          widgets.add(new SizedBox(width: 20.0));
+                          widgets.add(
+                              new GestureDetector(
+                                child: new Image.asset(
+                                    'assets/images/broadcast_btn.png', width: 48.0),
+                                onTap: sendBroadcast,
+                              )
+                          );
+                        }
                         return new Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: widgets,
@@ -191,7 +213,7 @@ class _DashboardState extends State<Dashboard> {
                       if(index == snapshot.data.data["documents"].length +2) {
                         return new Column(
                           children: <Widget>[
-                            const SizedBox(height: 28.0),
+                            const SizedBox(height: 14.0),
                             new GestureDetector(
                               onTap: openMessages,
                               child:  new Row(
@@ -214,14 +236,21 @@ class _DashboardState extends State<Dashboard> {
                                 new Icon(Icons.chevron_right)
                               ],
                             ),
-                            )
+                            ),
+                            const SizedBox(height: 14.0),
+                            new Container(
+                              height: 0.5,
+                              width: MediaQuery.of(context).size.width,
+                              color: Colors.grey,
+                            ),
                           ],
                         );
                       }
                       if(index == snapshot.data.data["documents"].length +3) {
                         return new Column(
                           children: <Widget>[
-                            const SizedBox(height: 28.0),
+                            const SizedBox(height: 14.0),
+
                             new GestureDetector(
                               onTap: openNotifications,
                               child:  new Row(
@@ -244,6 +273,12 @@ class _DashboardState extends State<Dashboard> {
                                   new Icon(Icons.chevron_right)
                                 ],
                               ),
+                            ),
+                            const SizedBox(height: 14.0),
+                            new Container(
+                              height: 0.5,
+                              width: MediaQuery.of(context).size.width,
+                              color: Colors.grey,
                             )
                           ],
                         );
@@ -251,7 +286,7 @@ class _DashboardState extends State<Dashboard> {
                       if(index == snapshot.data.data["documents"].length +4) {
                         return new Column(
                           children: <Widget>[
-                            const SizedBox(height: 28.0),
+                            const SizedBox(height: 14.0),
                             new GestureDetector(
                               onTap: openSettings,
                               child:  new Row(
@@ -280,7 +315,7 @@ class _DashboardState extends State<Dashboard> {
                       }
                       return new Column(
                         children: <Widget>[
-                          const SizedBox(height: 28.0),
+                          const SizedBox(height: 14.0),
                           new GestureDetector(
                             onTap: () {
                               if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
@@ -316,6 +351,12 @@ class _DashboardState extends State<Dashboard> {
                                 new Icon(Icons.chevron_right)
                               ],
                             ),
+                          ),
+                          const SizedBox(height: 14.0),
+                          new Container(
+                            height: 0.5,
+                            width: MediaQuery.of(context).size.width,
+                            color: Colors.grey,
                           )
                         ],
                       );

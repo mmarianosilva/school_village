@@ -35,6 +35,7 @@ class _HomeState extends State<Home> {
   bool isLoaded = false;
   final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   Location _location = new Location();
+  String _schoolId;
 
   @override
   void initState() {
@@ -179,9 +180,27 @@ class _HomeState extends State<Home> {
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
         schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
+      setState(() {
+        title = school.data["name"];
+        isLoaded = true;
+        _schoolId = schools[0]['ref'];
+      });
       return true;
     }
     return false;
+  }
+
+  checkNewSchool() async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    if(schoolId == null || schoolId == '') return;
+    if(schoolId != _schoolId) {
+      String schoolName = await UserHelper.getSchoolName();
+      setState(() {
+        title = schoolName;
+        isLoaded = false;
+        _schoolId = schoolId;
+      });
+    }
   }
 
   updateSchool() async {
@@ -192,6 +211,7 @@ class _HomeState extends State<Home> {
       if((await checkIfOnlyOneSchool())) {
         return;
       }
+      print("Redirecting to Schools");
       Navigator.push(
         context,
         new MaterialPageRoute(builder: (context) => new SchoolList()),
@@ -205,6 +225,7 @@ class _HomeState extends State<Home> {
     setState(() {
       title = schoolName;
       isLoaded = true;
+      _schoolId = schoolId;
     });
     _firebaseMessaging.requestNotificationPermissions();
   }
@@ -218,17 +239,22 @@ class _HomeState extends State<Home> {
     }
   }
 
+  _getLocationPermission() {
+    try {
+      _location.getLocation.then((location) {}).catchError((error) {});
+    } catch (e) {
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-
-
+    print("Building Home $isLoaded");
     if(!isLoaded) {
+      print("Updating school");
       updateSchool();
-      try {
-        _location.getLocation.then((location) {}).catchError((error) {});
-      } catch (e) {
-      }
+      _getLocationPermission();
+    } else {
+      checkNewSchool();
     }
 
       return new Scaffold(

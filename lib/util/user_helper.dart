@@ -45,6 +45,7 @@ class UserHelper {
     }
     _prefs.setString("email", null);
     _prefs.setString("password", null);
+    setSelectedSchool(schoolRole: null, schoolName: null, schoolId: null);
     return;
   }
 

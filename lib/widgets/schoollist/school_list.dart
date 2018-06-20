@@ -18,6 +18,7 @@ class _SchoolListState extends State<SchoolList> {
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     print(schoolId);
+    print("Setting school");
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
     Navigator.pop(_context);
@@ -37,6 +38,7 @@ class _SchoolListState extends State<SchoolList> {
           future: UserHelper.getSchools(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             print(snapshot.data);
+            print(snapshot.connectionState);
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 return new Text('Loading...');
@@ -49,7 +51,7 @@ class _SchoolListState extends State<SchoolList> {
 
                   return new ListView.builder(
                     padding: new EdgeInsets.all(22.0),
-                    itemExtent: 20.0,
+//                    itemExtent: 20.0,
                     itemBuilder: (BuildContext context, int index) {
                       return new FutureBuilder(
                         future: Firestore.instance
@@ -74,17 +76,32 @@ class _SchoolListState extends State<SchoolList> {
                                   isOwner = true;
                                 }
 
-                                return new FlatButton(
-                                    child: new Text(schoolSnapshot.data == null
-                                        ? ''
-                                        : schoolSnapshot.data["name"]),
-                                    onPressed: () {
-                                      selectSchool(
-                                          schoolName:
-                                          schoolSnapshot.data["name"],
-                                          schoolId: snapshot.data[index]['ref'],
-                                          role: snapshot.data[index]['role']);
-                                    });
+                                return new Container(
+                                  child: new Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new Container(
+                                        padding: EdgeInsets.only(
+                                            left: 8.0,
+                                            right: 8.0,
+                                            top: 8.0
+                                        ),
+                                        alignment: Alignment.centerLeft,
+                                        child: new FlatButton(
+                                            child: new Text(schoolSnapshot.data == null
+                                                ? ''
+                                                : schoolSnapshot.data["name"]),
+                                            onPressed: () {
+                                              selectSchool(
+                                                  schoolName:
+                                                  schoolSnapshot.data["name"],
+                                                  schoolId: snapshot.data[index]['ref'],
+                                                  role: snapshot.data[index]['role']);
+                                            }),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               }
                           }
                         },
