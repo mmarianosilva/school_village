@@ -89,6 +89,7 @@ class _LoginState extends State<Login> {
               new Flexible(
                   child: new TextField(
                     controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: new InputDecoration(
                         border: const UnderlineInputBorder(),
                         hintText: 'Email',
