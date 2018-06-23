@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:school_village/model/school_ref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'package:http/http.dart' as http;
 
 class UserHelper {
 
@@ -58,20 +56,16 @@ class UserHelper {
     print(currentUser);
     DocumentReference userRef = Firestore.instance.document(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-    subscribeToAllTopics(userSnapshot);
+//    subscribeToAllTopics(userSnapshot);
     List<dynamic> schools = [];
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
-    setIsOwner(userSnapshot['owner'] ? true : false);
-    print("Schools");
+    setIsOwner(userSnapshot['owner'] != null &&  userSnapshot['owner'] == true ? true : false);
     for(int i = 0; i < keys.length; i++) {
       schools.add({
         "ref" : "schools/${keys.elementAt(i).toString().trim()}",
         "role" : userSnapshot['associatedSchools'][keys.elementAt(i)]["role"]
       });
     }
-    print(schools);
-    print("UID:");
-    print(currentUser.uid);
     return schools;
   }
 
@@ -82,13 +76,11 @@ class UserHelper {
     DocumentSnapshot schoolSnapshot = await schoolRef.get();
     List<dynamic> groups = [];
     Iterable<dynamic> keys = schoolSnapshot['groups'].keys;
-    print("Groups");
     for(int i = 0; i < keys.length; i++) {
       groups.add({
         "name" : keys.elementAt(i).toString().trim(),
       });
     }
-    print(groups);
     return groups;
   }
 
@@ -137,7 +129,6 @@ class UserHelper {
   }
 
   static updateTopicSubscription() async {
-    print("Subscribing all");
     final FirebaseUser currentUser = await getUser();
     if(currentUser == null) {
       return null;
@@ -150,8 +141,6 @@ class UserHelper {
   }
 
   static subscribeToAllTopics(user) async {
-    print("Subscribing to topics");
-    print(user["associatedSchools"]);
     var schools = user["associatedSchools"].keys;
     bool owner = false;
     if(user["owner"] != null) {
@@ -160,7 +149,6 @@ class UserHelper {
     for(int i = 0; i<schools.length; i++) {
       subscribeToSchoolAlerts(schools.elementAt(i), owner);
       var groups = user["associatedSchools"][schools.elementAt(i)].containsKey("groups") ?  user["associatedSchools"][schools.elementAt(i)]["groups"].keys : [];
-      print("subscribing to groups $groups");
       for(int j =0; j<groups.length; j ++) {
         print("${schools.elementAt(i)}-grp-${groups.elementAt(j)}");
         _firebaseMessaging.subscribeToTopic(

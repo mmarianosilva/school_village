@@ -11,6 +11,8 @@ PODS:
     - Firebase/Database
     - Firebase/Firestore
     - Flutter
+  - device_info (0.0.1):
+    - Flutter
   - Firebase/Auth (5.0.1):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.0.0)
@@ -126,12 +128,13 @@ PODS:
 
 DEPENDENCIES:
   - cloud_firestore (from `Pods/.symlinks/plugins/cloud_firestore/ios`)
+  - device_info (from `Pods/.symlinks/plugins/device_info/ios`)
   - firebase_analytics (from `Pods/.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `Pods/.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `Pods/.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
   - location (from `Pods/.symlinks/plugins/location/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
@@ -162,6 +165,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   cloud_firestore:
     :path: Pods/.symlinks/plugins/cloud_firestore/ios
+  device_info:
+    :path: Pods/.symlinks/plugins/device_info/ios
   firebase_analytics:
     :path: Pods/.symlinks/plugins/firebase_analytics/ios
   firebase_auth:
@@ -173,7 +178,7 @@ EXTERNAL SOURCES:
   firebase_storage:
     :path: Pods/.symlinks/plugins/firebase_storage/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios
+    :path: Pods/.symlinks/flutter/ios-release
   location:
     :path: Pods/.symlinks/plugins/location/ios
   path_provider:
@@ -186,6 +191,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BoringSSL: 60dd24df4af296bf41d78e5841dbb95d75f88c0d
   cloud_firestore: a2d49d9c7219fce31033eb1a2ee953d7733c91d6
+  device_info: 76ce0b32e13034d1883be4a382433648f9dcee63
   Firebase: d6861c2059d8c32d1e6dd8932e22ada346d90a3a
   firebase_analytics: fcc60a9de4b8e07aa5af8941303a7f5fe6e0383f
   firebase_auth: 27a5a77a032d557c18f8e223aaf8ec1368f6cdbc

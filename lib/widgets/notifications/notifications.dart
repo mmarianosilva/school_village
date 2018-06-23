@@ -74,7 +74,7 @@ class _NotificationsState extends State<Notifications> {
                               Navigator.push(
                                 context,
                                 new MaterialPageRoute(
-                                  builder: (context) => new NotificationDetail(notification: document),
+                                  builder: (context) => new NotificationDetail(notification: document, title: 'Notification'),
                                 ),
                               );
                             },

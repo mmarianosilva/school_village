@@ -247,7 +247,14 @@ class _AlertState extends State<Alert> {
           new SizedBox(height: 32.0),
           new Image.asset('assets/images/alert_hand_icon.png',
               width: 48.0, height: 48.0),
-          new SizedBox(height: 32.0),
+          new SizedBox(height: 16.0),
+          new Container(
+            height: 0.5,
+            margin: EdgeInsets.all(12.0),
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          ),
+          new SizedBox(height: 16.0),
           new Card(
             margin: EdgeInsets.all(8.0),
             child: new Column(

@@ -1,3 +1,3 @@
 class Constants {
-  static final version = "1.0.7";
+  static final version = "1.0.8";
 }

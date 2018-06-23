@@ -38,14 +38,28 @@ class _LoginState extends State<Login> {
               '/home', (Route<dynamic> route) => false);
         }).catchError((error)  {
           _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
-          _scaffoldKey.currentState.showSnackBar(
-              new SnackBar(content:
-              new Row(
-                children: <Widget>[
-                  new Text(error.details)
-                ],
-              ),
-              )
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return new AlertDialog(
+                  title: new Text('Error loggin in'),
+                  content: new SingleChildScrollView(
+                    child: new ListBody(
+                      children: <Widget>[
+                        new Text(error.details)
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: new Text('Okay'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                );
+              }
           );
           print(error);
         });

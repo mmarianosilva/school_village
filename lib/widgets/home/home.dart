@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
 import '../messages/messages.dart';
+import '../../util/token_helper.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -40,6 +41,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    TokenHelper.saveToken();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print("onMessage: $message");
@@ -205,7 +207,7 @@ class _HomeState extends State<Home> {
 
   updateSchool() async {
     print("updating schools");
-    UserHelper.updateTopicSubscription();
+//    UserHelper.updateTopicSubscription();
     String schoolId = await UserHelper.getSelectedSchoolID();
     if(schoolId == null || schoolId == '') {
       if((await checkIfOnlyOneSchool())) {

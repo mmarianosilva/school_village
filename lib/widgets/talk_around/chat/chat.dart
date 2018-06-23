@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../util/user_helper.dart';
 import '../message/message.dart';
+import 'package:location/location.dart';
 
 class Chat extends StatefulWidget {
   final String conversation;
@@ -19,10 +20,13 @@ class _ChatState extends State<Chat> {
   final String conversation;
   final DocumentSnapshot user;
   final Firestore firestore = Firestore.instance;
+  bool isLoaded = false;
+  Location _location = new Location();
 
   _ChatState(this.conversation, this.user);
 
-  void _handleSubmitted(String text) {
+
+  void _handleSubmitted(String text) async {
     if(text == null || text.trim() == '') {
       return;
     }
@@ -32,9 +36,23 @@ class _ChatState extends State<Chat> {
       'body': _textController.text,
       'createdById' : user.documentID,
       'createdBy' : "${user.data['firstName']} ${user.data['lastName']}",
-      'createdAt' : new DateTime.now().millisecondsSinceEpoch
+      'createdAt' : new DateTime.now().millisecondsSinceEpoch,
+      'location': await _getLocation(),
+      'reportedByPhone' : "${user['phone']}"
     });
     _textController.clear();
+  }
+
+  _getLocation() async {
+    Map<String, double> location;
+    String error;
+    try {
+      location = await _location.getLocation;
+      error = null;
+    } catch (e) {
+      location = null;
+    }
+    return location;
   }
 
   Widget _buildTextComposer() {
@@ -66,7 +84,6 @@ class _ChatState extends State<Chat> {
 
   @override
   Widget build(BuildContext context) {
-    print(conversation);
     return new Column(                                        //modified
       children: <Widget>[                                         //new
             new Flexible(                                             //new
@@ -93,6 +110,8 @@ class _ChatState extends State<Chat> {
                             initial: "$initial",
                             timestamp: document['createdAt'],
                             self: document['createdById'] == user.documentID,
+                            location : document['location'],
+                            message: document,
                         );
                       },
                     );

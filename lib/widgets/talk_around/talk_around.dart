@@ -73,7 +73,7 @@ class _TalkAroundState extends State<TalkAround> {
               new Tab(text: "Security + Admin")
             ],
           ),
-          title: new Text('Talk Around',
+          title: new Text('Security Talk-Around',
               textAlign: TextAlign.center,
               style: new TextStyle(color: Colors.black)),
           leading: new BackButton(color: Colors.grey.shade800),
