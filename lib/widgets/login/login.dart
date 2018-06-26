@@ -46,7 +46,7 @@ class _LoginState extends State<Login> {
                   content: new SingleChildScrollView(
                     child: new ListBody(
                       children: <Widget>[
-                        new Text(error.details)
+                        new Text(error.message)
                       ],
                     ),
                   ),
