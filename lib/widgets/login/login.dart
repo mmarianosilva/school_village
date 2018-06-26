@@ -42,7 +42,7 @@ class _LoginState extends State<Login> {
               context: context,
               builder: (BuildContext context) {
                 return new AlertDialog(
-                  title: new Text('Error loggin in'),
+                  title: new Text('Error logging in'),
                   content: new SingleChildScrollView(
                     child: new ListBody(
                       children: <Widget>[

@@ -9,7 +9,12 @@ class Splash extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   goToNextPage(BuildContext context) async {
-    final FirebaseUser currentUser = await UserHelper.getUser();
+    FirebaseUser currentUser;
+    try {
+      currentUser = await UserHelper.getUser();
+    } catch(err) {
+      print("Bad Password");
+    }
     if(currentUser != null) {
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/home', (Route<dynamic> route) => false);
