@@ -9,3 +9,6 @@ build/
 .flutter-plugins
 
 functions/functions/node_modules/
+
+.idea
+*.iml
