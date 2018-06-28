@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
 import '../messages/messages.dart';
 import '../../util/token_helper.dart';
+import '../talk_around/talk_around.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -44,25 +45,13 @@ class _HomeState extends State<Home> {
     TokenHelper.saveToken();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
-        print("onMessage: $message");
-        if(message["type"] == "broadcast") {
-         return  _showBroadcastDialog(message);
-        }
-        _showItemDialog(message);
+        _onNotification(message);
       },
       onLaunch: (Map<String, dynamic> message) {
-        print("onLaunch: $message");
-        if(message["type"] == "broadcast") {
-          return  _showBroadcastDialog(message);
-        }
-        _showItemDialog(message);
+        _onNotification(message);
       },
       onResume: (Map<String, dynamic> message) {
-        print("onResume: $message");
-        if(message["type"] == "broadcast") {
-          return  _showBroadcastDialog(message);
-        }
-        _showItemDialog(message);
+        _onNotification(message);
       },
     );
     _firebaseMessaging.requestNotificationPermissions(
@@ -70,6 +59,27 @@ class _HomeState extends State<Home> {
     _firebaseMessaging.getToken().then((token){
       print(token);
     });
+  }
+
+  _onNotification(Map<String, dynamic> message) {
+    print("onResume: $message");
+    if(message["type"] == "broadcast") {
+      return  _showBroadcastDialog(message);
+    } else if(message["type"] == "security") {
+      return _goToSecurityChat();
+    }
+    _showItemDialog(message);
+  }
+
+  _goToSecurityChat() {
+    if(['school_admin', 'school_security'].contains(UserHelper.getSelectedSchoolRole())) {
+      Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (context) => new TalkAround(),
+        ),
+      );
+    }
   }
 
   _showBroadcastDialog(Map<String, dynamic> message) async {
