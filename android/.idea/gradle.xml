@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/../../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/cloud_firestore-0.7.2/android" />
+            <option value="$PROJECT_DIR$/../../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.2.1/android" />
             <option value="$PROJECT_DIR$/../../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_analytics-0.3.3/android" />
             <option value="$PROJECT_DIR$/../../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth-0.5.10/android" />
             <option value="$PROJECT_DIR$/../../../lib/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core-0.2.3/android" />
