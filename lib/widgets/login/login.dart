@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../util/user_helper.dart';
 import '../contact/contact.dart';
 import '../forgot/forgot.dart';
+import '../../util/analytics_helper.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -34,6 +35,7 @@ class _LoginState extends State<Login> {
         email: emailController.text.trim().toLowerCase(),
         password: passwordController.text).then((user) {
           print(user);
+          AnalyticsHelper.logLogin();
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/home', (Route<dynamic> route) => false);
         }).catchError((error)  {

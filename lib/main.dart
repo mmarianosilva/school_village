@@ -2,26 +2,69 @@ import 'package:flutter/material.dart';
 import 'widgets/splash/splash.dart';
 import 'widgets/home/home.dart';
 import 'widgets/login/login.dart';
-import 'widgets/schoollist/school_list.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'util/analytics_helper.dart';
+import 'util/constants.dart';
+import 'package:sentry/sentry.dart';
+import 'dart:async';
 
-FirebaseAnalytics analytics = new FirebaseAnalytics();
+final SentryClient _sentry = new SentryClient(dsn: Constants.sentry_dsn);
 
-void main() => runApp(new MaterialApp(
-    home: Splash(),
-    theme: new ThemeData(
-      primaryColor: Colors.grey.shade900,
-      accentColor: Colors.blue,
-      brightness: Brightness.light,
-      primaryColorDark: Colors.white10,
-      primaryColorLight: Colors.white
-    ),
-    routes: <String, WidgetBuilder> {
-        '/home': (BuildContext context) => new Home(),
-        '/login': (BuildContext context) => new Login(),
-    },
-    navigatorObservers: [
-        new FirebaseAnalyticsObserver(analytics: analytics),
-    ],
-));
+
+Future<Null> main() async {
+    FlutterError.onError = (FlutterErrorDetails details) async {
+        if (isInDebugMode) {
+            FlutterError.dumpErrorToConsole(details);
+        } else {
+            Zone.current.handleUncaughtError(details.exception, details.stack);
+        }
+    };
+    runZoned<Future<Null>>(() async {
+        runApp(new MaterialApp(
+            home: Splash(),
+            theme: new ThemeData(
+                primaryColor: Colors.grey.shade900,
+                accentColor: Colors.blue,
+                brightness: Brightness.light,
+                primaryColorDark: Colors.white10,
+                primaryColorLight: Colors.white
+            ),
+            routes: <String, WidgetBuilder> {
+                '/home': (BuildContext context) => new Home(),
+                '/login': (BuildContext context) => new Login(),
+            },
+            navigatorObservers: [
+                new FirebaseAnalyticsObserver(analytics: AnalyticsHelper.getAnalytics()),
+            ],
+        ));
+    }, onError: (error, stackTrace) async {
+        await _reportError(error, stackTrace);
+    });
+}
+
+
+bool get isInDebugMode {
+    bool inDebugMode = false;
+    assert(inDebugMode = true);
+    return inDebugMode;
+}
+
+
+Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
+    print('Caught error: $error');
+    if (isInDebugMode) {
+        print(stackTrace);
+        print('In dev mode. Not sending report to Sentry.io.');
+        return;
+    }
+    print('Reporting to Sentry.io...');
+    final SentryResponse response = await _sentry.captureException(
+        exception: error,
+        stackTrace: stackTrace,
+    );
+    if (response.isSuccessful) {
+        print('Success! Event ID: ${response.eventId}');
+    } else {
+        print('Failed to report to Sentry.io: ${response.error}');
+    }
+}

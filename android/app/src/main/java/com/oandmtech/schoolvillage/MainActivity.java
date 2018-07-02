@@ -13,6 +13,10 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
+import com.microsoft.appcenter.AppCenter;
+import com.microsoft.appcenter.analytics.Analytics;
+import com.microsoft.appcenter.crashes.Crashes;
+
 public class MainActivity extends FlutterActivity {
 
   private static final String CHANNEL = "schoolvillage.app/pdf_view";
@@ -22,6 +26,9 @@ public class MainActivity extends FlutterActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     GeneratedPluginRegistrant.registerWith(this);
+
+    AppCenter.start(getApplication(), "c5b4ce38-f8e5-458b-8f10-8328d37d76a3",
+              Analytics.class, Crashes.class);
 
     new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(
             new MethodChannel.MethodCallHandler() {

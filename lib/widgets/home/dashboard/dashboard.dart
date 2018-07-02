@@ -7,6 +7,7 @@ import '../../select_group/select_group.dart';
 import '../../talk_around/talk_around.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../util/file_helper.dart';
+import '../../../util/analytics_helper.dart';
 import 'dart:io';
 import '../../settings/settings.dart';
 import '../../notifications/notifications.dart';
@@ -323,6 +324,7 @@ class _DashboardState extends State<Dashboard> {
                                     context,
                                     snapshot.data.data["documents"][index - 2]
                                     ["location"]);
+
                               } else {
                                 _launchURL(snapshot.data.data["documents"][index - 2]
                                 ["location"]);

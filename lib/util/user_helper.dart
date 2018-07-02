@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'analytics_helper.dart';
 
 class UserHelper {
 
@@ -33,6 +34,7 @@ class UserHelper {
       }
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
     }
+    AnalyticsHelper.setUserId(user.uid);
     return user;
   }
 
@@ -119,6 +121,7 @@ class UserHelper {
     _prefs.setString("school_id", schoolId);
     _prefs.setString("school_name", schoolName);
     _prefs.setString("school_role", schoolRole);
+    AnalyticsHelper.setSchoolId(schoolId, schoolName, schoolRole);
   }
 
   static getSchoolName() async {

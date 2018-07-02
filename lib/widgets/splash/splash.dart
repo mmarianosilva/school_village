@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../util/user_helper.dart';
+import '../../util/analytics_helper.dart';
 
 class Splash extends StatelessWidget {
 
@@ -31,6 +32,7 @@ class Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsHelper.logAppOpen();
     startTimeout(context);
     return new Material(
       color: Theme.of(context).primaryColorLight,
