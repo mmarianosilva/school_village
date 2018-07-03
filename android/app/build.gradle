@@ -30,9 +30,13 @@ android {
         applicationId "com.oandmtech.schoolvillage"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 13
-        versionName "1.0.13"
+        versionCode 15
+        versionName "1.0.15"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
+        }
     }
 
     signingConfigs {
