@@ -232,123 +232,119 @@ class _AlertState extends State<Alert> {
         ]
       ),
 
-      body: new Column(
-        children: <Widget>[
-          new SizedBox(height: 32.0),
-          new Container(
-            padding: EdgeInsets.all(12.0),
-            child: new Text("TAP AN ICON BELOW TO SEND AN ALERT",
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                    color: Colors.red,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold),
-          )),
-          new SizedBox(height: 32.0),
-          new Image.asset('assets/images/alert_hand_icon.png',
-              width: 48.0, height: 48.0),
-          new SizedBox(height: 16.0),
-          new Container(
-            height: 0.5,
-            margin: EdgeInsets.all(12.0),
-            width: MediaQuery.of(context).size.width,
-            color: Colors.grey,
-          ),
-          new SizedBox(height: 16.0),
-          new Card(
-            margin: EdgeInsets.all(8.0),
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Expanded(
-                      flex: 1,
-                        child: new Container(
-                      margin: EdgeInsets.all(8.0),
-
-                      child: new GestureDetector(
-                          onTap: () {
-                            _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
-                            },
-                          child: new Column(children: [
-                            new Image.asset('assets/images/alert_armed.png',
-                                width: 48.0, height: 48.0),
-                            new Text("Armed Assailant", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                          ])),
-                    )),
-                    new Expanded(
-                        flex: 1,
-                        child: new Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: new GestureDetector(
-                              onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
-                              child: new Column(children: [
-                                new Image.asset('assets/images/alert_fight.png',
-                                    width: 48.0, height: 48.0),
-                                new Text("Fight", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                              ])),
-                        )),
-                    new Expanded(
-                        flex: 1,
-                        child: new Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: new GestureDetector(
-                              onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emrgency has been reported at $_schoolName", context);},
-                              child: new Column(children: [
-                                new Image.asset('assets/images/alert_medical.png',
-                                    width: 48.0, height: 48.0),
-                                new Text("Medical Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                              ])),
-                        ))
-                  ],
-                ),
-                new Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Expanded(
-                        flex: 1,
-                        child: new Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: new GestureDetector(
-                              onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
-                              child: new Column(children: [
-                                new Image.asset('assets/images/alert_fire.png',
-                                    width: 48.0, height: 48.0),
-                                new Text("Fire", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                              ])),
-                        )),
-                    new Expanded(
-                        flex: 1,
-                        child: new Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: new GestureDetector(
-                              onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
-                              child: new Column(children: [
-                                new Image.asset('assets/images/alert_intruder.png',
-                                    width: 48.0, height: 48.0),
-                                new Text("Intruder", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                              ])),
-                        )),
-                    new Expanded(
-                        flex: 1,
-                        child: new Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: new GestureDetector(
-                              onTap: () {_sendCustomAlert(context);},
-                              child: new Column(children: [
-                                new Image.asset('assets/images/alert_other.png',
-                                    width: 48.0, height: 48.0),
-                                new Text("Other Emergency", textAlign: TextAlign.center, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500))
-                              ])),
-                        ))
-                  ],
-                )
-              ],
+      body: new SingleChildScrollView(
+        child: new Column(
+          children: <Widget>[
+            new SizedBox(height: 32.0),
+            new Container(
+                padding: EdgeInsets.all(12.0),
+                child: new Text("TAP AN ICON BELOW TO SEND AN ALERT",
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                      color: Colors.red,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold),
+                )),
+            new SizedBox(height: 32.0),
+            new Image.asset('assets/images/alert_hand_icon.png',
+                width: 48.0, height: 48.0),
+            new SizedBox(height: 16.0),
+            new Container(
+              height: 0.5,
+              margin: EdgeInsets.all(12.0),
+              width: MediaQuery.of(context).size.width,
+              color: Colors.grey,
             ),
-          )
-        ],
+            new SizedBox(height: 16.0),
+            new Card(
+              margin: EdgeInsets.all(8.0),
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  new Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+
+                            child: new GestureDetector(
+                                onTap: () {
+                                  _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
+                                },
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_armed.png',
+                                      width: 72.0, height: 108.0),
+                                ])),
+                          )),
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: new GestureDetector(
+                                onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_fight.png',
+                                      width: 72.0, height: 95.4),
+                                ])),
+                          )),
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: new GestureDetector(
+                                onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emrgency has been reported at $_schoolName", context);},
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_medical.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          ))
+                    ],
+                  ),
+                  new Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: new GestureDetector(
+                                onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_fire.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          )),
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: new GestureDetector(
+                                onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_intruder.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          )),
+                      new Expanded(
+                          flex: 1,
+                          child: new Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: new GestureDetector(
+                                onTap: () {_sendCustomAlert(context);},
+                                child: new Column(children: [
+                                  new Image.asset('assets/images/alert_other.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          ))
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
