@@ -6,7 +6,9 @@ import 'package:firebase_analytics/observer.dart';
 import 'util/analytics_helper.dart';
 import 'util/constants.dart';
 import 'package:sentry/sentry.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'dart:async';
+import 'model/main_model.dart';
 
 final SentryClient _sentry = new SentryClient(dsn: Constants.sentry_dsn);
 
@@ -20,22 +22,25 @@ Future<Null> main() async {
         }
     };
     runZoned<Future<Null>>(() async {
-        runApp(new MaterialApp(
-            home: Splash(),
-            theme: new ThemeData(
-                primaryColor: Colors.grey.shade900,
-                accentColor: Colors.blue,
-                brightness: Brightness.light,
-                primaryColorDark: Colors.white10,
-                primaryColorLight: Colors.white
+        runApp(new ScopedModel<MainModel>(
+            model: MainModel(),
+            child: new MaterialApp(
+                home: Splash(),
+                theme: new ThemeData(
+                    primaryColor: Colors.grey.shade900,
+                    accentColor: Colors.blue,
+                    brightness: Brightness.light,
+                    primaryColorDark: Colors.white10,
+                    primaryColorLight: Colors.white
+                ),
+                routes: <String, WidgetBuilder> {
+                    '/home': (BuildContext context) => new Home(),
+                    '/login': (BuildContext context) => new Login(),
+                },
+                navigatorObservers: [
+                    new FirebaseAnalyticsObserver(analytics: AnalyticsHelper.getAnalytics()),
+                ],
             ),
-            routes: <String, WidgetBuilder> {
-                '/home': (BuildContext context) => new Home(),
-                '/login': (BuildContext context) => new Login(),
-            },
-            navigatorObservers: [
-                new FirebaseAnalyticsObserver(analytics: AnalyticsHelper.getAnalytics()),
-            ],
         ));
     }, onError: (error, stackTrace) async {
         await _reportError(error, stackTrace);

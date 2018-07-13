@@ -38,7 +38,7 @@ class UserHelper {
     return user;
   }
 
-  static logout() async {
+  static logout(token) async {
     _auth.signOut();
     if(_prefs == null) {
       _prefs = await _prefsFuture;

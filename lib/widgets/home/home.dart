@@ -11,6 +11,10 @@ import 'package:location/location.dart';
 import '../messages/messages.dart';
 import '../../util/token_helper.dart';
 import '../talk_around/talk_around.dart';
+import '../../model/main_model.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -25,7 +29,7 @@ class Choice {
 }
 
 const List<Choice> choices = const <Choice>[
-  const Choice(title: 'Notifications', icon: Icons.notifications),
+//  const Choice(title: 'Notifications', icon: Icons.notifications),
   const Choice(title: 'Settings', icon: Icons.settings)
 ];
 
@@ -38,6 +42,7 @@ class _HomeState extends State<Home> {
   final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   Location _location = new Location();
   String _schoolId;
+  String _token;
 
   @override
   void initState() {
@@ -57,6 +62,9 @@ class _HomeState extends State<Home> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token){
+      setState(() {
+        _token = token;
+      });
       print(token);
     });
   }
@@ -175,13 +183,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  openNotifications() {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => new Notifications()),
-    );
-  }
-
   checkIfOnlyOneSchool() async {
     var schools = await UserHelper.getSchools();
     if(schools.length == 1) {
@@ -215,6 +216,8 @@ class _HomeState extends State<Home> {
     }
   }
 
+
+
   updateSchool() async {
     print("updating schools");
 //    UserHelper.updateTopicSubscription();
@@ -246,9 +249,6 @@ class _HomeState extends State<Home> {
     if(choice.title == "Settings") {
       openSettings();
     }
-    if(choice.title == "Notifications") {
-      openNotifications();
-    }
   }
 
   _getLocationPermission() {
@@ -260,48 +260,56 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    print("Building Home $isLoaded");
-    if(!isLoaded) {
-      print("Updating school");
-      updateSchool();
-      _getLocationPermission();
-    } else {
-      checkNewSchool();
-    }
 
-      return new Scaffold(
-        backgroundColor: Colors.white,
-        appBar: new AppBar(
-          title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-          leading: new Container(
-            padding: new EdgeInsets.all(8.0),
-            child: new Image.asset('assets/images/logo.png'),
-          ),
-          backgroundColor: Colors.grey.shade200,
-          elevation: 0.0,
-          actions: <Widget>[
-            new PopupMenuButton<Choice>(
-              onSelected: _select,
-              icon: new Icon(Icons.more_vert, color: Colors.grey.shade800),
-              itemBuilder: (BuildContext context) {
-                return choices.map((Choice choice) {
-                  return new PopupMenuItem<Choice>(
-                    value: choice,
-                    child: new Row(
-                      children: <Widget>[
-                        new Icon(choice.icon, color: Colors.grey.shade800),
-                        new SizedBox(width: 8.0),
-                        new Text(choice.title)
-                      ],
-                    ),
-                  );
-                }).toList();
-              },
+    return new ScopedModelDescendant<MainModel>(
+      builder: (context, child, model) {
+
+        model.setToken(_token);
+        print("Building Home $isLoaded");
+        if(!isLoaded) {
+          model.refreshUserIfNull();
+          print("Updating school");
+          updateSchool();
+          _getLocationPermission();
+        } else {
+          checkNewSchool();
+        }
+
+        return new Scaffold(
+          backgroundColor: Colors.white,
+          appBar: new AppBar(
+            title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+            leading: new Container(
+              padding: new EdgeInsets.all(8.0),
+              child: new Image.asset('assets/images/logo.png'),
             ),
-          ],
-        ),
-        body: new Dashboard(),
-      );
+            backgroundColor: Colors.grey.shade200,
+            elevation: 0.0,
+            actions: <Widget>[
+              new PopupMenuButton<Choice>(
+                onSelected: _select,
+                icon: new Icon(Icons.more_vert, color: Colors.grey.shade800),
+                itemBuilder: (BuildContext context) {
+                  return choices.map((Choice choice) {
+                    return new PopupMenuItem<Choice>(
+                      value: choice,
+                      child: new Row(
+                        children: <Widget>[
+                          new Icon(choice.icon, color: Colors.grey.shade800),
+                          new SizedBox(width: 8.0),
+                          new Text(choice.title)
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
+            ],
+          ),
+          body: new Dashboard(),
+        );
+      },
+    );
   }
 
 

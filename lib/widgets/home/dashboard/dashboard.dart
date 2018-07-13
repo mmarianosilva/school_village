@@ -12,6 +12,8 @@ import 'dart:io';
 import '../../settings/settings.dart';
 import '../../notifications/notifications.dart';
 import '../../messages/messages.dart';
+import 'package:scoped_model/scoped_model.dart';
+import '../../../model/main_model.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -132,239 +134,241 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    print("Rendering Dashboard");
-    if(!isLoaded) {
-      _getSchoolId();
-    } else {
-      checkNewSchool();
-    }
+    return new ScopedModelDescendant<MainModel>(
+      builder: (context, child, model) {
+        if(ref != null && ref != '') {
+          model.getAlertGroups(this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '').then((alerts) {
+            print("User");
+            print(alerts);
+          });
+        }
 
+        print("Rendering Dashboard");
+        if(!isLoaded) {
+          _getSchoolId();
+        } else {
+          checkNewSchool();
+        }
 
-//    if(!hasSchool && isLoaded) {
-//      _updateSchool();
-//    } else {
-//      checkNewSchool();
-//    }
+        if(!isLoaded || !hasSchool) {
+          return new Material(
+              child: new Text("Please Select A School from Settings Tab")
+          );
+        }
 
-    var icons = [
-      {'icon': new Icon(Icons.book), 'text': "Safety Instructions"}
-    ];
+        return new FutureBuilder(
+            future: Firestore.instance.document(ref).get(),
+            builder:
+                (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return new Text('Loading...');
+                case ConnectionState.waiting:
+                  return new Text('Loading...');
+                case ConnectionState.active:
+                  return new Text('Loading...');
+                default:
+                  if (snapshot.hasError)
+                    return new Text('Error: ${snapshot.error}');
+                  else
 
-
-
-    if(!isLoaded || !hasSchool) {
-      return new Material(
-        child: new Text("Please Select A School from Settings Tab")
-      );
-    }
-
-    return new FutureBuilder(
-        future: Firestore.instance.document(ref).get(),
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return new Text('Loading...');
-            case ConnectionState.waiting:
-              return new Text('Loading...');
-            case ConnectionState.active:
-              return new Text('Loading...');
-            default:
-              if (snapshot.hasError)
-                return new Text('Error: ${snapshot.error}');
-              else
-
-                return new ListView.builder(
-                    padding: new EdgeInsets.all(8.0),
-                    itemBuilder: (BuildContext context, int index) {
-                      if(index == 0) {
-                        return new GestureDetector(child:
-                          new Image.asset('assets/images/alert.png',
-                            width: 120.0, height: 120.0),
-                          onTap: sendAlert,
-                        );
-                      }
-                      if(index == 1) {
-                        List<Widget> widgets = new List();
-                        List<String> securityRoles = ["school_admin", "school_security"];
-                        print("Owner $isOwner Role $role");
-                        if(securityRoles.contains(role)) {
-                          widgets.add(
-                            new GestureDetector(
-                              child: new Image.asset('assets/images/security_btn.png', width: 48.0),
-                              onTap: openTalk,
-                            )
-                          );
-                        }
-                        if(role == "school_admin") {
-                          widgets.add(new SizedBox(width: 20.0));
-                          widgets.add(
-                              new GestureDetector(
-                                child: new Image.asset(
-                                    'assets/images/broadcast_btn.png', width: 48.0),
-                                onTap: sendBroadcast,
-                              )
-                          );
-                        }
-                        return new Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: widgets,
-                        );
-                      }
-                      if(index == snapshot.data.data["documents"].length +2) {
-                        return new Column(
-                          children: <Widget>[
-                            const SizedBox(height: 14.0),
-                            new GestureDetector(
-                              onTap: openMessages,
-                              child:  new Row(
-                                children: <Widget>[
-    //                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                  new Container(
-                                  width: 48.0,
-                                  height: 48.0,
-                                  child: new Center(
-                                    child: new Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
+                    return new ListView.builder(
+                        padding: new EdgeInsets.all(8.0),
+                        itemBuilder: (BuildContext context, int index) {
+                          if(index == 0) {
+                            return new GestureDetector(child:
+                            new Image.asset('assets/images/alert.png',
+                                width: 120.0, height: 120.0),
+                              onTap: sendAlert,
+                            );
+                          }
+                          if(index == 1) {
+                            List<Widget> widgets = new List();
+                            List<String> securityRoles = ["school_admin", "school_security"];
+                            print("Owner $isOwner Role $role");
+                            if(securityRoles.contains(role)) {
+                              widgets.add(
+                                  new GestureDetector(
+                                    child: new Image.asset('assets/images/security_btn.png', width: 48.0),
+                                    onTap: openTalk,
+                                  )
+                              );
+                            }
+                            if(role == "school_admin") {
+                              widgets.add(new SizedBox(width: 20.0));
+                              widgets.add(
+                                  new GestureDetector(
+                                    child: new Image.asset(
+                                        'assets/images/broadcast_btn.png', width: 48.0),
+                                    onTap: sendBroadcast,
+                                  )
+                              );
+                            }
+                            return new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: widgets,
+                            );
+                          }
+                          if(index == snapshot.data.data["documents"].length +2) {
+                            return new Column(
+                              children: <Widget>[
+                                const SizedBox(height: 14.0),
+                                new GestureDetector(
+                                  onTap: openMessages,
+                                  child:  new Row(
+                                    children: <Widget>[
+                                      //                                new Image.asset('assets/images/logo.png', width: 48.0),
+                                      new Container(
+                                        width: 48.0,
+                                        height: 48.0,
+                                        child: new Center(
+                                          child: new Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
+                                        ),
+                                      ),
+                                      new SizedBox(width: 12.0),
+                                      new Expanded(
+                                          child: new Text(
+                                            "Messages",
+                                            textAlign: TextAlign.left,
+                                            style: new TextStyle(fontSize: 16.0),
+                                          )),
+                                      new Icon(Icons.chevron_right)
+                                    ],
                                   ),
                                 ),
-                                new SizedBox(width: 12.0),
-                                new Expanded(
-                                    child: new Text(
-                                      "Messages",
-                                      textAlign: TextAlign.left,
-                                      style: new TextStyle(fontSize: 16.0),
-                                    )),
-                                new Icon(Icons.chevron_right)
+                                const SizedBox(height: 14.0),
+                                new Container(
+                                  height: 0.5,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.grey,
+                                ),
                               ],
-                            ),
-                            ),
-                            const SizedBox(height: 14.0),
-                            new Container(
-                              height: 0.5,
-                              width: MediaQuery.of(context).size.width,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        );
-                      }
-                      if(index == snapshot.data.data["documents"].length +3) {
-                        return new Column(
-                          children: <Widget>[
-                            const SizedBox(height: 14.0),
-
-                            new GestureDetector(
-                              onTap: openNotifications,
-                              child:  new Row(
-                                children: <Widget>[
-                                  //                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                  new Container(
-                                    width: 48.0,
-                                    height: 48.0,
-                                    child: new Center(
-                                      child: new Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
-                                    ),
-                                  ),
-                                  new SizedBox(width: 12.0),
-                                  new Expanded(
-                                      child: new Text(
-                                        "Notifications",
-                                        textAlign: TextAlign.left,
-                                        style: new TextStyle(fontSize: 16.0),
-                                      )),
-                                  new Icon(Icons.chevron_right)
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 14.0),
-                            new Container(
-                              height: 0.5,
-                              width: MediaQuery.of(context).size.width,
-                              color: Colors.grey,
-                            )
-                          ],
-                        );
-                      }
-                      if(index == snapshot.data.data["documents"].length +4) {
-                        return new Column(
-                          children: <Widget>[
-                            const SizedBox(height: 14.0),
-                            new GestureDetector(
-                              onTap: openSettings,
-                              child:  new Row(
-                                children: <Widget>[
-                                  //                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                  new Container(
-                                    width: 48.0,
-                                    height: 48.0,
-                                    child: new Center(
-                                      child: new Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
-                                    ),
-                                  ),
-                                  new SizedBox(width: 12.0),
-                                  new Expanded(
-                                      child: new Text(
-                                        "Settings",
-                                        textAlign: TextAlign.left,
-                                        style: new TextStyle(fontSize: 16.0),
-                                      )),
-                                  new Icon(Icons.chevron_right)
-                                ],
-                              ),
-                            )
-                          ],
-                        );
-                      }
-                      return new Column(
-                        children: <Widget>[
-                          const SizedBox(height: 14.0),
-                          new GestureDetector(
-                            onTap: () {
-                              if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
-                                _showPDF(
-                                    context,
-                                    snapshot.data.data["documents"][index - 2]
-                                    ["location"]);
-
-                              } else {
-                                _launchURL(snapshot.data.data["documents"][index - 2]
-                                ["location"]);
+                            );
+                          }
+                          if(index == snapshot.data.data["documents"].length +3) {
+                            return new FutureBuilder(future: model.getAlertGroups(ref.split("/")[1]), builder: (context, alertGroups) {
+                              if(alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0 ){
+                                return SizedBox();
                               }
-                            },
-                            child: new Row(
+                              return new Column(
+                                children: <Widget>[
+                                  const SizedBox(height: 14.0),
+
+                                  new GestureDetector(
+                                    onTap: openNotifications,
+                                    child:  new Row(
+                                      children: <Widget>[
+                                        new Container(
+                                          width: 48.0,
+                                          height: 48.0,
+                                          child: new Center(
+                                            child: new Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
+                                          ),
+                                        ),
+                                        new SizedBox(width: 12.0),
+                                        new Expanded(
+                                            child: new Text(
+                                              "Notifications",
+                                              textAlign: TextAlign.left,
+                                              style: new TextStyle(fontSize: 16.0),
+                                            )),
+                                        new Icon(Icons.chevron_right)
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14.0),
+                                  new Container(
+                                    height: 0.5,
+                                    width: MediaQuery.of(context).size.width,
+                                    color: Colors.grey,
+                                  )
+                                ],
+                              );
+                            });
+                          }
+                          if(index == snapshot.data.data["documents"].length +4) {
+                            return new Column(
                               children: <Widget>[
-//                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                new FutureBuilder(
-                                    future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
-                                    ["icon"], context: context),
-                                    builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-                                      if(snapshot.data == null) {
-                                        return new Image.asset('assets/images/logo.png', width: 48.0);
-                                      }
-                                      return new Image.file(snapshot.data, width: 48.0);
-                                    }),
-                                new SizedBox(width: 12.0),
-                                new Expanded(
-                                    child: new Text(
-                                  snapshot.data.data["documents"][index - 2]
-                                      ["title"],
-                                  textAlign: TextAlign.left,
-                                  style: new TextStyle(fontSize: 16.0),
-                                )),
-                                new Icon(Icons.chevron_right)
+                                const SizedBox(height: 14.0),
+                                new GestureDetector(
+                                  onTap: openSettings,
+                                  child:  new Row(
+                                    children: <Widget>[
+                                      //                                new Image.asset('assets/images/logo.png', width: 48.0),
+                                      new Container(
+                                        width: 48.0,
+                                        height: 48.0,
+                                        child: new Center(
+                                          child: new Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
+                                        ),
+                                      ),
+                                      new SizedBox(width: 12.0),
+                                      new Expanded(
+                                          child: new Text(
+                                            "Settings",
+                                            textAlign: TextAlign.left,
+                                            style: new TextStyle(fontSize: 16.0),
+                                          )),
+                                      new Icon(Icons.chevron_right)
+                                    ],
+                                  ),
+                                )
                               ],
-                            ),
-                          ),
-                          const SizedBox(height: 14.0),
-                          new Container(
-                            height: 0.5,
-                            width: MediaQuery.of(context).size.width,
-                            color: Colors.grey,
-                          )
-                        ],
-                      );
-                    },
-                    itemCount: snapshot.data.data["documents"].length + 5);
-          }
-        });
+                            );
+                          }
+                          return new Column(
+                            children: <Widget>[
+                              const SizedBox(height: 14.0),
+                              new GestureDetector(
+                                onTap: () {
+                                  if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
+                                    _showPDF(
+                                        context,
+                                        snapshot.data.data["documents"][index - 2]
+                                        ["location"]);
+
+                                  } else {
+                                    _launchURL(snapshot.data.data["documents"][index - 2]
+                                    ["location"]);
+                                  }
+                                },
+                                child: new Row(
+                                  children: <Widget>[
+//                                new Image.asset('assets/images/logo.png', width: 48.0),
+                                    new FutureBuilder(
+                                        future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
+                                        ["icon"], context: context),
+                                        builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+                                          if(snapshot.data == null) {
+                                            return new Image.asset('assets/images/logo.png', width: 48.0);
+                                          }
+                                          return new Image.file(snapshot.data, width: 48.0);
+                                        }),
+                                    new SizedBox(width: 12.0),
+                                    new Expanded(
+                                        child: new Text(
+                                          snapshot.data.data["documents"][index - 2]
+                                          ["title"],
+                                          textAlign: TextAlign.left,
+                                          style: new TextStyle(fontSize: 16.0),
+                                        )),
+                                    new Icon(Icons.chevron_right)
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 14.0),
+                              new Container(
+                                height: 0.5,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.grey,
+                              )
+                            ],
+                          );
+                        },
+                        itemCount: snapshot.data.data["documents"].length + 5);
+              }
+            });
+      },
+    );
   }
 }

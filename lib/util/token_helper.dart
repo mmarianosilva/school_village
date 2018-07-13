@@ -29,6 +29,22 @@ class TokenHelper {
     addToken(token, user.uid);
   }
 
+  static deleteToken(token, userId) async {
+    print("Deleting token");
+    String userPath = "/users/$userId";
+    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentSnapshot userSnapshot = await userRef.get();
+    dynamic devices = userSnapshot.data['devices'];
+    if(devices != null && devices.containsKey(token))  {
+      devices.remove(token);
+      print(devices);
+      Firestore.instance.document("/users/$userId").setData(<String, dynamic>{
+        'devices': devices
+      }, merge: true);
+      print("Deleted token");
+    }
+  }
+
   static addToken(token, userId) async{
     print("Adding token");
     String deviceInfo  = await getDeviceInfo();
@@ -39,7 +55,6 @@ class TokenHelper {
     Firestore.instance.document("/users/$userId").setData(<String, dynamic>{
       'devices': device
     }, merge: true);
-    print("Added Alert");
 
   }
 

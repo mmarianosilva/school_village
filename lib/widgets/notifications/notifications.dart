@@ -5,30 +5,53 @@ import 'package:location/location.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 import '../notification/notification.dart';
+import 'package:scoped_model/scoped_model.dart';
+import '../../model/main_model.dart';
+import 'notifications_list.dart';
 
 class Notifications extends StatefulWidget {
   @override
   _NotificationsState createState() => new _NotificationsState();
 }
 
-class _NotificationsState extends State<Notifications> {
+class _NotificationsState extends State<Notifications> with TickerProviderStateMixin{
   String _schoolId = '';
-  String _schoolName = '';
-  String name = '';
-  DocumentReference _school;
-  DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
 
+  getTitle(alert) {
+    switch(alert) {
+      case 'medical' : return 'Medical';
+      case 'intruder' : return 'Intruders';
+      case 'other': return 'Other';
+      case 'fire': return 'Fire';
+      case 'fight': return 'Fights';
+      case 'armed': return 'Armed Assailant';
+      default : return alert;
+    }
+  }
+
   getUserDetails() async {
-    _schoolId = await UserHelper.getSelectedSchoolID();
-    _schoolName = await UserHelper.getSchoolName();
-    _school = Firestore.instance.document(_schoolId);
-    _school.get().then((school) {
+    String schoolId = await UserHelper.getSelectedSchoolID();
       setState(() {
-        _schoolSnapshot = school;
+        _schoolId = schoolId;
         isLoaded = true;
       });
+  }
+
+  _getTabs (alerts) {
+    List<Widget> tabs = [];
+    alerts.forEach((alert) {
+      tabs.add(new Tab(text: getTitle(alert)));
     });
+    return tabs;
+  }
+
+  _getTabWidgets (alerts) {
+    List<Widget> tabs = [];
+    alerts.forEach((alert) {
+      tabs.add(new NotificationsList(schoolId: _schoolId.split("/")[1], alertType: alert));
+    });
+    return tabs;
   }
 
 
@@ -37,58 +60,43 @@ class _NotificationsState extends State<Notifications> {
     if (!isLoaded) {
       getUserDetails();
     }
-    print("/$_schoolId/notifications");
-    return new Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: new AppBar(
-        title: new Text('Notifications',
-            textAlign: TextAlign.center,
-            style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade200,
-        elevation: 0.0,
-        leading: new BackButton(color: Colors.grey.shade800),
-      ),
-      body: !isLoaded ?  new Text("Loading..") :  new StreamBuilder(
-        stream: Firestore.instance.collection("/$_schoolId/notifications").orderBy("createdAt", descending: true).limit(20).snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (!snapshot.hasData) return const Text('Loading...');
-          final int messageCount = snapshot.data.documents.length;
-          return new ListView.builder(
-            itemCount: messageCount,
-            itemBuilder: (_, int index) {
-              final DocumentSnapshot document = snapshot.data.documents[index];
-              return new Card(
-                child: new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    new ListTile(
-                      title: new Text(document['title'], style: new TextStyle(fontWeight: FontWeight.bold),),
-                      subtitle: new Text("Reported at ${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}"),
-                    ),
-                    new ButtonTheme.bar( // make buttons use the appropriate styles for cards
-                      child: new ButtonBar(
-                        children: <Widget>[
-                          new FlatButton(
-                            child: const Text('VIEW'),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                new MaterialPageRoute(
-                                  builder: (context) => new NotificationDetail(notification: document, title: 'Notification'),
-                                ),
-                              );
-                            },
-                          )
-                        ],
+    return new ScopedModelDescendant<MainModel>(
+        builder: (context, child, model) {
+          if(_schoolId.split("/").length < 2) {
+            return Text('Loading');
+          }
+          return new FutureBuilder(future: model.getAlertGroups(_schoolId.split("/")[1]),
+              builder: (context, alertGroups) {
+                if(alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0 ){
+                  return SizedBox();
+                }
+                TabController tabController = new TabController(length: alertGroups.data.length , vsync: this);
+                return new DefaultTabController(
+                  length: alertGroups.data.length,
+                  child: Scaffold(
+                    backgroundColor: Colors.grey.shade100,
+                    appBar: AppBar(
+                      bottom: TabBar(
+                        isScrollable: true,
+                        labelColor: Colors.black,
+                        tabs: _getTabs(alertGroups.data),
+                        controller: tabController,
                       ),
+                      title: new Text('Notifications', textAlign: TextAlign.center,
+                          style: new TextStyle(color: Colors.black)),
+                      backgroundColor: Colors.grey.shade200,
+                      elevation: 0.0,
+                      leading: new BackButton(color: Colors.grey.shade800),
                     ),
-                  ]
-                ),
-              );
-            },
+                    body: TabBarView(
+                      children: _getTabWidgets(alertGroups.data),
+                      controller: tabController,
+                    ),
+                  ),
+                );
+              }
           );
         }
-      ),
     );
   }
 }

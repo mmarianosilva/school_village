@@ -164,7 +164,7 @@ class _BroadcastState extends State<Broadcast> {
           hintText: 'Message'),
     ));
     widgets.add(new SizedBox(height: 12.0));
-    widgets.add(new Text("$numCharacters characters (minimun 20)",
+    widgets.add(new Text("$numCharacters characters (minimum 20)",
       style: new TextStyle(
           fontSize: 12.0
       ),
