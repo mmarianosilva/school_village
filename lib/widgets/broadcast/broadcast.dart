@@ -53,7 +53,7 @@ class _BroadcastState extends State<Broadcast> {
 
   _sendMessage(context) {
     var text = customAlertController.text;
-    if(text.length < 20) return;
+    if(text.length < 10) return;
     _sendBroadcast(text, context);
   }
 
@@ -164,7 +164,7 @@ class _BroadcastState extends State<Broadcast> {
           hintText: 'Message'),
     ));
     widgets.add(new SizedBox(height: 12.0));
-    widgets.add(new Text("$numCharacters characters (minimum 20)",
+    widgets.add(new Text("$numCharacters characters (minimum 10)",
       style: new TextStyle(
           fontSize: 12.0
       ),
@@ -176,7 +176,7 @@ class _BroadcastState extends State<Broadcast> {
       child: new MaterialButton(
         color: Theme.of(context).accentColor,
         child: new Text("Send"),
-        onPressed: numCharacters >= 20 ?() {_sendMessage(context);} : null,
+        onPressed: numCharacters >= 10 ?() {_sendMessage(context);} : null,
       ),
     ));
 
