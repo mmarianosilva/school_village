@@ -43,7 +43,12 @@ class _SettingsState extends State<Settings> {
           content: new SingleChildScrollView(
             child: new ListBody(
               children: <Widget>[
-                new CircularProgressIndicator()
+                new Row(
+                  children: <Widget>[
+                    new CircularProgressIndicator(),
+                    new Text("Logging out")
+                  ],
+                )
               ],
             ),
           ),

@@ -5,6 +5,8 @@ import '../contact/contact.dart';
 import '../forgot/forgot.dart';
 import '../../util/analytics_helper.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => new _LoginState();
@@ -18,7 +20,29 @@ class _LoginState extends State<Login> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String title = "School Village";
 
-  onLogin() {
+  checkIfOnlyOneSchool() async {
+    var schools = await UserHelper.getSchools();
+    if(schools.length == 1) {
+      print("Only 1 School");
+      var school = await Firestore.instance
+          .document(schools[0]['ref'])
+          .get();
+      print(school.data["name"]);
+      await UserHelper.setSelectedSchool(
+          schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
+      return true;
+    }
+    return false;
+  }
+
+  proceed() async {
+    await checkIfOnlyOneSchool();
+    AnalyticsHelper.logLogin();
+    Navigator.of(context).pushNamedAndRemoveUntil(
+        '/home', (Route<dynamic> route) => false);
+  }
+
+  onLogin() async {
     _scaffoldKey.currentState.showSnackBar(
         new SnackBar(content:
           new Row(
@@ -35,9 +59,7 @@ class _LoginState extends State<Login> {
         email: emailController.text.trim().toLowerCase(),
         password: passwordController.text).then((user) {
           print(user);
-          AnalyticsHelper.logLogin();
-          Navigator.of(context).pushNamedAndRemoveUntil(
-              '/home', (Route<dynamic> route) => false);
+          proceed();
         }).catchError((error)  {
           _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
           showDialog(

@@ -227,13 +227,14 @@ class _HomeState extends State<Home> {
         return;
       }
       print("Redirecting to Schools");
+
+      setState(() {
+        isLoaded = true;
+      });
       Navigator.push(
         context,
         new MaterialPageRoute(builder: (context) => new SchoolList()),
       );
-      setState(() {
-        isLoaded = true;
-      });
       return;
     }
     String schoolName = await UserHelper.getSchoolName();
