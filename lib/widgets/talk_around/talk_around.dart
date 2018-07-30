@@ -11,7 +11,6 @@ class TalkAround extends StatefulWidget {
 }
 
 class _TalkAroundState extends State<TalkAround> {
-
   final TextEditingController _textController = new TextEditingController();
   bool _isLoading = true;
 
@@ -33,7 +32,6 @@ class _TalkAroundState extends State<TalkAround> {
     var schoolId = await UserHelper.getSelectedSchoolID();
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
-
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
@@ -46,7 +44,7 @@ class _TalkAroundState extends State<TalkAround> {
 
   @override
   Widget build(BuildContext context) {
-    if(_isLoading) {
+    if (_isLoading) {
       getUserDetails();
       return new Scaffold(
         appBar: new AppBar(
@@ -81,7 +79,8 @@ class _TalkAroundState extends State<TalkAround> {
         body: new TabBarView(
           children: [
             new Chat(conversation: _securityConversation, user: _userSnapshot),
-            new Chat(conversation: _securityAdminConversation, user: _userSnapshot)
+            new Chat(
+                conversation: _securityAdminConversation, user: _userSnapshot)
           ],
         ),
       ),

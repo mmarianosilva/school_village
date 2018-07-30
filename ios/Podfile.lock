@@ -1,4 +1,6 @@
 PODS:
+  - audioplayer (0.0.1):
+    - Flutter
   - BoringSSL (10.0.2):
     - BoringSSL/Implementation (= 10.0.2)
     - BoringSSL/Interface (= 10.0.2)
@@ -127,6 +129,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - audioplayer (from `Pods/.symlinks/plugins/audioplayer/ios`)
   - cloud_firestore (from `Pods/.symlinks/plugins/cloud_firestore/ios`)
   - device_info (from `Pods/.symlinks/plugins/device_info/ios`)
   - firebase_analytics (from `Pods/.symlinks/plugins/firebase_analytics/ios`)
@@ -134,7 +137,7 @@ DEPENDENCIES:
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `Pods/.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
   - location (from `Pods/.symlinks/plugins/location/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
@@ -163,6 +166,8 @@ SPEC REPOS:
     - Protobuf
 
 EXTERNAL SOURCES:
+  audioplayer:
+    :path: Pods/.symlinks/plugins/audioplayer/ios
   cloud_firestore:
     :path: Pods/.symlinks/plugins/cloud_firestore/ios
   device_info:
@@ -178,7 +183,7 @@ EXTERNAL SOURCES:
   firebase_storage:
     :path: Pods/.symlinks/plugins/firebase_storage/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-release
+    :path: Pods/.symlinks/flutter/ios
   location:
     :path: Pods/.symlinks/plugins/location/ios
   path_provider:
@@ -189,6 +194,7 @@ EXTERNAL SOURCES:
     :path: Pods/.symlinks/plugins/url_launcher/ios
 
 SPEC CHECKSUMS:
+  audioplayer: 3cc64e4f5f3e231c715c8923a9bc26a19dc5da3b
   BoringSSL: 60dd24df4af296bf41d78e5841dbb95d75f88c0d
   cloud_firestore: a2d49d9c7219fce31033eb1a2ee953d7733c91d6
   device_info: 76ce0b32e13034d1883be4a382433648f9dcee63
@@ -223,4 +229,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 2cc5f015089356be453e32508e962737a3bbfe14
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3

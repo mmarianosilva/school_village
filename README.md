@@ -20,4 +20,4 @@ Use NDK 16c to Build Android
  - school_admin
  - school_security
  - school_staff
- - school_student
+ - school_studentw
