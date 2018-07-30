@@ -294,7 +294,7 @@ class _AlertState extends State<Alert> {
                           child: new Container(
                             margin: EdgeInsets.all(8.0),
                             child: new GestureDetector(
-                                onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emrgency has been reported at $_schoolName", context);},
+                                onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emergency has been reported at $_schoolName", context);},
                                 child: new Column(children: [
                                   new Image.asset('assets/images/alert_medical.png',
                                       width: 72.0, height: 109.8),
