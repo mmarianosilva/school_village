@@ -87,6 +87,8 @@ PODS:
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
   - Flutter (1.0.0)
+  - flutter_custom_tabs (0.0.1):
+    - Flutter
   - GoogleToolboxForMac/Defines (2.1.4)
   - GoogleToolboxForMac/Logger (2.1.4):
     - GoogleToolboxForMac/Defines (= 2.1.4)
@@ -127,6 +129,8 @@ PODS:
     - Flutter
   - url_launcher (0.0.1):
     - Flutter
+  - video_player (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - audioplayer (from `Pods/.symlinks/plugins/audioplayer/ios`)
@@ -138,10 +142,12 @@ DEPENDENCIES:
   - firebase_messaging (from `Pods/.symlinks/plugins/firebase_messaging/ios`)
   - firebase_storage (from `Pods/.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - flutter_custom_tabs (from `Pods/.symlinks/plugins/flutter_custom_tabs/ios`)
   - location (from `Pods/.symlinks/plugins/location/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
   - url_launcher (from `Pods/.symlinks/plugins/url_launcher/ios`)
+  - video_player (from `Pods/.symlinks/plugins/video_player/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -184,6 +190,8 @@ EXTERNAL SOURCES:
     :path: Pods/.symlinks/plugins/firebase_storage/ios
   Flutter:
     :path: Pods/.symlinks/flutter/ios
+  flutter_custom_tabs:
+    :path: Pods/.symlinks/plugins/flutter_custom_tabs/ios
   location:
     :path: Pods/.symlinks/plugins/location/ios
   path_provider:
@@ -192,6 +200,8 @@ EXTERNAL SOURCES:
     :path: Pods/.symlinks/plugins/shared_preferences/ios
   url_launcher:
     :path: Pods/.symlinks/plugins/url_launcher/ios
+  video_player:
+    :path: Pods/.symlinks/plugins/video_player/ios
 
 SPEC CHECKSUMS:
   audioplayer: 3cc64e4f5f3e231c715c8923a9bc26a19dc5da3b
@@ -213,6 +223,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: f2360a966ecfb0d14facf0fbdf306efc2df0ddbe
   FirebaseStorage: 7ca4bb7b58a25fa647b04f524033fc7cb7eb272b
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  flutter_custom_tabs: 8dcb85ffe874ee8fd8139bb3960743efeaf521ee
   GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
   gRPC: 9362451032695e2dfb7bafcd3740e3a27939e4ff
   gRPC-Core: 9696b220565b283e021cf2722d473a4a74b7622a
@@ -226,6 +237,7 @@ SPEC CHECKSUMS:
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   shared_preferences: 5a1d487c427ee18fcd3ea1f2a131569481834b53
   url_launcher: 92b89c1029a0373879933c21642958c874539095
+  video_player: 906796a841943c8d370ac7c13b18039aa9b56498
 
 PODFILE CHECKSUM: 2cc5f015089356be453e32508e962737a3bbfe14
 
