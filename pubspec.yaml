@@ -55,6 +55,7 @@ flutter:
     - assets/images/broadcast_btn.png
     - assets/images/security_btn.png
     - assets/images/alert_hand_icon.png
+    - assets/images/hotline_header.png
     - assets/alarm.wav
   # To add assets to your application, add an assets section, like this:
   # assets:
