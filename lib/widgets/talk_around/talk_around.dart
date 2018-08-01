@@ -68,7 +68,7 @@ class _TalkAroundState extends State<TalkAround> {
             labelColor: Colors.black,
             tabs: [
               new Tab(text: "Security"),
-              new Tab(text: "Security + Admin")
+              new Tab(text: "Security & Admin")
             ],
           ),
           title: new Text('Security Talk-Around',

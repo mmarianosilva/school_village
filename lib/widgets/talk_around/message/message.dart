@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
-import 'package:url_launcher/url_launcher.dart' ;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../notification/notification.dart';
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message});
+  ChatMessage(
+      {this.text,
+      this.name,
+      this.initial,
+      this.timestamp,
+      this.self,
+      this.location,
+      this.message});
+
   final String text;
   final String name;
   final String initial;
@@ -13,56 +21,68 @@ class ChatMessage extends StatelessWidget {
   final bool self;
   final dynamic location;
   final DocumentSnapshot message;
+
   @override
   Widget build(BuildContext context) {
-    if(!self) return _getMessageView(context);
-    else return _getMyMessageView(context);
+    if (!self)
+      return _getMessageView(context);
+    else
+      return _getMyMessageView(context);
   }
 
-  _getMessageView(context){
-    DateTime time = new DateTime.fromMillisecondsSinceEpoch(timestamp);
-    Widget locationWidget = new SizedBox(width: 0.0, height: 0.0);
-    if(location != null) {
-      locationWidget = new GestureDetector(
-        child: new Text("Map", textAlign: TextAlign.right),
+  _getMessageView(context) {
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
+    if (location != null) {
+      locationWidget = GestureDetector(
+        child: Text("Map", textAlign: TextAlign.right),
         onTap: () {
-          launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
+          launch(
+              "https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
         },
       );
     }
-    return new Container(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: new Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          new Container(
+          Container(
             margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.redAccent),
+            child: CircleAvatar(
+                child: Text(initial), backgroundColor: Colors.redAccent),
           ),
-          new Flexible(child: new Column(
+          Flexible(
+              child: Column(
             children: <Widget>[
               locationWidget,
-              new GestureDetector(
-                child: new Container(
-                  child: new Column(
+              GestureDetector(
+                child: Container(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      new Text(name, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
-                      new Container(
+                      Text(name,
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.bold)),
+                      Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text(text),
+                        child: Text(text),
                       ),
-                      new Container(
+                      Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text("${time.month}/${time.day} ${time.hour}:${time.minute}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                        child: Text(
+                            "${time.month}/${time.day} ${time.hour}:${time
+                                    .minute}",
+                            style: TextStyle(
+                                fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
                     ],
                   ),
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.redAccent,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  padding: new EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                 ),
                 onTap: () {
                   goToDetails(context);
@@ -70,7 +90,7 @@ class ChatMessage extends StatelessWidget {
               )
             ],
           )),
-          new SizedBox(width: 32.0)
+          SizedBox(width: 32.0)
         ],
       ),
     );
@@ -79,67 +99,79 @@ class ChatMessage extends StatelessWidget {
   goToDetails(context) {
     Navigator.push(
       context,
-      new MaterialPageRoute(
-        builder: (context) => new NotificationDetail(notification: message, title: 'Message Details'),
+      MaterialPageRoute(
+        builder: (context) =>
+            NotificationDetail(notification: message, title: 'Message Details'),
       ),
     );
   }
 
   _getMyMessageView(context) {
-    DateTime time = new DateTime.fromMillisecondsSinceEpoch(timestamp);
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(timestamp);
 
-    Widget locationWidget = new SizedBox(width: 0.0, height: 0.0);
-    if(location != null) {
-      locationWidget = new GestureDetector(
-        child: new Text("Map", textAlign: TextAlign.right),
+    Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
+    if (location != null) {
+      locationWidget = GestureDetector(
+        child: Text("Map", textAlign: TextAlign.right),
         onTap: () {
-          launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
+          launch(
+              "https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
         },
       );
     }
-    return new Container(
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.centerRight,
-      child: new Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-        new SizedBox(width: 32.0),
-          new Flexible(child: new Column(
+          SizedBox(width: 32.0),
+          Flexible(
+              child: Column(
             children: <Widget>[
               locationWidget,
-              new GestureDetector(
-                child: new Container(
-                  child: new Column(
+              GestureDetector(
+                child: Container(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      new Text(name, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
-                      new Container(
+                      Text(name,
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.bold)),
+                      Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text(text,textAlign: TextAlign.end,),
+                        child: Text(
+                          text,
+                          textAlign: TextAlign.end,
+                        ),
                       ),
-                      new Container(
+                      Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text("${time.month}/${time.day} ${time.hour}:${time.minute}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                        child: Text(
+                            "${time.month}/${time.day} ${time.hour}:${time
+                                    .minute}",
+                            style: TextStyle(
+                                fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
                     ],
                   ),
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.green,
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  padding: new EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                 ),
                 onTap: () {
                   goToDetails(context);
                 },
               )
             ],
-          )
-          ),
-          new Container(
+          )),
+          Container(
             margin: const EdgeInsets.only(left: 16.0),
-            child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.green),
+            child: CircleAvatar(
+                child: Text(initial), backgroundColor: Colors.green),
           ),
         ],
       ),
