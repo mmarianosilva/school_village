@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 import '../contact/contact.dart';
 import '../forgot/forgot.dart';
@@ -108,7 +109,7 @@ class _LoginState extends State<Login> {
 
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(
+      appBar: new BaseAppBar(
         leading: new Container(
           padding: new EdgeInsets.all(8.0),
           child: new Image.asset('assets/images/logo.png'),

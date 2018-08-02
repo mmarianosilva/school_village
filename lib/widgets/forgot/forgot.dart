@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -48,7 +49,7 @@ class _ForgotState extends State<Forgot> {
 
     return new Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
+        appBar: new BaseAppBar(
 
           title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
           backgroundColor: Colors.grey.shade200,

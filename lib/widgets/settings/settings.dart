@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 import '../../util/constants.dart';
@@ -74,7 +75,7 @@ class _SettingsState extends State<Settings> {
 
         return new Scaffold(
           backgroundColor: Colors.grey.shade100,
-          appBar: new AppBar(
+          appBar: new BaseAppBar(
             title: new Text('Settings',
                 textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.black)),

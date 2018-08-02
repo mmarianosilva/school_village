@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
@@ -308,7 +309,7 @@ class _HomeState extends State<Home> {
 
         return new Scaffold(
           backgroundColor: Colors.white,
-          appBar: new AppBar(
+          appBar: new BaseAppBar(
             title: new Text(title,
                 textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.black)),

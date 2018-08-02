@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 import '../../model/school_ref.dart';
 
@@ -29,7 +30,7 @@ class _SchoolListState extends State<SchoolList> {
     _context = context;
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(
+      appBar: new BaseAppBar(
         title: new Text("Select School", style: new TextStyle(color: Colors.black)),
         leading: new BackButton(color: Colors.grey.shade800),
         backgroundColor: Colors.grey.shade200,
