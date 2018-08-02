@@ -28,6 +28,7 @@ class _ChatState extends State<Chat> {
   ScrollController controller;
   FocusNode focusNode = FocusNode();
   Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
+
   _ChatState(this.conversation, this.user);
 
   @override
@@ -159,13 +160,28 @@ class _ChatState extends State<Chat> {
           controller: controller,
           padding: EdgeInsets.all(8.0),
           itemBuilder: (_, int index) {
-            if(messageList[index].date != null){
-              return Text(messageList[index].date);
+            if (messageList[index].date != null) {
+              return Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container (height: 1.0, color: Colors.black12,),
+                  ),
+                  Container(
+                    child: Text(messageList[index].date, maxLines: 1, style: TextStyle(fontSize: 12.0),),
+                    margin: const EdgeInsets.only(left: 10.0, right: 10.0),
+                  ),
+
+                  Expanded(
+                    flex: 1,
+                    child: Container (height: 1.0, color: Colors.black12,),
+                  )
+                ],
+
+              );
             }
 
-
-            final DocumentSnapshot document =
-                messageList[index].message;
+            final DocumentSnapshot document = messageList[index].message;
             var createdBy = document['createdBy'].split(" ");
             var initial = createdBy[0].length > 0 ? createdBy[0][0] : '';
             if (createdBy.length > 1) {
