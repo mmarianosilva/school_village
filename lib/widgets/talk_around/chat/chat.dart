@@ -1,8 +1,9 @@
-import 'dart:async';
-
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:school_village/model/message_holder.dart';
+import 'package:school_village/util/constants.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 
@@ -22,16 +23,16 @@ class _ChatState extends State<Chat> {
   final DocumentSnapshot user;
   final Firestore firestore = Firestore.instance;
   Location _location = Location();
-  List<MessageHolder> messages;
+  List<MessageHolder> messageList;
   bool disposed = false;
   ScrollController controller;
   FocusNode focusNode = FocusNode();
-
+  Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
   _ChatState(this.conversation, this.user);
 
   @override
   initState() {
-    prepareCollectionObjects();
+    _handleMessageCollection();
     controller = ScrollController();
     controller.addListener(_scrollListener);
     super.initState();
@@ -106,9 +107,9 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  prepareCollectionObjects() {
-    if (messages == null) {
-      messages = List();
+  _handleMessageCollection() {
+    if (messageList == null) {
+      messageList = List();
     }
 
     firestore
@@ -116,29 +117,55 @@ class _ChatState extends State<Chat> {
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-          data.documentChanges.forEach((changes){
-            if(changes.type == DocumentChangeType.added) {
-              messages.insert(0, MessageHolder(null, changes.document));
-            }
-          });
-          data.documents.forEach((shot){
-            messages.insert(0, MessageHolder(null, shot));
-          });
-
-
-        if (!disposed) setState(() {});
+      data.documentChanges.forEach((changes) {
+        if (changes.type == DocumentChangeType.added) {
+          messageList.insert(0, MessageHolder(null, changes.document));
+        }
       });
+      data.documents.forEach((shot) {
+        var day = DateTime
+                .fromMillisecondsSinceEpoch(shot['createdAt'])
+                .millisecondsSinceEpoch ~/
+            Constants.oneDay;
+
+        var messages = messageMap[day];
+        if (messages == null) {
+          messages = List();
+          messageMap.putIfAbsent(day, () => messages);
+        }
+        messageMap[day].add(shot);
+      });
+
+      messageMap.keys.forEach((key) {
+        var time = DateTime.fromMillisecondsSinceEpoch(key * Constants.oneDay);
+        var formatter = DateFormat('EEEE, MMMM dd, yyyy');
+        String date = formatter.format(time);
+        messageList.insert(0, MessageHolder(date, null));
+
+        messageMap[key].forEach((shot) {
+          messageList.insert(0, MessageHolder(null, shot));
+        });
+      });
+
+      if (!disposed) setState(() {});
+    });
   }
 
   Widget _getScreen() {
-    if (messages != null && messages.length > 0) {
+    if (messageList != null && messageList.length > 0) {
       return ListView.builder(
-          itemCount: messages.length,
+          itemCount: messageList.length,
           reverse: true,
           controller: controller,
           padding: EdgeInsets.all(8.0),
           itemBuilder: (_, int index) {
-            final DocumentSnapshot document = messages[index].message;
+            if(messageList[index].date != null){
+              return Text(messageList[index].date);
+            }
+
+
+            final DocumentSnapshot document =
+                messageList[index].message;
             var createdBy = document['createdBy'].split(" ");
             var initial = createdBy[0].length > 0 ? createdBy[0][0] : '';
             if (createdBy.length > 1) {
@@ -146,6 +173,7 @@ class _ChatState extends State<Chat> {
                   ? "$initial${createdBy[1][0]}"
                   : "$initial";
             }
+
             return ChatMessage(
               text: document['body'],
               name: "${document['createdBy']}",
