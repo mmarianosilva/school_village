@@ -11,7 +11,6 @@ import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:location/location.dart';
 import '../messages/messages.dart';
 import '../../util/token_helper.dart';
 import '../talk_around/talk_around.dart';
@@ -44,7 +43,6 @@ class _HomeState extends State<Home> {
   String title = "School Village";
   bool isLoaded = false;
   final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-  Location _location = new Location();
   String _schoolId;
   String _token;
   AudioPlayer audioPlugin;
@@ -285,11 +283,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  _getLocationPermission() {
-    try {
-      _location.getLocation.then((location) {}).catchError((error) {});
-    } catch (e) {}
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -301,7 +295,6 @@ class _HomeState extends State<Home> {
           model.refreshUserIfNull();
           print("Updating school");
           updateSchool();
-          _getLocationPermission();
         } else {
           checkNewSchool();
         }

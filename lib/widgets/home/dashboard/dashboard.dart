@@ -3,6 +3,7 @@ import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
 import '../../alert/alert.dart';
+import '../../hotline/hotline.dart';
 import '../../select_group/select_group.dart';
 import '../../talk_around/talk_around.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,6 +15,8 @@ import '../../notifications/notifications.dart';
 import '../../messages/messages.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../../model/main_model.dart';
+import 'package:location/location.dart';
+import '../../../util/constants.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -27,6 +30,7 @@ class _DashboardState extends State<Dashboard> {
   String ref = "";
   bool isOwner = false;
   String role = "";
+  Location _location = new Location();
 
   _showPDF(context, url) {
     print(url);
@@ -89,11 +93,24 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  _getLocationPermission() {
+    try {
+      _location.getLocation.then((location) {}).catchError((error) {});
+    } catch (e) {}
+  }
+
   sendAlert() {
     print("Sending Alert");
     Navigator.push(
       context,
       new MaterialPageRoute(builder: (context) => new Alert()),
+    );
+  }
+
+  openHotline() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Hotline()),
     );
   }
 
@@ -132,6 +149,229 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  _buildSettingsOption() {
+    return new Column(
+      children: <Widget>[
+        const SizedBox(height: 14.0),
+        new GestureDetector(
+          onTap: openSettings,
+          child:  new Row(
+            children: <Widget>[
+              //                                new Image.asset('assets/images/logo.png', width: 48.0),
+              new Container(
+                width: 48.0,
+                height: 48.0,
+                child: new Center(
+                  child: new Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
+                ),
+              ),
+              new SizedBox(width: 12.0),
+              new Expanded(
+                  child: new Text(
+                    "Settings",
+                    textAlign: TextAlign.left,
+                    style: new TextStyle(fontSize: 16.0),
+                  )),
+              new Icon(Icons.chevron_right)
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  _buildNotificationsOption(model) {
+    if(role == 'school_student') {
+      return SizedBox();
+    }
+    return new FutureBuilder(future: model.getAlertGroups(ref.split("/")[1]), builder: (context, alertGroups) {
+      if(alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0 ){
+        return SizedBox();
+      }
+      return new Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+
+          new GestureDetector(
+            onTap: openNotifications,
+            child:  new Row(
+              children: <Widget>[
+                new Container(
+                  width: 48.0,
+                  height: 48.0,
+                  child: new Center(
+                    child: new Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
+                  ),
+                ),
+                new SizedBox(width: 12.0),
+                new Expanded(
+                    child: new Text(
+                      "Notifications",
+                      textAlign: TextAlign.left,
+                      style: new TextStyle(fontSize: 16.0),
+                    )),
+                new Icon(Icons.chevron_right)
+              ],
+            ),
+          ),
+          const SizedBox(height: 14.0),
+          new Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
+        ],
+      );
+    });
+  }
+
+  _buildMessagesOption(model) {
+    if(role == 'school_student') {
+      return SizedBox();
+    }
+    return new Column(
+      children: <Widget>[
+        const SizedBox(height: 14.0),
+        new GestureDetector(
+          onTap: openMessages,
+          child:  new Row(
+            children: <Widget>[
+              //                                new Image.asset('assets/images/logo.png', width: 48.0),
+              new Container(
+                width: 48.0,
+                height: 48.0,
+                child: new Center(
+                  child: new Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
+                ),
+              ),
+              new SizedBox(width: 12.0),
+              new Expanded(
+                  child: new Text(
+                    "Messages",
+                    textAlign: TextAlign.left,
+                    style: new TextStyle(fontSize: 16.0),
+                  )),
+              new Icon(Icons.chevron_right)
+            ],
+          ),
+        ),
+        const SizedBox(height: 14.0),
+        new Container(
+          height: 0.5,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey,
+        ),
+      ],
+    );
+  }
+
+  _buildDocumentOption(snapshot, index) {
+    return new Column(
+      children: <Widget>[
+        const SizedBox(height: 14.0),
+        new GestureDetector(
+          onTap: () {
+            if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
+              _showPDF(
+                  context,
+                  snapshot.data.data["documents"][index - 2]
+                  ["location"]);
+
+            } else {
+              _launchURL(snapshot.data.data["documents"][index - 2]
+              ["location"]);
+            }
+          },
+          child: new Row(
+            children: <Widget>[
+//                                new Image.asset('assets/images/logo.png', width: 48.0),
+              new FutureBuilder(
+                  future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
+                  ["icon"], context: context),
+                  builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+                    if(snapshot.data == null) {
+                      return new Image.asset('assets/images/logo.png', width: 48.0);
+                    }
+                    return new Image.file(snapshot.data, width: 48.0);
+                  }),
+              new SizedBox(width: 12.0),
+              new Expanded(
+                  child: new Text(
+                    snapshot.data.data["documents"][index - 2]
+                    ["title"],
+                    textAlign: TextAlign.left,
+                    style: new TextStyle(fontSize: 16.0),
+                  )),
+              new Icon(Icons.chevron_right)
+            ],
+          ),
+        ),
+        const SizedBox(height: 14.0),
+        new Container(
+          height: 0.5,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey,
+        )
+      ],
+    );
+  }
+
+  _buildSecurityOptions() {
+    if(role == 'school_student') {
+      return SizedBox();
+    }
+    List<Widget> widgets = new List();
+    List<String> securityRoles = ["school_admin", "school_security"];
+    print("Owner $isOwner Role $role");
+    if(securityRoles.contains(role)) {
+      widgets.add(
+          new GestureDetector(
+            child: new Image.asset('assets/images/security_btn.png', width: 48.0),
+            onTap: openTalk,
+          )
+      );
+    }
+    if(role == "school_admin") {
+      widgets.add(new SizedBox(width: 20.0));
+      widgets.add(
+          new GestureDetector(
+            child: new Image.asset(
+                'assets/images/broadcast_btn.png', width: 48.0),
+            onTap: sendBroadcast,
+          )
+      );
+    }
+    return new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: widgets,
+    );
+  }
+
+  _buildHotlineButton() {
+    return new GestureDetector(child:
+      new Column(
+        children: <Widget>[
+          new Text("Anonymous Safety Hotline", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+          new Image.asset('assets/images/hotline_header.png',
+              width: 160.0, height: 160.0,),
+          new Text("Safety is Everybody's Business!\nYou can make a difference", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0, color: Constants.hotLineBlue),)
+        ],
+      ),
+      onTap: openHotline,
+    );
+  }
+
+  _buildAlertButton() {
+    if(role == 'school_student') {
+      return _buildHotlineButton();
+    }
+    return new GestureDetector(child:
+    new Image.asset('assets/images/alert.png',
+        width: 120.0, height: 120.0),
+      onTap: sendAlert,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new ScopedModelDescendant<MainModel>(
@@ -148,6 +388,9 @@ class _DashboardState extends State<Dashboard> {
           _getSchoolId();
         } else {
           checkNewSchool();
+          if(role != 'school_student') {
+            _getLocationPermission();
+          }
         }
 
         if(!isLoaded || !hasSchool) {
@@ -176,194 +419,21 @@ class _DashboardState extends State<Dashboard> {
                         padding: new EdgeInsets.all(8.0),
                         itemBuilder: (BuildContext context, int index) {
                           if(index == 0) {
-                            return new GestureDetector(child:
-                            new Image.asset('assets/images/alert.png',
-                                width: 120.0, height: 120.0),
-                              onTap: sendAlert,
-                            );
+                            return _buildAlertButton();
                           }
                           if(index == 1) {
-                            List<Widget> widgets = new List();
-                            List<String> securityRoles = ["school_admin", "school_security"];
-                            print("Owner $isOwner Role $role");
-                            if(securityRoles.contains(role)) {
-                              widgets.add(
-                                  new GestureDetector(
-                                    child: new Image.asset('assets/images/security_btn.png', width: 48.0),
-                                    onTap: openTalk,
-                                  )
-                              );
-                            }
-                            if(role == "school_admin") {
-                              widgets.add(new SizedBox(width: 20.0));
-                              widgets.add(
-                                  new GestureDetector(
-                                    child: new Image.asset(
-                                        'assets/images/broadcast_btn.png', width: 48.0),
-                                    onTap: sendBroadcast,
-                                  )
-                              );
-                            }
-                            return new Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: widgets,
-                            );
+                            return _buildSecurityOptions();
                           }
                           if(index == snapshot.data.data["documents"].length +2) {
-                            return new Column(
-                              children: <Widget>[
-                                const SizedBox(height: 14.0),
-                                new GestureDetector(
-                                  onTap: openMessages,
-                                  child:  new Row(
-                                    children: <Widget>[
-                                      //                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                      new Container(
-                                        width: 48.0,
-                                        height: 48.0,
-                                        child: new Center(
-                                          child: new Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
-                                        ),
-                                      ),
-                                      new SizedBox(width: 12.0),
-                                      new Expanded(
-                                          child: new Text(
-                                            "Messages",
-                                            textAlign: TextAlign.left,
-                                            style: new TextStyle(fontSize: 16.0),
-                                          )),
-                                      new Icon(Icons.chevron_right)
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 14.0),
-                                new Container(
-                                  height: 0.5,
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Colors.grey,
-                                ),
-                              ],
-                            );
+                            return _buildMessagesOption(model);
                           }
                           if(index == snapshot.data.data["documents"].length +3) {
-                            return new FutureBuilder(future: model.getAlertGroups(ref.split("/")[1]), builder: (context, alertGroups) {
-                              if(alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0 ){
-                                return SizedBox();
-                              }
-                              return new Column(
-                                children: <Widget>[
-                                  const SizedBox(height: 14.0),
-
-                                  new GestureDetector(
-                                    onTap: openNotifications,
-                                    child:  new Row(
-                                      children: <Widget>[
-                                        new Container(
-                                          width: 48.0,
-                                          height: 48.0,
-                                          child: new Center(
-                                            child: new Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
-                                          ),
-                                        ),
-                                        new SizedBox(width: 12.0),
-                                        new Expanded(
-                                            child: new Text(
-                                              "Notifications",
-                                              textAlign: TextAlign.left,
-                                              style: new TextStyle(fontSize: 16.0),
-                                            )),
-                                        new Icon(Icons.chevron_right)
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14.0),
-                                  new Container(
-                                    height: 0.5,
-                                    width: MediaQuery.of(context).size.width,
-                                    color: Colors.grey,
-                                  )
-                                ],
-                              );
-                            });
+                            return _buildNotificationsOption(model);
                           }
                           if(index == snapshot.data.data["documents"].length +4) {
-                            return new Column(
-                              children: <Widget>[
-                                const SizedBox(height: 14.0),
-                                new GestureDetector(
-                                  onTap: openSettings,
-                                  child:  new Row(
-                                    children: <Widget>[
-                                      //                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                      new Container(
-                                        width: 48.0,
-                                        height: 48.0,
-                                        child: new Center(
-                                          child: new Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
-                                        ),
-                                      ),
-                                      new SizedBox(width: 12.0),
-                                      new Expanded(
-                                          child: new Text(
-                                            "Settings",
-                                            textAlign: TextAlign.left,
-                                            style: new TextStyle(fontSize: 16.0),
-                                          )),
-                                      new Icon(Icons.chevron_right)
-                                    ],
-                                  ),
-                                )
-                              ],
-                            );
+                            return _buildSettingsOption();
                           }
-                          return new Column(
-                            children: <Widget>[
-                              const SizedBox(height: 14.0),
-                              new GestureDetector(
-                                onTap: () {
-                                  if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
-                                    _showPDF(
-                                        context,
-                                        snapshot.data.data["documents"][index - 2]
-                                        ["location"]);
-
-                                  } else {
-                                    _launchURL(snapshot.data.data["documents"][index - 2]
-                                    ["location"]);
-                                  }
-                                },
-                                child: new Row(
-                                  children: <Widget>[
-//                                new Image.asset('assets/images/logo.png', width: 48.0),
-                                    new FutureBuilder(
-                                        future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
-                                        ["icon"], context: context),
-                                        builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-                                          if(snapshot.data == null) {
-                                            return new Image.asset('assets/images/logo.png', width: 48.0);
-                                          }
-                                          return new Image.file(snapshot.data, width: 48.0);
-                                        }),
-                                    new SizedBox(width: 12.0),
-                                    new Expanded(
-                                        child: new Text(
-                                          snapshot.data.data["documents"][index - 2]
-                                          ["title"],
-                                          textAlign: TextAlign.left,
-                                          style: new TextStyle(fontSize: 16.0),
-                                        )),
-                                    new Icon(Icons.chevron_right)
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 14.0),
-                              new Container(
-                                height: 0.5,
-                                width: MediaQuery.of(context).size.width,
-                                color: Colors.grey,
-                              )
-                            ],
-                          );
+                          return _buildDocumentOption(snapshot, index);
                         },
                         itemCount: snapshot.data.data["documents"].length + 5);
               }
