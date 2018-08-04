@@ -7,7 +7,16 @@ import '../../notification/notification.dart';
 import '../../../util/firebase_image_thumbnail.dart';
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message, this.imageUrl});
+  ChatMessage(
+      {this.text,
+      this.name,
+      this.initial,
+      this.timestamp,
+      this.self,
+      this.location,
+      this.message,
+      this.imageUrl});
+
   final String text;
   final String name;
   final String imageUrl;
@@ -40,6 +49,9 @@ class ChatMessage extends StatelessWidget {
     return dateFormatter.format(date) + ' ${date.day}$suffix';
   }
 
+  final nameTextStyle = TextStyle(
+      color: Color.fromRGBO(25, 24, 24, 1.0), fontWeight: FontWeight.bold, fontSize: 14.0, letterSpacing: 1.1);
+
   _getMessageView(context) {
     Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
     if (location != null) {
@@ -47,7 +59,11 @@ class ChatMessage extends StatelessWidget {
         child: Text(
           "Map",
           textAlign: TextAlign.right,
-          style: TextStyle(color: Colors.lightBlue, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Color.fromRGBO(0, 122, 255, 1.0),
+              fontWeight: nameTextStyle.fontWeight,
+              fontSize: nameTextStyle.fontSize,
+              letterSpacing: nameTextStyle.letterSpacing),
         ),
         onTap: () {
           launch(
@@ -56,7 +72,7 @@ class ChatMessage extends StatelessWidget {
       );
     }
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
+//      margin: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,7 +85,8 @@ class ChatMessage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(children: [
-                        Text(name, style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold)),
+                        Text(name,
+                            style: nameTextStyle),
                         Container(
                           child: locationWidget,
                           margin: const EdgeInsets.only(left: 40.0),
@@ -84,7 +101,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
                 ),
                 onTap: () => goToDetails(context),
               )
@@ -106,7 +123,7 @@ class ChatMessage extends StatelessWidget {
   }
 
   _getImage() {
-    if(imageUrl == null || imageUrl.trim() == '') {
+    if (imageUrl == null || imageUrl.trim() == '') {
       return SizedBox();
     }
 //    return Text("Image");
@@ -117,11 +134,12 @@ class ChatMessage extends StatelessWidget {
     DateTime time = new DateTime.fromMillisecondsSinceEpoch(timestamp);
 
     Widget locationWidget = new SizedBox(width: 0.0, height: 0.0);
-    if(location != null) {
+    if (location != null) {
       locationWidget = new GestureDetector(
         child: new Text("Map", textAlign: TextAlign.right),
         onTap: () {
-          launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
+          launch(
+              "https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${location["latitude"]},${location["longitude"]}");
         },
       );
     }
@@ -132,8 +150,9 @@ class ChatMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-        new SizedBox(width: 32.0),
-          new Flexible(child: new Column(
+          new SizedBox(width: 32.0),
+          new Flexible(
+              child: new Column(
             children: <Widget>[
               locationWidget,
               new GestureDetector(
@@ -142,14 +161,19 @@ class ChatMessage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       _getImage(),
-                      new Text(name, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                      new Text(name,
+                          style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
                       new Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text(text,textAlign: TextAlign.end,),
+                        child: new Text(
+                          text,
+                          textAlign: TextAlign.end,
+                        ),
                       ),
                       new Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text("${time.month}/${time.day} ${time.hour}:${time.minute}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                        child: new Text("${time.month}/${time.day} ${time.hour}:${time.minute}",
+                            style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
                     ],
                   ),
@@ -164,8 +188,7 @@ class ChatMessage extends StatelessWidget {
                 },
               )
             ],
-          )
-          ),
+          )),
           new Container(
             margin: const EdgeInsets.only(left: 16.0),
             child: new CircleAvatar(child: new Text(initial), backgroundColor: Colors.green),

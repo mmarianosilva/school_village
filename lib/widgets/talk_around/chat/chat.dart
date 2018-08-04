@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:school_village/model/message_holder.dart';
+import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
+import 'package:school_village/widgets/icon_button.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
@@ -24,7 +26,8 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final TextEditingController _textController = TextEditingController();
 
-  static FirebaseStorage storage = new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage =
+      new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
   final String conversation;
   final DocumentSnapshot user;
   final Firestore firestore = Firestore.instance;
@@ -68,11 +71,13 @@ class _ChatState extends State<Chat> {
     CollectionReference collection = Firestore.instance.collection('$conversation/messages');
     final DocumentReference document = collection.document();
     var path = '';
-    if(image != null) {
+    if (image != null) {
       _showLoading();
       path = '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1 ? lookupMimeType(image.path).split("/")[1] : type;
+      type = lookupMimeType(image.path).split("/").length > 1
+          ? lookupMimeType(image.path).split("/")[1]
+          : type;
       path = path + "." + type;
       print(path);
       await uploadFile(path, image);
@@ -84,10 +89,10 @@ class _ChatState extends State<Chat> {
       'createdBy': "${user.data['firstName']} ${user.data['lastName']}",
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'location': await _getLocation(),
-      'image' : image == null ? null : path,
+      'image': image == null ? null : path,
       'reportedByPhone': "${user['phone']}"
     });
-    if(image != null) {
+    if (image != null) {
       setState(() {
         image = null;
       });
@@ -102,14 +107,9 @@ class _ChatState extends State<Chat> {
     return downloadUrl;
   }
 
+  _showLoading() {}
 
-  _showLoading() {
-
-  }
-
-  _hideLoading() {
-
-  }
+  _hideLoading() {}
 
   _getLocation() async {
     Map<String, double> location;
@@ -152,82 +152,51 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  Widget _buildTextComposer() {
-    print(conversation);
-    return new IconTheme(
-      data: new IconThemeData(color: Theme.of(context).accentColor),
-      child: new Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: new Column(
-          children: <Widget>[
-            _buildImagePreview(),
-            new Row(
-              children: <Widget>[
-                new Container(
-                    margin: new EdgeInsets.symmetric(horizontal: 4.0),
-                    child: new IconButton(
-                        icon: new Icon(Icons.add_a_photo,
-                            color: Colors.grey.shade700),
-                        onPressed: () => _openImagePicker(context))),
-                new Flexible(
-                  child: new TextField(
-                    controller: _textController,
-                    onSubmitted: _handleSubmitted,
-                    decoration: new InputDecoration.collapsed(
-                        hintText: "Send a message"),
-                  ),
-                ),
-                new Container(
-                    margin: new EdgeInsets.symmetric(horizontal: 4.0),
-                    child: new IconButton(
-                        icon: new Icon(Icons.send),
-                        onPressed: () =>
-                            _handleSubmitted(_textController.text))),
-              ],
-            )
-          ],
-        ),
-      ), //new
-    );
-  }
-
   static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
+  static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
 
   _buildInput() {
-    return Container(
-        child: Card(
-      elevation: 5.0,
-
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius,
-      ),
-      child: Container(
-        color: Colors.white,
-        child: Card(
-          margin: EdgeInsets.all(2.0),
-          shape: RoundedRectangleBorder(
-              borderRadius: borderRadius),
-          color: Colors.grey.shade800,
-          child: TextField(
-            controller: _textController,
-            maxLines: 1,
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.grey.shade50),
-                fillColor: Colors.transparent,
-                filled: true,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Colors.white,
-                  ),
-                  onPressed: () => _handleSubmitted(_textController.text),
-                ),
-                hintText: "Type Message..."),
+    return Row(children: [
+      Container(
+        margin: horizontalMargin,
+          child:  CustomIconButton(
+            padding: EdgeInsets.all(0.0),
+              icon: ImageIcon(AssetImage('assets/images/camera.png'), color: SVColors.talkAroundAccent,),
+              onPressed: () => _openImagePicker(context))),
+      Card(
+        elevation: 10.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
+        ),
+        child: Container(
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width - 104,
+          child: Card(
+            margin: EdgeInsets.all(1.5),
+            shape: RoundedRectangleBorder(borderRadius: borderRadius),
+            color: SVColors.talkAroundAccent,
+            child: Container(
+                child: TextField(
+                  controller: _textController,
+                  maxLines: 1,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                      hintStyle: TextStyle(color: Colors.grey.shade50),
+                      fillColor: Colors.transparent,
+                      filled: true,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                        onPressed: () => _handleSubmitted(_textController.text),
+                      ),
+                      hintText: "Type Message..."),
+                )),
           ),
         ),
-      ),
-    ));
+      )
+    ]);
   }
 
   _buildInputBox() {
@@ -309,7 +278,7 @@ class _ChatState extends State<Chat> {
           itemCount: messageList.length,
           reverse: true,
           controller: controller,
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          padding: horizontalMargin,
           itemBuilder: (_, int index) {
             if (messageList[index].date != null) {
               return Container(
@@ -328,7 +297,7 @@ class _ChatState extends State<Chat> {
                           child: Text(
                         messageList[index].date,
                         maxLines: 1,
-                        style: TextStyle(fontSize: 12.0),
+                        style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
                       )),
                       margin: const EdgeInsets.only(left: 40.0, right: 40.0),
                     )
@@ -355,15 +324,18 @@ class _ChatState extends State<Chat> {
 
   @override
   build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(color: Colors.white, child: _getScreen()),
-        ), //new
-        Container(
-          margin: EdgeInsets.only(left: 30.0, right: 20.0, bottom: 10.0),
-          decoration: BoxDecoration(color: Colors.white), //new
-          child: _buildInput(), //modified
+    return Column(children: [
+      Expanded(
+        child: Container(color: Colors.white, child: _getScreen()),
+      ), //new
+      Container(
+        margin: EdgeInsets.only(bottom: 14.0),
+        decoration: BoxDecoration(color: Colors.white), //new
+        child: _buildInput(),
+      )
+    ]);
+  } //modified
+
   void saveImage(File file) async {
     print("Saving image");
     setState(() {
@@ -411,62 +383,5 @@ class _ChatState extends State<Chat> {
     ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
       if (image != null) saveImage(image);
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Column(
-      //modified
-      children: <Widget>[
-        //new
-        new Flexible(
-            //new
-            child: new StreamBuilder<QuerySnapshot>(
-                stream: firestore
-                    .collection("$conversation/messages")
-                    .orderBy("createdAt", descending: true)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) return const Text('Loading...');
-                  final int messageCount = snapshot.data.documents.length;
-                  return new ListView.builder(
-                    itemCount: messageCount,
-                    reverse: true,
-                    padding: new EdgeInsets.all(8.0),
-                    itemBuilder: (_, int index) {
-                      final DocumentSnapshot document =
-                          snapshot.data.documents[index];
-                      var createdBy = document['createdBy'].split(" ");
-                      var initial =
-                          createdBy[0].length > 0 ? createdBy[0][0] : '';
-                      if (createdBy.length > 1) {
-                        initial = createdBy[1].length > 0
-                            ? "$initial${createdBy[1][0]}"
-                            : "$initial";
-                      }
-                      return new ChatMessage(
-                        text: document['body'],
-                        name: "${document['createdBy']}",
-                        initial: "$initial",
-                        timestamp: document['createdAt'],
-                        self: document['createdById'] == user.documentID,
-                        location: document['location'],
-                        message: document,
-                        imageUrl: document['image'],
-                      );
-                    },
-                  );
-                }) //new
-            ), //new
-        new Divider(height: 1.0), //new
-        new Container(
-          //new
-          decoration:
-              new BoxDecoration(color: Theme.of(context).cardColor), //new
-          child: _buildTextComposer(), //modified
-        ), //new
-      ], //new
-    );
   }
 }
