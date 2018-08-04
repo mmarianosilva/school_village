@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 
 class Broadcast extends StatefulWidget {
@@ -183,7 +184,7 @@ class _BroadcastState extends State<Broadcast> {
 
     return new Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: new AppBar(
+        appBar: new BaseAppBar(
           title: new Text('Broadcast',
               textAlign: TextAlign.center,
               style: new TextStyle(color: Colors.black)),
