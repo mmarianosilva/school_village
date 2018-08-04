@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 import 'chat/chat.dart';
 
@@ -47,7 +48,7 @@ class _TalkAroundState extends State<TalkAround> {
     if (_isLoading) {
       getUserDetails();
       return  Scaffold(
-        appBar: AppBar(
+        appBar: BaseAppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           title: new Text('Talk Around', textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),

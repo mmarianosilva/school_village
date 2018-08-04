@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/components/base_appbar.dart';
 import 'package:url_launcher/url_launcher.dart' ;
 
 class NotificationDetail extends StatelessWidget {
@@ -106,7 +107,7 @@ class NotificationDetail extends StatelessWidget {
     );
     return new Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: new AppBar(
+        appBar: new BaseAppBar(
         title: new Text('Details',
           textAlign: TextAlign.center,
         style: new TextStyle(color: Colors.black)),
