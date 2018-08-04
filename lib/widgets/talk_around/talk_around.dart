@@ -46,44 +46,53 @@ class _TalkAroundState extends State<TalkAround> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       getUserDetails();
-      return new Scaffold(
-        appBar: new AppBar(
+      return  Scaffold(
+        appBar: AppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          title: new Text('Talk Around',
-              textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black)),
+          title: new Text('Talk Around', textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
           leading: new BackButton(color: Colors.grey.shade800),
         ),
         body: new Center(child: new Text("Loading")),
       );
     }
-    return new DefaultTabController(
-      length: 2,
-      child: new Scaffold(
-        appBar: new AppBar(
-          backgroundColor: Colors.grey.shade200,
-          elevation: 0.0,
-          bottom: new TabBar(
-            labelColor: Colors.black,
-            tabs: [
-              new Tab(text: "Security"),
-              new Tab(text: "Security + Admin")
-            ],
+    return  DefaultTabController(
+        length: 2,
+        child: Theme(
+          data: ThemeData(
+            primaryColor: Colors.white, //Changing this will change the color of the TabBar
           ),
-          title: new Text('Security Talk-Around',
-              textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black)),
-          leading: new BackButton(color: Colors.grey.shade800),
-        ),
-        body: new TabBarView(
-          children: [
-            new Chat(conversation: _securityConversation, user: _userSnapshot),
-            new Chat(
-                conversation: _securityAdminConversation, user: _userSnapshot)
-          ],
-        ),
-      ),
-    );
+          child: new Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(kToolbarHeight + kTextTabBarHeight),
+              child: Column(children: [
+                AppBar(
+                  backgroundColor: Color.fromRGBO(241, 241, 245, 1.0),
+                  elevation: 0.0,
+                  title: new Text('Security Talk-Around',
+                      textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+                  leading: new BackButton(color: Colors.grey.shade800),
+                ),
+                Container(
+                  color: Colors.white,
+                  width: MediaQuery.of(context).size.width,
+                  child: Center(child: TabBar(
+                    isScrollable: true,
+                    indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
+                    labelColor: Colors.black,
+                    tabs: [Tab(text: "Security"), new Tab(text: "Security & Admin")],
+                  ),)
+                )
+
+              ]),
+            ),
+            body: TabBarView(
+              children: [
+                Chat(conversation: _securityConversation, user: _userSnapshot),
+                Chat(conversation: _securityAdminConversation, user: _userSnapshot)
+              ],
+            ),
+          ),
+        ));
   }
 }

@@ -61,6 +61,7 @@ class _HomeState extends State<Home> {
     final localAssetFile =
         (await copyLocalAsset(localDir, bundleDir, assetName)).path;
     _localAssetFile = localAssetFile;
+    print(_localAssetFile);
   }
 
   Future<File> copyLocalAsset(
@@ -101,7 +102,6 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
-    print("onResume: $message");
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
@@ -214,30 +214,30 @@ class _HomeState extends State<Home> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text(message['title']),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[new Text(message['body'])],
+        return AlertDialog(
+          title: Text(message['title']),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text(message['body'])],
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('View Details'),
+            FlatButton(
+              child: Text('View Details'),
               onPressed: () {
                 audioPlugin.stop();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(
+                  MaterialPageRoute(
                     builder: (context) =>
                         new NotificationDetail(notification: notification),
                   ),
                 );
               },
             ),
-            new FlatButton(
-              child: new Text('Close Alert'),
+            FlatButton(
+              child: Text('Close Alert'),
               onPressed: () {
                 audioPlugin.stop();
                 Navigator.of(context).pop();
