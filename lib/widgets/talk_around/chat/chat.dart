@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
-import 'package:school_village/widgets/icon_button.dart';
+import 'package:school_village/widgets/talk_around/icon_button.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
@@ -26,8 +26,7 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final TextEditingController _textController = TextEditingController();
 
-  static FirebaseStorage storage =
-      new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
   final String conversation;
   final DocumentSnapshot user;
   final Firestore firestore = Firestore.instance;
@@ -75,9 +74,7 @@ class _ChatState extends State<Chat> {
       _showLoading();
       path = '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1
-          ? lookupMimeType(image.path).split("/")[1]
-          : type;
+      type = lookupMimeType(image.path).split("/").length > 1 ? lookupMimeType(image.path).split("/")[1] : type;
       path = path + "." + type;
       print(path);
       await uploadFile(path, image);
@@ -156,79 +153,57 @@ class _ChatState extends State<Chat> {
   static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
 
   _buildInput() {
-    return Row(children: [
-      Container(
-        margin: horizontalMargin,
-          child:  CustomIconButton(
-            padding: EdgeInsets.all(0.0),
-              icon: ImageIcon(AssetImage('assets/images/camera.png'), color: SVColors.talkAroundAccent,),
-              onPressed: () => _openImagePicker(context))),
-      Card(
-        elevation: 10.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: borderRadius,
-        ),
-        child: Container(
-          color: Colors.white,
-          width: MediaQuery.of(context).size.width - 104,
-          child: Card(
-            margin: EdgeInsets.all(1.5),
-            shape: RoundedRectangleBorder(borderRadius: borderRadius),
-            color: SVColors.talkAroundAccent,
-            child: Container(
-                child: TextField(
-                  controller: _textController,
-                  maxLines: 1,
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      hintStyle: TextStyle(color: Colors.grey.shade50),
-                      fillColor: Colors.transparent,
-                      filled: true,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          Icons.send,
-                          color: Colors.white,
-                        ),
-                        onPressed: () => _handleSubmitted(_textController.text),
-                      ),
-                      hintText: "Type Message..."),
-                )),
+    return Column(children: [
+      _buildImagePreview(),
+      Row(children: [
+        Container(
+            margin: horizontalMargin,
+            child: CustomIconButton(
+                padding: EdgeInsets.all(0.0),
+                icon: ImageIcon(
+                  AssetImage('assets/images/camera.png'),
+                  color: SVColors.talkAroundAccent,
+                ),
+                onPressed: () => _openImagePicker(context))),
+        Card(
+          elevation: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: borderRadius,
           ),
-        ),
-      )
+          child: Container(
+            color: Colors.white,
+            width: MediaQuery.of(context).size.width - 104,
+            child: Card(
+              margin: EdgeInsets.all(1.5),
+              shape: RoundedRectangleBorder(borderRadius: borderRadius),
+              color: SVColors.talkAroundAccent,
+              child: Container(
+                  child: TextField(
+                controller: _textController,
+                maxLines: 1,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    hintStyle: TextStyle(color: Colors.grey.shade50),
+                    fillColor: Colors.transparent,
+                    filled: true,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () => _handleSubmitted(_textController.text),
+                    ),
+                    hintText: "Type Message..."),
+              )),
+            ),
+          ),
+        )
+      ])
     ]);
   }
 
-  _buildInputBox() {
-    return Card(
-      elevation: 5.0,
-      shape: RoundedRectangleBorder(borderRadius: borderRadius),
-      child: TextField(
-        maxLines: 1,
-        controller: _textController,
-        style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-            filled: true,
-            hintStyle: TextStyle(color: Colors.grey.shade50, fontSize: 14.0),
-            fillColor: Colors.grey.shade800,
-            border: const OutlineInputBorder(
-                borderRadius: borderRadius,
-                borderSide:
-                    const BorderSide(color: Colors.white, style: BorderStyle.solid, width: 5.0)),
-            suffixIcon: IconButton(
-                icon: Icon(
-                  Icons.send,
-                  color: Colors.white,
-                ),
-                onPressed: () => _handleSubmitted(_textController.text)),
-            hintText: "Type Message..."),
-      ),
-    );
-  }
-
   _convertDateToKey(createdAt) {
-    return DateTime.fromMillisecondsSinceEpoch(createdAt).millisecondsSinceEpoch ~/
-        Constants.oneDay;
+    return DateTime.fromMillisecondsSinceEpoch(createdAt).millisecondsSinceEpoch ~/ Constants.oneDay;
   }
 
   _getHeaderItem(day) {
@@ -282,10 +257,12 @@ class _ChatState extends State<Chat> {
           itemBuilder: (_, int index) {
             if (messageList[index].date != null) {
               return Container(
+                margin: EdgeInsets.only(top: 30.0),
                 child: Stack(
                   children: [
                     Container(
                         height: 12.0,
+
                         child: Center(
                             child: Container(
                           height: 1.0,
@@ -313,6 +290,7 @@ class _ChatState extends State<Chat> {
               timestamp: document['createdAt'],
               self: document['createdById'] == user.documentID,
               location: document['location'],
+              imageUrl: document['image'],
               message: document,
             );
           });
@@ -329,8 +307,8 @@ class _ChatState extends State<Chat> {
         child: Container(color: Colors.white, child: _getScreen()),
       ), //new
       Container(
-        margin: EdgeInsets.only(bottom: 14.0),
-        decoration: BoxDecoration(color: Colors.white), //new
+        color: Colors.white,
+        padding: EdgeInsets.only(bottom: 14.0),
         child: _buildInput(),
       )
     ]);
