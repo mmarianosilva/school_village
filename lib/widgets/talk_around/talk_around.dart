@@ -60,11 +60,14 @@ class _TalkAroundState extends State<TalkAround> {
     }
     return new DefaultTabController(
       length: 2,
-      child: new Scaffold(
+      child: Theme(data: ThemeData(
+        primaryColor: Colors.white, //Changing this will change the color of the TabBar
+      ), child: new Scaffold(
         appBar: new AppBar(
-          backgroundColor: Colors.grey.shade200,
+          backgroundColor: Colors.white,
           elevation: 0.0,
           bottom: new TabBar(
+            indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
             labelColor: Colors.black,
             tabs: [
               new Tab(text: "Security"),
@@ -84,6 +87,6 @@ class _TalkAroundState extends State<TalkAround> {
           ],
         ),
       ),
-    );
+      ));
   }
 }
