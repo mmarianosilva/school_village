@@ -337,7 +337,7 @@ class _ChatState extends State<Chat> {
                 height: 10.0,
               ),
               FlatButton(
-                textColor: Theme.of(context).primaryColor,
+                textColor: SVColors.talkAroundAccent,
                 child: Text('Use Camera'),
                 onPressed: () {
                   Navigator.pop(context);
@@ -345,7 +345,7 @@ class _ChatState extends State<Chat> {
                 },
               ),
               FlatButton(
-                textColor: Theme.of(context).primaryColor,
+                textColor: SVColors.talkAroundAccent,
                 child: Text('Use Gallery'),
                 onPressed: () {
                   Navigator.pop(context);
