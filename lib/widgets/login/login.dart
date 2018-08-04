@@ -5,6 +5,7 @@ import '../../util/user_helper.dart';
 import '../contact/contact.dart';
 import '../forgot/forgot.dart';
 import '../../util/analytics_helper.dart';
+import '../student_login/student_login.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -104,6 +105,13 @@ class _LoginState extends State<Login> {
     );
   }
 
+  studentLogin() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new StudentLogin()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -156,6 +164,13 @@ class _LoginState extends State<Login> {
                   child: new Text("LOGIN")
               ),
               const SizedBox(height: 18.0),
+              new MaterialButton(
+                  minWidth: 200.0,
+                  color: Colors.grey.shade300,
+                  onPressed: studentLogin,
+                  child: new Text("STUDENT LOGIN")
+              ),
+              const SizedBox(height: 18.0),
               new FlatButton(
                   onPressed: onForgot,
                   child: new Text("Forgot Password?")
@@ -164,7 +179,8 @@ class _LoginState extends State<Login> {
               new FlatButton(
                   onPressed: createAccount,
                   child: new Text("Create Account")
-              )
+              ),
+
             ],
           ),
         ),

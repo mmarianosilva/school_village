@@ -61,6 +61,7 @@ class _SettingsState extends State<Settings> {
     print(_userId);
     await TokenHelper.deleteToken(token, _userId);
     await UserHelper.logout(token);
+    model.setUser(null);
     Navigator.of(context).pushNamedAndRemoveUntil(
         '/login', (Route<dynamic> route) => false);
   }

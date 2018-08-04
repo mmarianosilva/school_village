@@ -17,6 +17,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../../../model/main_model.dart';
 import 'package:location/location.dart';
 import '../../../util/constants.dart';
+import '../../holine_list/hotline_list.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -111,6 +112,13 @@ class _DashboardState extends State<Dashboard> {
     Navigator.push(
       context,
       new MaterialPageRoute(builder: (context) => new Hotline()),
+    );
+  }
+
+  openHotLineList() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new HotLineList()),
     );
   }
 
@@ -284,7 +292,6 @@ class _DashboardState extends State<Dashboard> {
           },
           child: new Row(
             children: <Widget>[
-//                                new Image.asset('assets/images/logo.png', width: 48.0),
               new FutureBuilder(
                   future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
                   ["icon"], context: context),
@@ -361,6 +368,47 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  _buildHotlineMessages() {
+    if(role != 'school_admin') {
+      return SizedBox();
+    }
+    return new Column(
+      children: <Widget>[
+        const SizedBox(height: 14.0),
+        new GestureDetector(
+          onTap: openHotLineList,
+          child:  new Row(
+            children: <Widget>[
+              //                                new Image.asset('assets/images/logo.png', width: 48.0),
+              new Container(
+                width: 48.0,
+                height: 48.0,
+                child: new Center(
+                  child: new Icon(Icons.record_voice_over, size: 36.0, color: Colors.green.shade700),
+                ),
+              ),
+              new SizedBox(width: 12.0),
+              new Expanded(
+                  child: new Text(
+                    "Anonymous Hotline",
+                    textAlign: TextAlign.left,
+                    style: new TextStyle(fontSize: 16.0),
+                  )),
+              new Icon(Icons.chevron_right)
+            ],
+          ),
+        ),
+        const SizedBox(height: 14.0),
+        new Container(
+          height: 0.5,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey,
+        ),
+      ],
+    );
+  }
+
+
   _buildAlertButton() {
     if(role == 'school_student') {
       return _buildHotlineButton();
@@ -431,11 +479,14 @@ class _DashboardState extends State<Dashboard> {
                             return _buildNotificationsOption(model);
                           }
                           if(index == snapshot.data.data["documents"].length +4) {
+                            return _buildHotlineMessages();
+                          }
+                          if(index == snapshot.data.data["documents"].length +5) {
                             return _buildSettingsOption();
                           }
                           return _buildDocumentOption(snapshot, index);
                         },
-                        itemCount: snapshot.data.data["documents"].length + 5);
+                        itemCount: snapshot.data.data["documents"].length + 6);
               }
             });
       },
