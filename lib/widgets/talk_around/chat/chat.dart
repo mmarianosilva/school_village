@@ -82,7 +82,7 @@ class _ChatState extends State<Chat> {
     return location;
   }
 
-  Widget _buildTextComposer() {
+  _buildTextComposer() {
     return IconTheme(
       data: IconThemeData(color: Theme.of(context).accentColor),
       child: Container(
@@ -104,6 +104,72 @@ class _ChatState extends State<Chat> {
           ],
         ),
       ), //new
+    );
+  }
+
+  static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
+
+  _buildInput() {
+    return Container(
+        child: Card(
+      elevation: 5.0,
+
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
+      child: Container(
+        color: Colors.white,
+        child: Card(
+          margin: EdgeInsets.all(2.0),
+          shape: RoundedRectangleBorder(
+              borderRadius: borderRadius),
+          color: Colors.grey.shade800,
+          child: TextField(
+            controller: _textController,
+            maxLines: 1,
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.grey.shade50),
+                fillColor: Colors.transparent,
+                filled: true,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => _handleSubmitted(_textController.text),
+                ),
+                hintText: "Type Message..."),
+          ),
+        ),
+      ),
+    ));
+  }
+
+  _buildInputBox() {
+    return Card(
+      elevation: 5.0,
+      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      child: TextField(
+        maxLines: 1,
+        controller: _textController,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+            filled: true,
+            hintStyle: TextStyle(color: Colors.grey.shade50, fontSize: 14.0),
+            fillColor: Colors.grey.shade800,
+            border: const OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide:
+                    const BorderSide(color: Colors.white, style: BorderStyle.solid, width: 5.0)),
+            suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.send,
+                  color: Colors.white,
+                ),
+                onPressed: () => _handleSubmitted(_textController.text)),
+            hintText: "Type Message..."),
+      ),
     );
   }
 
@@ -159,7 +225,7 @@ class _ChatState extends State<Chat> {
           itemCount: messageList.length,
           reverse: true,
           controller: controller,
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
           itemBuilder: (_, int index) {
             if (messageList[index].date != null) {
               return Container(
@@ -203,23 +269,17 @@ class _ChatState extends State<Chat> {
     );
   }
 
-
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     return Column(
-      //modified
       children: [
-        //new
-        Flexible(
-            //new
-            child: SizedBox.expand(
-          child: Container(color: Colors.white,child: _getScreen()),
-        )), //new
-        Divider(height: 1.0), //new
+        Expanded(
+          child: Container(color: Colors.white, child: _getScreen()),
+        ), //new
         Container(
-          //new
-          decoration: BoxDecoration(color: Theme.of(context).cardColor), //new
-          child: _buildTextComposer(), //modified
+          margin: EdgeInsets.only(left: 30.0, right: 20.0, bottom: 10.0),
+          decoration: BoxDecoration(color: Colors.white), //new
+          child: _buildInput(), //modified
         ), //new
       ], //new
     );

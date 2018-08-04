@@ -20,7 +20,7 @@ class ChatMessage extends StatelessWidget {
     return _getMessageView(context);
   }
 
-  var dateFormatter = DateFormat('hh:mm a on MMM');
+  final dateFormatter = DateFormat('hh:mm a on MMM');
 
   _getFormattedDate() {
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
@@ -32,7 +32,7 @@ class ChatMessage extends StatelessWidget {
       suffix = "nd";
     } else if (j == 3 && k != 13) {
       suffix = "rd";
-    }else{
+    } else {
       suffix = 'th';
     }
     return dateFormatter.format(date) + ' ${date.day}$suffix';

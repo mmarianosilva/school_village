@@ -25,7 +25,7 @@ dependencies:
   scoped_model: "^0.2.0"
   audioplayer: "^0.5.0"
   flutter_html_view: ^0.5.3
-  intl: 0.15.7
+  intl: any
   intl_translation: any
 
 
