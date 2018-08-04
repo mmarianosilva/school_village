@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' ;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../notification/notification.dart';
+import '../../../util/firebase_image_thumbnail.dart';
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message});
+  ChatMessage({this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message, this.imageUrl});
   final String text;
   final String name;
+  final String imageUrl;
   final String initial;
   final int timestamp;
   final bool self;
@@ -85,6 +87,14 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
+  _getImage() {
+    if(imageUrl == null || imageUrl.trim() == '') {
+      return SizedBox();
+    }
+//    return Text("Image");
+    return FireBaseImageThumbnail(reference: imageUrl, width: 160.0, height: 160.0);
+  }
+
   _getMyMessageView(context) {
     DateTime time = new DateTime.fromMillisecondsSinceEpoch(timestamp);
 
@@ -113,6 +123,7 @@ class ChatMessage extends StatelessWidget {
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
+                      _getImage(),
                       new Text(name, style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
                       new Container(
                         margin: const EdgeInsets.only(top: 5.0),
