@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'widgets/splash/splash.dart';
 import 'widgets/home/home.dart';
 import 'widgets/login/login.dart';
@@ -22,26 +23,29 @@ Future<Null> main() async {
         }
     };
     runZoned<Future<Null>>(() async {
-        runApp(new ScopedModel<MainModel>(
-            model: MainModel(),
-            child: new MaterialApp(
-                home: Splash(),
-                theme: new ThemeData(
-                    primaryColor: Colors.grey.shade900,
-                    accentColor: Colors.blue,
-                    brightness: Brightness.light,
-                    primaryColorDark: Colors.white10,
-                    primaryColorLight: Colors.white
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+            .then((_) {
+            runApp(new ScopedModel<MainModel>(
+                model: MainModel(),
+                child: new MaterialApp(
+                    home: Splash(),
+                    theme: new ThemeData(
+                        primaryColor: Colors.grey.shade900,
+                        accentColor: Colors.blue,
+                        brightness: Brightness.light,
+                        primaryColorDark: Colors.white10,
+                        primaryColorLight: Colors.white
+                    ),
+                    routes: <String, WidgetBuilder> {
+                        '/home': (BuildContext context) => new Home(),
+                        '/login': (BuildContext context) => new Login(),
+                    },
+                    navigatorObservers: [
+                        new FirebaseAnalyticsObserver(analytics: AnalyticsHelper.getAnalytics()),
+                    ],
                 ),
-                routes: <String, WidgetBuilder> {
-                    '/home': (BuildContext context) => new Home(),
-                    '/login': (BuildContext context) => new Login(),
-                },
-                navigatorObservers: [
-                    new FirebaseAnalyticsObserver(analytics: AnalyticsHelper.getAnalytics()),
-                ],
-            ),
-        ));
+            ));
+        });
     }, onError: (error, stackTrace) async {
         await _reportError(error, stackTrace);
     });

@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
+import '../holine_list/hotline_list.dart';
 import '../notifications/notifications.dart';
 import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
@@ -105,8 +106,47 @@ class _HomeState extends State<Home> {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
       return _goToSecurityChat();
+    } else if (message["type"] == "hotline") {
+      return _showHotLineMessageDialog(message);
     }
     _showItemDialog(message);
+  }
+
+  _showHotLineMessageDialog(message) {
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text(message['title']),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[new Text(message['body'])],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('View All'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new HotLineList(),
+                  ),
+                );
+              },
+            ),
+            new FlatButton(
+              child: new Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _goToSecurityChat() {

@@ -25,12 +25,12 @@ class UserModel extends Model {
 
   getAlertGroups(schoolId) async {
     DocumentSnapshot user = await getUser();
-    if(user.data['associatedSchools'].containsKey(schoolId) && user.data['associatedSchools'][schoolId].containsKey('alerts')) {
+    print(user);
+    if(user != null && user.data['associatedSchools'].containsKey(schoolId) && user.data['associatedSchools'][schoolId].containsKey('alerts')) {
       return user.data['associatedSchools'][schoolId]['alerts'].keys.where((k) => user.data['associatedSchools'][schoolId]['alerts'][k] == true);
     } else {
       return [];
     }
-
   }
 
   refreshUserIfNull() async{
