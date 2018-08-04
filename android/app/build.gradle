@@ -30,9 +30,10 @@ android {
         applicationId "com.oandmtech.schoolvillage"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 20
-        versionName "1.1.20"
+        versionCode 21
+        versionName "1.1.21"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
 
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "x86"
@@ -70,6 +71,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
+    compile 'com.android.support:multidex:1.0.0'
 
     def appCenterSdkVersion = '1.6.1'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
