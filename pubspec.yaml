@@ -28,6 +28,7 @@ dependencies:
   intl: any
   intl_translation: any
   image_picker: ^0.4.6
+  photo_view: any
 
 
 

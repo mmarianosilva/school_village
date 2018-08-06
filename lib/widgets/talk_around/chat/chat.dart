@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
-import 'package:school_village/widgets/talk_around/icon_button.dart';
+import 'package:school_village/components/icon_button.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
@@ -128,14 +128,13 @@ class _ChatState extends State<Chat> {
 
   Widget _buildImagePreview() {
     if (image == null) return SizedBox();
-    print("iamge");
-    return new Container(
+    return Container(
       padding: EdgeInsets.all(4.0),
-      child: new Center(
+      child: Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            new Image.file(image, height: 120.0),
+            Image.file(image, height: 120.0),
             SizedBox(width: 16.0),
             GestureDetector(
               onTap: () {
@@ -315,7 +314,6 @@ class _ChatState extends State<Chat> {
   } //modified
 
   void saveImage(File file) async {
-    print("Saving image");
     setState(() {
       image = file;
     });
