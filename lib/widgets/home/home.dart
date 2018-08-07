@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
+import '../holine_list/hotline_list.dart';
 import '../notifications/notifications.dart';
 import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
@@ -60,6 +62,7 @@ class _HomeState extends State<Home> {
     final localAssetFile =
         (await copyLocalAsset(localDir, bundleDir, assetName)).path;
     _localAssetFile = localAssetFile;
+    print(_localAssetFile);
   }
 
   Future<File> copyLocalAsset(
@@ -100,13 +103,51 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
-    print("onResume: $message");
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
       return _goToSecurityChat();
+    } else if (message["type"] == "hotline") {
+      return _showHotLineMessageDialog(message);
     }
     _showItemDialog(message);
+  }
+
+  _showHotLineMessageDialog(message) {
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text(message['title']),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[new Text(message['body'])],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('View All'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                    builder: (context) => new HotLineList(),
+                  ),
+                );
+              },
+            ),
+            new FlatButton(
+              child: new Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _goToSecurityChat() {
@@ -174,30 +215,30 @@ class _HomeState extends State<Home> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text(message['title']),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[new Text(message['body'])],
+        return AlertDialog(
+          title: Text(message['title']),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text(message['body'])],
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('View Details'),
+            FlatButton(
+              child: Text('View Details'),
               onPressed: () {
                 audioPlugin.stop();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(
+                  MaterialPageRoute(
                     builder: (context) =>
                         new NotificationDetail(notification: notification),
                   ),
                 );
               },
             ),
-            new FlatButton(
-              child: new Text('Close Alert'),
+            FlatButton(
+              child: Text('Close Alert'),
               onPressed: () {
                 audioPlugin.stop();
                 Navigator.of(context).pop();
@@ -301,7 +342,7 @@ class _HomeState extends State<Home> {
 
         return new Scaffold(
           backgroundColor: Colors.white,
-          appBar: new AppBar(
+          appBar: new BaseAppBar(
             title: new Text(title,
                 textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.black)),

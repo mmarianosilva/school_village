@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/components/base_appbar.dart';
 import '../../util/user_helper.dart';
 import '../contact/contact.dart';
 import '../forgot/forgot.dart';
 import '../../util/analytics_helper.dart';
+import '../student_login/student_login.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -103,12 +105,19 @@ class _LoginState extends State<Login> {
     );
   }
 
+  studentLogin() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new StudentLogin()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return new Scaffold(
       key: _scaffoldKey,
-      appBar: new AppBar(
+      appBar: new BaseAppBar(
         leading: new Container(
           padding: new EdgeInsets.all(8.0),
           child: new Image.asset('assets/images/logo.png'),
@@ -155,6 +164,13 @@ class _LoginState extends State<Login> {
                   child: new Text("LOGIN")
               ),
               const SizedBox(height: 18.0),
+              new MaterialButton(
+                  minWidth: 200.0,
+                  color: Colors.grey.shade300,
+                  onPressed: studentLogin,
+                  child: new Text("STUDENT LOGIN")
+              ),
+              const SizedBox(height: 18.0),
               new FlatButton(
                   onPressed: onForgot,
                   child: new Text("Forgot Password?")
@@ -163,7 +179,8 @@ class _LoginState extends State<Login> {
               new FlatButton(
                   onPressed: createAccount,
                   child: new Text("Create Account")
-              )
+              ),
+
             ],
           ),
         ),
