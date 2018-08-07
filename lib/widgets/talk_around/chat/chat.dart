@@ -2,15 +2,13 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
-import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
-import 'package:school_village/components/icon_button.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
 import 'package:mime/mime.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Chat extends StatefulWidget {
@@ -24,8 +22,6 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  final TextEditingController _textController = TextEditingController();
-
   static FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
   final String conversation;
   final DocumentSnapshot user;
@@ -38,7 +34,8 @@ class _ChatState extends State<Chat> {
   Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
   var dateFormatter = DateFormat('EEEE, MMMM dd, yyyy');
   bool isLoaded = false;
-  File image;
+
+  InputField inputField;
 
   _ChatState(this.conversation, this.user);
 
@@ -47,6 +44,10 @@ class _ChatState extends State<Chat> {
     _handleMessageCollection();
     controller = ScrollController();
     controller.addListener(_scrollListener);
+    inputField = InputField(sendPressed: (image, text) {
+      _handleSubmitted(image, text);
+    });
+
     super.initState();
   }
 
@@ -63,7 +64,7 @@ class _ChatState extends State<Chat> {
     super.dispose();
   }
 
-  void _handleSubmitted(String text) async {
+  _handleSubmitted(File image, String text) async {
     if (text == null || text.trim() == '') {
       return;
     }
@@ -81,7 +82,7 @@ class _ChatState extends State<Chat> {
       _hideLoading();
     }
     document.setData(<String, dynamic>{
-      'body': _textController.text,
+      'body': text,
       'createdById': user.documentID,
       'createdBy': "${user.data['firstName']} ${user.data['lastName']}",
       'createdAt': DateTime.now().millisecondsSinceEpoch,
@@ -89,12 +90,8 @@ class _ChatState extends State<Chat> {
       'image': image == null ? null : path,
       'reportedByPhone': "${user['phone']}"
     });
-    if (image != null) {
-      setState(() {
-        image = null;
-      });
-    }
-    _textController.clear();
+    //FIXME: not good practice
+    inputField.key.currentState.clearState();
   }
 
   uploadFile(String path, File file) async {
@@ -120,86 +117,7 @@ class _ChatState extends State<Chat> {
     return location;
   }
 
-  _removeImage() {
-    setState(() {
-      image = null;
-    });
-  }
-
-  Widget _buildImagePreview() {
-    if (image == null) return SizedBox();
-    return Container(
-      padding: EdgeInsets.all(4.0),
-      child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Image.file(image, height: 120.0),
-            SizedBox(width: 16.0),
-            GestureDetector(
-              onTap: () {
-                _removeImage();
-              },
-              child: Icon(Icons.remove_circle_outline, color: Colors.red),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
   static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
-
-  _buildInput() {
-    return Column(children: [
-      _buildImagePreview(),
-      Row(children: [
-        Container(
-            margin: horizontalMargin,
-            child: CustomIconButton(
-                padding: EdgeInsets.all(0.0),
-                icon: ImageIcon(
-                  AssetImage('assets/images/camera.png'),
-                  color: SVColors.talkAroundAccent,
-                ),
-                onPressed: () => _openImagePicker(context))),
-        Card(
-          elevation: 10.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: borderRadius,
-          ),
-          child: Container(
-            color: Colors.white,
-            width: MediaQuery.of(context).size.width - 104,
-            child: Card(
-              margin: EdgeInsets.all(1.5),
-              shape: RoundedRectangleBorder(borderRadius: borderRadius),
-              color: SVColors.talkAroundAccent,
-              child: Container(
-                  child: TextField(
-                controller: _textController,
-                maxLines: 1,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey.shade50),
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
-                      onPressed: () => _handleSubmitted(_textController.text),
-                    ),
-                    hintText: "Type Message..."),
-              )),
-            ),
-          ),
-        )
-      ])
-    ]);
-  }
 
   _convertDateToKey(createdAt) {
     return DateTime.fromMillisecondsSinceEpoch(createdAt).millisecondsSinceEpoch ~/ Constants.oneDay;
@@ -261,7 +179,6 @@ class _ChatState extends State<Chat> {
                   children: [
                     Container(
                         height: 12.0,
-
                         child: Center(
                             child: Container(
                           height: 1.0,
@@ -308,56 +225,9 @@ class _ChatState extends State<Chat> {
       Container(
         color: Colors.white,
         padding: EdgeInsets.only(bottom: 14.0),
-        child: _buildInput(),
+        child: inputField,
       )
     ]);
   } //modified
 
-  void saveImage(File file) async {
-    setState(() {
-      image = file;
-    });
-  }
-
-  void _openImagePicker(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 150.0,
-            padding: EdgeInsets.all(10.0),
-            child: Column(children: [
-              Text(
-                'Pick an Image',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              FlatButton(
-                textColor: SVColors.talkAroundAccent,
-                child: Text('Use Camera'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(context, ImageSource.camera);
-                },
-              ),
-              FlatButton(
-                textColor: SVColors.talkAroundAccent,
-                child: Text('Use Gallery'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(context, ImageSource.gallery);
-                },
-              )
-            ]),
-          );
-        });
-  }
-
-  void _getImage(BuildContext context, ImageSource source) {
-    ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
-      if (image != null) saveImage(image);
-    });
-  }
 }
