@@ -5,10 +5,9 @@ import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../notification/notification.dart';
 
-class ChatMessage extends StatelessWidget {
-  ChatMessage(
+class BroadcastMessage extends StatelessWidget {
+  BroadcastMessage(
       {this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message, this.imageUrl});
 
   final String text;
@@ -21,7 +20,7 @@ class ChatMessage extends StatelessWidget {
   final DocumentSnapshot message;
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     return _getMessageView(context);
   }
 
@@ -66,29 +65,26 @@ class ChatMessage extends StatelessWidget {
           Flexible(
               child: Column(
             children: [
-              GestureDetector(
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(children: [
-                        Text(name, style: nameTextStyle),
-                        Container(
-                          child: locationWidget,
-                          margin: const EdgeInsets.only(left: 40.0),
-                        )
-                      ]),
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:[
+                    Row(children: [
+                      Text(name, style: nameTextStyle),
                       Container(
-                        child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 5.0),
-                        child: Text(text),
-                      ),
-                    ],
-                  ),
+                        child: locationWidget,
+                        margin: const EdgeInsets.only(left: 40.0),
+                      )
+                    ]),
+                    Container(
+                      child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: Text(text),
+                    ),
+                  ],
                 ),
-                onTap: () => goToDetails(context),
               ),
               _getImage(context)
             ],
@@ -99,23 +95,15 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  goToDetails(context) {
+  _openImage(context, imageUrl) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NotificationDetail(notification: message, title: 'Message Details'),
-      ),
-    );
-  }
-
-  _openImage(context, imageUrl){
-    Navigator.push(
-      context,
-       MaterialPageRoute(builder: (context) => new ImageViewScreen(
-        imageUrl,
-        minScale: PhotoViewScaleBoundary.contained,
-        maxScale: PhotoViewScaleBoundary.covered,
-      )),
+          builder: (context) => new ImageViewScreen(
+                imageUrl,
+                minScale: PhotoViewScaleBoundary.contained,
+                maxScale: PhotoViewScaleBoundary.covered,
+              )),
     );
   }
 
@@ -124,9 +112,12 @@ class ChatMessage extends StatelessWidget {
       return SizedBox();
     }
 
-
-    return ProgressImage(height: 160.0,firebasePath: imageUrl, onTap: (imgUrl){
-      _openImage(context, imgUrl);
-    },);
+    return ProgressImage(
+      height: 160.0,
+      firebasePath: imageUrl,
+      onTap: (imgUrl) {
+        _openImage(context, imgUrl);
+      },
+    );
   }
 }

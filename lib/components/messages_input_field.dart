@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/util/constants.dart';
 
 typedef SendPressed(img, text);
 
@@ -23,7 +24,6 @@ class _InputFieldState extends State<InputField> {
   File image;
 
   static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
-  static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
 
   _InputFieldState({this.sendPressed});
 
@@ -119,7 +119,7 @@ class _InputFieldState extends State<InputField> {
       _buildImagePreview(),
       Row(children: [
         Container(
-            margin: horizontalMargin,
+            margin: Constants.messagesHorizontalMargin,
             child: CustomIconButton(
                 padding: EdgeInsets.all(0.0),
                 icon: ImageIcon(

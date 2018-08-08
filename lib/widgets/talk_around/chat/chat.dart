@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/constants.dart';
+import 'package:school_village/util/date_formatter.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
@@ -29,10 +30,9 @@ class _ChatState extends State<Chat> {
   Location _location = Location();
   List<MessageHolder> messageList = List();
   bool disposed = false;
-  ScrollController controller;
-  FocusNode focusNode = FocusNode();
+  ScrollController _scrollController;
+  final focusNode = FocusNode();
   Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
-  var dateFormatter = DateFormat('EEEE, MMMM dd, yyyy');
   bool isLoaded = false;
 
   InputField inputField;
@@ -42,8 +42,8 @@ class _ChatState extends State<Chat> {
   @override
   initState() {
     _handleMessageCollection();
-    controller = ScrollController();
-    controller.addListener(_scrollListener);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     inputField = InputField(sendPressed: (image, text) {
       _handleSubmitted(image, text);
     });
@@ -60,7 +60,7 @@ class _ChatState extends State<Chat> {
   @override
   dispose() {
     disposed = true;
-    controller.removeListener(_scrollListener);
+    _scrollController.removeListener(_scrollListener);
     super.dispose();
   }
 
@@ -125,8 +125,7 @@ class _ChatState extends State<Chat> {
 
   _getHeaderItem(day) {
     var time = DateTime.fromMillisecondsSinceEpoch(day * Constants.oneDay);
-    String date = dateFormatter.format(time);
-    return MessageHolder(date, null);
+    return MessageHolder(getHeaderDate(time.millisecondsSinceEpoch), null);
   }
 
   _handleMessageMapInsert(shot) {
@@ -164,13 +163,13 @@ class _ChatState extends State<Chat> {
     });
   }
 
-  Widget _getScreen() {
+  _getScreen() {
     if (messageList.length > 0) {
       return ListView.builder(
           itemCount: messageList.length,
           reverse: true,
-          controller: controller,
-          padding: horizontalMargin,
+          controller: _scrollController,
+          padding: Constants.messagesHorizontalMargin,
           itemBuilder: (_, int index) {
             if (messageList[index].date != null) {
               return Container(
