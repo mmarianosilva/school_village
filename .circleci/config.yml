@@ -6,10 +6,6 @@ version: 2
 jobs:
   build-ios-beta:
 
-    branches:
-      only:
-        - master
-
     # Specify the Xcode version to use
     macos:
       xcode: "9.2"
@@ -22,14 +18,11 @@ jobs:
           name: Install CocoaPods
           command: cd ios && pod install
       - run:
-          name: cd ios && fastlane beta
+          name: Fastlane iOS
+          command: cd ios && fastlane beta
 
   build-android-beta:
 
-    branches:
-      only:
-        - master
-
     # Specify the Xcode version to use
     macos:
       xcode: "9.2"
@@ -39,14 +32,21 @@ jobs:
 
       # Install CocoaPods
       - run:
-          name: Install CocoaPods
-          command: cd ios && pod install
+          name: Build flutter
+          command: flutter build apk --release
       - run:
-          name: cd ios && fastlane beta
+          name: Fastlane Android
+          command: cd ios && fastlane beta
 
 workflows:
   version: 2
   beta:
     jobs:
       - build-ios-beta
+          filters:
+              branches:
+                only: master
       - build-android-beta
+          filters:
+              branches:
+                only: master
