@@ -5,24 +5,17 @@
 version: 2
 jobs:
   build-ios-beta:
-
-    # Specify the Xcode version to use
     macos:
       xcode: "9.2.0"
 
     steps:
       - checkout
-
-      # Install CocoaPods
-      - run:
-          name: Install CocoaPods
-          command: cd ios && pod install
-      - run:
-          name: Fastlane iOS
-          command: cd ios && fastlane beta
+      - run: cd ios && pod install
+      - run: cd .. && flutter doctor
+      - run: flutter build ios --release
+      - run: cd ios && fastlane deploy_beta
 
   build-android-beta:
-
     docker:
       - image: cirrusci/flutter
 
@@ -30,7 +23,8 @@ jobs:
       - checkout
       - run: flutter doctor
       - run: flutter build apk --release
-      - run: cd android && fastlane deploy_beta
+      - run: cd android && fastlane add_plugin appcenter
+      - run: fastlane deploy_beta
 
 workflows:
   version: 2
