@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -29,7 +29,7 @@ class ImageViewScreen extends StatelessWidget {
             color: Colors.transparent,
             shape: CircleBorder(),
             child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                 child: CustomIconButton(
                     icon: Icon(
                       Icons.close,
