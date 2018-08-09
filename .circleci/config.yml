@@ -4,10 +4,10 @@
 #
 version: 2
 jobs:
+
   build-ios-beta:
     macos:
       xcode: "9.2.0"
-
     steps:
       - checkout
       - run: cd ios && pod install
@@ -18,7 +18,6 @@ jobs:
   build-android-beta:
     docker:
       - image: cirrusci/flutter
-
     steps:
       - checkout
       - run: flutter doctor
@@ -32,4 +31,10 @@ workflows:
   beta:
     jobs:
       - build-ios-beta
+        filters:
+          branches:
+            only: master
       - build-android-beta
+        filters:
+          branches:
+            only: master
