@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/colors.dart';
 import '../../util/user_helper.dart';
-import '../broadcast/broadcast.dart';
 
 class SelectGroups extends StatefulWidget {
+  final GlobalKey<_SelectGroupsState> key = GlobalKey();
+
   @override
   _SelectGroupsState createState() => new _SelectGroupsState();
 }
 
 class _SelectGroupsState extends State<SelectGroups> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool _isLoading = true;
-  BuildContext _context;
   Map<String, bool> selectedGroups = {};
   List<dynamic> groups;
-
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
@@ -26,60 +24,59 @@ class _SelectGroupsState extends State<SelectGroups> {
 
   @override
   Widget build(BuildContext context) {
-    _context = context;
-
-    if(_isLoading) {
+    if (_isLoading) {
       getGroups();
     }
-
-    return new Scaffold(
-      key: _scaffoldKey,
-      appBar: new BaseAppBar(
-        title: new Text("Select Groups", style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade200,
-        leading: new BackButton(color: Colors.grey.shade800),
-      ),
-      body: _isLoading ?  new Text('Loading...') : getList(groups),
-
-    );
-  }
-
-  writeMessage() {
-    print("Navigating");
-    Navigator.of(context).pop();
-    Navigator.of(context).push(
-      new MaterialPageRoute(builder: (context) => new Broadcast(groups: selectedGroups)),
-    );
+    return _isLoading ? Text('Loading...') : getList(groups);
   }
 
   getList(data) {
-    return new ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        if(index == data.length) {
-          return  new Container(
-            padding: EdgeInsets.all(16.0),
-            alignment: Alignment.centerRight,
-            child: new MaterialButton(
-              color: Theme.of(context).accentColor,
-              child: new Text("Next"),
-              onPressed: selectedGroups.length > 0 ? writeMessage : null,
-            ),
-          );
+    List<Widget> rows = List();
+    List<String> names = List();
+
+    for (var dataVal in data) {
+      String name = '${dataVal["name"]}';
+      names.add(name);
+    }
+
+    for (var i = 0; i < names.length; i++) {
+      var j = 0;
+      List<Widget> row = List();
+      print('j=0');
+      while (j < 2 && i < names.length) {
+        row.add(Container(padding: EdgeInsets.symmetric(vertical: 16.0),child:Expanded(
+            child: CheckboxListTile(
+                title: Text(names[i].substring(0, 1).toUpperCase() + names[i].substring(1),
+                    style: TextStyle(color: SVColors.talkAroundBlue)),
+                value: selectedGroups.containsKey(names[i]),
+                onChanged: (bool value) {
+                  setState(() {
+                    if (!value) {
+                      selectedGroups.remove(names[i]);
+                    } else {
+                      selectedGroups.addAll({names[i]: true});
+                    }
+                  });
+                }))));
+        print('index= $i');
+        if(j < 1){
+          i++;
         }
-        return new CheckboxListTile(
-            title: new Text(data[index]["name"]),
-            value: selectedGroups.containsKey(data[index]["name"]),
-            onChanged: (bool value) {
-              setState(() {
-                if(!value) {
-                  selectedGroups.remove(data[index]["name"]);
-                } else {
-                  selectedGroups.addAll({data[index]["name"] : true});
-                }
-              });
-            });
-      },
-      itemCount: data.length + 1,
+        j++;
+      }
+      rows.add(Container(
+        height: 16.0,
+          child: Row(
+        children: row,
+      )));
+    }
+    print('column length = ${rows.length}');
+
+    return Container(
+      child: Column(
+        children: rows,
+      ),
+      height: 80.0,
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +7,7 @@ import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/widgets/messages/broadcast_message.dart';
+import 'package:school_village/widgets/select_group/select_group.dart';
 import '../../util/user_helper.dart';
 import 'package:school_village/util/constants.dart';
 
@@ -17,9 +17,11 @@ class Messages extends StatefulWidget {
 }
 
 class _MessagesState extends State<Messages> {
-  FirebaseUser _userId;
+  FirebaseUser _user;
+  String _userId;
   String name = '';
   String _schoolId = '';
+  String phone = '';
   var isLoaded = false;
   DocumentReference _userRef;
   List<String> _groups = List<String>();
@@ -29,11 +31,12 @@ class _MessagesState extends State<Messages> {
   ScrollController _scrollController;
   final focusNode = FocusNode();
   InputField inputField;
+  final selectGroups = SelectGroups();
 
   getUserDetails() async {
-    _userId = await UserHelper.getUser();
+    _user = await UserHelper.getUser();
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
-    _userRef = Firestore.instance.document("users/${_userId.uid}");
+    _userRef = Firestore.instance.document("users/${_user.uid}");
     _userRef.get().then((user) {
       var keys = user.data["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
@@ -43,7 +46,9 @@ class _MessagesState extends State<Messages> {
         }
       }
       setState(() {
+        _userId = user.documentID;
         _schoolId = schoolId;
+        phone = user.data['phone'];
         _groups = groups;
         isLoaded = true;
         _handleMessageCollection();
@@ -72,7 +77,6 @@ class _MessagesState extends State<Messages> {
   }
 
   _handleMessageMapInsert(shot) {
-
     if (!belongsToGroup(shot['groups'].keys)) {
       return;
     }
@@ -94,11 +98,10 @@ class _MessagesState extends State<Messages> {
 
   @override
   initState() {
-
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     inputField = InputField(sendPressed: (image, text) {
-//      _handleSubmitted(image, text);
+      _sendMessage(text);
     });
 
     super.initState();
@@ -171,12 +174,17 @@ class _MessagesState extends State<Messages> {
             }
 
             final DocumentSnapshot document = messageList[index].message;
+            final groups = List<String>();
+
+            for (var value in (document['groups'].keys)) {
+              groups.add(value);
+            }
+
             return BroadcastMessage(
               text: document['body'],
               name: "${document['createdBy']}",
               timestamp: document['createdAt'],
-//              self: document['createdById'] == user.documentID,
-              location: document['location'],
+              groups: groups,
               imageUrl: document['image'],
               message: document,
             );
@@ -185,12 +193,58 @@ class _MessagesState extends State<Messages> {
     return const Center(
       child: const Text('Loading...'),
     );
+  }
 
+  _sendMessage(text) {
+    if (text.length < 10) return;
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Are you sure you want to send this message?'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [Text('This cannot be undone')],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                child: Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _saveBroadcast(text);
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  _saveBroadcast(alertBody) async {
+    CollectionReference collection = Firestore.instance.collection('$_schoolId/broadcasts');
+    final DocumentReference document = collection.document();
+
+    document.setData(<String, dynamic>{
+      'body': alertBody,
+      //FIXME: bad practice
+      'groups' : selectGroups.key.currentState.selectedGroups,
+      'createdById': _userId,
+      'createdBy': name,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+      'reportedByPhone': phone,
+    });
   }
 
   @override
   build(BuildContext context) {
-    if(!isLoaded){
+    if (!isLoaded) {
       getUserDetails();
     }
     return Scaffold(
@@ -201,7 +255,8 @@ class _MessagesState extends State<Messages> {
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
         ),
-        body:Column(children: [
+        body: Column(children: [
+          selectGroups,
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ), //new
@@ -210,7 +265,6 @@ class _MessagesState extends State<Messages> {
             padding: EdgeInsets.only(bottom: 14.0),
             child: inputField,
           )
-        ])
-    );
+        ]));
   }
 }
