@@ -32,7 +32,13 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+    # gradle(task: "clean assembleRelease")
+    # upload_to_play_store
+    hockey(
+          api_token: "d4c8235fffc88ae82adf2410590fdc20609564a0",
+          ipa: "../build",
+          notify: "0",
+          notes: changelog,
+        )
   end
 end

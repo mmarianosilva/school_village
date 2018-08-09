@@ -24,15 +24,17 @@ jobs:
   build-android-beta:
 
     docker:
-          - image: cirrusci/flutter
-        steps:
-          - checkout
-          - run: flutter doctor
-          - run: flutter test
-          - run: flutter -v build apk
+      - image: cirrusci/flutter
+
+    steps:
+      - checkout
+      - run: flutter doctor
+      - run: flutter build apk --release
+      - run: fastlane
 
 workflows:
   version: 2
+
   beta:
     jobs:
       - build-ios-beta
