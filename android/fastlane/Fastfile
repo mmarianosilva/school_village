@@ -34,15 +34,12 @@ platform :android do
   lane :deploy_beta do
     # gradle(task: "clean assembleRelease")
     # upload_to_play_store
-    hockey(
+    appcenter_upload(
           api_token: "19b26f52f67c75dc2f66af7726b033aa1aef8833",
-          apk: "../build/app/outputs/apk/release/app-release.apk",
-          notify: "0",
-          public_identifier:'School-Village-Android',
-          strategy:'replace',
-          timeout: 40,
-          owner_id: "schoolvillageowner",
-          notes: "New Build Available",
+          apk: "../build/app/outputs/apk/release/app-release.apk",notify: "0",
+          app_name:'School-Village-Android',
+          owner_name: "schoolvillageowner",
+          group: "Collaborators"
         )
   end
 end
