@@ -36,7 +36,7 @@ platform :android do
     # upload_to_play_store
     appcenter_upload(
           api_token: "19b26f52f67c75dc2f66af7726b033aa1aef8833",
-          apk: "../build/app/outputs/apk/release/app-release.apk",notify: "0",
+          apk: "../build/app/outputs/apk/release/app-release.apk",
           app_name:'School-Village-Android',
           owner_name: "schoolvillageowner",
           group: "Collaborators"
