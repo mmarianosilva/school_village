@@ -23,20 +23,13 @@ jobs:
 
   build-android-beta:
 
-    # Specify the Xcode version to use
-    macos:
-      xcode: "9.2.0"
-
-    steps:
-      - checkout
-
-      # Install CocoaPods
-      - run:
-          name: Build flutter
-          command: flutter build apk --release
-      - run:
-          name: Fastlane Android
-          command: cd ios && fastlane beta
+    docker:
+          - image: cirrusci/flutter
+        steps:
+          - checkout
+          - run: flutter doctor
+          - run: flutter test
+          - run: flutter -v build apk
 
 workflows:
   version: 2
