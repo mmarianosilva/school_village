@@ -21,7 +21,7 @@ import '../../holine_list/hotline_list.dart';
 
 class Dashboard extends StatefulWidget {
   @override
-  _DashboardState createState() => new _DashboardState();
+  _DashboardState createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
@@ -31,7 +31,7 @@ class _DashboardState extends State<Dashboard> {
   String ref = "";
   bool isOwner = false;
   String role = "";
-  Location _location = new Location();
+  Location _location = Location();
 
   _showPDF(context, url) {
     print(url);
@@ -104,83 +104,83 @@ class _DashboardState extends State<Dashboard> {
     print("Sending Alert");
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Alert()),
+      MaterialPageRoute(builder: (context) => Alert()),
     );
   }
 
   openHotline() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Hotline()),
+      MaterialPageRoute(builder: (context) => Hotline()),
     );
   }
 
   openHotLineList() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new HotLineList()),
+      MaterialPageRoute(builder: (context) => HotLineList()),
     );
   }
 
   openSettings() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Settings()),
+      MaterialPageRoute(builder: (context) => Settings()),
     );
   }
 
   openNotifications() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Notifications()),
+      MaterialPageRoute(builder: (context) => Notifications()),
     );
   }
 
   openMessages() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Messages()),
+      MaterialPageRoute(builder: (context) => Messages()),
     );
   }
 
   openTalk() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new TalkAround()),
+      MaterialPageRoute(builder: (context) => TalkAround()),
     );
   }
 
   sendBroadcast() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new SelectGroups()),
+      MaterialPageRoute(builder: (context) => Messages()),
     );
   }
 
   _buildSettingsOption() {
-    return new Column(
+    return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),
-        new GestureDetector(
+        GestureDetector(
           onTap: openSettings,
-          child:  new Row(
+          child:  Row(
             children: <Widget>[
-              //                                new Image.asset('assets/images/logo.png', width: 48.0),
-              new Container(
+              //                                Image.asset('assets/images/logo.png', width: 48.0),
+              Container(
                 width: 48.0,
                 height: 48.0,
-                child: new Center(
-                  child: new Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
+                child: Center(
+                  child: Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
                 ),
               ),
-              new SizedBox(width: 12.0),
-              new Expanded(
-                  child: new Text(
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
                     "Settings",
                     textAlign: TextAlign.left,
-                    style: new TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 16.0),
                   )),
-              new Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right)
             ],
           ),
         )
@@ -192,38 +192,38 @@ class _DashboardState extends State<Dashboard> {
     if(role == 'school_student') {
       return SizedBox();
     }
-    return new FutureBuilder(future: model.getAlertGroups(ref.split("/")[1]), builder: (context, alertGroups) {
+    return FutureBuilder(future: model.getAlertGroups(ref.split("/")[1]), builder: (context, alertGroups) {
       if(alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0 ){
         return SizedBox();
       }
-      return new Column(
+      return Column(
         children: <Widget>[
           const SizedBox(height: 14.0),
 
-          new GestureDetector(
+          GestureDetector(
             onTap: openNotifications,
-            child:  new Row(
+            child:  Row(
               children: <Widget>[
-                new Container(
+                Container(
                   width: 48.0,
                   height: 48.0,
-                  child: new Center(
-                    child: new Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
+                  child: Center(
+                    child: Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
                   ),
                 ),
-                new SizedBox(width: 12.0),
-                new Expanded(
-                    child: new Text(
+                SizedBox(width: 12.0),
+                Expanded(
+                    child: Text(
                       "Notifications",
                       textAlign: TextAlign.left,
-                      style: new TextStyle(fontSize: 16.0),
+                      style: TextStyle(fontSize: 16.0),
                     )),
-                new Icon(Icons.chevron_right)
+                Icon(Icons.chevron_right)
               ],
             ),
           ),
           const SizedBox(height: 14.0),
-          new Container(
+          Container(
             height: 0.5,
             width: MediaQuery.of(context).size.width,
             color: Colors.grey,
@@ -237,34 +237,34 @@ class _DashboardState extends State<Dashboard> {
     if(role == 'school_student') {
       return SizedBox();
     }
-    return new Column(
+    return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),
-        new GestureDetector(
+        GestureDetector(
           onTap: openMessages,
-          child:  new Row(
+          child:  Row(
             children: <Widget>[
-              //                                new Image.asset('assets/images/logo.png', width: 48.0),
-              new Container(
+              //                                Image.asset('assets/images/logo.png', width: 48.0),
+              Container(
                 width: 48.0,
                 height: 48.0,
-                child: new Center(
-                  child: new Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
+                child: Center(
+                  child: Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
                 ),
               ),
-              new SizedBox(width: 12.0),
-              new Expanded(
-                  child: new Text(
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
                     "Messages",
                     textAlign: TextAlign.left,
-                    style: new TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 16.0),
                   )),
-              new Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right)
             ],
           ),
         ),
         const SizedBox(height: 14.0),
-        new Container(
+        Container(
           height: 0.5,
           width: MediaQuery.of(context).size.width,
           color: Colors.grey,
@@ -274,10 +274,10 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildDocumentOption(snapshot, index) {
-    return new Column(
+    return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),
-        new GestureDetector(
+        GestureDetector(
           onTap: () {
             if(snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
               _showPDF(
@@ -290,31 +290,31 @@ class _DashboardState extends State<Dashboard> {
               ["location"]);
             }
           },
-          child: new Row(
+          child: Row(
             children: <Widget>[
-              new FutureBuilder(
+              FutureBuilder(
                   future: FileHelper.getFileFromStorage(url: snapshot.data.data["documents"][index - 2]
                   ["icon"], context: context),
                   builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
                     if(snapshot.data == null) {
-                      return new Image.asset('assets/images/logo.png', width: 48.0);
+                      return Image.asset('assets/images/logo.png', width: 48.0);
                     }
-                    return new Image.file(snapshot.data, width: 48.0);
+                    return Image.file(snapshot.data, width: 48.0);
                   }),
-              new SizedBox(width: 12.0),
-              new Expanded(
-                  child: new Text(
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
                     snapshot.data.data["documents"][index - 2]
                     ["title"],
                     textAlign: TextAlign.left,
-                    style: new TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 16.0),
                   )),
-              new Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right)
             ],
           ),
         ),
         const SizedBox(height: 14.0),
-        new Container(
+        Container(
           height: 0.5,
           width: MediaQuery.of(context).size.width,
           color: Colors.grey,
@@ -327,41 +327,41 @@ class _DashboardState extends State<Dashboard> {
     if(role == 'school_student') {
       return SizedBox();
     }
-    List<Widget> widgets = new List();
+    List<Widget> widgets = List();
     List<String> securityRoles = ["school_admin", "school_security"];
     print("Owner $isOwner Role $role");
     if(securityRoles.contains(role)) {
       widgets.add(
-          new GestureDetector(
-            child: new Image.asset('assets/images/security_btn.png', width: 48.0),
+          GestureDetector(
+            child: Image.asset('assets/images/security_btn.png', width: 48.0),
             onTap: openTalk,
           )
       );
     }
     if(role == "school_admin") {
-      widgets.add(new SizedBox(width: 20.0));
+      widgets.add(SizedBox(width: 20.0));
       widgets.add(
-          new GestureDetector(
-            child: new Image.asset(
+          GestureDetector(
+            child: Image.asset(
                 'assets/images/broadcast_btn.png', width: 48.0),
             onTap: sendBroadcast,
           )
       );
     }
-    return new Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: widgets,
     );
   }
 
   _buildHotlineButton() {
-    return new GestureDetector(child:
-      new Column(
+    return GestureDetector(child:
+      Column(
         children: <Widget>[
-          new Text("Anonymous Safety Hotline", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
-          new Image.asset('assets/images/hotline_header.png',
+          Text("Anonymous Safety Hotline", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+          Image.asset('assets/images/hotline_header.png',
               width: 160.0, height: 160.0,),
-          new Text("Safety is Everybody's Business!\nYou can make a difference", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0, color: Constants.hotLineBlue),)
+          Text("Safety is Everybody's Business!\nYou can make a difference", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0, color: Constants.hotLineBlue),)
         ],
       ),
       onTap: openHotline,
@@ -372,34 +372,34 @@ class _DashboardState extends State<Dashboard> {
     if(role != 'school_admin') {
       return SizedBox();
     }
-    return new Column(
+    return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),
-        new GestureDetector(
+        GestureDetector(
           onTap: openHotLineList,
-          child:  new Row(
+          child:  Row(
             children: <Widget>[
-              //                                new Image.asset('assets/images/logo.png', width: 48.0),
-              new Container(
+              //                                Image.asset('assets/images/logo.png', width: 48.0),
+              Container(
                 width: 48.0,
                 height: 48.0,
-                child: new Center(
-                  child: new Icon(Icons.record_voice_over, size: 36.0, color: Colors.green.shade700),
+                child: Center(
+                  child: Icon(Icons.record_voice_over, size: 36.0, color: Colors.green.shade700),
                 ),
               ),
-              new SizedBox(width: 12.0),
-              new Expanded(
-                  child: new Text(
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
                     "Anonymous Hotline",
                     textAlign: TextAlign.left,
-                    style: new TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 16.0),
                   )),
-              new Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right)
             ],
           ),
         ),
         const SizedBox(height: 14.0),
-        new Container(
+        Container(
           height: 0.5,
           width: MediaQuery.of(context).size.width,
           color: Colors.grey,
@@ -413,8 +413,8 @@ class _DashboardState extends State<Dashboard> {
     if(role == 'school_student') {
       return _buildHotlineButton();
     }
-    return new GestureDetector(child:
-    new Image.asset('assets/images/alert.png',
+    return GestureDetector(child:
+    Image.asset('assets/images/alert.png',
         width: 120.0, height: 120.0),
       onTap: sendAlert,
     );
@@ -422,7 +422,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         if(ref != null && ref != '') {
           model.getAlertGroups(this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '').then((alerts) {
@@ -442,29 +442,29 @@ class _DashboardState extends State<Dashboard> {
         }
 
         if(!isLoaded || !hasSchool) {
-          return new Material(
-              child: new Text("Please Select A School from Settings Tab")
+          return Material(
+              child: Text("Please Select A School from Settings Tab")
           );
         }
 
-        return new FutureBuilder(
+        return FutureBuilder(
             future: Firestore.instance.document(ref).get(),
             builder:
                 (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return new Text('Loading...');
+                  return Text('Loading...');
                 case ConnectionState.waiting:
-                  return new Text('Loading...');
+                  return Text('Loading...');
                 case ConnectionState.active:
-                  return new Text('Loading...');
+                  return Text('Loading...');
                 default:
                   if (snapshot.hasError)
-                    return new Text('Error: ${snapshot.error}');
+                    return Text('Error: ${snapshot.error}');
                   else
 
-                    return new ListView.builder(
-                        padding: new EdgeInsets.all(8.0),
+                    return ListView.builder(
+                        padding: EdgeInsets.all(8.0),
                         itemBuilder: (BuildContext context, int index) {
                           if(index == 0) {
                             return _buildAlertButton();
