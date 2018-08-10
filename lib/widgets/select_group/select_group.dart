@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/util/constants.dart';
 import '../../util/user_helper.dart';
 
 class SelectGroups extends StatefulWidget {
@@ -12,13 +13,21 @@ class SelectGroups extends StatefulWidget {
 class _SelectGroupsState extends State<SelectGroups> {
   bool _isLoading = true;
   Map<String, bool> selectedGroups = {};
-  List<dynamic> groups;
+  List<dynamic> groups = List();
+  final List<Widget> columns = List();
+  final checkBoxHeight = 40.0;
+  final textSize = 12.0;
+  int numOfRows = 1;
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
+
     setState(() {
+      groups.addAll(schoolGroups);
+      if (groups.length > 2) {
+        numOfRows = groups.length <= 4 ? 2 : 3;
+      }
       _isLoading = false;
-      groups = schoolGroups;
     });
   }
 
@@ -27,56 +36,77 @@ class _SelectGroupsState extends State<SelectGroups> {
     if (_isLoading) {
       getGroups();
     }
-    return _isLoading ? Text('Loading...') : getList(groups);
+    return _isLoading ? Center(child: Text('Loading...')) : _getList();
   }
 
-  getList(data) {
-    List<Widget> rows = List();
-    List<String> names = List();
+  _getHeight() {
+    if (numOfRows > 3) {
+      return 3;
+    }
+    return numOfRows;
+  }
 
-    for (var dataVal in data) {
+  _getList() {
+    List<String> names = List();
+    columns.clear();
+    for (var dataVal in groups) {
       String name = '${dataVal["name"]}';
       names.add(name);
     }
+    names.sort();
 
     for (var i = 0; i < names.length; i++) {
       var j = 0;
-      List<Widget> row = List();
-      print('j=0');
-      while (j < 2 && i < names.length) {
-        row.add(Container(padding: EdgeInsets.symmetric(vertical: 16.0),child:Expanded(
+      List<Widget> columnChildren = List();
+
+      while (j < numOfRows && i < names.length) {
+        final name = names[i];
+        columnChildren.add(SizedBox(
+            width: MediaQuery.of(context).size.width / 2,
+            height: checkBoxHeight,
             child: CheckboxListTile(
-                title: Text(names[i].substring(0, 1).toUpperCase() + names[i].substring(1),
+                isThreeLine: false,
+                title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
                     style: TextStyle(color: SVColors.talkAroundBlue)),
-                value: selectedGroups.containsKey(names[i]),
+                value: selectedGroups.containsKey(name),
                 onChanged: (bool value) {
                   setState(() {
                     if (!value) {
-                      selectedGroups.remove(names[i]);
+                      selectedGroups.remove(name);
                     } else {
-                      selectedGroups.addAll({names[i]: true});
+                      selectedGroups.addAll({name: true});
                     }
                   });
-                }))));
-        print('index= $i');
-        if(j < 1){
+                })));
+        if (j < numOfRows - 1) {
           i++;
         }
         j++;
       }
-      rows.add(Container(
-        height: 16.0,
-          child: Row(
-        children: row,
-      )));
+
+      while (columnChildren.length < numOfRows) {
+        columnChildren.add(SizedBox(width: MediaQuery.of(context).size.width / 2, height: checkBoxHeight));
+      }
+
+      columns.add(Column(
+        children: columnChildren,
+      ));
     }
-    print('column length = ${rows.length}');
 
     return Container(
-      child: Column(
-        children: rows,
-      ),
-      height: 80.0,
+      color: Colors.grey.shade100,
+      child: Column(children: [
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Container(
+              padding: EdgeInsets.only(top: 5.0),
+              margin: Constants.messagesHorizontalMargin,
+              child: Text("Select group:",
+                  style: TextStyle(color: Color.fromRGBO(50, 51, 57, 1.0), letterSpacing: 1.2, fontSize: textSize))),
+        ),
+        SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: columns)),
+      ]),
+      height: (checkBoxHeight * _getHeight()) + 30.0,
     );
   }
 }
