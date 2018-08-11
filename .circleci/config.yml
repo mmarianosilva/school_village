@@ -36,9 +36,3 @@ workflows:
             filters:
               branches:
                 only: beta
-      - build_prod:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
