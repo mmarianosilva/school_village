@@ -6,28 +6,28 @@ jobs:
       xcode: "9.2.0"
     steps:
       - checkout
-      - run: ./scripts/build_ios_dev.sh
+      - run: bash ./scripts/build_ios_dev.sh
 
   build-android-beta:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: ./scripts/build_android_dev.sh
+      - run: bash ./scripts/build_android_dev.sh
 
   build-ios-prod:
-      macos:
-        xcode: "9.2.0"
-      steps:
-        - checkout
-        - run: ./scripts/build_ios_prod.sh
+    macos:
+      xcode: "9.2.0"
+    steps:
+      - checkout
+      - run: bash ./scripts/build_ios_prod.sh
 
   build-android-prod:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: ./scripts/build_android_prod.sh
+      - run: bash ./scripts/build_android_prod.sh
 
 workflows:
   version: 2
