@@ -11,6 +11,12 @@ unzip flutter_macos_v0.5.1-beta.zip
 export PATH=`pwd`/flutter/bin:$PATH
 
 pip install six
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install --HEAD libimobiledevice
+brew install ideviceinstaller
+brew install ios-deploy
+brew upgrade cocoapods
+pod setup
 
 flutter upgrade
 flutter doctor
