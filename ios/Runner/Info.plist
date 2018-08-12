@@ -24,6 +24,8 @@
 	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>To send your location in case of an emergency</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
