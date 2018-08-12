@@ -10,10 +10,13 @@ curl https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_ma
 unzip flutter_macos_v0.5.1-beta.zip
 export PATH=`pwd`/flutter/bin:$PATH
 
+pip install six
+
 flutter upgrade
 flutter doctor
 
 cd ios && pod install
 cd ..
 flutter build ios --release --no-codesign --build-number="${BUILD_NUM}"
-cd ios && fastlane beta
+cd ios && bundle update
+bundle exec fastlane beta
