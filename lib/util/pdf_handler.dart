@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 
 class PdfHandler {
   static const platform = const MethodChannel('schoolvillage.app/pdf_view');
-  static FirebaseStorage storage = new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage = new FirebaseStorage();
 
   static showPdfFromUrl(BuildContext context, String url) async {
 

@@ -7,21 +7,21 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>801521806783-fl8d6ufv7j4kauuku268idhtptbefs3j.apps.googleusercontent.com</string>
+	<string>1094421769111-nvaec79pncjrnj6jfo8pme3e3ebvlifr.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.801521806783-fl8d6ufv7j4kauuku268idhtptbefs3j</string>
+	<string>com.googleusercontent.apps.1094421769111-nvaec79pncjrnj6jfo8pme3e3ebvlifr</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDYoK9Z0lcSAjPmx22Nzr5wL_8ln7IEmsI</string>
+	<string>AIzaSyCt4CEHZJxJJeH84YH8jSxBx5um0ftKCEU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>801521806783</string>
+	<string>1094421769111</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.oandmtech.SchoolVillage</string>
 	<key>PROJECT_ID</key>
-	<string>schoolvillage-1</string>
+	<string>schoolvillage-dev</string>
 	<key>STORAGE_BUCKET</key>
-	<string>schoolvillage-1.appspot.com</string>
+	<string>schoolvillage-dev.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<true></true>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -33,8 +33,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:801521806783:ios:4420e02b3687f1b8</string>
+	<string>1:1094421769111:ios:4420e02b3687f1b8</string>
 	<key>DATABASE_URL</key>
-	<string>https://schoolvillage-1.firebaseio.com</string>
+	<string>https://schoolvillage-dev.firebaseio.com</string>
 </dict>
 </plist>

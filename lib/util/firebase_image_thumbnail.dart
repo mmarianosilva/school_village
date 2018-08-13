@@ -23,7 +23,7 @@ class FireBaseImageThumbnail extends StatefulWidget {
 
 class _FireBaseImageThumbnailState extends State<FireBaseImageThumbnail> with TickerProviderStateMixin {
 
-  final FirebaseStorage storage = new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  final FirebaseStorage storage = new FirebaseStorage();
   final double width;
   final double height;
   String reference;
