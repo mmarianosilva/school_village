@@ -11,24 +11,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Login extends StatefulWidget {
   @override
-  _LoginState createState() => new _LoginState();
+  _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final emailController = new TextEditingController();
-  final passwordController = new TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "School Village";
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
 
   checkIfOnlyOneSchool() async {
     var schools = await UserHelper.getSchools();
-    if(schools.length == 1) {
+    if (schools.length == 1) {
       print("Only 1 School");
-      var school = await Firestore.instance
-          .document(schools[0]['ref'])
-          .get();
+      var school = await Firestore.instance.document(schools[0]['ref']).get();
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
           schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
@@ -40,151 +39,149 @@ class _LoginState extends State<Login> {
   proceed() async {
     await checkIfOnlyOneSchool();
     AnalyticsHelper.logLogin();
-    Navigator.of(context).pushNamedAndRemoveUntil(
-        '/home', (Route<dynamic> route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+  }
+
+  RegExp emailExp = new RegExp('([a-zA-Z0-9]+(?:[._+-][a-zA-Z0-9]+)*)@([a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*[.][a-zA-Z]{2,})',
+      multiLine: false, caseSensitive: false);
+
+  showErrorDialog(String error){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error logging in'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [Text(error)],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   onLogin() async {
-    _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content:
-          new Row(
-            children: <Widget>[
-              new CircularProgressIndicator(),
-              new Text("Logging in")
-            ],
-          ),
-          duration: new Duration(days: 1),
-        )
-    );
+    if (!emailExp.hasMatch(emailController.text.trim())) {
+      FocusScope.of(context).requestFocus(emailFocusNode);
+      showErrorDialog('Please enter valid email');
+      return;
+    }
 
-    UserHelper.signIn(
-        email: emailController.text.trim().toLowerCase(),
-        password: passwordController.text).then((user) {
-          print(user);
-          proceed();
-        }).catchError((error)  {
-          _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return new AlertDialog(
-                  title: new Text('Error logging in'),
-                  content: new SingleChildScrollView(
-                    child: new ListBody(
-                      children: <Widget>[
-                        new Text(error.message)
-                      ],
-                    ),
-                  ),
-                  actions: <Widget>[
-                    new FlatButton(
-                      child: new Text('Okay'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                );
-              }
-          );
-          print(error);
-        });
+    if(passwordController.text.trim().length < 6){
+      FocusScope.of(context).requestFocus(passwordFocusNode);
+      showErrorDialog('Password my be at least 6 characters');
+      return;
+    }
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Row(
+        children: <Widget>[CircularProgressIndicator(), Text("Logging in")],
+      ),
+      duration: Duration(days: 1),
+    ));
+
+    UserHelper.signIn(email: emailController.text.trim().toLowerCase(), password: passwordController.text).then((user) {
+      print(user);
+      proceed();
+    }).catchError((error) {
+      _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+      showErrorDialog(error.message);
+    });
   }
 
   onForgot() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Forgot()),
+      MaterialPageRoute(builder: (context) => Forgot()),
     );
   }
 
   createAccount() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Contact()),
+      MaterialPageRoute(builder: (context) => Contact()),
     );
   }
 
   studentLogin() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new StudentLogin()),
+      MaterialPageRoute(builder: (context) => StudentLogin()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return new Scaffold(
-      key: _scaffoldKey,
-      appBar: new BaseAppBar(
-        leading: new Container(
-          padding: new EdgeInsets.all(8.0),
-          child: new Image.asset('assets/images/logo.png'),
-        ),
-        title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade200,
-        elevation: 0.0,
-      ),
-      body: new Center(
-        child: new Container(
-          padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-          child: new Column(
-            children: <Widget>[
-              const SizedBox(height: 18.0),
-//              new Image.asset('assets/images/logo.png'),
-              new Flexible(
-                  child: new TextField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: new InputDecoration(
-                        border: const UnderlineInputBorder(),
-                        hintText: 'Email',
-                        icon: new Icon(Icons.email)),
-                  )
-              ),
-              const SizedBox(height: 12.0),
-              new Flexible(
-                  child: new TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: new InputDecoration(
-                        border: const UnderlineInputBorder(),
-                        hintText: 'Password',
-                        labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
-                        icon: new Icon(Icons.lock)),
-                  )
-              ),
-              const SizedBox(height: 32.0),
-              new MaterialButton(
-                  minWidth: 200.0,
-                  color: Theme.of(context).accentColor,
-                  onPressed: onLogin,
-                  textColor: Colors.white,
-                  child: new Text("LOGIN")
-              ),
-              const SizedBox(height: 18.0),
-              new MaterialButton(
-                  minWidth: 200.0,
-                  color: Colors.grey.shade300,
-                  onPressed: studentLogin,
-                  child: new Text("STUDENT LOGIN")
-              ),
-              const SizedBox(height: 18.0),
-              new FlatButton(
-                  onPressed: onForgot,
-                  child: new Text("Forgot Password?")
-              ),
-              const SizedBox(height: 18.0),
-              new FlatButton(
-                  onPressed: createAccount,
-                  child: new Text("Create Account")
-              ),
-
-            ],
+    return Scaffold(
+        key: _scaffoldKey,
+        appBar: BaseAppBar(
+          leading: Container(
+            padding: EdgeInsets.all(8.0),
+            child: Image.asset('assets/images/logo.png'),
           ),
+          title: Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+          backgroundColor: Colors.grey.shade200,
+          elevation: 0.0,
         ),
-      )
-    );
+        body: Center(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+            child: SingleChildScrollView(
+            child:Column(
+              children: [
+                const SizedBox(height: 18.0),
+//              Image.asset('assets/images/logo.png'),
+                Container(
+                  width: MediaQuery.of(context).size.width - 40.0,
+                    child: TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      focusNode: emailFocusNode,
+                      decoration:
+                      InputDecoration(border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
+                    )),
+                const SizedBox(height: 12.0),
+                Container(
+                    width: MediaQuery.of(context).size.width - 40.0,
+                    child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  focusNode: passwordFocusNode,
+                  decoration: InputDecoration(
+                      border: const UnderlineInputBorder(),
+                      hintText: 'Password',
+                      labelStyle:
+                          Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
+                      icon: Icon(Icons.lock)),
+                )),
+                const SizedBox(height: 32.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Theme.of(context).accentColor,
+                    onPressed: onLogin,
+                    textColor: Colors.white,
+                    child: Text("LOGIN")),
+                const SizedBox(height: 18.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Colors.grey.shade300,
+                    onPressed: studentLogin,
+                    child: Text("STUDENT LOGIN")),
+                const SizedBox(height: 18.0),
+                FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
+                const SizedBox(height: 18.0),
+                FlatButton(onPressed: createAccount, child: Text("Create Account")),
+              ],
+            ),
+          ),
+        )));
   }
 }

@@ -106,7 +106,7 @@ class _HomeState extends State<Home> {
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
-      return _goToSecurityChat();
+      return _goToSecurityChat(message['conversationId']);
     } else if (message["type"] == "hotline") {
       return _showHotLineMessageDialog(message);
     }
@@ -150,13 +150,13 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _goToSecurityChat() {
+  _goToSecurityChat(String conversationId) async{
     if (['school_admin', 'school_security']
-        .contains(UserHelper.getSelectedSchoolRole())) {
+        .contains((await UserHelper.getSelectedSchoolRole()))) {
       Navigator.push(
         context,
         new MaterialPageRoute(
-          builder: (context) => new TalkAround(),
+          builder: (context) => TalkAround(conversationId: conversationId),
         ),
       );
     }
