@@ -12,8 +12,12 @@ import '../../util/user_helper.dart';
 import 'package:school_village/util/constants.dart';
 
 class Messages extends StatefulWidget {
+  final String role;
+
+  Messages({Key key, this.role}) : super(key: key);
+
   @override
-  _MessagesState createState() => _MessagesState();
+  _MessagesState createState() => _MessagesState(role: role);
 }
 
 class _MessagesState extends State<Messages> {
@@ -32,6 +36,9 @@ class _MessagesState extends State<Messages> {
   final focusNode = FocusNode();
   InputField inputField;
   final selectGroups = SelectGroups();
+  final String role;
+
+  _MessagesState({this.role});
 
   getUserDetails() async {
     _user = await UserHelper.getUser();
@@ -139,6 +146,11 @@ class _MessagesState extends State<Messages> {
   }
 
   _getScreen() {
+    if (messageList.length == 0) {
+      return Center(
+        child: Text('No messages'),
+      );
+    }
     if (messageList.length > 0 && isLoaded) {
       return ListView.builder(
           itemCount: messageList.length,
@@ -190,8 +202,8 @@ class _MessagesState extends State<Messages> {
             );
           });
     }
-    return const Center(
-      child: const Text('Loading...'),
+    return Center(
+      child: Text('Loading...'),
     );
   }
 
@@ -234,7 +246,7 @@ class _MessagesState extends State<Messages> {
     document.setData(<String, dynamic>{
       'body': alertBody,
       //FIXME: bad practice
-      'groups' : selectGroups.key.currentState.selectedGroups,
+      'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
@@ -256,15 +268,22 @@ class _MessagesState extends State<Messages> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          selectGroups,
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ), //new
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.only(bottom: 14.0),
-            child: inputField,
-          )
+          role == 'school_admin'
+              ? Column(children: [
+                  selectGroups,
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.only(bottom: 14.0),
+                    child: inputField,
+                  )
+                ])
+              : SizedBox(
+                  width: 0.0,
+                  height: 0.0,
+                )
         ]));
   }
 }

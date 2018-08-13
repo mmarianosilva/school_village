@@ -139,7 +139,7 @@ class _DashboardState extends State<Dashboard> {
   openMessages() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Messages()),
+      MaterialPageRoute(builder: (context) => Messages(role: role,)),
     );
   }
 
@@ -153,7 +153,7 @@ class _DashboardState extends State<Dashboard> {
   sendBroadcast() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Messages()),
+      MaterialPageRoute(builder: (context) => Messages(role: role,)),
     );
   }
 
