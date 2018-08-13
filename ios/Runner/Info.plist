@@ -21,13 +21,13 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>22</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>You can upload images from camera directly</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>To send your location in case of an emergency</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
