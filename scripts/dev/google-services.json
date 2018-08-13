@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1094421769111",
+    "firebase_url": "https://schoolvillage-dev.firebaseio.com",
+    "project_id": "schoolvillage-dev",
+    "storage_bucket": "schoolvillage-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1094421769111:android:d5144530f59a9d92",
+        "android_client_info": {
+          "package_name": "com.oandmtech.schoolvillage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1094421769111-04omv4imbioiqkff4fdv6a34qagk87tt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOZlJZDCL0Jv5rHAYQ4iwpj_Aw5LqUaMk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

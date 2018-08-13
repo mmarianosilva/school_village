@@ -4,25 +4,31 @@ jobs:
   build-ios-beta:
     macos:
       xcode: "9.2.0"
+
     steps:
       - checkout
-      - run: wget https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_macos_v0.5.1-beta.zip
-      - run: unzip flutter_macos_v0.5.1-beta.zip
-      - run: export PATH=`pwd`/flutter/bin:$PATH
-      - run: cd ios && pod install
-      - run: cd .. && flutter doctor
-      - run: flutter build ios --release
-      - run: cd ios && fastlane deploy_beta
+      - run: bash ./scripts/build_ios_dev.sh
 
   build-android-beta:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: flutter doctor
-      - run: flutter build apk --release
-      - run: cd android && fastlane add_plugin appcenter
-      - run: fastlane deploy_beta
+      - run: bash ./scripts/build_android_dev.sh
+
+  build-ios-prod:
+    macos:
+      xcode: "9.2.0"
+    steps:
+      - checkout
+      - run: bash ./scripts/build_ios_prod.sh
+
+  build-android-prod:
+    docker:
+      - image: cirrusci/flutter
+    steps:
+      - checkout
+      - run: bash ./scripts/build_android_prod.sh
 
 workflows:
   version: 2
@@ -33,12 +39,14 @@ workflows:
             branches:
               only: beta
       - build-ios-beta:
-            filters:
-              branches:
-                only: beta
-      - build_prod:
-          requires:
-            - build
+          filters:
+            branches:
+              only: beta
+      - build-android-prod:
+          filters:
+            branches:
+              only: master
+      - build-ios-prod:
           filters:
             branches:
               only: master

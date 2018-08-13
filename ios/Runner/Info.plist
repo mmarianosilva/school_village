@@ -24,8 +24,11 @@
 	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+<<<<<<< HEAD
 	<key>NSCameraUsageDescription</key>
 	<string>You can upload images from camera directly</string>
+=======
+>>>>>>> beta
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSLocationAlwaysUsageDescription</key>
