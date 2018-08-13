@@ -23,7 +23,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  static FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage = FirebaseStorage();
   final String conversation;
   final DocumentSnapshot user;
   final Firestore firestore = Firestore.instance;

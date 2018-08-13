@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 
 class FileHelper {
-  static FirebaseStorage storage = new FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage = new FirebaseStorage();
 
   static Future<File> getFileFromStorage({url: String, context: BuildContext}) async {
     var bytes = utf8.encode(url);
