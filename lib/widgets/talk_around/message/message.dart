@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view_scale_boundary.dart';
 import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
+import 'package:school_village/util/date_formatter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../notification/notification.dart';
@@ -25,24 +25,6 @@ class ChatMessage extends StatelessWidget {
     return _getMessageView(context);
   }
 
-  final dateFormatter = DateFormat('hh:mm a on MMM');
-
-  _getFormattedDate() {
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    var suffix;
-    var j = date.day % 10, k = date.day % 100;
-    if (j == 1 && k != 11) {
-      suffix = "st";
-    } else if (j == 2 && k != 12) {
-      suffix = "nd";
-    } else if (j == 3 && k != 13) {
-      suffix = "rd";
-    } else {
-      suffix = 'th';
-    }
-    return dateFormatter.format(date) + ' ${date.day}$suffix';
-  }
-
   final nameTextStyle = TextStyle(
       color: Color.fromRGBO(25, 24, 24, 1.0), fontWeight: FontWeight.bold, fontSize: 14.0, letterSpacing: 1.1);
 
@@ -50,14 +32,25 @@ class ChatMessage extends StatelessWidget {
     Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
     if (location != null) {
       locationWidget = GestureDetector(
-        child: Text(
-          "Map",
-          textAlign: TextAlign.right,
-          style: TextStyle(
-              color: Color.fromRGBO(0, 122, 255, 1.0),
-              fontWeight: nameTextStyle.fontWeight,
-              fontSize: nameTextStyle.fontSize,
-              letterSpacing: nameTextStyle.letterSpacing),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    "Map",
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 122, 255, 1.0),
+                        fontWeight: nameTextStyle.fontWeight,
+                        fontSize: nameTextStyle.fontSize,
+                        letterSpacing: nameTextStyle.letterSpacing),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         onTap: () {
           launch(
@@ -86,7 +79,7 @@ class ChatMessage extends StatelessWidget {
                         )
                       ]),
                       Container(
-                        child: Text(_getFormattedDate(), style: TextStyle(fontSize: 11.0)),
+                        child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
                       ),
                       Container(
                         margin: const EdgeInsets.only(top: 5.0),

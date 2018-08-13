@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:school_village/components/icon_button.dart';
@@ -10,10 +9,10 @@ class ImageViewScreen extends StatelessWidget {
   final maxScale;
   final minScale;
 
-  ImageViewScreen(this.imageAddress, {@required this.minScale, @required this.maxScale});
+  ImageViewScreen(this.imageAddress, {this.minScale, this.maxScale});
 
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) {
     return Scaffold(
         body: Stack(children: [
       PhotoView(
