@@ -36,12 +36,6 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   proceed() async {
     await checkIfOnlyOneSchool();
     AnalyticsHelper.logLogin();
@@ -140,11 +134,13 @@ class _LoginState extends State<Login> {
         body: Center(
           child: Container(
             padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-            child: Column(
-              children: <Widget>[
+            child: SingleChildScrollView(
+            child:Column(
+              children: [
                 const SizedBox(height: 18.0),
 //              Image.asset('assets/images/logo.png'),
-                Flexible(
+                Container(
+                  width: MediaQuery.of(context).size.width - 40.0,
                     child: TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -153,7 +149,8 @@ class _LoginState extends State<Login> {
                       InputDecoration(border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
                     )),
                 const SizedBox(height: 12.0),
-                Flexible(
+                Container(
+                    width: MediaQuery.of(context).size.width - 40.0,
                     child: TextField(
                   controller: passwordController,
                   obscureText: true,
@@ -185,6 +182,6 @@ class _LoginState extends State<Login> {
               ],
             ),
           ),
-        ));
+        )));
   }
 }
