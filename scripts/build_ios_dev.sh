@@ -12,11 +12,14 @@ export PATH=`pwd`/flutter/bin:$PATH
 
 pip install six
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+cd ios
 brew install --HEAD libimobiledevice
 brew install ideviceinstaller
 brew install ios-deploy
 brew upgrade cocoapods
 pod setup
+cd ..
 
 flutter upgrade
 flutter doctor
