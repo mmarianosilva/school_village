@@ -12,3 +12,5 @@ functions/functions/node_modules/
 
 .idea
 *.iml
+/ios/Runner.app.dSYM.zip
+/ios/Runner.ipa

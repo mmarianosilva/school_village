@@ -20,6 +20,8 @@ class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "School Village";
+  FocusNode emailFocusNode = FocusNode();
+  FocusNode passwordFocusNode = FocusNode();
 
   checkIfOnlyOneSchool() async {
     var schools = await UserHelper.getSchools();
@@ -40,7 +42,45 @@ class _LoginState extends State<Login> {
     Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
   }
 
+  RegExp emailExp = new RegExp('([a-zA-Z0-9]+(?:[._+-][a-zA-Z0-9]+)*)@([a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*[.][a-zA-Z]{2,})',
+      multiLine: false, caseSensitive: false);
+
+  showErrorDialog(String error){
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error logging in'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [Text(error)],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
   onLogin() async {
+    if (!emailExp.hasMatch(emailController.text.trim())) {
+      FocusScope.of(context).requestFocus(emailFocusNode);
+      showErrorDialog('Please enter valid email');
+      return;
+    }
+
+    if(passwordController.text.trim().length < 6){
+      FocusScope.of(context).requestFocus(passwordFocusNode);
+      showErrorDialog('Password my be at least 6 characters');
+      return;
+    }
+
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Row(
         children: <Widget>[CircularProgressIndicator(), Text("Logging in")],
@@ -53,27 +93,7 @@ class _LoginState extends State<Login> {
       proceed();
     }).catchError((error) {
       _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error logging in'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[Text(error.message)],
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Okay'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });
-      print(error);
+      showErrorDialog(error.message);
     });
   }
 
@@ -111,60 +131,57 @@ class _LoginState extends State<Login> {
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
         ),
-        body: Center(child: LayoutBuilder(builder: (_, BoxConstraints viewportConstraints) {
-          return Container(
+        body: Center(
+          child: Container(
             padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
             child: SingleChildScrollView(
-              child: ConstrainedBox(constraints:  BoxConstraints(
-                minHeight: viewportConstraints.maxHeight,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  const SizedBox(height: 18.0),
+            child:Column(
+              children: [
+                const SizedBox(height: 18.0),
 //              Image.asset('assets/images/logo.png'),
-                  Container(
+                Container(
+                  width: MediaQuery.of(context).size.width - 40.0,
+                    child: TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      focusNode: emailFocusNode,
+                      decoration:
+                      InputDecoration(border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
+                    )),
+                const SizedBox(height: 12.0),
+                Container(
                     width: MediaQuery.of(context).size.width - 40.0,
-                      child: TextField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                        border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
-                  )),
-                  const SizedBox(height: 12.0),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 40.0,
-                      child: TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        border: const UnderlineInputBorder(),
-                        hintText: 'Password',
-                        labelStyle:
-                            Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
-                        icon: Icon(Icons.lock)),
-                  )),
-                  const SizedBox(height: 32.0),
-                  MaterialButton(
-                      minWidth: 200.0,
-                      color: Theme.of(context).accentColor,
-                      onPressed: onLogin,
-                      textColor: Colors.white,
-                      child: Text("LOGIN")),
-                  const SizedBox(height: 18.0),
-                  MaterialButton(
-                      minWidth: 200.0,
-                      color: Colors.grey.shade300,
-                      onPressed: studentLogin,
-                      child: Text("STUDENT LOGIN")),
-                  const SizedBox(height: 18.0),
-                  FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
-                  const SizedBox(height: 18.0),
-                  FlatButton(onPressed: createAccount, child: Text("Create Account")),
-                ],
-              ),
+                    child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  focusNode: passwordFocusNode,
+                  decoration: InputDecoration(
+                      border: const UnderlineInputBorder(),
+                      hintText: 'Password',
+                      labelStyle:
+                          Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
+                      icon: Icon(Icons.lock)),
+                )),
+                const SizedBox(height: 32.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Theme.of(context).accentColor,
+                    onPressed: onLogin,
+                    textColor: Colors.white,
+                    child: Text("LOGIN")),
+                const SizedBox(height: 18.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Colors.grey.shade300,
+                    onPressed: studentLogin,
+                    child: Text("STUDENT LOGIN")),
+                const SizedBox(height: 18.0),
+                FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
+                const SizedBox(height: 18.0),
+                FlatButton(onPressed: createAccount, child: Text("Create Account")),
+              ],
             ),
-          ));
-        })));
+          ),
+        )));
   }
 }

@@ -1,12 +1,11 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:school_village/widgets/talk_around/progress_imageview.dart';
-
+import 'package:photo_view/photo_view_scale_boundary.dart';
+import 'package:school_village/components/full_screen_image.dart';
+import 'package:school_village/components/progress_imageview.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../notification/notification.dart';
-import '../../../util/firebase_image_thumbnail.dart';
 
 class ChatMessage extends StatelessWidget {
   ChatMessage(
@@ -98,7 +97,7 @@ class ChatMessage extends StatelessWidget {
                 ),
                 onTap: () => goToDetails(context),
               ),
-              _getImage()
+              _getImage(context)
             ],
           )),
           SizedBox(width: 32.0)
@@ -116,11 +115,25 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  _getImage() {
+  _openImage(context, imageUrl){
+    Navigator.push(
+      context,
+       MaterialPageRoute(builder: (context) => new ImageViewScreen(
+        imageUrl,
+        minScale: PhotoViewScaleBoundary.contained,
+        maxScale: PhotoViewScaleBoundary.covered,
+      )),
+    );
+  }
+
+  _getImage(context) {
     if (imageUrl == null || imageUrl.trim() == '') {
       return SizedBox();
     }
-    print(imageUrl);
-    return ProgressImage(firebasePath: imageUrl,height: 160.0,);
+
+
+    return ProgressImage(height: 160.0,firebasePath: imageUrl, onTap: (imgUrl){
+      _openImage(context, imgUrl);
+    },);
   }
 }

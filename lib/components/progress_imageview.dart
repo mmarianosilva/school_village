@@ -2,15 +2,19 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 
+typedef void ProgressImageTapCallBack(String imgUrl);
+
 class ProgressImage extends StatefulWidget {
   final String url;
   final String firebasePath;
   final double height, width;
+  final ProgressImageTapCallBack onTap;
 
-  ProgressImage({Key key, this.url, this.firebasePath, this.height, this.width}) : super(key: key);
+  ProgressImage({Key key, this.url, this.firebasePath, this.height, this.width, this.onTap}) : super(key: key);
 
   @override
-  createState() => _ProgressImageState(url: url, firebasePath: firebasePath, height: height, width: width);
+  createState() =>
+      _ProgressImageState(url: url, firebasePath: firebasePath, height: height, width: width, onTap: onTap);
 }
 
 class _ProgressImageState extends State<ProgressImage> {
@@ -18,8 +22,10 @@ class _ProgressImageState extends State<ProgressImage> {
   final String firebasePath;
   final loading = true;
   final double height, width;
+  final ProgressImageTapCallBack onTap;
+  var isDisposed = false;
 
-  _ProgressImageState({this.url, this.firebasePath, this.height, this.width});
+  _ProgressImageState({this.url, this.firebasePath, this.height, this.width, this.onTap});
 
   static FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
 
@@ -28,12 +34,18 @@ class _ProgressImageState extends State<ProgressImage> {
     super.initState();
     if (firebasePath != null) {
       storage.ref().child(firebasePath).getDownloadURL().then((furl) {
-        print(furl);
-        setState(() {
-          url = furl;
-        });
+        if (!isDisposed)
+          setState(() {
+            url = furl;
+          });
       });
     }
+  }
+
+  @override
+  void dispose() {
+    isDisposed = true;
+    super.dispose();
   }
 
   @override
@@ -54,8 +66,12 @@ class _ProgressImageState extends State<ProgressImage> {
             child: CircularProgressIndicator(),
           ));
     }
-    //TODO handle width
-    return FadeInImage.memoryNetwork(placeholder: kTransparentImage, image: url, height: height, fit: BoxFit.fitHeight);
+    return GestureDetector(
+        child: FadeInImage.memoryNetwork(
+            placeholder: kTransparentImage, image: url, height: height, fit: BoxFit.fitHeight),
+        onTap: () {
+          this.onTap(url);
+        });
   }
 
   final Uint8List kTransparentImage = new Uint8List.fromList(<int>[

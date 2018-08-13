@@ -7,29 +7,29 @@ import '../../util/user_helper.dart';
 import 'chat/chat.dart';
 
 class TalkAround extends StatefulWidget {
+  final String conversationId;
+
+  TalkAround({Key key, this.conversationId}) : super(key: key);
+
   @override
-  _TalkAroundState createState() => new _TalkAroundState();
+  _TalkAroundState createState() => new _TalkAroundState(conversationId: conversationId);
 }
 
-class _TalkAroundState extends State<TalkAround> {
-  final TextEditingController _textController = new TextEditingController();
+class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateMixin{
   bool _isLoading = true;
 
   String _schoolId = '';
   String _securityConversation = "";
   String _securityAdminConversation = "";
+  final String conversationId;
+
+  _TalkAroundState({this.conversationId});
 
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
 
-  void _handleSubmitted(String text) {
-    _textController.clear();
-  }
-
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
-    print("User ID");
-    print(user.uid);
     var schoolId = await UserHelper.getSelectedSchoolID();
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
@@ -43,11 +43,20 @@ class _TalkAroundState extends State<TalkAround> {
     });
   }
 
+  TabController _tabController;
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, initialIndex: conversationId == 'security-admin' ? 1 : 0, vsync: this);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       getUserDetails();
-      return  Scaffold(
+      return Scaffold(
         appBar: BaseAppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
@@ -57,7 +66,7 @@ class _TalkAroundState extends State<TalkAround> {
         body: new Center(child: new Text("Loading")),
       );
     }
-    return  DefaultTabController(
+    return DefaultTabController(
         length: 2,
         child: Theme(
           data: ThemeData(
@@ -75,16 +84,20 @@ class _TalkAroundState extends State<TalkAround> {
                   leading: new BackButton(color: Colors.grey.shade800),
                 ),
                 Container(
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width,
-                  child: Center(child: TabBar(
-                    isScrollable: true,
-                    indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
-                    labelColor: Colors.black,
-                    tabs: [Tab(text: "Security"), new Tab(text: "Security & Admin")],
-                  ),)
-                )
-
+                    color: Colors.white,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    child: Center(
+                      child: TabBar(
+                        isScrollable: true,
+                        indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
+                        labelColor: Colors.black,
+                        tabs: [Tab(text: "Security"), Tab(text: "Security & Admin")],
+                        controller: _tabController,
+                      ),
+                    ))
               ]),
             ),
             body: TabBarView(
