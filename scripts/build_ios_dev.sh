@@ -20,8 +20,9 @@ echo "ruby-2.4" > ~/.ruby-version
 cd ios
 brew install --HEAD libimobiledevice
 brew install ideviceinstaller
-brew install ios-deploy
 brew upgrade cocoapods
+brew install ios-deploy
+sudo gem install cocoapods
 pod setup
 cd ..
 
