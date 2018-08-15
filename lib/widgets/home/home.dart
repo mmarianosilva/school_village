@@ -103,6 +103,10 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
+    message.forEach((key, value){
+      print('key = $key | value = $value');
+    });
+
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
