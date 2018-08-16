@@ -1,5 +1,5 @@
 app_identifier("com.oandmtech.SchoolVillage") # The bundle identifier of your app
-apple_id("jonathangizmo@gmail.com") # Your Apple email address
+apple_id("alexander.p@toptal.com") # Your Apple email address
 
 itc_team_id("44328800") # App Store Connect Team ID
 team_id("XZXPQNWEXH") # Developer Portal Team ID
