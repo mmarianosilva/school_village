@@ -211,7 +211,7 @@ class _ChatState extends State<Chat> {
           });
     }
     return const Center(
-      child: const Text('Loading...'),
+      child: const Text('No messages'),
     );
   }
 

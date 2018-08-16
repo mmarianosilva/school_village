@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/util/checkbox.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
 import '../../util/user_helper.dart';
@@ -16,7 +17,7 @@ class _SelectGroupsState extends State<SelectGroups> {
   List<dynamic> groups = List();
   final List<Widget> columns = List();
   final checkBoxHeight = 40.0;
-  final textSize = 12.0;
+  final textSize = 14.0;
   int numOfRows = 1;
 
   getGroups() async {
@@ -64,20 +65,28 @@ class _SelectGroupsState extends State<SelectGroups> {
         columnChildren.add(SizedBox(
             width: MediaQuery.of(context).size.width / 2,
             height: checkBoxHeight,
-            child: CheckboxListTile(
-                isThreeLine: false,
-                title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
-                    style: TextStyle(color: SVColors.talkAroundBlue)),
-                value: selectedGroups.containsKey(name),
-                onChanged: (bool value) {
-                  setState(() {
-                    if (!value) {
-                      selectedGroups.remove(name);
-                    } else {
-                      selectedGroups.addAll({name: true});
-                    }
-                  });
-                })));
+            child: Theme(
+              data: ThemeData(unselectedWidgetColor: SVColors.talkAroundBlue),
+                child: SVCheckboxListTile(
+                    isThreeLine: false,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
+                        style: TextStyle(
+                            color: selectedGroups.containsKey(name)
+                                ? SVColors.colorFromHex("#6d98cb")
+                                : SVColors.talkAroundBlue,
+                            decoration:
+                                selectedGroups.containsKey(name) ? TextDecoration.underline : TextDecoration.none)),
+                    value: selectedGroups.containsKey(name),
+                    onChanged: (bool value) {
+                      setState(() {
+                        if (!value) {
+                          selectedGroups.remove(name);
+                        } else {
+                          selectedGroups.addAll({name: true});
+                        }
+                      });
+                    }))));
         if (j < numOfRows - 1) {
           i++;
         }
@@ -94,15 +103,18 @@ class _SelectGroupsState extends State<SelectGroups> {
     }
 
     return Container(
-      color: Colors.grey.shade100,
+      color: SVColors.colorFromHex('#e5e5ea'),
       child: Column(children: [
         Align(
-          alignment: Alignment.bottomLeft,
           child: Container(
               padding: EdgeInsets.only(top: 5.0),
               margin: Constants.messagesHorizontalMargin,
               child: Text("Select group:",
-                  style: TextStyle(color: Color.fromRGBO(50, 51, 57, 1.0), letterSpacing: 1.2, fontSize: textSize))),
+                  style: TextStyle(
+                      color: Color.fromRGBO(50, 51, 57, 1.0),
+                      letterSpacing: 1.2,
+                      fontSize: textSize,
+                      fontWeight: FontWeight.bold))),
         ),
         SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: columns)),
       ]),

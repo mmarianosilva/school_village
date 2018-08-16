@@ -101,6 +101,7 @@ class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateM
               ]),
             ),
             body: TabBarView(
+              controller: _tabController,
               children: [
                 Chat(conversation: _securityConversation, user: _userSnapshot),
                 Chat(conversation: _securityAdminConversation, user: _userSnapshot)
