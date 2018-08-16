@@ -176,6 +176,12 @@ class _LoginState extends State<Login> {
                     onPressed: studentLogin,
                     child: Text("STUDENT LOGIN")),
                 const SizedBox(height: 18.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Colors.grey.shade300,
+                    onPressed: studentLogin,
+                    child: Text("FAMILY LOGIN")),
+                const SizedBox(height: 18.0),
                 FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
                 const SizedBox(height: 18.0),
                 FlatButton(onPressed: createAccount, child: Text("Create Account")),
