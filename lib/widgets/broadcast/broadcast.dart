@@ -11,7 +11,7 @@ class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.groups}) : super(key: key);
 
   @override
-  _BroadcastState createState() => new _BroadcastState(groups);
+  _BroadcastState createState() => _BroadcastState(groups);
 }
 
 class _BroadcastState extends State<Broadcast> {
@@ -29,7 +29,7 @@ class _BroadcastState extends State<Broadcast> {
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
   int numCharacters = 0;
-  final customAlertController = new TextEditingController();
+  final customAlertController = TextEditingController();
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -63,24 +63,24 @@ class _BroadcastState extends State<Broadcast> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Are you sure you want to send this message?'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
+          return AlertDialog(
+            title: Text('Are you sure you want to send this message?'),
+            content: SingleChildScrollView(
+              child: ListBody(
                 children: <Widget>[
-                  new Text('This cannot be undone')
+                  Text('This cannot be undone')
                 ],
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
-                child: new Text('No'),
+              FlatButton(
+                child: Text('No'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
-              new FlatButton(
-                child: new Text('Yes'),
+              FlatButton(
+                child: Text('Yes'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _saveBroadcast(alertBody, context);
@@ -103,7 +103,7 @@ class _BroadcastState extends State<Broadcast> {
       'groups' : groups,
       'createdById': _userId,
       'createdBy' : name,
-      'createdAt' : new DateTime.now().millisecondsSinceEpoch,
+      'createdAt' : DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone' : phone,
     });
     print("Added Message");
@@ -111,18 +111,18 @@ class _BroadcastState extends State<Broadcast> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Sent'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
+          return AlertDialog(
+            title: Text('Sent'),
+            content: SingleChildScrollView(
+              child: ListBody(
                 children: <Widget>[
-                  new Text('Your message has been sent')
+                  Text('Your message has been sent')
                 ],
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
-                child: new Text('Okay'),
+              FlatButton(
+                child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
@@ -141,18 +141,18 @@ class _BroadcastState extends State<Broadcast> {
       getUserDetails();
     }
 
-    List<Widget> widgets = new List();
+    List<Widget> widgets = List();
 
-    widgets.add(new Text("Message to broadcast:",
-      style: new TextStyle(
+    widgets.add(Text("Message to broadcast:",
+      style: TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.bold
       ),
     ));
 
-    widgets.add(new SizedBox(height: 12.0));
+    widgets.add(SizedBox(height: 12.0));
     
-    widgets.add(new TextField(
+    widgets.add(TextField(
       maxLines: 6,
       controller: customAlertController,
       onChanged: (String text) {
@@ -160,41 +160,41 @@ class _BroadcastState extends State<Broadcast> {
           numCharacters = customAlertController.text.length;
         });
       },
-      decoration: new InputDecoration(
+      decoration: InputDecoration(
           border: const OutlineInputBorder(),
           hintText: 'Message'),
     ));
-    widgets.add(new SizedBox(height: 12.0));
-    widgets.add(new Text("$numCharacters characters (minimum 10)",
-      style: new TextStyle(
+    widgets.add(SizedBox(height: 12.0));
+    widgets.add(Text("$numCharacters characters (minimum 10)",
+      style: TextStyle(
           fontSize: 12.0
       ),
     ));
-    widgets.add(new SizedBox(height: 12.0));
+    widgets.add(SizedBox(height: 12.0));
 
-    widgets.add(new Container(
+    widgets.add(Container(
       alignment: Alignment.centerRight,
-      child: new MaterialButton(
+      child: MaterialButton(
         color: Theme.of(context).accentColor,
-        child: new Text("Send"),
+        child: Text("Send"),
         onPressed: numCharacters >= 10 ?() {_sendMessage(context);} : null,
       ),
     ));
 
 
-    return new Scaffold(
+    return Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: new BaseAppBar(
-          title: new Text('Broadcast',
+        appBar: BaseAppBar(
+          title: Text('Broadcast',
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black)),
+              style: TextStyle(color: Colors.black)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          leading: new BackButton(color: Colors.grey.shade800),
+          leading: BackButton(color: Colors.grey.shade800),
         ),
-        body: new Container(
+        body: Container(
           padding: EdgeInsets.all(12.0),
-          child: new Column(
+          child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: widgets

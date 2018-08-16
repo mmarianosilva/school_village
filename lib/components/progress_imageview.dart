@@ -27,7 +27,7 @@ class _ProgressImageState extends State<ProgressImage> {
 
   _ProgressImageState({this.url, this.firebasePath, this.height, this.width, this.onTap});
 
-  static FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://schoolvillage-1.appspot.com');
+  static FirebaseStorage storage = FirebaseStorage();
 
   @override
   void initState() {

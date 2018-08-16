@@ -8,6 +8,7 @@ import '../../util/constants.dart';
 import '../../model/main_model.dart';
 import '../../util/token_helper.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:package_info/package_info.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -16,16 +17,24 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
   String name = '';
   String _userId;
+  String _version;
+  String _build;
 
   getUserDetails(MainModel model) async {
     FirebaseUser user = await UserHelper.getUser();
     print("ID: " + user.uid);
     DocumentSnapshot userSnapshot = await model.getUser();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
     setState(() {
+      _build = buildNumber;
+      _version = version;
       _userSnapshot = userSnapshot;
       name =
       "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
@@ -68,6 +77,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+
     return new ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         if (!isLoaded) {
@@ -141,7 +151,7 @@ class _SettingsState extends State<Settings> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   new FlatButton(
-                    child: new Text('Version ${Constants.version}',
+                    child: new Text('Version: $_version Build: $_build',
                         style: new TextStyle(
                             fontSize: 8.0, fontWeight: FontWeight.bold)),
                     onPressed: () {

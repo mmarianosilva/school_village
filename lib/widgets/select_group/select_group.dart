@@ -1,85 +1,112 @@
 import 'package:flutter/material.dart';
-import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/colors.dart';
+import 'package:school_village/util/constants.dart';
 import '../../util/user_helper.dart';
-import '../broadcast/broadcast.dart';
 
 class SelectGroups extends StatefulWidget {
+  final GlobalKey<_SelectGroupsState> key = GlobalKey();
+
   @override
   _SelectGroupsState createState() => new _SelectGroupsState();
 }
 
 class _SelectGroupsState extends State<SelectGroups> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool _isLoading = true;
-  BuildContext _context;
   Map<String, bool> selectedGroups = {};
-  List<dynamic> groups;
-
+  List<dynamic> groups = List();
+  final List<Widget> columns = List();
+  final checkBoxHeight = 40.0;
+  final textSize = 12.0;
+  int numOfRows = 1;
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
+
     setState(() {
+      groups.addAll(schoolGroups);
+      if (groups.length > 2) {
+        numOfRows = groups.length <= 4 ? 2 : 3;
+      }
       _isLoading = false;
-      groups = schoolGroups;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _context = context;
-
-    if(_isLoading) {
+    if (_isLoading) {
       getGroups();
     }
-
-    return new Scaffold(
-      key: _scaffoldKey,
-      appBar: new BaseAppBar(
-        title: new Text("Select Groups", style: new TextStyle(color: Colors.black)),
-        backgroundColor: Colors.grey.shade200,
-        leading: new BackButton(color: Colors.grey.shade800),
-      ),
-      body: _isLoading ?  new Text('Loading...') : getList(groups),
-
-    );
+    return _isLoading ? Center(child: Text('Loading...')) : _getList();
   }
 
-  writeMessage() {
-    print("Navigating");
-    Navigator.of(context).pop();
-    Navigator.of(context).push(
-      new MaterialPageRoute(builder: (context) => new Broadcast(groups: selectedGroups)),
-    );
+  _getHeight() {
+    if (numOfRows > 3) {
+      return 3;
+    }
+    return numOfRows;
   }
 
-  getList(data) {
-    return new ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        if(index == data.length) {
-          return  new Container(
-            padding: EdgeInsets.all(16.0),
-            alignment: Alignment.centerRight,
-            child: new MaterialButton(
-              color: Theme.of(context).accentColor,
-              child: new Text("Next"),
-              onPressed: selectedGroups.length > 0 ? writeMessage : null,
-            ),
-          );
+  _getList() {
+    List<String> names = List();
+    columns.clear();
+    for (var dataVal in groups) {
+      String name = '${dataVal["name"]}';
+      names.add(name);
+    }
+    names.sort();
+
+    for (var i = 0; i < names.length; i++) {
+      var j = 0;
+      List<Widget> columnChildren = List();
+
+      while (j < numOfRows && i < names.length) {
+        final name = names[i];
+        columnChildren.add(SizedBox(
+            width: MediaQuery.of(context).size.width / 2,
+            height: checkBoxHeight,
+            child: CheckboxListTile(
+                isThreeLine: false,
+                title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
+                    style: TextStyle(color: SVColors.talkAroundBlue)),
+                value: selectedGroups.containsKey(name),
+                onChanged: (bool value) {
+                  setState(() {
+                    if (!value) {
+                      selectedGroups.remove(name);
+                    } else {
+                      selectedGroups.addAll({name: true});
+                    }
+                  });
+                })));
+        if (j < numOfRows - 1) {
+          i++;
         }
-        return new CheckboxListTile(
-            title: new Text(data[index]["name"]),
-            value: selectedGroups.containsKey(data[index]["name"]),
-            onChanged: (bool value) {
-              setState(() {
-                if(!value) {
-                  selectedGroups.remove(data[index]["name"]);
-                } else {
-                  selectedGroups.addAll({data[index]["name"] : true});
-                }
-              });
-            });
-      },
-      itemCount: data.length + 1,
+        j++;
+      }
+
+      while (columnChildren.length < numOfRows) {
+        columnChildren.add(SizedBox(width: MediaQuery.of(context).size.width / 2, height: checkBoxHeight));
+      }
+
+      columns.add(Column(
+        children: columnChildren,
+      ));
+    }
+
+    return Container(
+      color: Colors.grey.shade100,
+      child: Column(children: [
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Container(
+              padding: EdgeInsets.only(top: 5.0),
+              margin: Constants.messagesHorizontalMargin,
+              child: Text("Select group:",
+                  style: TextStyle(color: Color.fromRGBO(50, 51, 57, 1.0), letterSpacing: 1.2, fontSize: textSize))),
+        ),
+        SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: columns)),
+      ]),
+      height: (checkBoxHeight * _getHeight()) + 30.0,
     );
   }
 }

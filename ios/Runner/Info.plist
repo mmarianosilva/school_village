@@ -21,13 +21,19 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>22</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>You can upload images from camera directly</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>To send your location in case of an emergency</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>To send your location in case of an emergency</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Images for security chat and hot line</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -51,9 +57,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Images for security chat and hot line</string>
-	<key>NSCameraUsageDescription</key>
-    <string>You can upload images from camera directly</string>
 </dict>
 </plist>
