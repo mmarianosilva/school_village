@@ -23,8 +23,6 @@ platform :ios do
     desc "Push a new beta build to TestFlight"
     lane :beta do
         match(type: "appstore")
-        get_certificates
-        get_provisioning_profile
         pem
         build_ios_app(workspace: "Runner.xcworkspace", scheme: "Runner")
         #gym(changelog: "New Build, Features & Fixes", export_method: "flut-store")
