@@ -51,4 +51,4 @@ workflows:
             branches:
               only:
               - master
-              - beta_iOS_codesign_issues
+              -
