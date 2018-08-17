@@ -24,7 +24,6 @@ platform :ios do
     lane :beta do
         match(type: "appstore")
         pem
-        build_ios_app(workspace: "Runner.xcworkspace", scheme: "Runner")
-        #gym(changelog: "New Build, Features & Fixes", export_method: "flut-store")
+        gym(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")
     end
 end
