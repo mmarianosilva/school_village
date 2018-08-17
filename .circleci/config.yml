@@ -49,4 +49,6 @@ workflows:
       - build-ios-prod:
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - beta_iOS_codesign_issues
