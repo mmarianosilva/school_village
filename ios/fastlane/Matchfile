@@ -9,6 +9,6 @@ type("development") # The default type, can be: appstore, adhoc, enterprise or d
 # Remove the # in the beginning of the line to enable the other options
 
 app_identifier("com.oandmtech.SchoolVillage")
-username("alexandrius")
+username("alexander.p@toptal.com")
 
 type "appstore"
