@@ -23,6 +23,6 @@ platform :ios do
         get_provisioning_profile
         pem
         build_ios_app(workspace: "Runner.xcworkspace", scheme: "Runner")
-        #gym(changelog: "New Build, Features & Fixes", export_method: "app-store")
+        #gym(changelog: "New Build, Features & Fixes", export_method: "flut-store")
     end
 end
