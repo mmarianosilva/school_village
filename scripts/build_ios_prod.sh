@@ -23,7 +23,11 @@ brew install ideviceinstaller
 brew upgrade cocoapods
 brew install ios-deploy
 echo "Installing CocoaPods"
-sudo gem install cocoapods
+brew install cocoapods
+echo "Linking CocoaPods"
+brew link --overwrite cocoapods
+echo "Installing bundler"
+sudo gem install bundler
 pod setup
 cd ..
 
