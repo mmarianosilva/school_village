@@ -16,16 +16,6 @@ or alternatively using `brew cask install fastlane`
 
 # Available Actions
 ## iOS
-### ios install_xcode
-```
-fastlane ios install_xcode
-```
-Alexander - My Xcode version
-### ios install_pods
-```
-fastlane ios install_pods
-```
-Install pod dependencies
 ### ios beta
 ```
 fastlane ios beta

@@ -20,18 +20,9 @@ platform :ios do
         setup_circle_ci
     end
 
-    desc "Alexander - My Xcode version"
-    lane :install_xcode do
-        xcode_install(version: "9.4.1")
-    end
-
-    desc "Install pod dependencies"
-    lane :install_pods do
-        cocoapods
-    end
-
     desc "Push a new beta build to TestFlight"
     lane :beta do
+        cocoapods
         match(type: "appstore")
         pem
         gym(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")

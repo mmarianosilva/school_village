@@ -22,6 +22,7 @@ brew install --HEAD libimobiledevice
 brew install ideviceinstaller
 brew upgrade cocoapods
 brew install ios-deploy
+echo "Installing CocoaPods"
 sudo gem install cocoapods
 pod setup
 cd ..
@@ -35,7 +36,7 @@ flutter doctor
 cd ios && pod install
 cd ..
 echo "Running: flutter build ios --release --no-codesign --build-number=\"${BUILD_NUM}\""
-flutter build ios --release --no-codesign --build-number="${BUILD_NUM}"
+flutter build ios --release --build-number="${BUILD_NUM}"
 
 echo "flutter bundle exec fastlane beta"
 cd ios && bundle update
