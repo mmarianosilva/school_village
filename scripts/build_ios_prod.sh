@@ -40,8 +40,8 @@ flutter doctor
 cd ios && pod install
 cd ..
 echo "Running: flutter build ios --release --no-codesign --build-number=\"${BUILD_NUM}\""
-flutter build ios --release --build-number="${BUILD_NUM}"
+flutter build ios --release --no-codesign --build-number="${BUILD_NUM}"
 
 echo "flutter bundle exec fastlane beta"
-cd ios && bundle update
+cd ios && bundle install && bundle update
 bundle exec fastlane beta

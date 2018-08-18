@@ -22,7 +22,6 @@ platform :ios do
 
     desc "Push a new beta build to TestFlight"
     lane :beta do
-        cocoapods
         match(type: "appstore")
         pem
         gym(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")
