@@ -22,6 +22,7 @@ brew install --HEAD libimobiledevice
 brew install ideviceinstaller
 brew upgrade cocoapods
 brew install ios-deploy
+echo "Installing CocoaPods"
 sudo gem install cocoapods
 pod setup
 cd ..
