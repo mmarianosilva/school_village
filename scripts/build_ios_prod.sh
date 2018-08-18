@@ -23,11 +23,7 @@ brew install ideviceinstaller
 brew upgrade cocoapods
 brew install ios-deploy
 echo "Installing CocoaPods"
-brew install cocoapods
-echo "Linking CocoaPods"
-brew link --overwrite cocoapods
-echo "Installing bundler"
-sudo gem install bundler
+sudo gem install cocoapods
 pod setup
 cd ..
 
@@ -43,5 +39,5 @@ echo "Running: flutter build ios --release --no-codesign --build-number=\"${BUIL
 flutter build ios --release --no-codesign --build-number="${BUILD_NUM}"
 
 echo "flutter bundle exec fastlane beta"
-cd ios && bundle install && bundle update
+cd ios && bundle update
 bundle exec fastlane beta
