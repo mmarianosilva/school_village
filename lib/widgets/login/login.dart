@@ -111,10 +111,10 @@ class _LoginState extends State<Login> {
     );
   }
 
-  studentLogin() {
+  studentLogin(role) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => StudentLogin()),
+      MaterialPageRoute(builder: (context) => StudentLogin(role: role)),
     );
   }
 
@@ -173,8 +173,14 @@ class _LoginState extends State<Login> {
                 MaterialButton(
                     minWidth: 200.0,
                     color: Colors.grey.shade300,
-                    onPressed: studentLogin,
+                    onPressed: studentLogin("student"),
                     child: Text("STUDENT LOGIN")),
+                const SizedBox(height: 18.0),
+                MaterialButton(
+                    minWidth: 200.0,
+                    color: Colors.grey.shade300,
+                    onPressed: studentLogin("family"),
+                    child: Text("FAMILY LOGIN")),
                 const SizedBox(height: 18.0),
                 FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
                 const SizedBox(height: 18.0),
