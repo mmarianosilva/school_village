@@ -240,7 +240,7 @@ class _MessagesState extends State<Messages> {
   }
 
   _saveBroadcast(alertBody) async {
-    CollectionReference collection = Firestore.instance.collection('$_schoolId/broadcasts');
+    CollectionReference collection = Firestore.instance.collection('schools/$_schoolId/broadcasts');
     final DocumentReference document = collection.document();
 
     document.setData(<String, dynamic>{
