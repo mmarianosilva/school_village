@@ -121,11 +121,11 @@ class UserHelper {
     _prefs.setString("anonymous_role", role);
   }
 
-  static getAnonymousOwner() async {
+  static getAnonymousRole() async {
     if(_prefs == null) {
       _prefs = await _prefsFuture;
     }
-    return _prefs.getString("anonymous_role") == null ? '' : _prefs.getBool("anonymous_role");
+    return _prefs.getString("anonymous_role") == null ? '' : _prefs.getString("anonymous_role");
   }
 
   static setSelectedSchool({schoolId: String, schoolName: String, schoolRole: String}) async {

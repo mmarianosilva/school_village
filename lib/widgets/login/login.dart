@@ -173,13 +173,17 @@ class _LoginState extends State<Login> {
                 MaterialButton(
                     minWidth: 200.0,
                     color: Colors.grey.shade300,
-                    onPressed: studentLogin("student"),
+                    onPressed: () {
+                      studentLogin("student");
+                    },
                     child: Text("STUDENT LOGIN")),
                 const SizedBox(height: 18.0),
                 MaterialButton(
                     minWidth: 200.0,
                     color: Colors.grey.shade300,
-                    onPressed: studentLogin("family"),
+                    onPressed: () {
+                      studentLogin("family");
+                    },
                     child: Text("FAMILY LOGIN")),
                 const SizedBox(height: 18.0),
                 FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),

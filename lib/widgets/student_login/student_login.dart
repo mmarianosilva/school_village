@@ -12,7 +12,7 @@ class StudentLogin extends StatefulWidget {
   StudentLogin({Key key, this.role}) : super(key: key);
 
   @override
-  _StudentLoginState createState() => new _StudentLoginState();
+  _StudentLoginState createState() => new _StudentLoginState(role: role);
 }
 
 class _StudentLoginState extends State<StudentLogin> {

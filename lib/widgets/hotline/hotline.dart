@@ -164,33 +164,7 @@ class _HotlineState extends State<Hotline> {
   _sendMessage() {
     var text = customAlertController.text;
     if (text.length < 1) return;
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Are you sure you want to send this message?'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
-                children: <Widget>[new Text('This cannot be undone')],
-              ),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text('No'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text('Yes'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _saveMessage(text);
-                },
-              )
-            ],
-          );
-        });
+    _saveMessage(text);
   }
 
   _saveMessage(message) async {
@@ -201,6 +175,7 @@ class _HotlineState extends State<Hotline> {
     document.setData(<String, dynamic>{
       'body': message,
       'createdAt': new DateTime.now().millisecondsSinceEpoch,
+      'createdBy': await UserHelper.getAnonymousRole()
     });
     print("Added hotline");
 
