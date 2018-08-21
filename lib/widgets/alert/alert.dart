@@ -135,7 +135,7 @@ class _AlertState extends State<Alert> {
     Map<String, double> location;
     String error;
     try {
-      location = await _location.getLocation;
+      location = await _location.getLocation();
       error = null;
     } catch (e) {
 //      if (e.code == 'PERMISSION_DENIED') {

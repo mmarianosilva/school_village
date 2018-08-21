@@ -12,7 +12,7 @@ import 'package:package_info/package_info.dart';
 
 class Settings extends StatefulWidget {
   @override
-  _SettingsState createState() => new _SettingsState();
+  _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
@@ -48,15 +48,15 @@ class _SettingsState extends State<Settings> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Logging out'),
-          content: new SingleChildScrollView(
-            child: new ListBody(
+        return AlertDialog(
+          title: Text('Logging out'),
+          content: SingleChildScrollView(
+            child: ListBody(
               children: <Widget>[
-                new Row(
+                Row(
                   children: <Widget>[
-                    new CircularProgressIndicator(),
-                    new Text("Logging out")
+                    CircularProgressIndicator(),
+                    Text("Logging out")
                   ],
                 )
               ],
@@ -75,70 +75,77 @@ class _SettingsState extends State<Settings> {
         '/login', (Route<dynamic> route) => false);
   }
 
+  navigateToSchoolList(BuildContext context) async {
+    print('navigateToSchoolList');
+    bool result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SchoolList()),
+    );
+    if(result){
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    return new ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         if (!isLoaded) {
           getUserDetails(model);
         }
 
-        return new Scaffold(
+        return Scaffold(
           backgroundColor: Colors.grey.shade100,
-          appBar: new BaseAppBar(
-            title: new Text('Settings',
+          appBar: BaseAppBar(
+            title: Text('Settings',
                 textAlign: TextAlign.center,
-                style: new TextStyle(color: Colors.black)),
+                style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
-            leading: new BackButton(color: Colors.grey.shade800),
+            leading: BackButton(color: Colors.grey.shade800),
           ),
-          body: new Column(
+          body: Column(
             children: <Widget>[
-              const SizedBox(height: 24.0),
-              new Row(
+              SizedBox(height: 24.0),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new Container(
+                  Container(
                     padding: EdgeInsets.all(8.0),
                   ),
-                  new Text(name,
-                      style: new TextStyle(
+                  Text(name,
+                      style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade800)),
                 ],
               ),
-              const SizedBox(height: 24.0),
-              new Row(
+              SizedBox(height: 24.0),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new FlatButton.icon(
-                    icon: const Icon(Icons.school, size: 32.0),
-                    label: new Text('Change School',
-                        style: new TextStyle(
+                  FlatButton.icon(
+                    icon: Icon(Icons.school, size: 32.0),
+                    label: Text('Change School',
+                        style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.bold)),
                     onPressed: () {
                       _auth.signOut().then((nothing) {
-                        Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                              builder: (context) => new SchoolList()),
-                        );
+                        navigateToSchoolList(context);
                       });
                     },
                   ),
                 ],
               ),
-              const SizedBox(height: 24.0),
-              new Row(
+              SizedBox(height: 24.0),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new FlatButton.icon(
-                    icon: const Icon(Icons.exit_to_app, size: 32.0),
-                    label: new Text('Logout',
-                        style: new TextStyle(
+                  FlatButton.icon(
+                    icon: Icon(Icons.exit_to_app, size: 32.0),
+                    label: Text('Logout',
+                        style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.bold)),
                     onPressed: () {
                       _logout(context, model);
@@ -146,13 +153,13 @@ class _SettingsState extends State<Settings> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24.0),
-              new Row(
+              SizedBox(height: 24.0),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new FlatButton(
-                    child: new Text('Version: $_version Build: $_build',
-                        style: new TextStyle(
+                  FlatButton(
+                    child: Text('Version: $_version Build: $_build',
+                        style: TextStyle(
                             fontSize: 8.0, fontWeight: FontWeight.bold)),
                     onPressed: () {
                     },

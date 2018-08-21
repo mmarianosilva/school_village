@@ -109,7 +109,7 @@ class _ChatState extends State<Chat> {
     Map<String, double> location;
     String error;
     try {
-      location = await _location.getLocation;
+      location = await _location.getLocation();
       error = null;
     } catch (e) {
       location = null;

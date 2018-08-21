@@ -96,7 +96,7 @@ class _DashboardState extends State<Dashboard> {
 
   _getLocationPermission() {
     try {
-      _location.getLocation.then((location) {}).catchError((error) {});
+      _location.getLocation().then((location){}).catchError((error){});
     } catch (e) {}
   }
 
