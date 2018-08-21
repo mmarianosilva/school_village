@@ -106,6 +106,7 @@ class _HomeState extends State<Home> {
     message.forEach((key, value){
       print('key = $key | value = $value');
     });
+    playAlarm();
 
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);

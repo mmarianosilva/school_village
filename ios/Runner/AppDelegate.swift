@@ -4,16 +4,19 @@ import AVFoundation
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-    var mySound: AVAudioPlayer?
+    var alarmSound: AVAudioPlayer?
+    let audioSession = AVAudioSession.sharedInstance()
     
-    override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?
-        ) -> Bool {
-        
+    func prepareAudioPlayer(){
         if let sound = self.setupAudioPlayerWithFile(file: "alarm", type: "wav") {
-            self.mySound = sound
+            self.alarmSound = sound
         }
+    }
+    
+    override func application(_ application: UIApplication,didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?)
+        -> Bool {
+        
+        prepareAudioPlayer()
         
         GeneratedPluginRegistrant.register(with: self)
         
@@ -37,25 +40,32 @@ import AVFoundation
     
     
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("native code:")
-        if(application.applicationState == .background){
-            print("Application state = Background")
-        }else if(application.applicationState == .inactive){
-            print("Application state = inactive")
-        }else if(application.applicationState == .active){
-            print("Application state = active")
+        if(application.applicationState != .active){
+            do {
+                try audioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)
+                try audioSession.setActive(true)
+            } catch {
+                print("AudioSession error setActive(true)\naudioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)")
+            }
+            
+            if(self.alarmSound == nil){
+                prepareAudioPlayer()
+            }
+            
+            self.alarmSound?.play()
+            completionHandler(.newData)
         }
-        let audioSession = AVAudioSession.sharedInstance()
-        
+    }
+    
+    
+   
+    override func applicationWillEnterForeground(_ application: UIApplication) {
+        self.alarmSound?.stop()
         do {
-            try audioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)
-            try audioSession.setActive(true)
-        } catch {
-            print("Player not available")
+            try self.audioSession.setActive(false)
+        }catch{
+            print("AudioSession error setActive(false)")
         }
-        
-        self.mySound?.play()
-        completionHandler(.newData)
     }
     
     func setupAudioPlayerWithFile(file: NSString, type: NSString) -> AVAudioPlayer? {
