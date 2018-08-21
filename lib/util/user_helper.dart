@@ -114,6 +114,20 @@ class UserHelper {
     return _prefs.getBool("is_owner") == null ? false : _prefs.getBool("is_owner");
   }
 
+  static setAnonymousRole(role) async{
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    _prefs.setString("anonymous_role", role);
+  }
+
+  static getAnonymousRole() async {
+    if(_prefs == null) {
+      _prefs = await _prefsFuture;
+    }
+    return _prefs.getString("anonymous_role") == null ? '' : _prefs.getString("anonymous_role");
+  }
+
   static setSelectedSchool({schoolId: String, schoolName: String, schoolRole: String}) async {
     if(_prefs == null) {
       _prefs = await _prefsFuture;
