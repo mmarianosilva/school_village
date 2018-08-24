@@ -72,7 +72,7 @@ class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateM
           data: ThemeData(
             primaryColor: Colors.white, //Changing this will change the color of the TabBar
           ),
-          child: new Scaffold(
+          child:  Scaffold(
             appBar: PreferredSize(
               preferredSize: Size.fromHeight(kToolbarHeight + kTextTabBarHeight),
               child: Column(children: [

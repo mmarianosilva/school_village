@@ -8,7 +8,6 @@ import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
 import '../holine_list/hotline_list.dart';
-import '../notifications/notifications.dart';
 import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -19,8 +18,6 @@ import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:audioplayer/audioplayer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Home extends StatefulWidget {

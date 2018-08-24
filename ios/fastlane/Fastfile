@@ -22,9 +22,9 @@ platform :ios do
 
     desc "Push a new beta build to TestFlight"
     lane :beta do
+        log = changelog_from_git_commits(commits_count: 10, pretty: '• %s\n', merge_commit_filtering: 'exclude_merges')
         match(type: "appstore")
-        pem
         gym(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")
-        pilot
+        pilot(groups: ['SV Testers'], distribute_external: true, changelog: log)
     end
 end
