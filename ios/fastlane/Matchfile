@@ -1,4 +1,4 @@
-git_url("https://alexandrius:Mastera1992@github.com/oandmtech333/schoolvillage_certs.git")
+git_url("https://alexandrius@github.com/oandmtech333/schoolvillage_certs.git")
 
 type("development") # The default type, can be: appstore, adhoc, enterprise or development
 
