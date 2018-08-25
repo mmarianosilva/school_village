@@ -1,7 +1,10 @@
 import 'dart:collection';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mime/mime.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
@@ -22,6 +25,7 @@ class Messages extends StatefulWidget {
 }
 
 class _MessagesState extends State<Messages> {
+  static FirebaseStorage storage = FirebaseStorage();
   FirebaseUser _user;
   String _userId;
   String name = '';
@@ -110,7 +114,7 @@ class _MessagesState extends State<Messages> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     inputField = InputField(sendPressed: (image, text) {
-      _sendMessage(text);
+      _sendMessage(image, text);
     });
 
     super.initState();
@@ -209,8 +213,34 @@ class _MessagesState extends State<Messages> {
     );
   }
 
-  _sendMessage(text) {
-    if (text.length < 10) return;
+  showErrorDialog(String error) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error sending broadcast'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [Text(error)],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  _sendMessage(File image, text) {
+    if (text.length < 10) {
+      showErrorDialog("Text length should be at least 10 characters");
+      return;
+    }
 
     showDialog(
         context: context,
@@ -233,7 +263,7 @@ class _MessagesState extends State<Messages> {
                 child: Text('Yes'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _saveBroadcast(text);
+                  _saveBroadcast(image,text);
                 },
               )
             ],
@@ -241,9 +271,26 @@ class _MessagesState extends State<Messages> {
         });
   }
 
-  _saveBroadcast(alertBody) async {
-    CollectionReference collection = Firestore.instance.collection('schools/$_schoolId/broadcasts');
+  _showLoading() {}
+
+  _hideLoading() {}
+
+  _saveBroadcast(image, alertBody) async {
+    final broadcastPath = 'schools/$_schoolId/broadcasts';
+    CollectionReference collection = Firestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.document();
+
+    var path = '';
+    if (image != null) {
+      _showLoading();
+      path = '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
+      String type = 'jpeg';
+      type = lookupMimeType(image.path).split("/").length > 1 ? lookupMimeType(image.path).split("/")[1] : type;
+      path = path + "." + type;
+      print(path);
+      await uploadFile(path, image);
+      _hideLoading();
+    }
 
     document.setData(<String, dynamic>{
       'body': alertBody,
@@ -251,11 +298,19 @@ class _MessagesState extends State<Messages> {
       'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
+      'image': image == null ? null : path,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone': phone,
     });
   //FIXME: bad practice
     inputField.key.currentState.clearState();
+  }
+
+  uploadFile(String path, File file) async {
+    final StorageReference ref = storage.ref().child(path);
+    final StorageUploadTask uploadTask = ref.putFile(file);
+    final Uri downloadUrl = (await uploadTask.future).downloadUrl;
+    return downloadUrl;
   }
 
   @override
