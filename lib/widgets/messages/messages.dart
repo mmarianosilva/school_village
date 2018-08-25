@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
+import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/widgets/messages/broadcast_message.dart';
 import 'package:school_village/widgets/select_group/select_group.dart';
@@ -54,6 +55,7 @@ class _MessagesState extends State<Messages> {
       }
       setState(() {
         _userId = user.documentID;
+        name = "${user.data['firstName']} ${user.data['lastName']}";
         _schoolId = schoolId;
         phone = user.data['phone'];
         _groups = groups;
@@ -252,6 +254,8 @@ class _MessagesState extends State<Messages> {
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone': phone,
     });
+  //FIXME: bad practice
+    inputField.key.currentState.clearState();
   }
 
   @override
@@ -270,12 +274,16 @@ class _MessagesState extends State<Messages> {
         body: Column(children: [
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
+          ),
+          SizedBox(
+            width: 0.0,
+            height: 10.0,
           ), //new
           role == 'school_admin'
               ? Column(children: [
                   selectGroups,
                   Container(
-                    color: Colors.white,
+                    color: SVColors.colorFromHex('#e5e5ea'),
                     padding: EdgeInsets.only(bottom: 14.0),
                     child: inputField,
                   )
