@@ -87,8 +87,7 @@ class _HomeState extends State<Home> {
         _onNotification(message);
       },
     );
-    _firebaseMessaging
-        .requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
       setState(() {
         _token = token;
@@ -98,6 +97,7 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
+    print("_onNotification");
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
@@ -145,14 +145,10 @@ class _HomeState extends State<Home> {
     );
   }
 
+
   _goToSecurityChat(String conversationId) async {
     if (['school_admin', 'school_security'].contains((await UserHelper.getSelectedSchoolRole()))) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TalkAround(conversationId: conversationId),
-        ),
-      );
+      TalkAround.navigate(conversationId, context);
     }
   }
 
