@@ -220,7 +220,7 @@ class _ChatState extends State<Chat> {
     return Column(children: [
       Expanded(
         child: Container(color: Colors.white, child: _getScreen()),
-      ), //new
+      ),
       Container(
         color: Colors.white,
         padding: EdgeInsets.only(bottom: 14.0),

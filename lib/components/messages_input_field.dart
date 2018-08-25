@@ -148,6 +148,7 @@ class _InputFieldState extends State<InputField> {
                     hintStyle: TextStyle(color: Colors.grey.shade50),
                     fillColor: Colors.transparent,
                     filled: true,
+                    border: InputBorder.none,
                     suffixIcon: IconButton(
                       icon: Icon(
                         Icons.send,
