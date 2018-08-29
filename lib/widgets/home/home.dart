@@ -18,7 +18,7 @@ import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:audioplayer/audioplayer.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 
 class Home extends StatefulWidget {
   @override
@@ -38,6 +38,8 @@ List<Choice> choices = <Choice>[
 ];
 
 class _HomeState extends State<Home> {
+  static const platform = const MethodChannel('schoolvillage.app/audio');
+
   int index = 0;
   String title = "School Village";
   bool isLoaded = false;
@@ -87,8 +89,7 @@ class _HomeState extends State<Home> {
         _onNotification(message);
       },
     );
-    _firebaseMessaging
-        .requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
       setState(() {
         _token = token;
@@ -98,11 +99,8 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
-    message.forEach((key, value){
-      print('key = $key | value = $value');
-    });
-    playAlarm();
-
+    print('onNotification');
+    platform.invokeMethod('playBackgroundAudio');
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
@@ -202,7 +200,6 @@ class _HomeState extends State<Home> {
     playAlarm();
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
-    debugPrint(message['notificationId']);
     DocumentSnapshot notification;
     Firestore.instance.document("/schools/$schoolId/notifications/$notificationId").get().then((document) {
       notification = document;

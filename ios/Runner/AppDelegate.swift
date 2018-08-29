@@ -6,6 +6,7 @@ import AVFoundation
 @objc class AppDelegate: FlutterAppDelegate {
     var alarmSound: AVAudioPlayer?
     let audioSession = AVAudioSession.sharedInstance()
+    var _resumingFromBackground: Bool?
     
     func prepareAudioPlayer(){
         if let sound = self.setupAudioPlayerWithFile(file: "alarm", type: "wav") {
@@ -15,32 +16,39 @@ import AVFoundation
     
     override func application(_ application: UIApplication,didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?)
         -> Bool {
-        
-        prepareAudioPlayer()
-        
-        GeneratedPluginRegistrant.register(with: self)
-        
-        let controller : FlutterViewController = window?.rootViewController as! FlutterViewController;
-        let pdfViewChannel = FlutterMethodChannel.init(name: "schoolvillage.app/pdf_view",
-                                                       binaryMessenger: controller);
-        pdfViewChannel.setMethodCallHandler({
-            (call: FlutterMethodCall, result: FlutterResult) -> Void in
             
-            let path = call.arguments as! String
-            _ = controller.lookupKey(forAsset: path)!
+            prepareAudioPlayer()
             
-            let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
-            let newViewController = storyBoard.instantiateViewController(withIdentifier: "webViewController") as! WebViewController
-            newViewController.url  = path
-            self.window?.rootViewController?.present(newViewController, animated: true, completion: nil)
-        });
-        
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+            GeneratedPluginRegistrant.register(with: self)
+            
+            let controller : FlutterViewController = window?.rootViewController as! FlutterViewController;
+            let pdfViewChannel = FlutterMethodChannel.init(name: "schoolvillage.app/pdf_view",
+                                                           binaryMessenger: controller);
+            pdfViewChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
+                
+                let path = call.arguments as! String
+                _ = controller.lookupKey(forAsset: path)!
+                
+                let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                let newViewController = storyBoard.instantiateViewController(withIdentifier: "webViewController") as! WebViewController
+                newViewController.url  = path
+                self.window?.rootViewController?.present(newViewController, animated: true, completion: nil)
+            })
+            
+            let audioChannel = FlutterMethodChannel.init(name: "schoolvillage.app/audio",
+                                                           binaryMessenger: controller);
+            audioChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
+                if ("playBackgroundAudio" == call.method) {
+                    self.playBackgroundAudio()
+                }
+            })
+            
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    
-    override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if(application.applicationState != .active){
+    func playBackgroundAudio(){
+        print("playBackgroundAudio")
+        if(UIApplication.shared.applicationState != .active){
             do {
                 try audioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)
                 try audioSession.setActive(true)
@@ -53,12 +61,9 @@ import AVFoundation
             }
             
             self.alarmSound?.play()
-            completionHandler(.newData)
         }
     }
     
-    
-   
     override func applicationWillEnterForeground(_ application: UIApplication) {
         self.alarmSound?.stop()
         do {
@@ -81,5 +86,5 @@ import AVFoundation
         
         return audioPlayer
     }
-
+    
 }
