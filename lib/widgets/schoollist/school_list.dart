@@ -8,12 +8,12 @@ import '../../model/school_ref.dart';
 
 class SchoolList extends StatefulWidget {
   @override
-  _SchoolListState createState() => new _SchoolListState();
+  _SchoolListState createState() => _SchoolListState();
 }
 
 class _SchoolListState extends State<SchoolList> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool _isLoading = true;
   BuildContext _context;
 
@@ -22,39 +22,39 @@ class _SchoolListState extends State<SchoolList> {
     print("Setting school");
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
-    Navigator.pop(_context);
+    Navigator.pop(_context, true);
   }
 
   @override
   Widget build(BuildContext context) {
     _context = context;
-    return new Scaffold(
+    return Scaffold(
       key: _scaffoldKey,
-      appBar: new BaseAppBar(
-        title: new Text("Select School", style: new TextStyle(color: Colors.black)),
-        leading: new BackButton(color: Colors.grey.shade800),
+      appBar: BaseAppBar(
+        title: Text("Select School", style: TextStyle(color: Colors.black)),
+        leading: BackButton(color: Colors.grey.shade800),
         backgroundColor: Colors.grey.shade200,
       ),
-      body: new FutureBuilder(
+      body: FutureBuilder(
           future: UserHelper.getSchools(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             print(snapshot.data);
             print(snapshot.connectionState);
             switch (snapshot.connectionState) {
               case ConnectionState.none:
-                return new Text('Loading...');
+                return Text('Loading...');
               case ConnectionState.waiting:
-                return new Text('Loading...');
+                return Text('Loading...');
               default:
                 if (snapshot.hasError)
-                  return new Text('Error: ${snapshot.error}');
+                  return Text('Error: ${snapshot.error}');
                 else {
 
-                  return new ListView.builder(
-                    padding: new EdgeInsets.all(22.0),
+                  return ListView.builder(
+                    padding: EdgeInsets.all(22.0),
 //                    itemExtent: 20.0,
                     itemBuilder: (BuildContext context, int index) {
-                      return new FutureBuilder(
+                      return FutureBuilder(
                         future: Firestore.instance
                             .document(snapshot.data[index]['ref'])
                             .get(),
@@ -63,33 +63,33 @@ class _SchoolListState extends State<SchoolList> {
                             AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
                           switch (snapshot.connectionState) {
                             case ConnectionState.none:
-                              return new Text('Loading...');
+                              return Text('Loading...');
                             case ConnectionState.waiting:
-                              return new Text('Loading...');
+                              return Text('Loading...');
                             case ConnectionState.active:
-                              return new Text('Loading...');
+                              return Text('Loading...');
                             default:
                               if (snapshot.hasError)
-                                return new Text('Error: ${snapshot.error}');
+                                return Text('Error: ${snapshot.error}');
                               else {
                                 var isOwner = false;
                                 if(snapshot.data[index]['role'] == 'SiteAdmin' || snapshot.data[index]['role'] == 'Owner') {
                                   isOwner = true;
                                 }
 
-                                return new Container(
-                                  child: new Column(
+                                return Container(
+                                  child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      new Container(
+                                      Container(
                                         padding: EdgeInsets.only(
                                             left: 8.0,
                                             right: 8.0,
                                             top: 8.0
                                         ),
                                         alignment: Alignment.centerLeft,
-                                        child: new FlatButton(
-                                            child: new Text(schoolSnapshot.data == null
+                                        child: FlatButton(
+                                            child: Text(schoolSnapshot.data == null
                                                 ? ''
                                                 : schoolSnapshot.data["name"]),
                                             onPressed: () {

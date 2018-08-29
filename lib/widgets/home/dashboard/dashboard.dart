@@ -96,7 +96,7 @@ class _DashboardState extends State<Dashboard> {
 
   _getLocationPermission() {
     try {
-      _location.getLocation.then((location) {}).catchError((error) {});
+      _location.getLocation().then((location){}).catchError((error){});
     } catch (e) {}
   }
 
@@ -234,9 +234,6 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildMessagesOption(model) {
-    if(role == 'school_student') {
-      return SizedBox();
-    }
     return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),

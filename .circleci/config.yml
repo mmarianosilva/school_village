@@ -1,9 +1,10 @@
 version: 2
+
 jobs:
 
   build-ios-beta:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.4.1"
 
     steps:
       - checkout
@@ -18,7 +19,7 @@ jobs:
 
   build-ios-prod:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.4.1"
     steps:
       - checkout
       - run: bash ./scripts/build_ios_prod.sh
@@ -37,11 +38,15 @@ workflows:
       - build-android-beta:
           filters:
             branches:
-              only: beta
+              only:
+              - beta
+              - develop
       - build-ios-beta:
           filters:
             branches:
-              only: beta
+              only:
+              - beta
+              - develop
       - build-android-prod:
           filters:
             branches:
@@ -49,4 +54,5 @@ workflows:
       - build-ios-prod:
           filters:
             branches:
-              only: master
+              only:
+              - master

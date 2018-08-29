@@ -86,10 +86,19 @@ class _HotLineListState extends State<HotLineList> {
                             left: 8.0,
                             right: 8.0,
                             top: 2.0,
-                            bottom: 8.0
+                            bottom: 2.0
                         ),
                         alignment: Alignment.centerLeft,
                         child: new Text("${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                      ),
+                      new Container(
+                        padding: EdgeInsets.only(
+                            left: 8.0,
+                            right: 8.0,
+                            bottom: 8.0
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: document['createdBy']== null ? new Text('') : new Text("${document['createdBy']}", style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
                       ),
                     ]
                 ),
