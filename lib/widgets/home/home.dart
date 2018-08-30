@@ -148,14 +148,10 @@ class _HomeState extends State<Home> {
     );
   }
 
+
   _goToSecurityChat(String conversationId) async {
     if (['school_admin', 'school_security'].contains((await UserHelper.getSelectedSchoolRole()))) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TalkAround(conversationId: conversationId),
-        ),
-      );
+      TalkAround.navigate(conversationId, context);
     }
   }
 
