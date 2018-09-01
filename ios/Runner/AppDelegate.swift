@@ -64,6 +64,10 @@ import AVFoundation
         }
     }
     
+    func stopBackgroundAudio(){
+        
+    }
+    
     override func applicationWillEnterForeground(_ application: UIApplication) {
         self.alarmSound?.stop()
         do {

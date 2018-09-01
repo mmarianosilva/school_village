@@ -17,7 +17,7 @@ import '../../util/token_helper.dart';
 import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:audioplayer/audioplayer.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 
 class Home extends StatefulWidget {
