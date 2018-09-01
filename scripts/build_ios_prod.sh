@@ -2,6 +2,10 @@
 
 BUILD_NUM="$((${CIRCLE_BUILD_NUM}+1))"
 
+cd ../ios
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${BUILD_NUM}" "./Runner/Info.plist"
+cd ..
+
 echo ${BUILD_NUM}
 
 cp ./scripts/dev/GoogleServices-Info.plist ./ios/Runner/GoogleServices-Info.plist
