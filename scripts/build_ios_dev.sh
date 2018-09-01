@@ -8,13 +8,13 @@ cd ..
 
 echo ${BUILD_NUM}
 
-cp ./scripts/dev/GoogleServices-Info.plist ./ios/Runner/GoogleServices-Info.plist
+#cp ./scripts/dev/GoogleServices-Info.plist ./ios/Runner/GoogleServices-Info.plist
 
 
 echo "Installing requirements"
 
-curl https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_macos_v0.5.1-beta.zip -o flutter_macos_v0.5.1-beta.zip
-unzip flutter_macos_v0.5.1-beta.zip
+curl https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_macos_v0.6.0-beta.zip -o flutter_macos_v0.6.0-beta.zip
+unzip flutter_macos_v0.6.0-beta.zip
 export PATH=`pwd`/flutter/bin:$PATH
 
 pip install six
