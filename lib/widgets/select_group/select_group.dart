@@ -16,7 +16,7 @@ class _SelectGroupsState extends State<SelectGroups> {
   Map<String, bool> selectedGroups = {};
   List<dynamic> groups = List();
   final List<Widget> columns = List();
-  final checkBoxHeight = 40.0;
+  final checkBoxHeight = 33.0;
   final textSize = 14.0;
   int numOfRows = 1;
 
@@ -66,9 +66,10 @@ class _SelectGroupsState extends State<SelectGroups> {
             width: MediaQuery.of(context).size.width / 2,
             height: checkBoxHeight,
             child: Theme(
-              data: ThemeData(unselectedWidgetColor: SVColors.talkAroundBlue),
-                child: SVCheckboxListTile(
+                data: ThemeData(unselectedWidgetColor: SVColors.talkAroundBlue),
+                child: CheckboxListTile(
                     isThreeLine: false,
+                    dense: true,
                     controlAffinity: ListTileControlAffinity.leading,
                     title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
                         style: TextStyle(
@@ -107,13 +108,12 @@ class _SelectGroupsState extends State<SelectGroups> {
       child: Column(children: [
         Align(
           child: Container(
-              padding: EdgeInsets.only(top: 5.0),
-              margin: Constants.messagesHorizontalMargin,
+              padding: EdgeInsets.only(top: 3.0),
               child: Text("Select group:",
                   style: TextStyle(
                       color: Color.fromRGBO(50, 51, 57, 1.0),
                       letterSpacing: 1.2,
-                      fontSize: textSize,
+                      fontSize: 12.0,
                       fontWeight: FontWeight.bold))),
         ),
         SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: columns)),

@@ -193,6 +193,7 @@ class SVCheckboxListTile extends StatelessWidget {
           trailing: trailing,
           isThreeLine: isThreeLine,
           dense: dense,
+          contentPadding: EdgeInsets.all(0.0),
           enabled: onChanged != null,
           onTap: onChanged != null ? () { onChanged(!value); } : null,
           selected: selected,

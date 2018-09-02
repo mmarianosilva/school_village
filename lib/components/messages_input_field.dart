@@ -140,6 +140,7 @@ class _InputFieldState extends State<InputField> {
               shape: RoundedRectangleBorder(borderRadius: borderRadius),
               color: SVColors.talkAroundAccent,
               child: Container(
+                height: 40.0,
                   child: TextField(
                 controller: inputController,
                 maxLines: 1,

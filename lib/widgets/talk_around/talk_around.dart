@@ -14,11 +14,11 @@ class TalkAround extends StatefulWidget {
   static Route _route;
   static TalkAround _talkAround;
 
-  static navigate(conversationId, context){
-    if(_route != null && _route.isCurrent){
+  static navigate(conversationId, context) {
+    if (_route != null && _route.isCurrent) {
       final talkAroundState = _talkAround.key.currentState;
       talkAroundState.tabController.index = talkAroundState.getInitialIndex(conversationId);
-    }else{
+    } else {
       _talkAround = TalkAround(key: GlobalKey(), conversationId: conversationId);
       _route = MaterialPageRoute(
         builder: (context) => _talkAround,
@@ -98,7 +98,7 @@ class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateM
           ),
           child: Scaffold(
             appBar: PreferredSize(
-              preferredSize: Size.fromHeight(kToolbarHeight + kTextTabBarHeight),
+              preferredSize: Size.fromHeight(kToolbarHeight + kTextTabBarHeight + 8),
               child: Column(children: [
                 AppBar(
                   backgroundColor: Color.fromRGBO(241, 241, 245, 1.0),
@@ -107,18 +107,20 @@ class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateM
                       textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
                   leading: new BackButton(color: Colors.grey.shade800),
                 ),
-                Container(
-                    color: Colors.white,
-                    width: MediaQuery.of(context).size.width,
-                    child: Center(
-                      child: TabBar(
-                        isScrollable: true,
-                        indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
-                        labelColor: Colors.black,
-                        tabs: [Tab(text: "Security"), Tab(text: "Security & Admin")],
-                        controller: tabController,
-                      ),
-                    ))
+                Card(
+                    elevation: 2.0,
+                    child: Container(
+                        color: Colors.white,
+                        width: MediaQuery.of(context).size.width,
+                        child: Center(
+                          child: TabBar(
+                            isScrollable: true,
+                            indicatorColor: Color.fromRGBO(255, 0, 40, 1.0),
+                            labelColor: Colors.black,
+                            tabs: [Tab(text: "Security"), Tab(text: "Security & Admin")],
+                            controller: tabController,
+                          ),
+                        )))
               ]),
             ),
             body: TabBarView(
