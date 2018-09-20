@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
   copyLocalAssets() async {
     final bundleDir = 'assets/audio';
     final assetName = 'alarm.wav';
-    final localDir = await getApplicationDocumentsDirectory();
+    final localDir = await getTemporaryDirectory();
     final localAssetFile = (await copyLocalAsset(localDir, bundleDir, assetName)).path;
     _localAssetFile = localAssetFile;
     print(_localAssetFile);

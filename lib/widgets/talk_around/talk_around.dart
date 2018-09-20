@@ -105,7 +105,7 @@ class _TalkAroundState extends State<TalkAround> with SingleTickerProviderStateM
                   elevation: 0.0,
                   title: new Text('Security Talk-Around',
                       textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-                  leading: new BackButton(color: Colors.grey.shade800),
+                  leading:  new BackButton(color: Colors.grey.shade800),
                 ),
                 Card(
                     elevation: 2.0,

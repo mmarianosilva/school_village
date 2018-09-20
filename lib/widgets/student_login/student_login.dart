@@ -174,6 +174,7 @@ class _StudentLoginState extends State<StudentLogin> {
 //              new Image.asset('assets/images/logo.png'),
                 new Flexible(
                     child: new TextField(
+                      autofocus: true,
                       controller: codeController,
                       decoration: new InputDecoration(
                           border: const UnderlineInputBorder(),

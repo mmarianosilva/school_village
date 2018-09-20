@@ -13,8 +13,8 @@ echo ${BUILD_NUM}
 
 echo "Installing requirements"
 
-curl https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_macos_v0.6.0-beta.zip -o flutter_macos_v0.6.0-beta.zip
-unzip flutter_macos_v0.6.0-beta.zip
+curl https://storage.googleapis.com/flutter_infra/releases/beta/macos/flutter_macos_v0.8.2-beta.zip -o flutter.zip
+unzip flutter.zip
 export PATH=`pwd`/flutter/bin:$PATH
 
 pip install six

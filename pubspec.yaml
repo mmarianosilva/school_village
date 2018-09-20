@@ -30,6 +30,7 @@ dependencies:
   image_picker: ^0.4.10
   photo_view: 0.0.7
   package_info: ^0.3.2
+  video_player: any
 
 
 dev_dependencies:
