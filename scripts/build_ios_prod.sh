@@ -28,6 +28,7 @@ brew upgrade cocoapods
 brew install ios-deploy
 echo "Installing CocoaPods"
 sudo gem install cocoapods
+yes | sudo gem update fastlane
 pod setup
 cd ..
 
