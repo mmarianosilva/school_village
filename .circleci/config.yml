@@ -2,57 +2,23 @@ version: 2
 
 jobs:
 
-  build-ios-beta:
-    macos:
-      xcode: "9.4.1"
 
-    steps:
-      - checkout
-      - run: bash ./scripts/build_ios_dev.sh
+  build-ios-android:
+      macos:
+        xcode: "9.4.1"
+      steps:
+        - checkout
+        - run: bash ./scripts/build.sh
 
-  build-android-beta:
-    docker:
-      - image: cirrusci/flutter
-    steps:
-      - checkout
-      - run: bash ./scripts/build_android_dev.sh
-
-  build-ios-prod:
-    macos:
-      xcode: "9.4.1"
-    steps:
-      - checkout
-      - run: bash ./scripts/build_ios_prod.sh
-
-  build-android-prod:
-    docker:
-      - image: cirrusci/flutter
-    steps:
-      - checkout
-      - run: bash ./scripts/build_android_prod.sh
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build-android-beta:
+      - build-ios-android:
           filters:
             branches:
               only:
               - beta
               - develop
-      - build-ios-beta:
-          filters:
-            branches:
-              only:
-              - beta
-              - develop
-      - build-android-prod:
-          filters:
-            branches:
-              only: master
-      - build-ios-prod:
-          filters:
-            branches:
-              only:
               - master
