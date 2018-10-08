@@ -27,16 +27,14 @@ class ImageViewScreen extends StatelessWidget {
           child: Card(
             color: Colors.transparent,
             shape: CircleBorder(),
-            child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: CustomIconButton(
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    })),
+            child: CustomIconButton(
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
           ))
     ]));
   }

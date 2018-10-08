@@ -26,7 +26,7 @@ class ChatMessage extends StatelessWidget {
   }
 
   final nameTextStyle = TextStyle(
-      color: Color.fromRGBO(25, 24, 24, 1.0), fontWeight: FontWeight.bold, fontSize: 14.0, letterSpacing: 1.1);
+      color: Color.fromRGBO(25, 24, 24, 1.0), fontWeight: FontWeight.bold, fontSize: 14.0);
 
   _getMessageView(context) {
     Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
@@ -59,44 +59,42 @@ class ChatMessage extends StatelessWidget {
       );
     }
     return Container(
-      margin: EdgeInsets.only(top: 20.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Flexible(
-              child: Column(
-            children: [
-              GestureDetector(
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(children: [
-                        Text(name, style: nameTextStyle),
+        margin: EdgeInsets.only(top: 20.0),
+        child: Row(
+          children: [
+            Flexible(
+                child: Column(
+              children: [
+                GestureDetector(
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(children: [
+                          Text(name, style: nameTextStyle),
+                          Container(
+                            child: locationWidget,
+                            margin: const EdgeInsets.only(left: 30.0),
+                          )
+                        ]),
                         Container(
-                          child: locationWidget,
-                          margin: const EdgeInsets.only(left: 40.0),
-                        )
-                      ]),
-                      Container(
-                        child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 5.0),
-                        child: Text(text),
-                      ),
-                    ],
+                          child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 5.0),
+                          child: Text(text),
+                        ),
+                      ],
+                    ),
                   ),
+                  onTap: () => goToDetails(context),
                 ),
-                onTap: () => goToDetails(context),
-              ),
-              _getImage(context)
-            ],
-          )),
-          SizedBox(width: 32.0)
-        ],
-      ),
-    );
+                _getImage(context)
+              ],
+            )),
+            SizedBox(width: 32.0)
+          ],
+        ));
   }
 
   goToDetails(context) {
@@ -108,14 +106,15 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  _openImage(context, imageUrl){
+  _openImage(context, imageUrl) {
     Navigator.push(
       context,
-       MaterialPageRoute(builder: (context) => new ImageViewScreen(
-        imageUrl,
-        minScale: PhotoViewScaleBoundary.contained,
-        maxScale: PhotoViewScaleBoundary.covered,
-      )),
+      MaterialPageRoute(
+          builder: (context) => new ImageViewScreen(
+                imageUrl,
+                minScale: PhotoViewScaleBoundary.contained,
+                maxScale: PhotoViewScaleBoundary.covered,
+              )),
     );
   }
 
@@ -124,9 +123,12 @@ class ChatMessage extends StatelessWidget {
       return SizedBox();
     }
 
-
-    return ProgressImage(height: 160.0,firebasePath: imageUrl, onTap: (imgUrl){
-      _openImage(context, imgUrl);
-    },);
+    return ProgressImage(
+      height: 160.0,
+      firebasePath: imageUrl,
+      onTap: (imgUrl) {
+        _openImage(context, imgUrl);
+      },
+    );
   }
 }

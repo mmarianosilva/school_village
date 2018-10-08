@@ -109,7 +109,7 @@ class _ChatState extends State<Chat> {
     Map<String, double> location;
     String error;
     try {
-      location = await _location.getLocation;
+      location = await _location.getLocation();
       error = null;
     } catch (e) {
       location = null;
@@ -211,7 +211,7 @@ class _ChatState extends State<Chat> {
           });
     }
     return const Center(
-      child: const Text('Loading...'),
+      child: const Text('No messages'),
     );
   }
 
@@ -220,7 +220,7 @@ class _ChatState extends State<Chat> {
     return Column(children: [
       Expanded(
         child: Container(color: Colors.white, child: _getScreen()),
-      ), //new
+      ),
       Container(
         color: Colors.white,
         padding: EdgeInsets.only(bottom: 14.0),

@@ -5,7 +5,37 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.025777">
+      <testcase classname="fastlane.lanes" name="0: update_fastlane" time="0.261144">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: default_platform" time="0.001061">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: setup_circle_ci" time="0.001337">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: changelog_from_git_commits" time="0.027196">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: match" time="10.917689">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: gym" time="195.430576">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="6: pilot" time="1.210577">
         
       </testcase>
     

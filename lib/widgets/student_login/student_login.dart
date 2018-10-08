@@ -7,15 +7,22 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 
 class StudentLogin extends StatefulWidget {
+
+  final String role;
+  StudentLogin({Key key, this.role}) : super(key: key);
+
   @override
-  _StudentLoginState createState() => new _StudentLoginState();
+  _StudentLoginState createState() => new _StudentLoginState(role: role);
 }
 
 class _StudentLoginState extends State<StudentLogin> {
 
+  _StudentLoginState({this.role});
+
   final codeController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String title = "School Village";
+  final String role;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   checkIfOnlyOneSchool() async {
@@ -146,6 +153,9 @@ class _StudentLoginState extends State<StudentLogin> {
   @override
   Widget build(BuildContext context) {
 
+    UserHelper.setAnonymousRole(role);
+    print(role + "Role");
+
     return new Scaffold(
         key: _scaffoldKey,
         appBar: new AppBar(
@@ -164,6 +174,7 @@ class _StudentLoginState extends State<StudentLogin> {
 //              new Image.asset('assets/images/logo.png'),
                 new Flexible(
                     child: new TextField(
+                      autofocus: true,
                       controller: codeController,
                       decoration: new InputDecoration(
                           border: const UnderlineInputBorder(),

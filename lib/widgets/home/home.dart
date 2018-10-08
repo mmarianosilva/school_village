@@ -8,7 +8,6 @@ import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
 import '../holine_list/hotline_list.dart';
-import '../notifications/notifications.dart';
 import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -18,33 +17,33 @@ import '../../util/token_helper.dart';
 import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:audioplayer/audioplayer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 
 class Home extends StatefulWidget {
   @override
-  _HomeState createState() => new _HomeState();
+  _HomeState createState() => _HomeState();
 }
 
 class Choice {
-  const Choice({this.title, this.icon});
+  Choice({this.title, this.icon});
 
   final String title;
   final IconData icon;
 }
 
-const List<Choice> choices = const <Choice>[
-//  const Choice(title: 'Notifications', icon: Icons.notifications),
-  const Choice(title: 'Settings', icon: Icons.settings)
+List<Choice> choices = <Choice>[
+//  Choice(title: 'Notifications', icon: Icons.notifications),
+  Choice(title: 'Settings', icon: Icons.settings)
 ];
 
 class _HomeState extends State<Home> {
+  static const platform = const MethodChannel('schoolvillage.app/audio');
+
   int index = 0;
   String title = "School Village";
   bool isLoaded = false;
-  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   String _schoolId;
   String _token;
   AudioPlayer audioPlugin;
@@ -58,15 +57,13 @@ class _HomeState extends State<Home> {
   copyLocalAssets() async {
     final bundleDir = 'assets/audio';
     final assetName = 'alarm.wav';
-    final localDir = await getApplicationDocumentsDirectory();
-    final localAssetFile =
-        (await copyLocalAsset(localDir, bundleDir, assetName)).path;
+    final localDir = await getTemporaryDirectory();
+    final localAssetFile = (await copyLocalAsset(localDir, bundleDir, assetName)).path;
     _localAssetFile = localAssetFile;
     print(_localAssetFile);
   }
 
-  Future<File> copyLocalAsset(
-      Directory localDir, String bundleDir, String assetName) async {
+  Future<File> copyLocalAsset(Directory localDir, String bundleDir, String assetName) async {
     final localAssetFile = File('${localDir.path}/$assetName');
     if (!(await localAssetFile.exists())) {
       final data = await rootBundle.load('$bundleDir/$assetName');
@@ -92,8 +89,7 @@ class _HomeState extends State<Home> {
         _onNotification(message);
       },
     );
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
       setState(() {
         _token = token;
@@ -103,6 +99,8 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> message) {
+    print('onNotification');
+    platform.invokeMethod('playBackgroundAudio');
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
@@ -118,28 +116,28 @@ class _HomeState extends State<Home> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text(message['title']),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[new Text(message['body'])],
+        return AlertDialog(
+          title: Text(message['title']),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text(message['body'])],
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('View All'),
+            FlatButton(
+              child: Text('View All'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(
-                    builder: (context) => new HotLineList(),
+                  MaterialPageRoute(
+                    builder: (context) => HotLineList(),
                   ),
                 );
               },
             ),
-            new FlatButton(
-              child: new Text('Close'),
+            FlatButton(
+              child: Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -150,15 +148,10 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _goToSecurityChat(String conversationId) async{
-    if (['school_admin', 'school_security']
-        .contains((await UserHelper.getSelectedSchoolRole()))) {
-      Navigator.push(
-        context,
-        new MaterialPageRoute(
-          builder: (context) => TalkAround(conversationId: conversationId),
-        ),
-      );
+
+  _goToSecurityChat(String conversationId) async {
+    if (['school_admin', 'school_security'].contains((await UserHelper.getSelectedSchoolRole()))) {
+      TalkAround.navigate(conversationId, context);
     }
   }
 
@@ -167,28 +160,28 @@ class _HomeState extends State<Home> {
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text(message['title']),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[new Text(message['body'])],
+        return AlertDialog(
+          title: Text(message['title']),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text(message['body'])],
             ),
           ),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('View All'),
+            FlatButton(
+              child: Text('View All'),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(
-                    builder: (context) => new Messages(),
+                  MaterialPageRoute(
+                    builder: (context) => Messages(),
                   ),
                 );
               },
             ),
-            new FlatButton(
-              child: new Text('Close'),
+            FlatButton(
+              child: Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -203,12 +196,8 @@ class _HomeState extends State<Home> {
     playAlarm();
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
-    debugPrint(message['notificationId']);
     DocumentSnapshot notification;
-    Firestore.instance
-        .document("/schools/$schoolId/notifications/$notificationId")
-        .get()
-        .then((document) {
+    Firestore.instance.document("/schools/$schoolId/notifications/$notificationId").get().then((document) {
       notification = document;
     });
     return showDialog<Null>(
@@ -231,8 +220,7 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        new NotificationDetail(notification: notification),
+                    builder: (context) => NotificationDetail(notification: notification),
                   ),
                 );
               },
@@ -253,7 +241,7 @@ class _HomeState extends State<Home> {
   openSettings() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Settings()),
+      MaterialPageRoute(builder: (context) => Settings()),
     );
   }
 
@@ -264,9 +252,7 @@ class _HomeState extends State<Home> {
       var school = await Firestore.instance.document(schools[0]['ref']).get();
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
-          schoolId: schools[0]['ref'],
-          schoolName: school.data["name"],
-          schoolRole: schools[0]['role']);
+          schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
       setState(() {
         title = school.data["name"];
         isLoaded = true;
@@ -290,6 +276,8 @@ class _HomeState extends State<Home> {
     }
   }
 
+  var _navigatedToSchoolList = false;
+
   updateSchool() async {
     print("updating schools");
 //    UserHelper.updateTopicSubscription();
@@ -303,10 +291,13 @@ class _HomeState extends State<Home> {
       setState(() {
         isLoaded = true;
       });
-      Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) => new SchoolList()),
-      );
+      if (!_navigatedToSchoolList) {
+        _navigatedToSchoolList = true;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SchoolList()),
+        );
+      }
       return;
     }
     String schoolName = await UserHelper.getSchoolName();
@@ -324,11 +315,9 @@ class _HomeState extends State<Home> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         model.setToken(_token);
         print("Building Home $isLoaded");
@@ -340,31 +329,29 @@ class _HomeState extends State<Home> {
           checkNewSchool();
         }
 
-        return new Scaffold(
+        return Scaffold(
           backgroundColor: Colors.white,
-          appBar: new BaseAppBar(
-            title: new Text(title,
-                textAlign: TextAlign.center,
-                style: new TextStyle(color: Colors.black)),
-            leading: new Container(
-              padding: new EdgeInsets.all(8.0),
-              child: new Image.asset('assets/images/logo.png'),
+          appBar: BaseAppBar(
+            title: Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+            leading: Container(
+              padding: EdgeInsets.all(8.0),
+              child: Image.asset('assets/images/logo.png'),
             ),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
             actions: <Widget>[
-              new PopupMenuButton<Choice>(
+              PopupMenuButton<Choice>(
                 onSelected: _select,
-                icon: new Icon(Icons.more_vert, color: Colors.grey.shade800),
+                icon: Icon(Icons.more_vert, color: Colors.grey.shade800),
                 itemBuilder: (BuildContext context) {
                   return choices.map((Choice choice) {
-                    return new PopupMenuItem<Choice>(
+                    return PopupMenuItem<Choice>(
                       value: choice,
-                      child: new Row(
+                      child: Row(
                         children: <Widget>[
-                          new Icon(choice.icon, color: Colors.grey.shade800),
-                          new SizedBox(width: 8.0),
-                          new Text(choice.title)
+                          Icon(choice.icon, color: Colors.grey.shade800),
+                          SizedBox(width: 8.0),
+                          Text(choice.title)
                         ],
                       ),
                     );
@@ -373,7 +360,7 @@ class _HomeState extends State<Home> {
               ),
             ],
           ),
-          body: new Dashboard(),
+          body: Dashboard(),
         );
       },
     );

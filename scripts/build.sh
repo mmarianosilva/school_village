@@ -46,3 +46,12 @@ flutter build ios --release --no-codesign --build-number="${BUILD_NUM}"
 echo "flutter bundle exec fastlane beta"
 cd ios && bundle update
 bundle exec fastlane beta
+
+
+#Build Andriod
+
+#cp ./scripts/dev/google-services.json ./android/app/google-services.json
+cd ..
+flutter build apk --release --build-number="${BUILD_NUM}"
+cd android && sudo fastlane add_plugin appcenter
+fastlane deploy_beta

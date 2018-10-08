@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
+import 'package:video_player/video_player.dart';
 
 typedef SendPressed(img, text);
 
@@ -22,6 +23,8 @@ class _InputFieldState extends State<InputField> {
   final TextEditingController inputController = TextEditingController();
   final SendPressed sendPressed;
   File image;
+  bool isVideoFile;
+  VideoPlayerController _controller;
 
   static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
 
@@ -32,38 +35,102 @@ class _InputFieldState extends State<InputField> {
     return _buildInput();
   }
 
-  _getImage(BuildContext context, ImageSource source) {
-    ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
-      if (image != null) saveImage(image);
-    });
+  _getImage(BuildContext context, ImageSource source, bool isVideo) {
+    if (!isVideo) {
+      ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
+        if (image != null) saveImage(image, isVideo);
+      });
+    } else {
+      ImagePicker.pickVideo(source: source).then((File video) {
+        if (video != null) saveImage(video, isVideo);
+      });
+    }
   }
 
-  void saveImage(File file) async {
+  initState() {
+    super.initState();
+//    _controller = VideoPlayerController.file(
+//      'http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
+//    )
+//      ..addListener(() {
+////        final bool isPlaying = _controller.value.isPlaying;
+////        if (isPlaying != _isPlaying) {
+////          setState(() {
+////            _isPlaying = isPlaying;
+////          });
+////        }
+//      });
+  }
+
+  void saveImage(File file, bool isVideoFile) async {
     setState(() {
+      this.isVideoFile = isVideoFile;
       image = file;
     });
   }
 
-
   _buildImagePreview() {
     if (image == null) return SizedBox();
-    return Container(
-      padding: EdgeInsets.all(4.0),
-      child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Image.file(image, height: 120.0),
-            SizedBox(width: 16.0),
-            GestureDetector(
-              onTap: () {
-                _removeImage();
-              },
-              child: Icon(Icons.remove_circle_outline, color: Colors.red),
-            )
-          ],
+
+    if (isVideoFile) {
+      return _buildVideoPreview();
+    }
+
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(4.0),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.file(image, height: 120.0),
+                SizedBox(width: 16.0),
+                GestureDetector(
+                  onTap: () {
+                    _removeImage();
+                  },
+                  child: Icon(Icons.remove_circle_outline, color: Colors.red),
+                )
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
+    );
+  }
+
+  _getVideoController() {
+    return VideoPlayerController.file(image)
+      ..addListener(() => {
+
+      })
+      ..initialize().then((_) => {});
+  }
+
+  _buildVideoPreview() {
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(4.0),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                VideoPlayer(_getVideoController()),
+                SizedBox(width: 16.0),
+                GestureDetector(
+                  onTap: () {
+                    _removeImage();
+                  },
+                  child: Icon(Icons.remove_circle_outline, color: Colors.red),
+                )
+              ],
+            ),
+          ),
+        ),
+        Center(child: Icon(Icons.play_circle_outline, color: Colors.grey.shade800))
+      ],
     );
   }
 
@@ -83,22 +150,19 @@ class _InputFieldState extends State<InputField> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 150.0,
+            height: 160.0,
             padding: EdgeInsets.all(10.0),
             child: Column(children: [
               Text(
                 'Pick an Image',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(
-                height: 10.0,
-              ),
               FlatButton(
                 textColor: SVColors.talkAroundAccent,
                 child: Text('Use Camera'),
                 onPressed: () {
                   Navigator.pop(context);
-                  _getImage(context, ImageSource.camera);
+                  _getImage(context, ImageSource.camera, false);
                 },
               ),
               FlatButton(
@@ -106,9 +170,32 @@ class _InputFieldState extends State<InputField> {
                 child: Text('Use Gallery'),
                 onPressed: () {
                   Navigator.pop(context);
-                  _getImage(context, ImageSource.gallery);
+                  _getImage(context, ImageSource.gallery, false);
                 },
-              )
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+//              Text(
+//                'Pick a Video',
+//                style: TextStyle(fontWeight: FontWeight.bold),
+//              ),
+//              FlatButton(
+//                textColor: SVColors.talkAroundAccent,
+//                child: Text('Use Camera'),
+//                onPressed: () {
+//                  Navigator.pop(context);
+//                  _getImage(context, ImageSource.camera, true);
+//                },
+//              ),
+//              FlatButton(
+//                textColor: SVColors.talkAroundAccent,
+//                child: Text('Use Gallery'),
+//                onPressed: () {
+//                  Navigator.pop(context);
+//                  _getImage(context, ImageSource.gallery, true);
+//                },
+//              )
             ]),
           );
         });
@@ -140,25 +227,27 @@ class _InputFieldState extends State<InputField> {
               shape: RoundedRectangleBorder(borderRadius: borderRadius),
               color: SVColors.talkAroundAccent,
               child: Container(
+                  height: 40.0,
                   child: TextField(
-                controller: inputController,
-                maxLines: 1,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    hintStyle: TextStyle(color: Colors.grey.shade50),
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        sendPressed(image, inputController.text);
-                      },
-                    ),
-                    hintText: "Type Message..."),
-              )),
+                    controller: inputController,
+                    maxLines: 1,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                        hintStyle: TextStyle(color: Colors.grey.shade50),
+                        fillColor: Colors.transparent,
+                        filled: true,
+                        border: InputBorder.none,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            sendPressed(image, inputController.text);
+                          },
+                        ),
+                        hintText: "Type Message..."),
+                  )),
             ),
           ),
         )
