@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -58,12 +59,14 @@ class _HomeState extends State<Home> {
     final bundleDir = 'assets/audio';
     final assetName = 'alarm.wav';
     final localDir = await getTemporaryDirectory();
-    final localAssetFile = (await copyLocalAsset(localDir, bundleDir, assetName)).path;
+    final localAssetFile =
+        (await copyLocalAsset(localDir, bundleDir, assetName)).path;
     _localAssetFile = localAssetFile;
     print(_localAssetFile);
   }
 
-  Future<File> copyLocalAsset(Directory localDir, String bundleDir, String assetName) async {
+  Future<File> copyLocalAsset(Directory localDir, String bundleDir,
+      String assetName) async {
     final localAssetFile = File('${localDir.path}/$assetName');
     if (!(await localAssetFile.exists())) {
       final data = await rootBundle.load('$bundleDir/$assetName');
@@ -89,7 +92,8 @@ class _HomeState extends State<Home> {
         _onNotification(message);
       },
     );
-    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.requestNotificationPermissions(
+        IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
       setState(() {
         _token = token;
@@ -98,9 +102,20 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _onNotification(Map<String, dynamic> message) {
-    print('onNotification');
-    platform.invokeMethod('playBackgroundAudio');
+  _onNotification(Map<String, dynamic> data) {
+    if (Platform.isIOS) {
+      platform.invokeMethod('playBackgroundAudio');
+    }
+
+    Map<String, dynamic> message;
+    print(message);
+    print(message["data"]);
+    if (data["data"] != null) {
+      message = new Map<String, dynamic>.from(data["data"]);
+    } else {
+      message = data;
+    }
+
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
@@ -112,15 +127,16 @@ class _HomeState extends State<Home> {
   }
 
   _showHotLineMessageDialog(message) {
+    print(message);
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(message['title']),
+          title: Text(message['title'] ?? ''),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[Text(message['body'])],
+              children: <Widget>[Text(message['body'] ?? '')],
             ),
           ),
           actions: <Widget>[
@@ -148,9 +164,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-
   _goToSecurityChat(String conversationId) async {
-    if (['school_admin', 'school_security'].contains((await UserHelper.getSelectedSchoolRole()))) {
+    if (['school_admin', 'school_security']
+        .contains((await UserHelper.getSelectedSchoolRole()))) {
       TalkAround.navigate(conversationId, context);
     }
   }
@@ -161,10 +177,10 @@ class _HomeState extends State<Home> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(message['title']),
+          title: Text(message['title'] ?? ''),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[Text(message['body'])],
+              children: <Widget>[Text(message['body'] ?? '')],
             ),
           ),
           actions: <Widget>[
@@ -197,7 +213,10 @@ class _HomeState extends State<Home> {
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
     DocumentSnapshot notification;
-    Firestore.instance.document("/schools/$schoolId/notifications/$notificationId").get().then((document) {
+    Firestore.instance
+        .document("/schools/$schoolId/notifications/$notificationId")
+        .get()
+        .then((document) {
       notification = document;
     });
     return showDialog<Null>(
@@ -205,10 +224,10 @@ class _HomeState extends State<Home> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(message['title']),
+          title: Text(message['title'] ?? ''),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[Text(message['body'])],
+              children: <Widget>[Text(message['body']) ?? ''],
             ),
           ),
           actions: <Widget>[
@@ -220,7 +239,8 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => NotificationDetail(notification: notification),
+                    builder: (context) =>
+                        NotificationDetail(notification: notification),
                   ),
                 );
               },
@@ -252,7 +272,9 @@ class _HomeState extends State<Home> {
       var school = await Firestore.instance.document(schools[0]['ref']).get();
       print(school.data["name"]);
       await UserHelper.setSelectedSchool(
-          schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
+          schoolId: schools[0]['ref'],
+          schoolName: school.data["name"],
+          schoolRole: schools[0]['role']);
       setState(() {
         title = school.data["name"];
         isLoaded = true;
@@ -332,7 +354,9 @@ class _HomeState extends State<Home> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: BaseAppBar(
-            title: Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+            title: Text(title,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black)),
             leading: Container(
               padding: EdgeInsets.all(8.0),
               child: Image.asset('assets/images/logo.png'),
