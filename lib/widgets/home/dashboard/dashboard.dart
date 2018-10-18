@@ -172,7 +172,8 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.settings, size: 36.0, color: Colors.grey.shade900),
+                  child: Icon(Icons.settings,
+                      size: 36.0, color: Colors.grey.shade900),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -197,7 +198,8 @@ class _DashboardState extends State<Dashboard> {
     return FutureBuilder(
         future: model.getAlertGroups(ref.split("/")[1]),
         builder: (context, alertGroups) {
-          if (alertGroups.connectionState != ConnectionState.done || alertGroups.data.length == 0) {
+          if (alertGroups.connectionState != ConnectionState.done ||
+              alertGroups.data.length == 0) {
             return SizedBox();
           }
           return Column(
@@ -211,7 +213,8 @@ class _DashboardState extends State<Dashboard> {
                       width: 48.0,
                       height: 48.0,
                       child: Center(
-                        child: Icon(Icons.notifications, size: 36.0, color: Colors.red.shade800),
+                        child: Icon(Icons.notifications,
+                            size: 36.0, color: Colors.red.shade800),
                       ),
                     ),
                     SizedBox(width: 12.0),
@@ -249,7 +252,8 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.message, size: 36.0, color: Theme.of(context).accentColor),
+                  child: Icon(Icons.message,
+                      size: 36.0, color: Theme.of(context).accentColor),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -280,17 +284,21 @@ class _DashboardState extends State<Dashboard> {
         GestureDetector(
           onTap: () {
             if (snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
-              _showPDF(context, snapshot.data.data["documents"][index - 2]["location"]);
+              _showPDF(context,
+                  snapshot.data.data["documents"][index - 2]["location"]);
             } else {
-              _launchURL(snapshot.data.data["documents"][index - 2]["location"]);
+              _launchURL(
+                  snapshot.data.data["documents"][index - 2]["location"]);
             }
           },
           child: Row(
             children: <Widget>[
               FutureBuilder(
                   future: FileHelper.getFileFromStorage(
-                      url: snapshot.data.data["documents"][index - 2]["icon"], context: context),
-                  builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+                      url: snapshot.data.data["documents"][index - 2]["icon"],
+                      context: context),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<File> snapshot) {
                     if (snapshot.data == null) {
                       return Image.asset('assets/images/logo.png', width: 48.0);
                     }
@@ -348,7 +356,8 @@ class _DashboardState extends State<Dashboard> {
       child: Column(
         children: <Widget>[
           Text("Anonymous Safety Hotline",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center),
           Image.asset(
             'assets/images/hotline_header.png',
             width: 160.0,
@@ -357,7 +366,10 @@ class _DashboardState extends State<Dashboard> {
           Text(
             "Safety is Everybody's Business!\nYou can make a difference",
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0, color: Constants.hotLineBlue),
+            style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16.0,
+                color: Constants.hotLineBlue),
           )
         ],
       ),
@@ -381,7 +393,8 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.record_voice_over, size: 36.0, color: Colors.green.shade700),
+                  child: Icon(Icons.record_voice_over,
+                      size: 36.0, color: Colors.green.shade700),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -406,11 +419,12 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildAlertButton() {
-    if (role == 'school_student') {
+    if (role == 'school_student' || role == 'school_family') {
       return _buildHotlineButton();
     }
     return GestureDetector(
-      child: Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
+      child:
+          Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
       onTap: sendAlert,
     );
   }
@@ -420,7 +434,10 @@ class _DashboardState extends State<Dashboard> {
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         if (ref != null && ref != '') {
-          model.getAlertGroups(this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '').then((alerts) {
+          model
+              .getAlertGroups(
+                  this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '')
+              .then((alerts) {
             print("User");
             print(alerts);
           });
@@ -437,12 +454,14 @@ class _DashboardState extends State<Dashboard> {
         }
 
         if (!isLoaded || !hasSchool) {
-          return Material(child: Text("Please Select A School from Settings Tab"));
+          return Material(
+              child: Text("Please Select A School from Settings Tab"));
         }
 
         return FutureBuilder(
             future: Firestore.instance.document(ref).get(),
-            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
                   return Text('Loading...');
@@ -463,16 +482,20 @@ class _DashboardState extends State<Dashboard> {
                           if (index == 1) {
                             return _buildSecurityOptions();
                           }
-                          if (index == snapshot.data.data["documents"].length + 2) {
+                          if (index ==
+                              snapshot.data.data["documents"].length + 2) {
                             return _buildMessagesOption(model);
                           }
-                          if (index == snapshot.data.data["documents"].length + 3) {
+                          if (index ==
+                              snapshot.data.data["documents"].length + 3) {
                             return _buildNotificationsOption(model);
                           }
-                          if (index == snapshot.data.data["documents"].length + 4) {
+                          if (index ==
+                              snapshot.data.data["documents"].length + 4) {
                             return _buildHotlineMessages();
                           }
-                          if (index == snapshot.data.data["documents"].length + 5) {
+                          if (index ==
+                              snapshot.data.data["documents"].length + 5) {
                             return _buildSettingsOption();
                           }
                           return _buildDocumentOption(snapshot, index);

@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/constants.dart';
@@ -124,7 +123,7 @@ class _ChatState extends State<Chat> {
   }
 
   _getHeaderItem(day) {
-    var time = DateTime.fromMillisecondsSinceEpoch(day * Constants.oneDay);
+    var time = DateTime.fromMillisecondsSinceEpoch(day);
     return MessageHolder(getHeaderDate(time.millisecondsSinceEpoch), null);
   }
 
@@ -136,7 +135,7 @@ class _ChatState extends State<Chat> {
     if (messages == null) {
       messages = List();
       messageMap[day] = messages;
-      messageList.insert(0, _getHeaderItem(day));
+      messageList.insert(0, _getHeaderItem(shot['createdAt']));
       messageList.insert(0, message);
     } else {
       messageList.insert(0, message);

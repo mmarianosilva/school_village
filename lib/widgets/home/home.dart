@@ -65,8 +65,8 @@ class _HomeState extends State<Home> {
     print(_localAssetFile);
   }
 
-  Future<File> copyLocalAsset(Directory localDir, String bundleDir,
-      String assetName) async {
+  Future<File> copyLocalAsset(
+      Directory localDir, String bundleDir, String assetName) async {
     final localAssetFile = File('${localDir.path}/$assetName');
     if (!(await localAssetFile.exists())) {
       final data = await rootBundle.load('$bundleDir/$assetName');
@@ -108,8 +108,7 @@ class _HomeState extends State<Home> {
     }
 
     Map<String, dynamic> message;
-    print(message);
-    print(message["data"]);
+
     if (data["data"] != null) {
       message = new Map<String, dynamic>.from(data["data"]);
     } else {
@@ -119,7 +118,7 @@ class _HomeState extends State<Home> {
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
-      return _goToSecurityChat(message['conversationId']);
+      return _goToSecurityChat(message['conversationId'], message['title']);
     } else if (message["type"] == "hotline") {
       return _showHotLineMessageDialog(message);
     }
@@ -164,10 +163,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _goToSecurityChat(String conversationId) async {
+  _goToSecurityChat(String conversationId, String title) async {
     if (['school_admin', 'school_security']
         .contains((await UserHelper.getSelectedSchoolRole()))) {
-      TalkAround.navigate(conversationId, context);
+      if (TalkAround.navigate(conversationId, context)) {
+        TalkAround.triggerNewMessage(conversationId, title);
+      }
     }
   }
 
