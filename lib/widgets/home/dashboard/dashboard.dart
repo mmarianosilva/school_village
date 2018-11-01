@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/widgets/incident_report/incident_report.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
@@ -334,17 +335,29 @@ class _DashboardState extends State<Dashboard> {
     print("Owner $isOwner Role $role");
     if (securityRoles.contains(role)) {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/security_btn.png', width: 48.0),
+        child: Image.asset('assets/images/security_btn.png', width: 80.0),
         onTap: openTalk,
       ));
     }
     if (role == "school_admin") {
       widgets.add(SizedBox(width: 20.0));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: 48.0),
+        child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
         onTap: sendBroadcast,
       ));
     }
+
+//    widgets.add(GestureDetector(
+//      child: Icon(Icons.assignment_turned_in),
+//      onTap: () {
+//        Navigator.push(
+//          context,
+//          MaterialPageRoute(
+//              builder: (context) => IncidentReport()),
+//        );
+//      },
+//    ));
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: widgets,

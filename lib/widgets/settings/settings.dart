@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
-import '../../util/constants.dart';
 import '../../model/main_model.dart';
 import '../../util/token_helper.dart';
 import 'package:scoped_model/scoped_model.dart';
