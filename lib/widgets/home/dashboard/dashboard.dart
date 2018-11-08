@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:school_village/widgets/incident_report/incident_report.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
 import '../../alert/alert.dart';
 import '../../hotline/hotline.dart';
-import '../../select_group/select_group.dart';
 import '../../talk_around/talk_around.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../util/file_helper.dart';
-import '../../../util/analytics_helper.dart';
 import 'dart:io';
 import '../../settings/settings.dart';
 import '../../notifications/notifications.dart';
@@ -62,6 +59,7 @@ class _DashboardState extends State<Dashboard> {
       }
       isLoaded = true;
     });
+    TalkAround.role = userRole;
   }
 
   _updateSchool() async {

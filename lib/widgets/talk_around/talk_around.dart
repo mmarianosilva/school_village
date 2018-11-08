@@ -14,6 +14,7 @@ class TalkAround extends StatefulWidget {
 
   static Route _route;
   static TalkAround _talkAround;
+  static String role;
 
   static navigate(conversationId, context) {
     if (_route != null && _route.isCurrent) {
@@ -93,8 +94,8 @@ class _TalkAroundState extends State<TalkAround>
     return conversationId == 'security-admin' ? 1 : 0;
   }
 
-  getTabName(id){
-    if(id == 'security-admin'){
+  getTabName(id) {
+    if (id == 'security-admin') {
       return 'Security & Admin';
     }
     return 'Security';
@@ -129,7 +130,8 @@ class _TalkAroundState extends State<TalkAround>
     if (showNewMessage)
       return GestureDetector(
           onTap: () {
-            tabController.index = newMessageConversationId == 'security-admin' ? 1 : 0;
+            tabController.index =
+                newMessageConversationId == 'security-admin' ? 1 : 0;
           },
           child: Container(
               width: MediaQuery.of(context).size.width,
@@ -231,11 +233,15 @@ class _TalkAroundState extends State<TalkAround>
                   controller: tabController,
                   children: [
                     Chat(
-                        conversation: _securityConversation,
-                        user: _userSnapshot),
+                      conversation: _securityConversation,
+                      user: _userSnapshot,
+                      showInput: TalkAround.role == 'school_security',
+                    ),
                     Chat(
-                        conversation: _securityAdminConversation,
-                        user: _userSnapshot)
+                      conversation: _securityAdminConversation,
+                      user: _userSnapshot,
+                      showInput: TalkAround.role == 'school_admin',
+                    )
                   ],
                 ),
               ),

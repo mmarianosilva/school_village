@@ -14,17 +14,20 @@ import 'package:firebase_storage/firebase_storage.dart';
 class Chat extends StatefulWidget {
   final String conversation;
   final DocumentSnapshot user;
+  final bool showInput;
 
-  Chat({Key key, this.conversation, this.user}) : super(key: key);
+  Chat({Key key, this.conversation, this.user, this.showInput})
+      : super(key: key);
 
   @override
-  createState() => _ChatState(conversation, user);
+  createState() => _ChatState(conversation, user, this.showInput);
 }
 
 class _ChatState extends State<Chat> {
   static FirebaseStorage storage = FirebaseStorage();
   final String conversation;
   final DocumentSnapshot user;
+  final bool showInput;
   final Firestore firestore = Firestore.instance;
   Location _location = Location();
   List<MessageHolder> messageList = List();
@@ -36,7 +39,7 @@ class _ChatState extends State<Chat> {
 
   InputField inputField;
 
-  _ChatState(this.conversation, this.user);
+  _ChatState(this.conversation, this.user, this.showInput);
 
   @override
   initState() {
@@ -67,14 +70,18 @@ class _ChatState extends State<Chat> {
     if (text == null || text.trim() == '') {
       return;
     }
-    CollectionReference collection = Firestore.instance.collection('$conversation/messages');
+    CollectionReference collection =
+        Firestore.instance.collection('$conversation/messages');
     final DocumentReference document = collection.document();
     var path = '';
     if (image != null) {
       _showLoading();
-      path = '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
+      path =
+          '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1 ? lookupMimeType(image.path).split("/")[1] : type;
+      type = lookupMimeType(image.path).split("/").length > 1
+          ? lookupMimeType(image.path).split("/")[1]
+          : type;
       path = path + "." + type;
       print(path);
       await uploadFile(path, image);
@@ -119,7 +126,9 @@ class _ChatState extends State<Chat> {
   static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
 
   _convertDateToKey(createdAt) {
-    return DateTime.fromMillisecondsSinceEpoch(createdAt).millisecondsSinceEpoch ~/ Constants.oneDay;
+    return DateTime.fromMillisecondsSinceEpoch(createdAt)
+            .millisecondsSinceEpoch ~/
+        Constants.oneDay;
   }
 
   _getHeaderItem(day) {
@@ -157,7 +166,11 @@ class _ChatState extends State<Chat> {
   }
 
   _handleMessageCollection() {
-    firestore.collection("$conversation/messages").orderBy("createdAt").snapshots().listen((data) {
+    firestore
+        .collection("$conversation/messages")
+        .orderBy("createdAt")
+        .snapshots()
+        .listen((data) {
       _handleDocumentChanges(data.documentChanges);
     });
   }
@@ -220,11 +233,16 @@ class _ChatState extends State<Chat> {
       Expanded(
         child: Container(color: Colors.white, child: _getScreen()),
       ),
-      Container(
-        color: Colors.white,
-        padding: EdgeInsets.only(bottom: 14.0),
-        child: inputField,
-      )
+      this.showInput
+          ? Container(
+              color: Colors.white,
+              padding: EdgeInsets.only(bottom: 14.0),
+              child: inputField,
+            )
+          : SizedBox(
+              width: 0.0,
+              height: 10.0
+            )
     ]);
   } //modified
 
