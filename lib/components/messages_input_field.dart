@@ -7,7 +7,7 @@ import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:video_player/video_player.dart';
 
-typedef SendPressed(img, text);
+typedef SendPressed(img, text, isVideo);
 
 class InputField extends StatefulWidget {
   final SendPressed sendPressed;
@@ -26,7 +26,8 @@ class _InputFieldState extends State<InputField> {
   bool isVideoFile;
   VideoPlayerController _controller;
 
-  static const borderRadius = const BorderRadius.all(const Radius.circular(45.0));
+  static const borderRadius =
+      const BorderRadius.all(const Radius.circular(45.0));
 
   _InputFieldState({this.sendPressed});
 
@@ -47,26 +48,12 @@ class _InputFieldState extends State<InputField> {
     }
   }
 
-  initState() {
-    super.initState();
-//    _controller = VideoPlayerController.file(
-//      'http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
-//    )
-//      ..addListener(() {
-////        final bool isPlaying = _controller.value.isPlaying;
-////        if (isPlaying != _isPlaying) {
-////          setState(() {
-////            _isPlaying = isPlaying;
-////          });
-////        }
-//      });
-  }
-
   void saveImage(File file, bool isVideoFile) async {
     setState(() {
       this.isVideoFile = isVideoFile;
       image = file;
     });
+    _initVideoController();
   }
 
   _buildImagePreview() {
@@ -100,12 +87,11 @@ class _InputFieldState extends State<InputField> {
     );
   }
 
-  _getVideoController() {
-    return VideoPlayerController.file(image)
-      ..addListener(() => {
-
-      })
-      ..initialize().then((_) => {});
+  _initVideoController() {
+    _controller = VideoPlayerController.file(image);
+    _controller.initialize().then((_) {
+      setState(() {});
+    });
   }
 
   _buildVideoPreview() {
@@ -117,7 +103,10 @@ class _InputFieldState extends State<InputField> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                VideoPlayer(_getVideoController()),
+                Container(
+//                    width: MediaQuery.of(context).size.width - 48,
+                    height: 120,
+                    child: _buildVideoView()),
                 SizedBox(width: 16.0),
                 GestureDetector(
                   onTap: () {
@@ -129,9 +118,22 @@ class _InputFieldState extends State<InputField> {
             ),
           ),
         ),
-        Center(child: Icon(Icons.play_circle_outline, color: Colors.grey.shade800))
       ],
     );
+  }
+
+  _buildVideoView() {
+    return Center(
+        child: _controller.value.initialized
+            ? GestureDetector(
+                onTap: () {
+                  print('onVideoTap');
+                },
+                child: AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                ))
+            : Container());
   }
 
   clearState() {
@@ -150,7 +152,7 @@ class _InputFieldState extends State<InputField> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 160.0,
+            height: 280.0,
             padding: EdgeInsets.all(10.0),
             child: Column(children: [
               Text(
@@ -176,26 +178,26 @@ class _InputFieldState extends State<InputField> {
               SizedBox(
                 height: 20.0,
               ),
-//              Text(
-//                'Pick a Video',
-//                style: TextStyle(fontWeight: FontWeight.bold),
-//              ),
-//              FlatButton(
-//                textColor: SVColors.talkAroundAccent,
-//                child: Text('Use Camera'),
-//                onPressed: () {
-//                  Navigator.pop(context);
-//                  _getImage(context, ImageSource.camera, true);
-//                },
-//              ),
-//              FlatButton(
-//                textColor: SVColors.talkAroundAccent,
-//                child: Text('Use Gallery'),
-//                onPressed: () {
-//                  Navigator.pop(context);
-//                  _getImage(context, ImageSource.gallery, true);
-//                },
-//              )
+              Text(
+                'Pick a Video',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              FlatButton(
+                textColor: SVColors.talkAroundAccent,
+                child: Text('Use Camera'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _getImage(context, ImageSource.camera, true);
+                },
+              ),
+              FlatButton(
+                textColor: SVColors.talkAroundAccent,
+                child: Text('Use Gallery'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _getImage(context, ImageSource.gallery, true);
+                },
+              )
             ]),
           );
         });
@@ -215,14 +217,13 @@ class _InputFieldState extends State<InputField> {
                 ),
                 onPressed: () => _openImagePicker(context))),
         Card(
-          elevation: 10.0,
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
           ),
           child: Container(
-            color: Colors.white,
             width: MediaQuery.of(context).size.width - 104,
             child: Card(
+              elevation: 10.0,
               margin: EdgeInsets.all(1.5),
               shape: RoundedRectangleBorder(borderRadius: borderRadius),
               color: SVColors.talkAroundAccent,
@@ -243,7 +244,7 @@ class _InputFieldState extends State<InputField> {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            sendPressed(image, inputController.text);
+                            sendPressed(image, inputController.text, isVideoFile);
                           },
                         ),
                         hintText: "Type Message..."),

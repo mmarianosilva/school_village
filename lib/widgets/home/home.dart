@@ -49,20 +49,28 @@ class _HomeState extends State<Home> {
   String _token;
   AudioPlayer audioPlugin;
   String _localAssetFile;
+  String _messageAlertAssetFile;
 
   Future playAlarm() async {
     await copyLocalAssets();
     await audioPlugin.play(_localAssetFile, isLocal: true);
   }
 
+  Future playMessageAlert() async {
+    await copyLocalAssets();
+    await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
+  }
+
   copyLocalAssets() async {
     final bundleDir = 'assets/audio';
     final assetName = 'alarm.wav';
+    final assetName2 = 'message.wav';
     final localDir = await getTemporaryDirectory();
-    final localAssetFile =
+    _localAssetFile =
         (await copyLocalAsset(localDir, bundleDir, assetName)).path;
-    _localAssetFile = localAssetFile;
-    print(_localAssetFile);
+
+    _messageAlertAssetFile =
+        (await copyLocalAsset(localDir, bundleDir, assetName2)).path;
   }
 
   Future<File> copyLocalAsset(
@@ -115,6 +123,7 @@ class _HomeState extends State<Home> {
       message = data;
     }
 
+    playMessageAlert();
     if (message["type"] == "broadcast") {
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {

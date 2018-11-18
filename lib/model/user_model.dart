@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../util/user_helper.dart';
 import 'dart:async';
 
-class UserModel extends Model {
+mixin UserModel on Model {
 
   DocumentSnapshot _user;
   String _token = '';

@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:school_village/components/icon_button.dart';

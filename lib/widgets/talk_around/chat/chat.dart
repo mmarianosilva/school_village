@@ -46,7 +46,7 @@ class _ChatState extends State<Chat> {
     _handleMessageCollection();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    inputField = InputField(sendPressed: (image, text) {
+    inputField = InputField(sendPressed: (image, text, isVideo) {
       _handleSubmitted(image, text);
     });
 
@@ -103,7 +103,14 @@ class _ChatState extends State<Chat> {
   uploadFile(String path, File file) async {
     final StorageReference ref = storage.ref().child(path);
     final StorageUploadTask uploadTask = ref.putFile(file);
-    final Uri downloadUrl = (await uploadTask.future).downloadUrl;
+//    final Uri downloadUrl = (await uploadTask.future).downloadUrl;
+
+    String downloadUrl;
+    await uploadTask.onComplete.then((val) {
+      val.ref.getDownloadURL().then((v) {
+        downloadUrl = v; //Val here is Already String
+      });
+    });
     return downloadUrl;
   }
 
@@ -239,10 +246,7 @@ class _ChatState extends State<Chat> {
               padding: EdgeInsets.only(bottom: 14.0),
               child: inputField,
             )
-          : SizedBox(
-              width: 0.0,
-              height: 10.0
-            )
+          : SizedBox(width: 0.0, height: 10.0)
     ]);
   } //modified
 

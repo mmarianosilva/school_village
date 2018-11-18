@@ -53,7 +53,9 @@ class _MessagesState extends State<Messages> {
       var keys = user.data["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user.data["associatedSchools"][schoolId]["groups"][keys.elementAt(i)] == true) {
+        if (user.data["associatedSchools"][schoolId]["groups"]
+                [keys.elementAt(i)] ==
+            true) {
           groups.add(keys.elementAt(i));
         }
       }
@@ -81,7 +83,9 @@ class _MessagesState extends State<Messages> {
   }
 
   _convertDateToKey(createdAt) {
-    return DateTime.fromMillisecondsSinceEpoch(createdAt).millisecondsSinceEpoch ~/ Constants.oneDay;
+    return DateTime.fromMillisecondsSinceEpoch(createdAt)
+            .millisecondsSinceEpoch ~/
+        Constants.oneDay;
   }
 
   _getHeaderItem(day) {
@@ -113,8 +117,8 @@ class _MessagesState extends State<Messages> {
   initState() {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    inputField = InputField(sendPressed: (image, text) {
-      _sendMessage(image, text);
+    inputField = InputField(sendPressed: (image, text, isVideo) {
+      _sendMessage(image, text, isVideo);
     });
 
     super.initState();
@@ -138,7 +142,11 @@ class _MessagesState extends State<Messages> {
   }
 
   _handleMessageCollection() {
-    Firestore.instance.collection("schools/$_schoolId/broadcasts").orderBy("createdAt").snapshots().listen((data) {
+    Firestore.instance
+        .collection("schools/$_schoolId/broadcasts")
+        .orderBy("createdAt")
+        .snapshots()
+        .listen((data) {
       _handleDocumentChanges(data.documentChanges);
     });
   }
@@ -197,6 +205,7 @@ class _MessagesState extends State<Messages> {
             for (var value in (document['groups'].keys)) {
               groups.add(value);
             }
+            print(document['isVideo'] ?? false);
 
             return BroadcastMessage(
               text: document['body'],
@@ -205,6 +214,7 @@ class _MessagesState extends State<Messages> {
               groups: groups,
               imageUrl: document['image'],
               message: document,
+              isVideo: document['isVideo'] ?? false,
             );
           });
     }
@@ -236,7 +246,7 @@ class _MessagesState extends State<Messages> {
         });
   }
 
-  _sendMessage(File image, text) {
+  _sendMessage(File image, text, isVideo) {
     if (text.length < 10) {
       showErrorDialog("Text length should be at least 10 characters");
       return;
@@ -263,7 +273,7 @@ class _MessagesState extends State<Messages> {
                 child: Text('Yes'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _saveBroadcast(image,text);
+                  _saveBroadcast(image, text, isVideo);
                 },
               )
             ],
@@ -275,22 +285,29 @@ class _MessagesState extends State<Messages> {
 
   _hideLoading() {}
 
-  _saveBroadcast(image, alertBody) async {
+  _saveBroadcast(image, alertBody, bool isVideo) async {
     final broadcastPath = 'schools/$_schoolId/broadcasts';
-    CollectionReference collection = Firestore.instance.collection(broadcastPath);
+    CollectionReference collection =
+        Firestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.document();
 
     var path = '';
     if (image != null) {
       _showLoading();
-      path = '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
+      path =
+          '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1 ? lookupMimeType(image.path).split("/")[1] : type;
+      type = lookupMimeType(image.path).split("/").length > 1
+          ? lookupMimeType(image.path).split("/")[1]
+          : type;
+
       path = path + "." + type;
       print(path);
       await uploadFile(path, image);
       _hideLoading();
     }
+
+    print('saveBroadcast is vidoe ' + isVideo.toString());
 
     document.setData(<String, dynamic>{
       'body': alertBody,
@@ -301,15 +318,24 @@ class _MessagesState extends State<Messages> {
       'image': image == null ? null : path,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone': phone,
+      'isVideo': isVideo
     });
-  //FIXME: bad practice
+    //FIXME: bad practice
     inputField.key.currentState.clearState();
   }
 
   uploadFile(String path, File file) async {
     final StorageReference ref = storage.ref().child(path);
     final StorageUploadTask uploadTask = ref.putFile(file);
-    final Uri downloadUrl = (await uploadTask.future).downloadUrl;
+
+    String downloadUrl;
+    await uploadTask.onComplete.then((val) {
+      val.ref.getDownloadURL().then((v) {
+        downloadUrl = v; //Val here is Already String
+      });
+    });
+
+//    final Uri downloadUrl = (await uploadTask.onComplete).downloadUrl;
     return downloadUrl;
   }
 
@@ -321,7 +347,9 @@ class _MessagesState extends State<Messages> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: BaseAppBar(
-          title: Text('Messages', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+          title: Text('Messages',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),

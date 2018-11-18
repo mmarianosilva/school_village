@@ -1,6 +1,9 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:school_village/components/video_view.dart';
 import 'dart:typed_data';
+
+import 'package:video_player/video_player.dart';
 
 typedef void ProgressImageTapCallBack(String imgUrl);
 
@@ -9,12 +12,26 @@ class ProgressImage extends StatefulWidget {
   final String firebasePath;
   final double height, width;
   final ProgressImageTapCallBack onTap;
+  final bool isVideo;
 
-  ProgressImage({Key key, this.url, this.firebasePath, this.height, this.width, this.onTap}) : super(key: key);
+  ProgressImage({Key key,
+    this.url,
+    this.firebasePath,
+    this.height,
+    this.width,
+    this.onTap,
+    this.isVideo})
+      : super(key: key);
 
   @override
   createState() =>
-      _ProgressImageState(url: url, firebasePath: firebasePath, height: height, width: width, onTap: onTap);
+      _ProgressImageState(
+          url: url,
+          firebasePath: firebasePath,
+          height: height,
+          width: width,
+          onTap: onTap,
+          isVideo: isVideo);
 }
 
 class _ProgressImageState extends State<ProgressImage> {
@@ -24,8 +41,14 @@ class _ProgressImageState extends State<ProgressImage> {
   final double height, width;
   final ProgressImageTapCallBack onTap;
   var isDisposed = false;
+  final bool isVideo;
 
-  _ProgressImageState({this.url, this.firebasePath, this.height, this.width, this.onTap});
+  _ProgressImageState({this.url,
+    this.firebasePath,
+    this.height,
+    this.width,
+    this.onTap,
+    this.isVideo});
 
   static FirebaseStorage storage = FirebaseStorage();
 
@@ -66,9 +89,19 @@ class _ProgressImageState extends State<ProgressImage> {
             child: CircularProgressIndicator(),
           ));
     }
+    if (this.isVideo) {
+      return GestureDetector(
+        child: VideoView(url: url, height: height, width: width), onTap: () {
+        this.onTap(url);
+      });
+    }
+
     return GestureDetector(
         child: FadeInImage.memoryNetwork(
-            placeholder: kTransparentImage, image: url, height: height, fit: BoxFit.fitHeight),
+            placeholder: kTransparentImage,
+            image: url,
+            height: height,
+            fit: BoxFit.fitHeight),
         onTap: () {
           this.onTap(url);
         });

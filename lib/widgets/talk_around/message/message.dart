@@ -1,5 +1,5 @@
+import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view_scale_boundary.dart';
 import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/date_formatter.dart';
@@ -107,13 +107,14 @@ class ChatMessage extends StatelessWidget {
   }
 
   _openImage(context, imageUrl) {
+
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => new ImageViewScreen(
                 imageUrl,
-                minScale: PhotoViewScaleBoundary.contained,
-                maxScale: PhotoViewScaleBoundary.covered,
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered
               )),
     );
   }
