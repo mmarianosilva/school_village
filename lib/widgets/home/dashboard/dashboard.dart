@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/widgets/incident_report/incident_report.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
@@ -212,14 +213,13 @@ class _DashboardState extends State<Dashboard> {
                       width: 48.0,
                       height: 48.0,
                       child: Center(
-                        child: Icon(Icons.notifications,
-                            size: 36.0, color: Colors.red.shade800),
+                        child: Image.asset('assets/images/alert.png', width: 80.0, height: 80.0),
                       ),
                     ),
                     SizedBox(width: 12.0),
                     Expanded(
                         child: Text(
-                      "Notifications",
+                      "Alerts",
                       textAlign: TextAlign.left,
                       style: TextStyle(fontSize: 16.0),
                     )),
@@ -251,8 +251,7 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.message,
-                      size: 36.0, color: Theme.of(context).accentColor),
+                  child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -282,19 +281,19 @@ class _DashboardState extends State<Dashboard> {
         const SizedBox(height: 14.0),
         GestureDetector(
           onTap: () {
-            if (snapshot.data.data["documents"][index - 2]["type"] == "pdf") {
+            if (snapshot.data.data["documents"][index - 3]["type"] == "pdf") {
               _showPDF(context,
-                  snapshot.data.data["documents"][index - 2]["location"]);
+                  snapshot.data.data["documents"][index - 3]["location"]);
             } else {
               _launchURL(
-                  snapshot.data.data["documents"][index - 2]["location"]);
+                  snapshot.data.data["documents"][index - 3]["location"]);
             }
           },
           child: Row(
             children: <Widget>[
               FutureBuilder(
                   future: FileHelper.getFileFromStorage(
-                      url: snapshot.data.data["documents"][index - 2]["icon"],
+                      url: snapshot.data.data["documents"][index - 3]["icon"],
                       context: context),
                   builder:
                       (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -306,7 +305,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data.data["documents"][index - 2]["title"],
+                snapshot.data.data["documents"][index - 3]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),
@@ -345,20 +344,57 @@ class _DashboardState extends State<Dashboard> {
       ));
     }
 
-//    widgets.add(GestureDetector(
-//      child: Icon(Icons.assignment_turned_in),
-//      onTap: () {
-//        Navigator.push(
-//          context,
-//          MaterialPageRoute(
-//              builder: (context) => IncidentReport()),
-//        );
-//      },
-//    ));
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: widgets,
+    );
+  }
+
+  _buildIncidentReport() {
+    if (role == 'school_student') {
+      return SizedBox();
+    }
+
+    return Column(
+      children: <Widget>[
+        const SizedBox(height: 14.0),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => IncidentReport()),
+            );
+          },
+          child: Row(
+            children: <Widget>[
+              //                                Image.asset('assets/images/logo.png', width: 48.0),
+              Container(
+                width: 55.0,
+                height: 48.0,
+                child: Center(
+                  child: Image.asset('assets/images/feature_image.png',
+                      width: 48.0, height: 48.0),
+                ),
+              ),
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
+                "Incident Report",
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 16.0),
+              )),
+              Icon(Icons.chevron_right)
+            ],
+          ),
+        ),
+        const SizedBox(height: 14.0),
+        Container(
+          height: 0.5,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey,
+        ),
+      ],
     );
   }
 
@@ -454,7 +490,6 @@ class _DashboardState extends State<Dashboard> {
           });
         }
 
-        print("Rendering Dashboard");
         if (!isLoaded) {
           _getSchoolId();
         } else {
@@ -493,25 +528,28 @@ class _DashboardState extends State<Dashboard> {
                           if (index == 1) {
                             return _buildSecurityOptions();
                           }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 2) {
-                            return _buildMessagesOption(model);
+                          if (index == 2) {
+                            return _buildIncidentReport();
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 3) {
-                            return _buildNotificationsOption(model);
+                            return _buildMessagesOption(model);
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 4) {
-                            return _buildHotlineMessages();
+                            return _buildNotificationsOption(model);
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 5) {
+                            return _buildHotlineMessages();
+                          }
+                          if (index ==
+                              snapshot.data.data["documents"].length + 6) {
                             return _buildSettingsOption();
                           }
                           return _buildDocumentOption(snapshot, index);
                         },
-                        itemCount: snapshot.data.data["documents"].length + 6);
+                        itemCount: snapshot.data.data["documents"].length + 7);
               }
             });
       },

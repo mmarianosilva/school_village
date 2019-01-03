@@ -152,7 +152,7 @@ class _InputFieldState extends State<InputField> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 280.0,
+            height: 140.0,
             padding: EdgeInsets.all(10.0),
             child: Column(children: [
               Text(
@@ -175,29 +175,29 @@ class _InputFieldState extends State<InputField> {
                   _getImage(context, ImageSource.gallery, false);
                 },
               ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Text(
-                'Pick a Video',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              FlatButton(
-                textColor: SVColors.talkAroundAccent,
-                child: Text('Use Camera'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(context, ImageSource.camera, true);
-                },
-              ),
-              FlatButton(
-                textColor: SVColors.talkAroundAccent,
-                child: Text('Use Gallery'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _getImage(context, ImageSource.gallery, true);
-                },
-              )
+//              SizedBox(
+//                height: 20.0,
+//              ),
+//              Text(
+//                'Pick a Video',
+//                style: TextStyle(fontWeight: FontWeight.bold),
+//              ),
+//              FlatButton(
+//                textColor: SVColors.talkAroundAccent,
+//                child: Text('Use Camera'),
+//                onPressed: () {
+//                  Navigator.pop(context);
+//                  _getImage(context, ImageSource.camera, true);
+//                },
+//              ),
+//              FlatButton(
+//                textColor: SVColors.talkAroundAccent,
+//                child: Text('Use Gallery'),
+//                onPressed: () {
+//                  Navigator.pop(context);
+//                  _getImage(context, ImageSource.gallery, true);
+//                },
+//              )
             ]),
           );
         });

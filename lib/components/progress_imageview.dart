@@ -14,24 +14,24 @@ class ProgressImage extends StatefulWidget {
   final ProgressImageTapCallBack onTap;
   final bool isVideo;
 
-  ProgressImage({Key key,
-    this.url,
-    this.firebasePath,
-    this.height,
-    this.width,
-    this.onTap,
-    this.isVideo})
+  ProgressImage(
+      {Key key,
+      this.url,
+      this.firebasePath,
+      this.height,
+      this.width,
+      this.onTap,
+      this.isVideo})
       : super(key: key);
 
   @override
-  createState() =>
-      _ProgressImageState(
-          url: url,
-          firebasePath: firebasePath,
-          height: height,
-          width: width,
-          onTap: onTap,
-          isVideo: isVideo);
+  createState() => _ProgressImageState(
+      url: url,
+      firebasePath: firebasePath,
+      height: height,
+      width: width,
+      onTap: onTap,
+      isVideo: isVideo);
 }
 
 class _ProgressImageState extends State<ProgressImage> {
@@ -43,12 +43,13 @@ class _ProgressImageState extends State<ProgressImage> {
   var isDisposed = false;
   final bool isVideo;
 
-  _ProgressImageState({this.url,
-    this.firebasePath,
-    this.height,
-    this.width,
-    this.onTap,
-    this.isVideo});
+  _ProgressImageState(
+      {this.url,
+      this.firebasePath,
+      this.height,
+      this.width,
+      this.onTap,
+      this.isVideo});
 
   static FirebaseStorage storage = FirebaseStorage();
 
@@ -89,11 +90,13 @@ class _ProgressImageState extends State<ProgressImage> {
             child: CircularProgressIndicator(),
           ));
     }
-    if (this.isVideo) {
+
+    if (this.isVideo != null && this.isVideo) {
       return GestureDetector(
-        child: VideoView(url: url, height: height, width: width), onTap: () {
-        this.onTap(url);
-      });
+          child: VideoView(url: url, height: height, width: width),
+          onTap: () {
+            this.onTap(url);
+          });
     }
 
     return GestureDetector(

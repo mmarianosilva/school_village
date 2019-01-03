@@ -66,6 +66,7 @@ flutter:
     - assets/images/camera.png
     - assets/images/incident_type.png
     - assets/images/incident_details.png
+    - assets/images/feature_image.png
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 
