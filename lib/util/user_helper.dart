@@ -58,7 +58,7 @@ class UserHelper {
     print(currentUser);
     DocumentReference userRef = Firestore.instance.document(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-//    subscribeToAllTopics(userSnapshot);
+
     List<dynamic> schools = [];
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
     setIsOwner(userSnapshot['owner'] != null &&  userSnapshot['owner'] == true ? true : false);

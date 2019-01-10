@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:image_picker/image_picker.dart';
+
+final dateTimeFormatter = DateFormat('M / DD / y hh:mm a');
 
 class IncidentReport extends StatefulWidget {
   @override
@@ -184,6 +187,16 @@ class IncidentState extends State<IncidentReport> {
           child: RaisedButton(
               onPressed: () {
                 if (_validateContent(context)) {
+                  List<String> sNames = [];
+                  List<String> wNames = [];
+
+                  subjectNames.forEach((controller) {
+                    sNames.add(controller.text);
+                  });
+                  witnessNames.forEach((controller) {
+                    wNames.add(controller.text);
+                  });
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -191,8 +204,8 @@ class IncidentState extends State<IncidentReport> {
                               items: items,
                               posItems: posItems,
                               other: other,
-                              subjectNames: subjectNames,
-                              witnessNames: witnessNames,
+                              subjectNames: sNames,
+                              witnessNames: wNames,
                               date: date,
                               location: location,
                               details: details,
@@ -281,12 +294,12 @@ class IncidentState extends State<IncidentReport> {
               child: OutlineButton(
                   child: Text(date == null
                       ? 'Select Time and Date'
-                      : date.toString().substring(0, 16)),
+                      : dateTimeFormatter.format(date)),
                   onPressed: () {
                     _selectDate();
                   }),
             )),
-            SizedBox(width: rightMargin),
+            SizedBox(width: rightMargin - 10),
           ],
         ),
         Row(
