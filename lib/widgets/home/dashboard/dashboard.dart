@@ -46,6 +46,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _getSchoolId() async {
+
     var schoolId = await UserHelper.getSelectedSchoolID();
     var userIsOwner = await UserHelper.getIsOwner();
     if (userIsOwner == null) {
@@ -354,9 +355,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildIncidentReport() {
-    if (role == 'school_student') {
-      return SizedBox();
-    }
+//    if (role == 'school_student') {
+//      return SizedBox();
+//    }
 
     return Column(
       children: <Widget>[
@@ -401,9 +402,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildIncidentList() {
-    if (role == 'school_student') {
-      return SizedBox();
-    }
+//    if (role == 'school_student') {
+//      return SizedBox();
+//    }
 
     return Column(
       children: <Widget>[

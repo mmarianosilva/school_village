@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:scoped_model/scoped_model.dart';
+
+
+final dateTimeFormatter = DateFormat('M / DD / y hh:mm a');
 
 class IncidentList extends StatefulWidget {
   @override
@@ -22,16 +26,12 @@ class IncidentListState extends State<IncidentList> {
   bool isLoaded = false;
   List<DocumentSnapshot> reports = [];
 
-  @override
-  void initState() {
-
-    super.initState();
-  }
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
     _school = Firestore.instance.document(_schoolId);
     _handleMessageCollection();
+    await UserHelper.loadIncidentTypes();
     setState(() {
       isLoaded= true;
     });
@@ -58,31 +58,45 @@ class IncidentListState extends State<IncidentList> {
   }
 
   Widget _buildList() {
-
-
-
-
     reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+
+
     return ListView.builder(
       itemCount: reports.length,
       itemBuilder: (_, int index) {
         final DocumentSnapshot document = reports[index];
-//        print(document['witnesses']);
         List<String> subjectNames = List<String>.from(document['subjects']);
         List<String> witnessNames = List<String>.from(document['witnesses']);
 
-        final Map<String, bool> items = Map<String,bool>.from(document['incidents']);
-        final Map<String, bool> posItems = Map<String,bool>.from(document['positiveIncidents']);
+        List<String> items = List<String>.from(document['incidents']);
+        List<String> posItems = List<String>.from(document['positiveIncidents']);
+
+        var report = '';
+
+        items.forEach((value) {
+        report += UserHelper.negativeIncidents[value] + ', ';
+        });
+        posItems.forEach((value) {
+        report += UserHelper.positiveIncidents[value] + ', ';
+        });
+
+        var other = document['other'];
+        if (other == null || other.isEmpty) {
+          report = report.substring(0, report.length - 2);
+        } else {
+        report += other;
+        }
 
         return Card(
           child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
             ListTile(
               title: Text(
-                document['details'],
+                report,
+                maxLines: 3,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                  "${DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}"),
+                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}"),
               trailing: FlatButton(
                 child: Text('VIEW'),
                 onPressed: () {

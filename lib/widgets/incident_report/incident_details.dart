@@ -18,8 +18,8 @@ final dateFormatter = DateFormat('M / DD / y');
 final timeFormatter = DateFormat('hh:mm a');
 
 class IncidentDetails extends StatefulWidget {
-  final Map<String, bool> items;
-  final Map<String, bool> posItems;
+  final List<String> items;
+  final List<String> posItems;
   final String other;
   final List<String> subjectNames;
   final List<String> witnessNames;
@@ -68,8 +68,8 @@ class IncidentDetails extends StatefulWidget {
 class IncidentDetailsState extends State<IncidentDetails> {
   static FirebaseStorage storage = FirebaseStorage();
 
-  final Map<String, bool> items;
-  final Map<String, bool> posItems;
+  final List<String> items;
+  final List<String> posItems;
   final String other;
   final List<String> subjectNames;
   final List<String> witnessNames;
@@ -135,15 +135,12 @@ class IncidentDetailsState extends State<IncidentDetails> {
 
   _renderBody() {
     var incident = '';
-    items.forEach((key, value) {
-      if (items[key]) {
-        incident += key + ', ';
-      }
+    items.forEach((value) {
+        incident += UserHelper.negativeIncidents[value] + ', ';
+
     });
-    posItems.forEach((key, value) {
-      if (posItems[key]) {
-        incident += key + ', ';
-      }
+    posItems.forEach((value) {
+        incident += UserHelper.positiveIncidents[value] + ', ';
     });
 
     if (other == null || other.isEmpty) {

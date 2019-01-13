@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -17,36 +18,8 @@ class IncidentReport extends StatefulWidget {
 }
 
 class IncidentState extends State<IncidentReport> {
-  var items = {
-    'Abduction/Missing': false,
-    'Inappropriate Clothing': false,
-    'Accident/Injury': false,
-    'Intruder': false,
-    'Out of Class': false,
-    'Bullying': false,
-    'Sexual Harassment: Campus': false,
-    'Cheating on Test/Classwork': false,
-    'Sexual Harassment: Home': false,
-    'Depression/Suicidal': false,
-    'Disability Related': false,
-    'Threats': false,
-    'Drugs/Alcohol': false,
-    'Unauthorized Vehicle on Campus': false,
-    'Fight': false,
-    'Use of Cell Phone': false,
-    'Fire': false,
-    'Vandalism': false,
-    'Gang Activity': false,
-    'Weapons': false,
-  };
-
-  var posItems = {
-    'Act of Kindness': false,
-    'Commendation': false,
-    'Exceptional Class Work': false,
-    'Notable Achievement': false,
-    'Remarkable Improvement': false
-  };
+  Map<String, bool> items = Map<String, bool>();
+  Map<String, bool> posItems = Map<String, bool>();
 
   var subjectNames = [TextEditingController(text: '')];
   var witnessNames = [TextEditingController(text: '')];
@@ -67,6 +40,24 @@ class IncidentState extends State<IncidentReport> {
   static const fontSize = 11.0;
 
   @override
+  void initState() {
+    super.initState();
+    loadIncidentTypes();
+  }
+
+  loadIncidentTypes() async {
+    await UserHelper.loadIncidentTypes();
+
+    UserHelper.negativeIncidents.forEach((key, value) {
+      items[key] = false;
+    });
+    UserHelper.positiveIncidents.forEach((key, value) {
+      posItems[key] = false;
+    });
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
@@ -78,17 +69,19 @@ class IncidentState extends State<IncidentReport> {
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
         ),
-        body: Builder(
-          builder: (context) => Stack(children: [
-                buildSingleChildScrollView(context),
-                positiveFeedbackVisible
-                    ? _buildPositiveOverlay()
-                    : SizedBox(
-                        height: 0,
-                        width: 0,
-                      )
-              ]),
-        ));
+        body: items.length == 0
+            ? Text('Loading...')
+            : Builder(
+                builder: (context) => Stack(children: [
+                      buildSingleChildScrollView(context),
+                      positiveFeedbackVisible
+                          ? _buildPositiveOverlay()
+                          : SizedBox(
+                              height: 0,
+                              width: 0,
+                            )
+                    ]),
+              ));
   }
 
   _buildPositiveOverlay() {
@@ -126,7 +119,7 @@ class IncidentState extends State<IncidentReport> {
   _buildPositiveOverlayContent() {
     List<Widget> widgets = [];
     posItems.forEach((key, value) {
-      widgets.add(_buildCheckBox(key, posItems));
+      widgets.add(_buildCheckBox(key, posItems, UserHelper.positiveIncidents));
     });
 
     return (Column(
@@ -197,12 +190,21 @@ class IncidentState extends State<IncidentReport> {
                     wNames.add(controller.text);
                   });
 
+                  List<String> negativeIncidents = List<String>();
+                  items.forEach((key, value) {
+                    if (items[key]) negativeIncidents.add(key);
+                  });
+                  List<String> positiveIncidents = List<String>();
+                  posItems.forEach((key, value) {
+                    if (posItems[key]) positiveIncidents.add(key);
+                  });
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => IncidentDetails(
-                              items: items,
-                              posItems: posItems,
+                              items: negativeIncidents,
+                              posItems: positiveIncidents,
                               other: other,
                               subjectNames: sNames,
                               witnessNames: wNames,
@@ -512,7 +514,7 @@ class IncidentState extends State<IncidentReport> {
   _buildCheckBoxes() {
     List<Widget> widgets = [];
     items.forEach((key, value) {
-      widgets.add(_buildCheckBox(key, items));
+      widgets.add(_buildCheckBox(key, items, UserHelper.negativeIncidents));
     });
 
     List<Widget> rows = [];
@@ -529,8 +531,9 @@ class IncidentState extends State<IncidentReport> {
     return Column(children: rows);
   }
 
-  _buildCheckBox(title, items) {
-    var val = items[title];
+  _buildCheckBox(key, items, map) {
+    var val = items[key];
+
     return SizedBox(
       width: MediaQuery.of(context).size.width / 2,
       child: CheckboxListTile(
@@ -539,10 +542,10 @@ class IncidentState extends State<IncidentReport> {
           controlAffinity: ListTileControlAffinity.leading,
           onChanged: (value) {
             setState(() {
-              items[title] = value;
+              items[key] = value;
             });
           },
-          title: Text(title)),
-    );
+          title: Text(map[key]),
+    ));
   }
 }
