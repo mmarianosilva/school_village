@@ -301,7 +301,17 @@ class IncidentState extends State<IncidentReport> {
                     _selectDate();
                   }),
             )),
-            SizedBox(width: rightMargin - 10),
+            SizedBox(width: 10),
+            MaterialButton(
+              minWidth: 50.0,
+              child: Text('Now', style: TextStyle(color: Colors.white)),
+              color: SVColors.incidentReport,
+              onPressed: () {
+                setState(() {
+                  date = DateTime.now();
+                });
+              },
+            )
           ],
         ),
         Row(
@@ -535,8 +545,8 @@ class IncidentState extends State<IncidentReport> {
     var val = items[key];
 
     return SizedBox(
-      width: MediaQuery.of(context).size.width / 2,
-      child: CheckboxListTile(
+        width: MediaQuery.of(context).size.width / 2,
+        child: CheckboxListTile(
           value: val,
           dense: true,
           controlAffinity: ListTileControlAffinity.leading,
@@ -546,6 +556,6 @@ class IncidentState extends State<IncidentReport> {
             });
           },
           title: Text(map[key]),
-    ));
+        ));
   }
 }
