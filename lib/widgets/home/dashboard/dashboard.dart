@@ -242,6 +242,8 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildMessagesOption(model) {
+    return SizedBox();
+
     return Column(
       children: <Widget>[
         const SizedBox(height: 14.0),

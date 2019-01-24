@@ -123,12 +123,14 @@ class _HomeState extends State<Home> {
       message = data;
     }
 
-    playMessageAlert();
     if (message["type"] == "broadcast") {
+      playAlarm();
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
+      playMessageAlert();
       return _goToSecurityChat(message['conversationId'], message['title']);
     } else if (message["type"] == "hotline") {
+      playMessageAlert();
       return _showHotLineMessageDialog(message);
     }
     _showItemDialog(message);

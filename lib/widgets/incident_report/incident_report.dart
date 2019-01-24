@@ -199,6 +199,7 @@ class IncidentState extends State<IncidentReport> {
                     if (posItems[key]) positiveIncidents.add(key);
                   });
 
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -266,6 +267,16 @@ class IncidentState extends State<IncidentReport> {
 
     if (subjectNames[0].text.isEmpty) {
       _showSnackBar('Enter subject name', context);
+      return false;
+    }
+
+    if(witnessNames[0].text.isEmpty){
+      _showSnackBar('Enter witness name', context);
+      return false;
+    }
+
+    if(date == null){
+      _showSnackBar('Please enter date', context);
       return false;
     }
 
