@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
@@ -14,7 +13,6 @@ class PdfHandler {
   static FirebaseStorage storage = new FirebaseStorage();
 
   static showPdfFromUrl(BuildContext context, String url) async {
-
     final FirebaseStorage storage = new FirebaseStorage();
     var bytes = utf8.encode(url); // data being hashed
     var digest = sha256.convert(bytes);
@@ -36,13 +34,12 @@ class PdfHandler {
       hideLoading(context);
     }
 
-
     Future<Null> _showPdf() async {
       try {
         final int result = await platform.invokeMethod('viewPdf', path);
-      } on PlatformException catch (e) {
-      }
+      } on PlatformException catch (e) {}
     }
+
     _showPdf();
   }
 

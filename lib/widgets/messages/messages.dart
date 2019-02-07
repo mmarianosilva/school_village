@@ -104,7 +104,7 @@ class _MessagesState extends State<Messages> {
     if (messages == null) {
       messages = List();
       messageMap[day] = messages;
-      messageList.insert(0, _getHeaderItem(day));
+      // messageList.insert(0, _getHeaderItem(day));
       messageList.insert(0, message);
     } else {
       messageList.insert(0, message);
@@ -355,16 +355,17 @@ class _MessagesState extends State<Messages> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
+          selectGroups,
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),
           SizedBox(
             width: 0.0,
-            height: 10.0,
+            height: 5.0,
           ), //new
           role == 'school_admin'
               ? Column(children: [
-                  selectGroups,
+                  // selectGroups,
                   Container(
                     color: SVColors.colorFromHex('#e5e5ea'),
                     padding: EdgeInsets.only(bottom: 14.0),

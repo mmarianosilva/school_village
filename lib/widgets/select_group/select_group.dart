@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school_village/util/checkbox.dart';
 import 'package:school_village/util/colors.dart';
-import 'package:school_village/util/constants.dart';
 import '../../util/user_helper.dart';
 
 class SelectGroups extends StatefulWidget {

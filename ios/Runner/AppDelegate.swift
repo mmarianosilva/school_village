@@ -31,6 +31,7 @@ import AVFoundation
                 
                 let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let newViewController = storyBoard.instantiateViewController(withIdentifier: "webViewController") as! WebViewController
+                newViewController.modalPresentationStyle = .overFullScreen
                 newViewController.url  = path
                 self.window?.rootViewController?.present(newViewController, animated: true, completion: nil)
             })

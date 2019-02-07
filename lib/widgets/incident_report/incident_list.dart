@@ -7,17 +7,21 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-
 final dateTimeFormatter = DateFormat('M / DD / y hh:mm a');
 
 class IncidentList extends StatefulWidget {
+  final String id;
+
+  IncidentList({Key key, this.id}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
-    return IncidentListState();
+    return IncidentListState(id: id);
   }
 }
 
 class IncidentListState extends State<IncidentList> {
+  String id;
   String _schoolId = '';
   String _schoolName = '';
   String name = '';
@@ -26,6 +30,7 @@ class IncidentListState extends State<IncidentList> {
   bool isLoaded = false;
   List<DocumentSnapshot> reports = [];
 
+  IncidentListState({this.id});
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
@@ -33,7 +38,7 @@ class IncidentListState extends State<IncidentList> {
     _handleMessageCollection();
     await UserHelper.loadIncidentTypes();
     setState(() {
-      isLoaded= true;
+      isLoaded = true;
     });
   }
 
@@ -54,12 +59,10 @@ class IncidentListState extends State<IncidentList> {
         reports.add(change.document);
       }
     });
-
   }
 
   Widget _buildList() {
     reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
-
 
     return ListView.builder(
       itemCount: reports.length,
@@ -69,22 +72,23 @@ class IncidentListState extends State<IncidentList> {
         List<String> witnessNames = List<String>.from(document['witnesses']);
 
         List<String> items = List<String>.from(document['incidents']);
-        List<String> posItems = List<String>.from(document['positiveIncidents']);
+        List<String> posItems =
+            List<String>.from(document['positiveIncidents']);
 
         var report = '';
 
         items.forEach((value) {
-        report += UserHelper.negativeIncidents[value] + ', ';
+          report += UserHelper.negativeIncidents[value] + ', ';
         });
         posItems.forEach((value) {
-        report += UserHelper.positiveIncidents[value] + ', ';
+          report += UserHelper.positiveIncidents[value] + ', ';
         });
 
         var other = document['other'];
         if (other == null || other.isEmpty) {
           report = report.substring(0, report.length - 2);
         } else {
-        report += other;
+          report += other;
         }
 
         return Card(
@@ -104,17 +108,17 @@ class IncidentListState extends State<IncidentList> {
                     context,
                     new MaterialPageRoute(
                       builder: (context) => IncidentDetails(
-                        demo: false,
-                        details: document['details'],
-                        date: DateTime.fromMillisecondsSinceEpoch(document['date']),
-                        name: document['createdBy'],
-                        location: document['location'],
-                        witnessNames: witnessNames,
-                        subjectNames: subjectNames,
-                        items: items,
-                        posItems: posItems,
-                        imgUrl: document['image']
-                      ),
+                          demo: false,
+                          details: document['details'],
+                          date: DateTime.fromMillisecondsSinceEpoch(
+                              document['date']),
+                          name: document['createdBy'],
+                          location: document['location'],
+                          witnessNames: witnessNames,
+                          subjectNames: subjectNames,
+                          items: items,
+                          posItems: posItems,
+                          imgUrl: document['image']),
                     ),
                   );
                 },

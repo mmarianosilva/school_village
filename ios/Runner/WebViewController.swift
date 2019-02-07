@@ -13,22 +13,21 @@ class WebViewController: UIViewController {
     //MARK: Properties
     
     @IBOutlet weak var webView: UIWebView!
-    @IBOutlet weak var closeBtn: UIButton!
     
     var url: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         do {
-//            let pdf = Bundle.main.path(forResource: self.url, ofType: "")!
-//            if let resourceUrl = Bundle.main.url(forResource: url, withExtension: "pdf") {
-//                if FileManager.default.fileExists(atPath: resourceUrl.path) {
-//                    print("file found")
-//                }
-//            }
+            //            let pdf = Bundle.main.path(forResource: self.url, ofType: "")!
+            //            if let resourceUrl = Bundle.main.url(forResource: url, withExtension: "pdf") {
+            //                if FileManager.default.fileExists(atPath: resourceUrl.path) {
+            //                    print("file found")
+            //                }
+            //            }
             let pdfURL = NSURL.fileURL(withPath: url)
-//            let pdfURL = NSURL.fileURL(withPath: pdf)
+            //            let pdfURL = NSURL.fileURL(withPath: pdf)
             let data = try Data(contentsOf: pdfURL)
             self.webView?.scalesPageToFit=true;
             self.webView?.load(data, mimeType: "application/pdf", textEncodingName:"", baseURL: (pdfURL.deletingLastPathComponent()))
@@ -37,18 +36,11 @@ class WebViewController: UIViewController {
             // catch errors here
         }
         
-        self.closeBtn?.addTarget(self, action: Selector(("buttonClicked:")), for: .touchUpInside)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    func buttonClicked(_ sender: AnyObject?) {
-        if sender === self.closeBtn {
-            dismiss(animated: true, completion: nil)
-        }
     }
     
     func updateZoomToAspectToFit(webView: UIWebView) {
@@ -65,15 +57,20 @@ class WebViewController: UIViewController {
             webView.scrollView.zoomScale = ratio
         }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    @IBAction func dismiss(_ sender: Any) {
+        print("Dismiss PDF");
+        dismiss(animated: true, completion: nil)
     }
-    */
-
+    
+    /*
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
 }

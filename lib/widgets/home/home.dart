@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/notification/notification.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
@@ -130,11 +131,56 @@ class _HomeState extends State<Home> {
       playMessageAlert();
       return _goToSecurityChat(message['conversationId'], message['title']);
     } else if (message["type"] == "hotline") {
-      playMessageAlert();
+      playAlarm();
       return _showHotLineMessageDialog(message);
+    } else if (message["type"] == "incident") {
+      playAlarm();
+      _shoIncidentReportDialog(message);
+      // return _showHotLineMessageDialog(message);
     }
     _showItemDialog(message);
   }
+
+  _shoIncidentReportDialog(message) {
+
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message['title'] ?? ''),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text(message['body'] ?? '')],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('View All'),
+              onPressed: () {
+                audioPlugin.stop();
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => IncidentList(),
+                  ),
+                );
+              },
+            ),
+            FlatButton(
+              child: Text('Close'),
+              onPressed: () {
+                audioPlugin.stop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
 
   _showHotLineMessageDialog(message) {
     print(message);
@@ -153,6 +199,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
+                audioPlugin.stop();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -165,6 +212,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
+                audioPlugin.stop();
                 Navigator.of(context).pop();
               },
             ),
@@ -199,6 +247,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
+                audioPlugin.stop();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -211,6 +260,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
+                audioPlugin.stop();
                 Navigator.of(context).pop();
               },
             ),

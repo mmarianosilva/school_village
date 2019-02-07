@@ -151,7 +151,7 @@ class _ChatState extends State<Chat> {
     if (messages == null) {
       messages = List();
       messageMap[day] = messages;
-      messageList.insert(0, _getHeaderItem(shot['createdAt']));
+      // messageList.insert(0, _getHeaderItem(shot['createdAt']));
       messageList.insert(0, message);
     } else {
       messageList.insert(0, message);
