@@ -347,7 +347,7 @@ class _MessagesState extends State<Messages> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: BaseAppBar(
-          title: Text('Messages',
+          title: Text('Broadcast Messaging',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black)),
           backgroundColor: Colors.grey.shade200,
