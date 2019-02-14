@@ -7,7 +7,7 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-final dateTimeFormatter = DateFormat('M / DD / y hh:mm a');
+final dateTimeFormatter = DateFormat('M / dd / y hh:mm a');
 
 class IncidentList extends StatefulWidget {
   final String id;
