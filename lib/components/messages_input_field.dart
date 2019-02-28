@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
@@ -20,6 +21,9 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
+  static const platform =
+      const MethodChannel('schoolvillage.app/transcode_video');
+
   final TextEditingController inputController = TextEditingController();
   final SendPressed sendPressed;
   File image;
@@ -43,8 +47,20 @@ class _InputFieldState extends State<InputField> {
       });
     } else {
       ImagePicker.pickVideo(source: source).then((File video) {
-        if (video != null) saveImage(video, isVideo);
+        if (video != null) {
+          this._transcodeVideo(video);
+        }
       });
+    }
+  }
+
+  _transcodeVideo(File video) async {
+    try {
+      final int result = await platform.invokeMethod('transcode', video.renameSync(video.path + '.mp4').path);
+      print(result);
+      // saveImage(result, isVideo);
+    } on PlatformException catch (e) {
+      print(e);
     }
   }
 
@@ -175,29 +191,29 @@ class _InputFieldState extends State<InputField> {
                   _getImage(context, ImageSource.gallery, false);
                 },
               ),
-//              SizedBox(
-//                height: 20.0,
-//              ),
-//              Text(
-//                'Pick a Video',
-//                style: TextStyle(fontWeight: FontWeight.bold),
-//              ),
-//              FlatButton(
-//                textColor: SVColors.talkAroundAccent,
-//                child: Text('Use Camera'),
-//                onPressed: () {
-//                  Navigator.pop(context);
-//                  _getImage(context, ImageSource.camera, true);
-//                },
-//              ),
-//              FlatButton(
-//                textColor: SVColors.talkAroundAccent,
-//                child: Text('Use Gallery'),
-//                onPressed: () {
-//                  Navigator.pop(context);
-//                  _getImage(context, ImageSource.gallery, true);
-//                },
-//              )
+              // SizedBox(
+              //   height: 20.0,
+              // ),
+              // Text(
+              //   'Pick a Video',
+              //   style: TextStyle(fontWeight: FontWeight.bold),
+              // ),
+              // FlatButton(
+              //   textColor: SVColors.talkAroundAccent,
+              //   child: Text('Use Camera'),
+              //   onPressed: () {
+              //     Navigator.pop(context);
+              //     _getImage(context, ImageSource.camera, true);
+              //   },
+              // ),
+              // FlatButton(
+              //   textColor: SVColors.talkAroundAccent,
+              //   child: Text('Use Gallery'),
+              //   onPressed: () {
+              //     Navigator.pop(context);
+              //     _getImage(context, ImageSource.gallery, true);
+              //   },
+              // )
             ]),
           );
         });
@@ -244,7 +260,8 @@ class _InputFieldState extends State<InputField> {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            sendPressed(image, inputController.text, isVideoFile);
+                            sendPressed(
+                                image, inputController.text, isVideoFile);
                           },
                         ),
                         hintText: "Type Message..."),

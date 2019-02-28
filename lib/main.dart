@@ -29,6 +29,7 @@ Future<Null> main() async {
                 model: MainModel(),
                 child: new MaterialApp(
                     home: Splash(),
+                    
                     theme: new ThemeData(
                         primaryColor: Colors.grey.shade900,
                         accentColor: Colors.blue,

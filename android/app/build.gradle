@@ -20,7 +20,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     lintOptions {
         disable 'InvalidPackage'
@@ -28,8 +28,8 @@ android {
 
     defaultConfig {
         applicationId "com.oandmtech.schoolvillage"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion 18
+        targetSdkVersion 28
         versionCode 138
         versionName "1.2"
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -72,6 +72,7 @@ dependencies {
     implementation 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.5'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
 
     def appCenterSdkVersion = '1.8.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"

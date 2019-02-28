@@ -3,14 +3,11 @@ package com.oandmtech.schoolvillage;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
-
-import java.io.IOException;
 
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
@@ -24,6 +21,7 @@ import com.microsoft.appcenter.crashes.Crashes;
 public class MainActivity extends FlutterActivity {
 
     private static final String CHANNEL = "schoolvillage.app/pdf_view";
+    private static final String TRANSCODE_VIDEO_CHANNEL = "schoolvillage.app/transcode_video";
 
 
     @Override
@@ -52,13 +50,29 @@ public class MainActivity extends FlutterActivity {
                 new MethodChannel.MethodCallHandler() {
                     @Override
                     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
-                        // TODO
                         String key = call.arguments.toString();
-//                  String key = getFlutterView().getLookupKeyForAsset(call.arguments.toString());
                         Toast.makeText(getApplicationContext(), key, Toast.LENGTH_SHORT).show();
                         getApplicationContext().startActivity(new Intent(getApplicationContext(), PdfViewerActivity.class).putExtra("URL", key));
 
                     }
                 });
+
+        new MethodChannel(getFlutterView(), TRANSCODE_VIDEO_CHANNEL).setMethodCallHandler(
+                new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+                        String path = call.arguments.toString();
+                        Log.d("VIDZIOPATH", path);
+//                        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND);
+//                        try (FileOutputStream out = new FileOutputStream(getFilesDir().toString() + "/thumb.png")) {
+//                            thumb.compress(Bitmap.CompressFormat.PNG, 100, out);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+
+                    }
+                });
+
+
     }
 }

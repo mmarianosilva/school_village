@@ -46,7 +46,6 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _getSchoolId() async {
-
     var schoolId = await UserHelper.getSelectedSchoolID();
     var userIsOwner = await UserHelper.getIsOwner();
     if (userIsOwner == null) {
@@ -124,10 +123,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   openSettings() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Settings()),
-    );
+    _launchURL("https://schoolvillage.org/index_support_dashboard");
   }
 
   openNotifications() {
@@ -161,6 +157,9 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  // #043882#048midnightbluehsl(215,94,26)rgb(4,56,130)
+
+
   _buildSettingsOption() {
     return Column(
       children: <Widget>[
@@ -174,14 +173,13 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.settings,
-                      size: 36.0, color: Colors.grey.shade900),
+                  child: Icon(Icons.info, size: 36.0, color: Color.fromRGBO(4, 56, 130, 1)),
                 ),
               ),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Settings",
+                "Support",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),
@@ -357,9 +355,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildIncidentReport() {
-//    if (role == 'school_student') {
-//      return SizedBox();
-//    }
+    if (role == 'school_student' || role == 'school_family') {
+      return SizedBox();
+    }
 
     return Column(
       children: <Widget>[
@@ -404,9 +402,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildIncidentList() {
-//    if (role == 'school_student') {
-//      return SizedBox();
-//    }
+    if (role == 'school_student' || role == 'school_family') {
+      return SizedBox();
+    }
 
     return Column(
       children: <Widget>[
