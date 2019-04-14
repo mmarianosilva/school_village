@@ -136,11 +136,10 @@ class IncidentDetailsState extends State<IncidentDetails> {
   _renderBody() {
     var incident = '';
     items.forEach((value) {
-        incident += UserHelper.negativeIncidents[value] + ', ';
-
+      incident += UserHelper.negativeIncidents[value] + ', ';
     });
     posItems.forEach((value) {
-        incident += UserHelper.positiveIncidents[value] + ', ';
+      incident += UserHelper.positiveIncidents[value] + ', ';
     });
 
     if (other == null || other.isEmpty) {

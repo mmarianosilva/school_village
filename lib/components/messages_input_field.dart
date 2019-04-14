@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
@@ -21,14 +21,14 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
-  static const platform =
-      const MethodChannel('schoolvillage.app/transcode_video');
-
+  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   final TextEditingController inputController = TextEditingController();
   final SendPressed sendPressed;
   File image;
   bool isVideoFile;
   VideoPlayerController _controller;
+  File thumbNail;
+  bool _loading = false;
 
   static const borderRadius =
       const BorderRadius.all(const Radius.circular(45.0));
@@ -43,7 +43,8 @@ class _InputFieldState extends State<InputField> {
   _getImage(BuildContext context, ImageSource source, bool isVideo) {
     if (!isVideo) {
       ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
-        if (image != null) saveImage(image, isVideo);
+        print(image);
+        if (image != null) saveImage(image, isVideo, null);
       });
     } else {
       ImagePicker.pickVideo(source: source).then((File video) {
@@ -55,29 +56,36 @@ class _InputFieldState extends State<InputField> {
   }
 
   _transcodeVideo(File video) async {
-    try {
-      final int result = await platform.invokeMethod('transcode', video.renameSync(video.path + '.mp4').path);
-      print(result);
-      // saveImage(result, isVideo);
-    } on PlatformException catch (e) {
-      print(e);
-    }
+    String path = "${video.path}.mp4";
+    String thumbPath = "${video.path}_thumb.jpg";
+    setState(() {
+      _loading = true;
+    });
+
+    _flutterFFmpeg
+        .execute("-ss 1 -i ${video.path} -vframes 1 $thumbPath")
+        .then((r) {
+      saveImage(File(path), true, File(thumbPath));
+
+      _flutterFFmpeg.execute("-i ${video.path} -s hd480 $path").then((rc) {
+        setState(() {
+          _loading = false;
+        });
+      });
+    });
   }
 
-  void saveImage(File file, bool isVideoFile) async {
+  void saveImage(File file, bool isVideoFile, File thumb) async {
     setState(() {
       this.isVideoFile = isVideoFile;
       image = file;
+      thumbNail = thumb;
     });
     _initVideoController();
   }
 
   _buildImagePreview() {
     if (image == null) return SizedBox();
-
-    if (isVideoFile) {
-      return _buildVideoPreview();
-    }
 
     return Stack(
       children: [
@@ -87,7 +95,7 @@ class _InputFieldState extends State<InputField> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Image.file(image, height: 120.0),
+                Image.file(isVideoFile ? thumbNail : image, height: 120.0),
                 SizedBox(width: 16.0),
                 GestureDetector(
                   onTap: () {
@@ -99,6 +107,13 @@ class _InputFieldState extends State<InputField> {
             ),
           ),
         ),
+        _loading
+            ? Container(
+                height: 300,
+                color: SVColors.incidentReportGray,
+                margin: EdgeInsets.symmetric(horizontal: 20),
+              )
+            : SizedBox()
       ],
     );
   }
@@ -120,7 +135,6 @@ class _InputFieldState extends State<InputField> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-//                    width: MediaQuery.of(context).size.width - 48,
                     height: 120,
                     child: _buildVideoView()),
                 SizedBox(width: 16.0),
@@ -168,7 +182,7 @@ class _InputFieldState extends State<InputField> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 140.0,
+            height: 280.0,
             padding: EdgeInsets.all(10.0),
             child: Column(children: [
               Text(
@@ -191,29 +205,29 @@ class _InputFieldState extends State<InputField> {
                   _getImage(context, ImageSource.gallery, false);
                 },
               ),
-              // SizedBox(
-              //   height: 20.0,
-              // ),
-              // Text(
-              //   'Pick a Video',
-              //   style: TextStyle(fontWeight: FontWeight.bold),
-              // ),
-              // FlatButton(
-              //   textColor: SVColors.talkAroundAccent,
-              //   child: Text('Use Camera'),
-              //   onPressed: () {
-              //     Navigator.pop(context);
-              //     _getImage(context, ImageSource.camera, true);
-              //   },
-              // ),
-              // FlatButton(
-              //   textColor: SVColors.talkAroundAccent,
-              //   child: Text('Use Gallery'),
-              //   onPressed: () {
-              //     Navigator.pop(context);
-              //     _getImage(context, ImageSource.gallery, true);
-              //   },
-              // )
+              SizedBox(
+                height: 20.0,
+              ),
+              Text(
+                'Pick a Video',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              FlatButton(
+                textColor: SVColors.talkAroundAccent,
+                child: Text('Use Camera'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _getImage(context, ImageSource.camera, true);
+                },
+              ),
+              FlatButton(
+                textColor: SVColors.talkAroundAccent,
+                child: Text('Use Gallery'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _getImage(context, ImageSource.gallery, true);
+                },
+              )
             ]),
           );
         });

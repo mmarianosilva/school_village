@@ -101,11 +101,12 @@ class BroadcastMessage extends StatelessWidget {
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered)),
       );
-    }else{
+    } else {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => FullScreenVideoView(url: imageUrl, message: text)),
+            builder: (context) =>
+                FullScreenVideoView(url: imageUrl, message: text)),
       );
     }
   }

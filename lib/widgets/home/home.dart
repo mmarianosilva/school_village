@@ -53,8 +53,20 @@ class _HomeState extends State<Home> {
   String _messageAlertAssetFile;
 
   Future playAlarm() async {
-    await copyLocalAssets();
-    await audioPlugin.play(_localAssetFile, isLocal: true);
+    if (!Platform.isIOS) {
+      await copyLocalAssets();
+      await audioPlugin.play(_localAssetFile, isLocal: true);
+    } else {
+      platform.invokeMethod('playBackgroundAudio');
+    }
+  }
+
+  stopSound() {
+    if(Platform.isIOS) {
+      platform.invokeMethod('stopBackgroundAudio');
+    }else{
+      audioPlugin.stop();
+    }
   }
 
   Future playMessageAlert() async {
@@ -112,10 +124,6 @@ class _HomeState extends State<Home> {
   }
 
   _onNotification(Map<String, dynamic> data) {
-    if (Platform.isIOS) {
-      platform.invokeMethod('playBackgroundAudio');
-    }
-
     Map<String, dynamic> message;
 
     if (data["data"] != null) {
@@ -142,7 +150,6 @@ class _HomeState extends State<Home> {
   }
 
   _shoIncidentReportDialog(message) {
-
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -158,7 +165,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -171,7 +178,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
               },
             ),
@@ -180,7 +187,6 @@ class _HomeState extends State<Home> {
       },
     );
   }
-  
 
   _showHotLineMessageDialog(message) {
     print(message);
@@ -199,7 +205,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -212,7 +218,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
               },
             ),
@@ -247,7 +253,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -260,7 +266,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
               },
             ),
@@ -296,7 +302,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View Details'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -310,7 +316,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close Alert'),
               onPressed: () {
-                audioPlugin.stop();
+                stopSound();
                 Navigator.of(context).pop();
               },
             ),

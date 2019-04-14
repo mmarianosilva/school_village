@@ -76,7 +76,7 @@ class _ProgressImageState extends State<ProgressImage> {
   build(BuildContext context) {
     return Card(
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         color: Colors.grey.shade500,
         child: _buildImageContainer());

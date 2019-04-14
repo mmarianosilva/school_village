@@ -41,6 +41,8 @@ import AVFoundation
             audioChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
                 if ("playBackgroundAudio" == call.method) {
                     self.playBackgroundAudio()
+                }else if("stopBackgroundAudio" == call.method){
+                    self.stopBackgroundAudio()
                 }
             })
             
@@ -66,10 +68,6 @@ import AVFoundation
     }
     
     func stopBackgroundAudio(){
-        
-    }
-    
-    override func applicationWillEnterForeground(_ application: UIApplication) {
         self.alarmSound?.stop()
         do {
             try self.audioSession.setActive(false)
@@ -77,6 +75,7 @@ import AVFoundation
             print("AudioSession error setActive(false)")
         }
     }
+
     
     func setupAudioPlayerWithFile(file: NSString, type: NSString) -> AVAudioPlayer? {
         

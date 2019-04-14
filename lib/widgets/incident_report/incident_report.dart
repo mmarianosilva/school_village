@@ -199,7 +199,6 @@ class IncidentState extends State<IncidentReport> {
                     if (posItems[key]) positiveIncidents.add(key);
                   });
 
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -270,12 +269,12 @@ class IncidentState extends State<IncidentReport> {
       return false;
     }
 
-    if(witnessNames[0].text.isEmpty){
+    if (witnessNames[0].text.isEmpty) {
       _showSnackBar('Enter witness name', context);
       return false;
     }
 
-    if(date == null){
+    if (date == null) {
       _showSnackBar('Please enter date', context);
       return false;
     }
@@ -322,7 +321,7 @@ class IncidentState extends State<IncidentReport> {
                   date = DateTime.now();
                 });
               },
-            )
+            ),
           ],
         ),
         Row(

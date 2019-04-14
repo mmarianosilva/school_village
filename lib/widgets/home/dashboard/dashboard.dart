@@ -159,7 +159,6 @@ class _DashboardState extends State<Dashboard> {
 
   // #043882#048midnightbluehsl(215,94,26)rgb(4,56,130)
 
-
   _buildSettingsOption() {
     return Column(
       children: <Widget>[
@@ -173,7 +172,8 @@ class _DashboardState extends State<Dashboard> {
                 width: 48.0,
                 height: 48.0,
                 child: Center(
-                  child: Icon(Icons.info, size: 36.0, color: Color.fromRGBO(4, 56, 130, 1)),
+                  child: Icon(Icons.info,
+                      size: 36.0, color: Color.fromRGBO(4, 56, 130, 1)),
                 ),
               ),
               SizedBox(width: 12.0),
