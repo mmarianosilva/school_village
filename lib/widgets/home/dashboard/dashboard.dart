@@ -430,7 +430,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident List",
+                "Incident Log",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),

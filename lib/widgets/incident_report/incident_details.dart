@@ -274,7 +274,8 @@ class IncidentDetailsState extends State<IncidentDetails> {
   }
 
   _buildImagePreview() {
-    if (imageFile == null && imgUrl == null) {
+
+    if (imageFile == null && (imgUrl == null || imgUrl.isEmpty)) {
       return SizedBox();
     }
     if (imgUrl != null) {

@@ -46,8 +46,8 @@ class _ChatState extends State<Chat> {
     _handleMessageCollection();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    inputField = InputField(sendPressed: (image, text, isVideo) {
-      _handleSubmitted(image, text);
+    inputField = InputField(sendPressed: (image, text, thumb) {
+      _handleSubmitted(image, text, thumb);
     });
 
     super.initState();
@@ -66,7 +66,7 @@ class _ChatState extends State<Chat> {
     super.dispose();
   }
 
-  _handleSubmitted(File image, String text) async {
+  _handleSubmitted(File image, String text, File thumb) async {
     if (text == null || text.trim() == '') {
       return;
     }
@@ -74,6 +74,7 @@ class _ChatState extends State<Chat> {
         Firestore.instance.collection('$conversation/messages');
     final DocumentReference document = collection.document();
     var path = '';
+    var thumbPath = '';
     if (image != null) {
       _showLoading();
       path =
@@ -83,8 +84,14 @@ class _ChatState extends State<Chat> {
           ? lookupMimeType(image.path).split("/")[1]
           : type;
       path = path + "." + type;
+
+      thumbPath =
+          '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}' +
+              '.jpeg';
+
       print(path);
       await uploadFile(path, image);
+      await uploadFile(thumbPath, thumb);
       _hideLoading();
     }
     document.setData(<String, dynamic>{
@@ -94,6 +101,7 @@ class _ChatState extends State<Chat> {
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'location': await _getLocation(),
       'image': image == null ? null : path,
+      'thumb': thumb == null ? null : thumbPath,
       'reportedByPhone': "${user['phone']}"
     });
     //FIXME: not good practice
@@ -224,7 +232,7 @@ class _ChatState extends State<Chat> {
               timestamp: document['createdAt'],
               self: document['createdById'] == user.documentID,
               location: document['location'],
-              imageUrl: document['image'],
+              imageUrl: document['thumb'] ?? document['image'],
               message: document,
             );
           });

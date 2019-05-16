@@ -247,6 +247,11 @@ class _MessagesState extends State<Messages> {
   }
 
   _sendMessage(File image, text, isVideo) {
+    if (selectGroups.key.currentState.selectedGroups.length < 1) {
+      showErrorDialog("Please select group to send the broadcast message");
+      return;
+    }
+
     if (text.length < 10) {
       showErrorDialog("Text length should be at least 10 characters");
       return;
@@ -311,7 +316,6 @@ class _MessagesState extends State<Messages> {
 
     document.setData(<String, dynamic>{
       'body': alertBody,
-      //FIXME: bad practice
       'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
@@ -320,7 +324,6 @@ class _MessagesState extends State<Messages> {
       'reportedByPhone': phone,
       'isVideo': isVideo
     });
-    //FIXME: bad practice
     inputField.key.currentState.clearState();
   }
 

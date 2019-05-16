@@ -275,7 +275,7 @@ class _InputFieldState extends State<InputField> {
                           ),
                           onPressed: () {
                             sendPressed(
-                                image, inputController.text, isVideoFile);
+                                image, inputController.text, thumbNail);
                           },
                         ),
                         hintText: "Type Message..."),
