@@ -104,7 +104,6 @@ class _ChatState extends State<Chat> {
       'thumb': thumb == null ? null : thumbPath,
       'reportedByPhone': "${user['phone']}"
     });
-    //FIXME: not good practice
     inputField.key.currentState.clearState();
   }
 
@@ -127,10 +126,14 @@ class _ChatState extends State<Chat> {
   _hideLoading() {}
 
   _getLocation() async {
-    Map<String, double> location;
+    Map<String, double> location = new Map();
     String error;
     try {
-      location = await _location.getLocation();
+      LocationData locationData = await _location.getLocation();
+      location['accuracy'] = locationData.accuracy;
+      location['altitude'] = locationData.altitude;
+      location['latitude'] = locationData.latitude;
+      location['longitude'] = locationData.longitude;
       error = null;
     } catch (e) {
       location = null;

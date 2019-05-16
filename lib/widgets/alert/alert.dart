@@ -132,10 +132,14 @@ class _AlertState extends State<Alert> {
   }
 
   _getLocation() async {
-    Map<String, double> location;
+    Map<String, double> location = new Map();
     String error;
     try {
-      location = await _location.getLocation();
+      LocationData locationData = await _location.getLocation();
+      location['accuracy'] = locationData.accuracy;
+      location['altitude'] = locationData.altitude;
+      location['latitude'] = locationData.latitude;
+      location['longitude'] = locationData.longitude;
       error = null;
     } catch (e) {
 //      if (e.code == 'PERMISSION_DENIED') {

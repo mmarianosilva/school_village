@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId "com.oandmtech.schoolvillage"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 138
         versionName "1.2"

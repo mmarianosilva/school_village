@@ -17,7 +17,6 @@ class ImageViewScreen extends StatelessWidget {
       PhotoView(
         imageProvider: NetworkImage(imageAddress),
         loadingChild: Text("Loading", style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.white,
         minScale: minScale,
         maxScale: maxScale,
       ),
