@@ -10,7 +10,6 @@ import '../../talk_around/talk_around.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../util/file_helper.dart';
 import 'dart:io';
-import '../../settings/settings.dart';
 import '../../notifications/notifications.dart';
 import '../../messages/messages.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -220,7 +219,7 @@ class _DashboardState extends State<Dashboard> {
                     SizedBox(width: 12.0),
                     Expanded(
                         child: Text(
-                      "Alerts",
+                      "Alert Log",
                       textAlign: TextAlign.left,
                       style: TextStyle(fontSize: 16.0),
                     )),
@@ -383,7 +382,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report",
+                "Incident Report Form",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),
@@ -430,7 +429,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Log",
+                "Incident Report Log",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),
@@ -497,7 +496,7 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Anonymous Hotline",
+                "Anonymous Hotline Log",
                 textAlign: TextAlign.left,
                 style: TextStyle(fontSize: 16.0),
               )),

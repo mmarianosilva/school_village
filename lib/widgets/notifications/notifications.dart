@@ -89,7 +89,7 @@ class _NotificationsState extends State<Notifications> {
         return new Scaffold(
           backgroundColor: Colors.grey.shade100,
           appBar: new BaseAppBar(
-            title: new Text('Notifications',
+            title: new Text('Alert Log',
                 textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.black)),
             backgroundColor: Colors.grey.shade200,

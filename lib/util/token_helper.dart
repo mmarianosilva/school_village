@@ -11,7 +11,6 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 
 class TokenHelper {
-
   static saveToken() async {
     print("Saving token");
     final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
@@ -22,7 +21,8 @@ class TokenHelper {
     print('User path /users/${user.uid}');
     DocumentReference userRef = Firestore.instance.document(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-    if(userSnapshot['devices'] != null && userSnapshot['devices'].keys.contains(token)) {
+    if (userSnapshot['devices'] != null &&
+        userSnapshot['devices'].keys.contains(token)) {
       print("Not adding Token to user");
       return;
     }
@@ -30,32 +30,33 @@ class TokenHelper {
   }
 
   static deleteToken(token, userId) async {
+    print("token = $token");
     print("Deleting token");
     String userPath = "/users/$userId";
     DocumentReference userRef = Firestore.instance.document(userPath);
+
     DocumentSnapshot userSnapshot = await userRef.get();
     dynamic devices = userSnapshot.data['devices'];
-    if(devices != null && devices.containsKey(token))  {
-      devices[token] = 'DELETE' ;
-      Firestore.instance.document("/users/$userId").setData(<String, dynamic>{
-        'devices': devices
-      }, merge: true);
+
+    if (devices != null && devices.containsKey(token)) {
+
+      devices.remove(token);
+      Firestore.instance
+          .document("/users/$userId")
+          .setData(<String, dynamic>{'devices': devices}, merge: false);
       print(devices);
       print("Deleted token");
     }
   }
 
-  static addToken(token, userId) async{
+  static addToken(token, userId) async {
     print("Adding token");
-    String deviceInfo  = await getDeviceInfo();
-    Map<String, String> device = {
-      token: deviceInfo
-    };
+    String deviceInfo = await getDeviceInfo();
+    Map<String, String> device = {token: deviceInfo};
 
-    Firestore.instance.document("/users/$userId").setData(<String, dynamic>{
-      'devices': device
-    }, merge: true);
-
+    Firestore.instance
+        .document("/users/$userId")
+        .setData(<String, dynamic>{'devices': device}, merge: true);
   }
 
   static getDeviceInfo() async {
@@ -64,18 +65,20 @@ class TokenHelper {
     try {
       if (Platform.isAndroid) {
         deviceInfo = 'Android ';
-        Map<String, dynamic> deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-        deviceInfo = '${deviceInfo} ${deviceData["brand"]} ${deviceData["device"]} ${deviceData["model"]}';
+        Map<String, dynamic> deviceData =
+            _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+        deviceInfo =
+            '${deviceInfo} ${deviceData["brand"]} ${deviceData["device"]} ${deviceData["model"]}';
         print(deviceData);
       } else if (Platform.isIOS) {
         deviceInfo = 'iOS ';
-        Map<String, dynamic> deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-        deviceInfo = '${deviceInfo} ${deviceData["localizedModel"]} ${deviceData["utsname.machine"]}';
+        Map<String, dynamic> deviceData =
+            _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+        deviceInfo =
+            '${deviceInfo} ${deviceData["localizedModel"]} ${deviceData["utsname.machine"]}';
         print(deviceData);
       }
-    } on PlatformException {
-
-    }
+    } on PlatformException {}
     return deviceInfo;
   }
 
@@ -105,6 +108,4 @@ class TokenHelper {
       'utsname.machine:': data.utsname.machine,
     };
   }
-
-
 }

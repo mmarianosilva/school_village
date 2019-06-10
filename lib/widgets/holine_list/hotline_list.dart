@@ -51,7 +51,7 @@ class _HotLineListState extends State<HotLineList> {
     return new Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: new AppBar(
-        title: new Text('Hotline',
+        title: new Text('Anonymous Hotline Log',
             textAlign: TextAlign.center,
             style: new TextStyle(color: Colors.black)),
         backgroundColor: Colors.grey.shade200,

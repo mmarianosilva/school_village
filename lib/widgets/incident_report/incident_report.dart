@@ -62,7 +62,7 @@ class IncidentState extends State<IncidentReport> {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: BaseAppBar(
-          title: Text('Incident Report',
+          title: Text('Incident Report Form',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black)),
           backgroundColor: Colors.grey.shade200,
