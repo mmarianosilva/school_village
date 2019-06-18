@@ -43,7 +43,7 @@ class TokenHelper {
       devices.remove(token);
       Firestore.instance
           .document("/users/$userId")
-          .setData(<String, dynamic>{'devices': devices}, merge: false);
+          .setData(<String, dynamic>{'devices': devices}, merge: true);
       print(devices);
       print("Deleted token");
     }
