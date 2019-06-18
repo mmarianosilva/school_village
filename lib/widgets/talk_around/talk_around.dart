@@ -235,8 +235,7 @@ class _TalkAroundState extends State<TalkAround>
                     Chat(
                       conversation: _securityConversation,
                       user: _userSnapshot,
-                      // showInput: TalkAround.role == 'school_security',
-                      showInput: true
+                      showInput: TalkAround.role == 'school_security',
                     ),
                     Chat(
                       conversation: _securityAdminConversation,

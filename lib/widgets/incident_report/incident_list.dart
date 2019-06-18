@@ -55,9 +55,11 @@ class IncidentListState extends State<IncidentList> {
   _handleDocumentChanges(documentChanges) {
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
-        print(change.document);
         reports.add(change.document);
       }
+    });
+
+    setState(() {      
     });
   }
 
@@ -134,6 +136,7 @@ class IncidentListState extends State<IncidentList> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(builder: (context, child, model) {
       if (!isLoaded) {
+        print('isloaded');
         getUserDetails(model);
       }
 
