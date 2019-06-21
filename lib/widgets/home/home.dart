@@ -141,8 +141,8 @@ class _HomeState extends State<Home> {
       playAlarm();
       return _showHotLineMessageDialog(message);
     } else if (message["type"] == "incident") {
-      playAlarm();
-      _shoIncidentReportDialog(message);
+      playMessageAlert();
+      return _shoIncidentReportDialog(message);
       // return _showHotLineMessageDialog(message);
     }
     _showItemDialog(message);
@@ -164,7 +164,6 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
-                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -177,7 +176,6 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
-                stopSound();
                 Navigator.of(context).pop();
               },
             ),
