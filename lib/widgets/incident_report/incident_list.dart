@@ -48,23 +48,16 @@ class IncidentListState extends State<IncidentList> {
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-      _handleDocumentChanges(data.documentChanges);
+          reports.clear();
+          reports.addAll(data.documents);
+          reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+          setState(() {});
     });
   }
 
-  _handleDocumentChanges(documentChanges) {
-    documentChanges.forEach((change) {
-      if (change.type == DocumentChangeType.added) {
-        reports.add(change.document);
-      }
-    });
-
-    setState(() {      
-    });
-  }
 
   Widget _buildList() {
-    reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+    
 
     return ListView.builder(
       itemCount: reports.length,
@@ -80,6 +73,7 @@ class IncidentListState extends State<IncidentList> {
         var report = '';
 
         items.forEach((value) {
+          print(value);
           report += UserHelper.negativeIncidents[value] + ', ';
         });
         posItems.forEach((value) {
@@ -136,7 +130,6 @@ class IncidentListState extends State<IncidentList> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(builder: (context, child, model) {
       if (!isLoaded) {
-        print('isloaded');
         getUserDetails(model);
       }
 
