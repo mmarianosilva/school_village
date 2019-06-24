@@ -38,8 +38,11 @@ class TokenHelper {
     DocumentSnapshot userSnapshot = await userRef.get();
     dynamic devices = userSnapshot.data['devices'];
 
+    print(devices);
+
     if (devices != null && devices.containsKey(token)) {
-      devices[token] = 'DELETE';
+    
+      devices[token] = FieldValue.delete();
 
       Firestore.instance
           .document("/users/$userId")
