@@ -30,8 +30,8 @@ android {
         applicationId "com.oandmtech.schoolvillage"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 138
-        versionName "1.2"
+        versionCode 280
+        versionName "1.3"
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

@@ -61,9 +61,9 @@ class _HomeState extends State<Home> {
   }
 
   stopSound() {
-    if(Platform.isIOS) {
+    if (Platform.isIOS) {
       platform.invokeMethod('stopBackgroundAudio');
-    }else{
+    } else {
       audioPlugin.stop();
     }
   }
@@ -132,13 +132,15 @@ class _HomeState extends State<Home> {
     }
 
     if (message["type"] == "broadcast") {
-      playAlarm();
+      // playAlarm();
+      playMessageAlert(); //Remove this
       return _showBroadcastDialog(message);
     } else if (message["type"] == "security") {
       playMessageAlert();
       return _goToSecurityChat(message['conversationId'], message['title']);
     } else if (message["type"] == "hotline") {
-      playAlarm();
+      // playAlarm();
+      playMessageAlert(); //Remove this
       return _showHotLineMessageDialog(message);
     } else if (message["type"] == "incident") {
       playMessageAlert();
@@ -274,7 +276,8 @@ class _HomeState extends State<Home> {
   }
 
   _showItemDialog(Map<String, dynamic> message) async {
-    playAlarm();
+    // playAlarm();
+    playMessageAlert(); //Remove this
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
     DocumentSnapshot notification;
