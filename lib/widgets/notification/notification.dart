@@ -71,14 +71,14 @@ class NotificationDetail extends StatelessWidget {
 
     if(notification["location"] != null) {
       widgets.add(
-        new GestureDetector(
-          onTap: () {
-            launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
-          },
-          child: new Image.network(
-              "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
-        )
-          
+          new GestureDetector(
+            onTap: () {
+              launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
+            },
+            child: new Image.network(
+                "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
+          )
+
       );
     }
     widgets.add(
@@ -108,17 +108,17 @@ class NotificationDetail extends StatelessWidget {
     return new Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: new BaseAppBar(
-        title: new Text('Details',
-          textAlign: TextAlign.center,
-        style: new TextStyle(color: Colors.black)),
-    backgroundColor: Colors.grey.shade200,
-    elevation: 0.0,
-    leading: new BackButton(color: Colors.grey.shade800),
-    ),
-    body: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: widgets
-    ));
+          title: new Text('Details',
+              textAlign: TextAlign.center,
+              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+          backgroundColor: Colors.grey.shade200,
+          elevation: 0.0,
+          leading: new BackButton(color: Colors.grey.shade800),
+        ),
+        body: new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: widgets
+        ));
   }
 }

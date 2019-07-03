@@ -186,7 +186,7 @@ class _BroadcastState extends State<Broadcast> {
         appBar: BaseAppBar(
           title: Text('Broadcast',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),

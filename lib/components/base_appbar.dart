@@ -15,7 +15,7 @@ class BaseAppBar extends AppBar {
       IconThemeData iconTheme,
       TextTheme textTheme,
       bool primary: true,
-      bool centerTitle,
+      bool centerTitle: true,
       double titleSpacing: NavigationToolbar.kMiddleSpacing,
       double toolbarOpacity: 1.0,
       double bottomOpacity: 1.0})

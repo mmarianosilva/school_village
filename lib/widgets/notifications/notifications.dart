@@ -81,26 +81,26 @@ class _NotificationsState extends State<Notifications> {
   @override
   Widget build(BuildContext context) {
     return new ScopedModelDescendant<MainModel>(
-      builder: (context, child, model) {
-        if (!isLoaded) {
-          getUserDetails(model);
-        }
-        print("/$_schoolId/notifications");
-        return new Scaffold(
-          backgroundColor: Colors.grey.shade100,
-          appBar: new BaseAppBar(
-            title: new Text('Alert Log',
-                textAlign: TextAlign.center,
-                style: new TextStyle(color: Colors.black)),
-            backgroundColor: Colors.grey.shade200,
-            elevation: 0.0,
-            leading: new BackButton(color: Colors.grey.shade800),
-          ),
-          body: !isLoaded ?  new Text("Loading..") :
-          _buildList()
+        builder: (context, child, model) {
+          if (!isLoaded) {
+            getUserDetails(model);
+          }
+          print("/$_schoolId/notifications");
+          return new Scaffold(
+              backgroundColor: Colors.grey.shade100,
+              appBar: new BaseAppBar(
+                title: new Text('Alert Log',
+                    textAlign: TextAlign.center,
+                    style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+                backgroundColor: Colors.grey.shade200,
+                elevation: 0.0,
+                leading: new BackButton(color: Colors.grey.shade800),
+              ),
+              body: !isLoaded ?  new Text("Loading..") :
+              _buildList()
           );
 
-      }
+        }
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/util/colors.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
 import '../../../util/pdf_handler.dart';
@@ -137,8 +138,8 @@ class _DashboardState extends State<Dashboard> {
       context,
       MaterialPageRoute(
           builder: (context) => Messages(
-                role: role,
-              )),
+            role: role,
+          )),
     );
   }
 
@@ -151,8 +152,8 @@ class _DashboardState extends State<Dashboard> {
       context,
       MaterialPageRoute(
           builder: (context) => Messages(
-                role: role,
-              )),
+            role: role,
+          )),
     );
   }
 
@@ -168,20 +169,20 @@ class _DashboardState extends State<Dashboard> {
             children: <Widget>[
               //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
-                width: 48.0,
+                width: 55.0,
                 height: 48.0,
                 child: Center(
                   child: Icon(Icons.info,
-                      size: 36.0, color: Color.fromRGBO(4, 56, 130, 1)),
+                      size: 48.0, color: Color.fromRGBO(4, 56, 130, 1)),
                 ),
               ),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Support",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    "Support",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -209,7 +210,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Row(
                   children: <Widget>[
                     Container(
-                      width: 48.0,
+                      width: 55.0,
                       height: 48.0,
                       child: Center(
                         child: Image.asset('assets/images/alert.png',
@@ -219,10 +220,10 @@ class _DashboardState extends State<Dashboard> {
                     SizedBox(width: 12.0),
                     Expanded(
                         child: Text(
-                      "Alert Log",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 16.0),
-                    )),
+                          "Alert Log",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                        )),
                     Icon(Icons.chevron_right)
                   ],
                 ),
@@ -260,10 +261,10 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Messages",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    "Messages",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -301,17 +302,17 @@ class _DashboardState extends State<Dashboard> {
                   builder:
                       (BuildContext context, AsyncSnapshot<File> snapshot) {
                     if (snapshot.data == null) {
-                      return Image.asset('assets/images/logo.png', width: 48.0);
+                      return Image.asset('assets/images/logo.png', width: 55.0);
                     }
-                    return Image.file(snapshot.data, width: 48.0);
+                    return Image.file(snapshot.data, width: 55.0);
                   }),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data.data["documents"][index - 4]["title"],
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    snapshot.data.data["documents"][index - 4]["title"],
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -382,10 +383,10 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Form",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    "Incident Report Form",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -429,10 +430,10 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Log",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    "Incident Report Log",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -452,7 +453,7 @@ class _DashboardState extends State<Dashboard> {
       child: Column(
         children: <Widget>[
           Text("Anonymous Safety Hotline",
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 16.0, color: Constants.hotLineBlue),
               textAlign: TextAlign.center),
           Image.asset(
             'assets/images/hotline_header.png',
@@ -463,7 +464,6 @@ class _DashboardState extends State<Dashboard> {
             "Safety is Everybody's Business!\nYou can make a difference",
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontWeight: FontWeight.w500,
                 fontSize: 16.0,
                 color: Constants.hotLineBlue),
           )
@@ -486,7 +486,7 @@ class _DashboardState extends State<Dashboard> {
             children: <Widget>[
               //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
-                width: 48.0,
+                width: 55.0,
                 height: 48.0,
                 child: Center(
                   child: Icon(Icons.record_voice_over,
@@ -496,10 +496,10 @@ class _DashboardState extends State<Dashboard> {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Anonymous Hotline Log",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontSize: 16.0),
-              )),
+                    "Anonymous Hotline Log",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                  )),
               Icon(Icons.chevron_right)
             ],
           ),
@@ -520,7 +520,7 @@ class _DashboardState extends State<Dashboard> {
     }
     return GestureDetector(
       child:
-          Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
+      Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
       onTap: sendAlert,
     );
   }
@@ -532,7 +532,7 @@ class _DashboardState extends State<Dashboard> {
         if (ref != null && ref != '') {
           model
               .getAlertGroups(
-                  this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '')
+              this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '')
               .then((alerts) {
             print("User");
             print(alerts);

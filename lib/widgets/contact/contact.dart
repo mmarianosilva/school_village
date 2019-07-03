@@ -60,11 +60,12 @@ class _ContactState extends State<Contact> {
     return new Scaffold(
         key: _scaffoldKey,
         appBar: new BaseAppBar(
-
-          title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
-          backgroundColor: Colors.grey.shade200,
-          elevation: 0.0,
-          leading: new BackButton(color: Colors.grey.shade800)
+            title: new Text(title,
+                textAlign: TextAlign.center,
+                style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+            backgroundColor: Colors.grey.shade200,
+            elevation: 0.0,
+            leading: new BackButton(color: Colors.grey.shade800)
         ),
         body: new Center(
           child: new Container(

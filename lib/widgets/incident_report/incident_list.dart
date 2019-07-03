@@ -48,16 +48,16 @@ class IncidentListState extends State<IncidentList> {
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-          reports.clear();
-          reports.addAll(data.documents);
-          reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
-          setState(() {});
+      reports.clear();
+      reports.addAll(data.documents);
+      reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+      setState(() {});
     });
   }
 
 
   Widget _buildList() {
-    
+
 
     return ListView.builder(
       itemCount: reports.length,
@@ -68,7 +68,7 @@ class IncidentListState extends State<IncidentList> {
 
         List<String> items = List<String>.from(document['incidents']);
         List<String> posItems =
-            List<String>.from(document['positiveIncidents']);
+        List<String>.from(document['positiveIncidents']);
 
         var report = '';
 
@@ -138,7 +138,7 @@ class IncidentListState extends State<IncidentList> {
           appBar: BaseAppBar(
             title: Text('Incident Report Log',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black)),
+                style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
             leading: BackButton(color: Colors.grey.shade800),

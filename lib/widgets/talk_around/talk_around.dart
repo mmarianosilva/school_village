@@ -182,7 +182,7 @@ class _TalkAroundState extends State<TalkAround>
           elevation: 0.0,
           title: new Text('Talk Around',
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black)),
+              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
           leading: new BackButton(color: Colors.grey.shade800),
         ),
         body: new Center(child: new Text("Loading")),

@@ -127,71 +127,73 @@ class _LoginState extends State<Login> {
             padding: EdgeInsets.all(8.0),
             child: Image.asset('assets/images/logo.png'),
           ),
-          title: Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+          title: Text(title,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
         ),
         body: Center(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-            child: SingleChildScrollView(
-            child:Column(
-              children: [
-                const SizedBox(height: 18.0),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+              child: SingleChildScrollView(
+                child:Column(
+                  children: [
+                    const SizedBox(height: 18.0),
 //              Image.asset('assets/images/logo.png'),
-                Container(
-                  width: MediaQuery.of(context).size.width - 40.0,
-                    child: TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      focusNode: emailFocusNode,
-                      decoration:
-                      InputDecoration(border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
-                    )),
-                const SizedBox(height: 12.0),
-                Container(
-                    width: MediaQuery.of(context).size.width - 40.0,
-                    child: TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  focusNode: passwordFocusNode,
-                  decoration: InputDecoration(
-                      border: const UnderlineInputBorder(),
-                      hintText: 'Password',
-                      labelStyle:
-                          Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
-                      icon: Icon(Icons.lock)),
-                )),
-                const SizedBox(height: 32.0),
-                MaterialButton(
-                    minWidth: 200.0,
-                    color: Theme.of(context).accentColor,
-                    onPressed: onLogin,
-                    textColor: Colors.white,
-                    child: Text("LOGIN")),
-                const SizedBox(height: 18.0),
-                MaterialButton(
-                    minWidth: 200.0,
-                    color: Colors.grey.shade300,
-                    onPressed: () {
-                      studentLogin("student");
-                    },
-                    child: Text("STUDENT LOGIN")),
-                const SizedBox(height: 18.0),
-                MaterialButton(
-                    minWidth: 200.0,
-                    color: Colors.grey.shade300,
-                    onPressed: () {
-                      studentLogin("family");
-                    },
-                    child: Text("FAMILY LOGIN")),
-                const SizedBox(height: 18.0),
-                FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
-                const SizedBox(height: 18.0),
-                FlatButton(onPressed: createAccount, child: Text("Create Account")),
-              ],
-            ),
-          ),
-        )));
+                    Container(
+                        width: MediaQuery.of(context).size.width - 40.0,
+                        child: TextField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          focusNode: emailFocusNode,
+                          decoration:
+                          InputDecoration(border: const UnderlineInputBorder(), hintText: 'Email', icon: Icon(Icons.email)),
+                        )),
+                    const SizedBox(height: 12.0),
+                    Container(
+                        width: MediaQuery.of(context).size.width - 40.0,
+                        child: TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          focusNode: passwordFocusNode,
+                          decoration: InputDecoration(
+                              border: const UnderlineInputBorder(),
+                              hintText: 'Password',
+                              labelStyle:
+                              Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
+                              icon: Icon(Icons.lock)),
+                        )),
+                    const SizedBox(height: 32.0),
+                    MaterialButton(
+                        minWidth: 200.0,
+                        color: Theme.of(context).accentColor,
+                        onPressed: onLogin,
+                        textColor: Colors.white,
+                        child: Text("LOGIN")),
+                    const SizedBox(height: 18.0),
+                    MaterialButton(
+                        minWidth: 200.0,
+                        color: Colors.grey.shade300,
+                        onPressed: () {
+                          studentLogin("student");
+                        },
+                        child: Text("STUDENT LOGIN")),
+                    const SizedBox(height: 18.0),
+                    MaterialButton(
+                        minWidth: 200.0,
+                        color: Colors.grey.shade300,
+                        onPressed: () {
+                          studentLogin("family");
+                        },
+                        child: Text("FAMILY LOGIN")),
+                    const SizedBox(height: 18.0),
+                    FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
+                    const SizedBox(height: 18.0),
+                    FlatButton(onPressed: createAccount, child: Text("Create Account")),
+                  ],
+                ),
+              ),
+            )));
   }
 }

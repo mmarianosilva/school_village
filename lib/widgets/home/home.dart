@@ -424,7 +424,7 @@ class _HomeState extends State<Home> {
           appBar: BaseAppBar(
             title: Text(title,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black)),
+                style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
             leading: Container(
               padding: EdgeInsets.all(8.0),
               child: Image.asset('assets/images/logo.png'),

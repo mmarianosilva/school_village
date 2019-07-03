@@ -4,8 +4,9 @@ class SVColors {
   static const talkAroundAccent = const Color.fromRGBO(50, 51, 57, 1.0);
   static const talkAroundBlue = const Color.fromRGBO(0, 122, 255, 1.0);
   static const incidentReport = const Color.fromRGBO(89, 193, 234, 1.0);
-  static const incidentReportRed = const Color.fromRGBO(234, 51, 54, 1);
-  static final incidentReportGray = colorFromHex('#4a4a4a');
+  static const incidentReportRed = const Color.fromRGBO(234, 51, 54, 1.0);
+  static const incidentReportGray = const Color.fromRGBO(74, 74, 74, 1.0);
+  static const dashboardItemFontColor = const Color.fromRGBO(50, 51, 57, 1.0);
 
   static colorFromHex(String hex) {
     if (hex.startsWith('#')) {

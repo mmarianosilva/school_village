@@ -54,7 +54,7 @@ class _MessagesState extends State<Messages> {
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
         if (user.data["associatedSchools"][schoolId]["groups"]
-                [keys.elementAt(i)] ==
+        [keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
@@ -84,7 +84,7 @@ class _MessagesState extends State<Messages> {
 
   _convertDateToKey(createdAt) {
     return DateTime.fromMillisecondsSinceEpoch(createdAt)
-            .millisecondsSinceEpoch ~/
+        .millisecondsSinceEpoch ~/
         Constants.oneDay;
   }
 
@@ -181,17 +181,17 @@ class _MessagesState extends State<Messages> {
                         height: 12.0,
                         child: Center(
                             child: Container(
-                          height: 1.0,
-                          decoration: BoxDecoration(color: Colors.black12),
-                        ))),
+                              height: 1.0,
+                              decoration: BoxDecoration(color: Colors.black12),
+                            ))),
                     Container(
                       color: Colors.white,
                       child: Center(
                           child: Text(
-                        messageList[index].date,
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
-                      )),
+                            messageList[index].date,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
+                          )),
                       margin: const EdgeInsets.only(left: 40.0, right: 40.0),
                     )
                   ],
@@ -293,14 +293,14 @@ class _MessagesState extends State<Messages> {
   _saveBroadcast(image, alertBody, bool isVideo) async {
     final broadcastPath = 'schools/$_schoolId/broadcasts';
     CollectionReference collection =
-        Firestore.instance.collection(broadcastPath);
+    Firestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.document();
 
     var path = '';
     if (image != null) {
       _showLoading();
       path =
-          '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
+      '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
       String type = 'jpeg';
       type = lookupMimeType(image.path).split("/").length > 1
           ? lookupMimeType(image.path).split("/")[1]
@@ -352,7 +352,7 @@ class _MessagesState extends State<Messages> {
         appBar: BaseAppBar(
           title: Text('Broadcast Messaging',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
@@ -368,17 +368,17 @@ class _MessagesState extends State<Messages> {
           ), //new
           role == 'school_admin'
               ? Column(children: [
-                  // selectGroups,
-                  Container(
-                    color: SVColors.colorFromHex('#e5e5ea'),
-                    padding: EdgeInsets.only(bottom: 14.0),
-                    child: inputField,
-                  )
-                ])
+            // selectGroups,
+            Container(
+              color: SVColors.colorFromHex('#e5e5ea'),
+              padding: EdgeInsets.only(bottom: 14.0),
+              child: inputField,
+            )
+          ])
               : SizedBox(
-                  width: 0.0,
-                  height: 0.0,
-                )
+            width: 0.0,
+            height: 0.0,
+          )
         ]));
   }
 }

@@ -109,7 +109,7 @@ class MessageDetail extends StatelessWidget {
         appBar: new BaseAppBar(
           title: new Text('Message',
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black)),
+              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: new BackButton(color: Colors.grey.shade800),

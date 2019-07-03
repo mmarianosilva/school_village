@@ -31,7 +31,8 @@ class _SchoolListState extends State<SchoolList> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: BaseAppBar(
-        title: Text("Select School", style: TextStyle(color: Colors.black)),
+        title: Text("Select School",
+            style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
         leading: BackButton(color: Colors.grey.shade800),
         backgroundColor: Colors.grey.shade200,
       ),

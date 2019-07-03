@@ -41,7 +41,7 @@ class _SettingsState extends State<Settings> {
       _userId = user.uid;
     });
   }
-  
+
   _logout(context, MainModel model) async{
     showDialog<Null>(
       context: context,
@@ -90,86 +90,86 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
 
     return ScopedModelDescendant<MainModel>(
-      builder: (context, child, model) {
-        if (!isLoaded) {
-          getUserDetails(model);
-        }
+        builder: (context, child, model) {
+          if (!isLoaded) {
+            getUserDetails(model);
+          }
 
-        return Scaffold(
-          backgroundColor: Colors.grey.shade100,
-          appBar: BaseAppBar(
-            title: Text('Settings',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black)),
-            backgroundColor: Colors.grey.shade200,
-            elevation: 0.0,
-            leading: BackButton(color: Colors.grey.shade800),
-          ),
-          body: Column(
-            children: <Widget>[
-              SizedBox(height: 24.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                  ),
-                  Text(name,
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800)),
-                ],
-              ),
-              SizedBox(height: 24.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  FlatButton.icon(
-                    icon: Icon(Icons.school, size: 32.0),
-                    label: Text('Change School',
+          return Scaffold(
+            backgroundColor: Colors.grey.shade100,
+            appBar: BaseAppBar(
+              title: Text('Settings',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+              backgroundColor: Colors.grey.shade200,
+              elevation: 0.0,
+              leading: BackButton(color: Colors.grey.shade800),
+            ),
+            body: Column(
+              children: <Widget>[
+                SizedBox(height: 24.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(8.0),
+                    ),
+                    Text(name,
                         style: TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      _auth.signOut().then((nothing) {
-                        navigateToSchoolList(context);
-                      });
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 24.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  FlatButton.icon(
-                    icon: Icon(Icons.exit_to_app, size: 32.0),
-                    label: Text('Logout',
-                        style: TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                      _logout(context, model);
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 24.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  FlatButton(
-                    child: Text('Version: $_version Build: $_build',
-                        style: TextStyle(
-                            fontSize: 8.0, fontWeight: FontWeight.bold)),
-                    onPressed: () {
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
-        );
-      }
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800)),
+                  ],
+                ),
+                SizedBox(height: 24.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    FlatButton.icon(
+                      icon: Icon(Icons.school, size: 32.0),
+                      label: Text('Change School',
+                          style: TextStyle(
+                              fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        _auth.signOut().then((nothing) {
+                          navigateToSchoolList(context);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    FlatButton.icon(
+                      icon: Icon(Icons.exit_to_app, size: 32.0),
+                      label: Text('Logout',
+                          style: TextStyle(
+                              fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        _logout(context, model);
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    FlatButton(
+                      child: Text('Version: $_version Build: $_build',
+                          style: TextStyle(
+                              fontSize: 8.0, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        }
     );
   }
 }

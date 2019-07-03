@@ -33,18 +33,18 @@ class IncidentDetails extends StatefulWidget {
 
   IncidentDetails(
       {Key key,
-      this.items,
-      this.posItems,
-      this.other,
-      this.subjectNames,
-      this.witnessNames,
-      this.date,
-      this.location,
-      this.details,
-      this.demo,
-      this.imageFile,
-      this.name,
-      this.imgUrl})
+        this.items,
+        this.posItems,
+        this.other,
+        this.subjectNames,
+        this.witnessNames,
+        this.date,
+        this.location,
+        this.details,
+        this.demo,
+        this.imageFile,
+        this.name,
+        this.imgUrl})
       : super(key: key);
 
   @override
@@ -93,7 +93,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
   getDetails() async {
     FirebaseUser _user = await UserHelper.getUser();
     DocumentReference _userRef =
-        Firestore.instance.document("users/${_user.uid}");
+    Firestore.instance.document("users/${_user.uid}");
     var schoolId = await UserHelper.getSelectedSchoolID();
     _userRef.get().then((user) {
       userId = user.documentID;
@@ -106,17 +106,17 @@ class IncidentDetailsState extends State<IncidentDetails> {
 
   IncidentDetailsState(
       {this.items,
-      this.posItems,
-      this.other,
-      this.subjectNames,
-      this.witnessNames,
-      this.date,
-      this.location,
-      this.details,
-      this.demo,
-      this.imageFile,
-      this.name,
-      this.imgUrl});
+        this.posItems,
+        this.other,
+        this.subjectNames,
+        this.witnessNames,
+        this.date,
+        this.location,
+        this.details,
+        this.demo,
+        this.imageFile,
+        this.name,
+        this.imgUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +125,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
         appBar: BaseAppBar(
           title: Text('Incident Report',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.white,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
@@ -167,7 +167,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
         child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
             child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _buildKeyValueText('Incident', incident),
               SizedBox.fromSize(size: Size(0, 10.0)),
               _buildKeyValueText('Subject', subject),
@@ -200,13 +200,13 @@ class IncidentDetailsState extends State<IncidentDetails> {
               SizedBox.fromSize(size: Size(0, 26.0)),
               demo
                   ? Center(
-                      child: RaisedButton(
-                          onPressed: () {
-                            _sendReport();
-                          },
-                          color: SVColors.incidentReportRed,
-                          child: Text("SEND REPORT",
-                              style: TextStyle(color: Colors.white))))
+                  child: RaisedButton(
+                      onPressed: () {
+                        _sendReport();
+                      },
+                      color: SVColors.incidentReportRed,
+                      child: Text("SEND REPORT",
+                          style: TextStyle(color: Colors.white))))
                   : SizedBox.fromSize(size: Size(0, 0)),
               SizedBox.fromSize(size: Size(0, 15.0)),
             ])));
@@ -217,7 +217,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       loading = true;
     });
     CollectionReference collection =
-        Firestore.instance.collection('$schoolId/incident_reports');
+    Firestore.instance.collection('$schoolId/incident_reports');
     final DocumentReference document = collection.document();
     var path = '';
 
@@ -305,7 +305,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       Expanded(
           child: Text(value == null ? '' : value,
               style:
-                  TextStyle(color: SVColors.incidentReportGray, fontSize: 16)))
+              TextStyle(color: SVColors.incidentReportGray, fontSize: 16)))
     ]);
   }
 }

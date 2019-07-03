@@ -64,7 +64,7 @@ class IncidentState extends State<IncidentReport> {
         appBar: BaseAppBar(
           title: Text('Incident Report Form',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
@@ -72,16 +72,16 @@ class IncidentState extends State<IncidentReport> {
         body: items.length == 0
             ? Text('Loading...')
             : Builder(
-                builder: (context) => Stack(children: [
-                      buildSingleChildScrollView(context),
-                      positiveFeedbackVisible
-                          ? _buildPositiveOverlay()
-                          : SizedBox(
-                              height: 0,
-                              width: 0,
-                            )
-                    ]),
-              ));
+          builder: (context) => Stack(children: [
+            buildSingleChildScrollView(context),
+            positiveFeedbackVisible
+                ? _buildPositiveOverlay()
+                : SizedBox(
+              height: 0,
+              width: 0,
+            )
+          ]),
+        ));
   }
 
   _buildPositiveOverlay() {
@@ -89,31 +89,31 @@ class IncidentState extends State<IncidentReport> {
         color: Colors.transparent,
         child: Center(
             child: Stack(children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width,
-            child: _buildPositiveOverlayContent(),
-            height: 260,
-            margin: EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: SVColors.incidentReport,
-                  width: 2.0,
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: _buildPositiveOverlayContent(),
+                height: 260,
+                margin: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: SVColors.incidentReport,
+                      width: 2.0,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(2.0))),
+              ),
+              Positioned(
+                right: 16,
+                child: IconButton(
+                  icon: Icon(Icons.close, color: SVColors.incidentReport),
+                  onPressed: () {
+                    setState(() {
+                      positiveFeedbackVisible = false;
+                    });
+                  },
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(2.0))),
-          ),
-          Positioned(
-            right: 16,
-            child: IconButton(
-              icon: Icon(Icons.close, color: SVColors.incidentReport),
-              onPressed: () {
-                setState(() {
-                  positiveFeedbackVisible = false;
-                });
-              },
-            ),
-          ),
-        ])));
+              ),
+            ])));
   }
 
   _buildPositiveOverlayContent() {
@@ -130,79 +130,79 @@ class IncidentState extends State<IncidentReport> {
   SingleChildScrollView buildSingleChildScrollView(BuildContext context) {
     return SingleChildScrollView(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        constraints: BoxConstraints.expand(
-            height: 38.0, width: MediaQuery.of(context).size.width),
-        color: SVColors.incidentReport,
-        child: Center(
-            child: Text(
-          'Incident Type',
-          style: TextStyle(color: Colors.white, fontSize: 18.0),
-        )),
-      ),
-      Container(child: _buildCheckBoxes()),
-      _buildLastRow(),
-      Container(
-        height: 2,
-        color: SVColors.incidentReport,
-        margin: EdgeInsets.symmetric(vertical: 25.0),
-      ),
-      Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: _buildReporter()),
-      SizedBox.fromSize(size: Size(0, 27)),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-              icon: Icon(
-                Icons.photo,
-                color: SVColors.incidentReportGray,
-                size: 36,
-              ),
-              onPressed: () {
-                _getImage(context, ImageSource.gallery, false);
-              }),
-          IconButton(
-              icon: Icon(
-                Icons.photo_camera,
-                color: SVColors.incidentReportGray,
-                size: 36,
-              ),
-              onPressed: () {
-                _getImage(context, ImageSource.camera, false);
-              }),
-        ],
-      ),
-      _buildImagePreview(),
-      SizedBox.fromSize(size: Size(0, 22)),
-      Center(
-          child: RaisedButton(
-              onPressed: () {
-                if (_validateContent(context)) {
-                  List<String> sNames = [];
-                  List<String> wNames = [];
+          Container(
+            constraints: BoxConstraints.expand(
+                height: 38.0, width: MediaQuery.of(context).size.width),
+            color: SVColors.incidentReport,
+            child: Center(
+                child: Text(
+                  'Incident Type',
+                  style: TextStyle(color: Colors.white, fontSize: 18.0),
+                )),
+          ),
+          Container(child: _buildCheckBoxes()),
+          _buildLastRow(),
+          Container(
+            height: 2,
+            color: SVColors.incidentReport,
+            margin: EdgeInsets.symmetric(vertical: 25.0),
+          ),
+          Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: _buildReporter()),
+          SizedBox.fromSize(size: Size(0, 27)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                  icon: Icon(
+                    Icons.photo,
+                    color: SVColors.incidentReportGray,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    _getImage(context, ImageSource.gallery, false);
+                  }),
+              IconButton(
+                  icon: Icon(
+                    Icons.photo_camera,
+                    color: SVColors.incidentReportGray,
+                    size: 36,
+                  ),
+                  onPressed: () {
+                    _getImage(context, ImageSource.camera, false);
+                  }),
+            ],
+          ),
+          _buildImagePreview(),
+          SizedBox.fromSize(size: Size(0, 22)),
+          Center(
+              child: RaisedButton(
+                  onPressed: () {
+                    if (_validateContent(context)) {
+                      List<String> sNames = [];
+                      List<String> wNames = [];
 
-                  subjectNames.forEach((controller) {
-                    sNames.add(controller.text);
-                  });
-                  witnessNames.forEach((controller) {
-                    wNames.add(controller.text);
-                  });
+                      subjectNames.forEach((controller) {
+                        sNames.add(controller.text);
+                      });
+                      witnessNames.forEach((controller) {
+                        wNames.add(controller.text);
+                      });
 
-                  List<String> negativeIncidents = List<String>();
-                  items.forEach((key, value) {
-                    if (items[key]) negativeIncidents.add(key);
-                  });
-                  List<String> positiveIncidents = List<String>();
-                  posItems.forEach((key, value) {
-                    if (posItems[key]) positiveIncidents.add(key);
-                  });
+                      List<String> negativeIncidents = List<String>();
+                      items.forEach((key, value) {
+                        if (items[key]) negativeIncidents.add(key);
+                      });
+                      List<String> positiveIncidents = List<String>();
+                      posItems.forEach((key, value) {
+                        if (posItems[key]) positiveIncidents.add(key);
+                      });
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => IncidentDetails(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => IncidentDetails(
                               items: negativeIncidents,
                               posItems: positiveIncidents,
                               other: other,
@@ -214,14 +214,14 @@ class IncidentState extends State<IncidentReport> {
                               imageFile: image,
                               demo: true,
                             )),
-                  );
-                }
-              },
-              color: SVColors.incidentReport,
-              child: Text("REVIEW REPORT",
-                  style: TextStyle(color: Colors.white)))),
-      SizedBox.fromSize(size: Size(0, 31))
-    ]));
+                      );
+                    }
+                  },
+                  color: SVColors.incidentReport,
+                  child: Text("REVIEW REPORT",
+                      style: TextStyle(color: Colors.white)))),
+          SizedBox.fromSize(size: Size(0, 31))
+        ]));
   }
 
   _getImage(BuildContext context, ImageSource source, bool isVideo) {
@@ -302,15 +302,15 @@ class IncidentState extends State<IncidentReport> {
             SizedBox(width: padding),
             Flexible(
                 child: ButtonTheme(
-              minWidth: double.infinity,
-              child: OutlineButton(
-                  child: Text(date == null
-                      ? 'Select Time and Date'
-                      : dateTimeFormatter.format(date)),
-                  onPressed: () {
-                    _selectDate();
-                  }),
-            )),
+                  minWidth: double.infinity,
+                  child: OutlineButton(
+                      child: Text(date == null
+                          ? 'Select Time and Date'
+                          : dateTimeFormatter.format(date)),
+                      onPressed: () {
+                        _selectDate();
+                      }),
+                )),
             SizedBox(width: 10),
             MaterialButton(
               minWidth: 50.0,
@@ -409,10 +409,10 @@ class IncidentState extends State<IncidentReport> {
 
   _selectTime(DateTime date) async {
     final TimeOfDay picked =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    await showTimePicker(context: context, initialTime: TimeOfDay.now());
     if (picked != null && picked != time) {
       var newDate =
-          DateTime(date.year, date.month, date.day, picked.hour, picked.minute);
+      DateTime(date.year, date.month, date.day, picked.hour, picked.minute);
       print(newDate.toString());
       setState(() {
         this.date = newDate;
@@ -455,10 +455,10 @@ class IncidentState extends State<IncidentReport> {
                     ),
                     onPressed: i > 0
                         ? () {
-                            setState(() {
-                              names.removeAt(i);
-                            });
-                          }
+                      setState(() {
+                        names.removeAt(i);
+                      });
+                    }
                         : null,
                   ))),
           Container(
