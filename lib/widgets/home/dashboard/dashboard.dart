@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
 import '../../../util/pdf_handler.dart';
@@ -145,6 +146,13 @@ class _DashboardState extends State<Dashboard> {
 
   openTalk() {
     TalkAround.navigate("", context);
+  }
+
+  openIncidentManagement() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => IncidentManagement())
+    );
   }
 
   sendBroadcast() {
@@ -338,6 +346,11 @@ class _DashboardState extends State<Dashboard> {
       widgets.add(GestureDetector(
         child: Image.asset('assets/images/security_btn.png', width: 80.0),
         onTap: openTalk,
+      ));
+      widgets.add(SizedBox(width: 20.0));
+      widgets.add(GestureDetector(
+          child: Icon(Icons.warning, size: 80.0),
+          onTap: openIncidentManagement
       ));
     }
     if (role == "school_admin") {
