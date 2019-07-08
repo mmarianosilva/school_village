@@ -15,8 +15,9 @@ class Chat extends StatefulWidget {
   final String conversation;
   final DocumentSnapshot user;
   final bool showInput;
+  final bool reverseInput;
 
-  Chat({Key key, this.conversation, this.user, this.showInput})
+  Chat({Key key, this.conversation, this.user, this.showInput, this.reverseInput = false})
       : super(key: key);
 
   @override
@@ -197,7 +198,7 @@ class _ChatState extends State<Chat> {
     if (messageList.length > 0) {
       return ListView.builder(
           itemCount: messageList.length,
-          reverse: true,
+          reverse: widget.reverseInput,
           controller: _scrollController,
           padding: Constants.messagesHorizontalMargin,
           itemBuilder: (_, int index) {
