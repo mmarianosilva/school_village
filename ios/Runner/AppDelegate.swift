@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
 import AVFoundation
+import GoogleMaps
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -20,6 +21,8 @@ import AVFoundation
             prepareAudioPlayer()
             
             GeneratedPluginRegistrant.register(with: self)
+
+            GMSServices.provideAPIKey("AIzaSyBVRFQqX_6Xp01lE2vO2Uozw0TNX9OiUOg")
             
             let controller : FlutterViewController = window?.rootViewController as! FlutterViewController;
             let pdfViewChannel = FlutterMethodChannel.init(name: "schoolvillage.app/pdf_view",

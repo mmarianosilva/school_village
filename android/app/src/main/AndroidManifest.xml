@@ -26,6 +26,11 @@
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="my_channel_01"/>
+
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyBVRFQqX_6Xp01lE2vO2Uozw0TNX9OiUOg" />
+
         <activity
                 android:name=".MainActivity"
                 android:launchMode="singleTop"
