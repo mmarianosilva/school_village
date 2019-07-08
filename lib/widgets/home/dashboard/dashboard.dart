@@ -349,7 +349,7 @@ class _DashboardState extends State<Dashboard> {
       ));
       widgets.add(SizedBox(width: 20.0));
       widgets.add(GestureDetector(
-          child: Icon(Icons.warning, size: 80.0),
+          child: Image.asset('assets/images/incident_management_icon.png', width: 80.0),
           onTap: openIncidentManagement
       ));
     }
