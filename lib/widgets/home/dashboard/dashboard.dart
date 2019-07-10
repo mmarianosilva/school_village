@@ -151,7 +151,7 @@ class _DashboardState extends State<Dashboard> {
   openIncidentManagement() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => IncidentManagement())
+      MaterialPageRoute(builder: (context) => IncidentManagement(conversationId: "", role: role))
     );
   }
 

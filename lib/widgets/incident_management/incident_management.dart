@@ -1,22 +1,27 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/messages/messages.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class IncidentManagement extends StatefulWidget {
   final GlobalKey<_IncidentManagementState> key;
   final String conversationId;
+  final String role;
 
-  IncidentManagement({this.key, this.conversationId}) : super(key: key);
+  IncidentManagement({this.key, this.conversationId, this.role}) : super(key: key);
 
   @override
-  createState() => _IncidentManagementState(conversationId: conversationId);
+  createState() => _IncidentManagementState(conversationId: conversationId, role: role);
 }
 
 class _IncidentManagementState extends State<IncidentManagement> {
@@ -29,8 +34,9 @@ class _IncidentManagementState extends State<IncidentManagement> {
   String newMessageText = "";
   String newMessageConversationId = "";
   final String conversationId;
+  final String role;
 
-  _IncidentManagementState({this.conversationId});
+  _IncidentManagementState({this.conversationId, this.role});
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
@@ -38,6 +44,16 @@ class _IncidentManagementState extends State<IncidentManagement> {
 
   void _onSchoolMap() {
 
+  }
+
+  void _showBroadcast() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Messages(
+            role: role,
+          )),
+    );
   }
 
   getUserDetails() async {
@@ -87,7 +103,7 @@ class _IncidentManagementState extends State<IncidentManagement> {
                     Flexible(
                       child: GoogleMap(
                         onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(target: LatLng(37.7632125, -122.3997630), zoom: 19),
+                        initialCameraPosition: CameraPosition(target: LatLng(33.9018491, -118.1544462), zoom: 16.4),
                         mapType: MapType.satellite,
                         myLocationButtonEnabled: false,
                         indoorViewEnabled: true,
@@ -96,28 +112,45 @@ class _IncidentManagementState extends State<IncidentManagement> {
                     ),
                     Flexible(child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text("Address",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)
+                      child: GestureDetector(
+                        onTap: () {launch("https://goo.gl/maps/omQy8JRpbV8CqvzV7");},
+                        child: Text("14429 Downey Ave, Paramount, CA 90723, USA",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.lightBlue)
+                        ),
                       ),
                     ), flex: 1),
                     Flexible(
                       child: Row(
                         children: <Widget>[
-                          Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("Alert type",
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
-                              )
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("Alert type",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
                           ),
                           Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text("911 Callback: ",
-                                    textAlign: TextAlign.end,
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text("911 Callback: ",
+                                        textAlign: TextAlign.end,
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                                    Text("John Smith",
+                                        textAlign: TextAlign.end,
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                                    GestureDetector(
+                                      onTap: () { launch("tel://9491234567"); },
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+                                        child: Text("949-123-4568",
+                                            textAlign: TextAlign.end,
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Colors.lightBlue)),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               )
                           )
                         ],
@@ -126,23 +159,41 @@ class _IncidentManagementState extends State<IncidentManagement> {
                     ),
                     Flexible(child: Padding(
                       padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                      child: Text("Alert description",
+                      child: Text("An Armed Assailant has been reported at Paramount High School",
                           textAlign: TextAlign.start,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
                       ),
-                    ), flex: 1),
+                    ), flex: 2),
                     Flexible(child: Padding(
                       padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                      child: Text("Initial report by",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0)
+                      child: Row(
+                        children: <Widget>[
+                          Text("Initial report by: ",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
+                          ),
+                          Text("Michael Wiggins",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                          GestureDetector(
+                              onTap: () { launch("tel://9492741789"); },
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+                                child: Text("949-274-1709",
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Colors.lightBlue)),
+                              )
+                          )
+                        ],
                       ),
                     ), flex: 1),
                     Flexible(
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Container(child: Image.asset("assets/images/broadcast_btn.png", width: 64, height: 64), padding: EdgeInsets.all(8)),
+                              Container(
+                                  child: GestureDetector(
+                                      child: Image.asset("assets/images/broadcast_btn.png", width: 64, height: 64),
+                                      onTap: _showBroadcast),
+                                  padding: EdgeInsets.all(8)),
                               Spacer(),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
