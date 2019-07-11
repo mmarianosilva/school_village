@@ -73,6 +73,9 @@ flutter:
     - assets/images/incident_details.png
     - assets/images/feature_image.png
     - assets/images/incident_management_icon.png
+    - assets/images/group_message_btn.png
+    - assets/images/school_map_btn.png
+    - assets/images/stop_sign.png
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 
