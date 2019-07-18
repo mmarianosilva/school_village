@@ -160,7 +160,7 @@ class _SettingsState extends State<Settings> {
                     FlatButton(
                       child: Text('Version: $_version Build: $_build',
                           style: TextStyle(
-                              fontSize: 8.0, fontWeight: FontWeight.bold)),
+                              fontSize: 14.0, fontWeight: FontWeight.bold)),
                       onPressed: () {
                       },
                     ),
