@@ -252,8 +252,8 @@ class _MessagesState extends State<Messages> {
       return;
     }
 
-    if (text.length < 10) {
-      showErrorDialog("Text length should be at least 10 characters");
+    if (text.length < 8) {
+      showErrorDialog("Text length should be at least 8 characters");
       return;
     }
 
