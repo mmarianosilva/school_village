@@ -35,6 +35,7 @@ dependencies:
   progress_hud: ^1.1.0
   mime: ^0.9.6+3
   google_maps_flutter: ^0.5.11
+  rxdart: ^0.22.1
 
 
 
