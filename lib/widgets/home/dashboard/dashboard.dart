@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
@@ -32,6 +33,31 @@ class _DashboardState extends State<Dashboard> {
   bool isOwner = false;
   String role = "";
   Location _location = Location();
+  SchoolAlert alertInProgress = null;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlertIsInProgress();
+  }
+
+  _checkIfAlertIsInProgress() async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
+    alerts.orderBy("createdAt", descending: true).snapshots().first.then((result) {
+      if (result.documents.length > 0) {
+        DocumentSnapshot latestAlert = result.documents.first;
+        if (latestAlert != null) {
+          SchoolAlert alert = SchoolAlert.fromMap(latestAlert.data);
+          if (this.alertInProgress != alert) {
+            this.setState(() {
+              this.alertInProgress = alert;
+            });
+          }
+        }
+      }
+    });
+  }
 
   _showPDF(context, url) {
     print(url);
@@ -151,7 +177,7 @@ class _DashboardState extends State<Dashboard> {
   openIncidentManagement() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => IncidentManagement(conversationId: "", role: role))
+      MaterialPageRoute(builder: (context) => IncidentManagement(alert: alertInProgress, role: role))
     );
   }
 
@@ -347,11 +373,14 @@ class _DashboardState extends State<Dashboard> {
         child: Image.asset('assets/images/security_btn.png', width: 80.0),
         onTap: openTalk,
       ));
-      widgets.add(SizedBox(width: 20.0));
-      widgets.add(GestureDetector(
-          child: Image.asset('assets/images/incident_management_icon.png', width: 80.0),
-          onTap: openIncidentManagement
-      ));
+      if (alertInProgress != null) {
+        widgets.add(SizedBox(width: 20.0));
+        widgets.add(GestureDetector(
+            child: Image.asset(
+                'assets/images/incident_management_icon.png', width: 80.0),
+            onTap: openIncidentManagement
+        ));
+      }
     }
     if (role == "school_admin") {
       widgets.add(SizedBox(width: 20.0));
