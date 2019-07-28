@@ -13,6 +13,7 @@ class IncidentMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
@@ -67,6 +68,7 @@ class IncidentMessage extends StatelessWidget {
               TextSpan(text: message)
             ]
           ),
+          textAlign: TextAlign.justify,
         ),
         Divider(color: Colors.red)
       ],

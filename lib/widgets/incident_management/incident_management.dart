@@ -3,51 +3,48 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:school_village/base/pair.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
+import 'package:school_village/model/school_alert.dart';
+import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/messages/messages.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:intl/intl.dart';
 import 'incident_message.dart';
 
 
 class IncidentManagement extends StatefulWidget {
   final GlobalKey<_IncidentManagementState> key;
-  final String conversationId;
+  final SchoolAlert alert;
   final String role;
+  final DateFormat dateFormatter = DateFormat("hh:mm a");
 
-  IncidentManagement({this.key, this.conversationId, this.role}) : super(key: key);
+
+  IncidentManagement({this.key, this.alert, this.role}) : super(key: key);
 
   @override
-  createState() => _IncidentManagementState(conversationId: conversationId, role: role);
+  createState() => _IncidentManagementState(alert: alert, role: role);
 }
 
 class _IncidentManagementState extends State<IncidentManagement> {
-  static const titles = ["Message", "Message", "Alert"];
-  static const authors = ["Samuel Security", "Michael Wiggins", "Demo Staff"];
-  static const messages = [
-    "We have a report from the Anonymous Hotline that Tommy Jones, wearing a black hoodie and blue pants has a gun and is planning to shoot someone at school. Advise if he is seen and watch campus entry points to prevent entry if possible.",
-    "A simulation of system communications during an armed assailant incident will begin in one minute. This is only a simulation.",
-    "An Armed Assailant has been reported at SchoolVillage Demo"];
-  static const timestamps = ["9:16 AM", "9:12 AM", "9:01 AM"];
-  static const targetGroups = ["Security/Admin", "Staff, Students, Family", ""];
-
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
   String _schoolId = '';
-  String _securityConversation = "";
-  String _securityAdminConversation = "";
+  StreamSubscription<QuerySnapshot> _messageStream;
+  List<TalkAroundMessage> _messages = List<TalkAroundMessage>();
   String newMessageText = "";
   String newMessageConversationId = "";
-  final String conversationId;
+  final SchoolAlert alert;
   final String role;
 
-  _IncidentManagementState({this.conversationId, this.role});
+  _IncidentManagementState({this.alert, this.role});
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
@@ -71,6 +68,23 @@ class _IncidentManagementState extends State<IncidentManagement> {
     );
   }
 
+  void onMessagesChanged(Pair<QuerySnapshot, QuerySnapshot> snapshotPair) {
+    List<DocumentSnapshot> mergedList = snapshotPair.first.documents;
+    mergedList.addAll(snapshotPair.second.documents);
+    List<TalkAroundMessage> updatedList = mergedList.map((data) {
+      return TalkAroundMessage(
+          data["body"],
+          DateTime.fromMillisecondsSinceEpoch(data["createdAt"]),
+          data["createdBy"],
+          data["location"]["latitude"],
+          data["location"]["longitude"]);
+    }).toList();
+    updatedList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
+    setState(() {
+      _messages = updatedList;
+    });
+  }
+
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
@@ -78,20 +92,37 @@ class _IncidentManagementState extends State<IncidentManagement> {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
-        _securityConversation = "$schoolId/conversations/security";
-        _securityAdminConversation = "$schoolId/conversations/security-admin";
         _isLoading = false;
       });
+      getConversationDetails();
+    });
+  }
+
+  getConversationDetails() async {
+    CollectionReference securityAdminMessageCollection = Firestore.instance.collection('${_schoolId}/conversations/security-admin/messages');
+    Stream<QuerySnapshot> securityAdminStream = securityAdminMessageCollection
+        .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+        .orderBy("createdAt", descending: true)
+        .snapshots();
+    CollectionReference securityMessageCollection = Firestore.instance.collection('${_schoolId}/conversations/security/messages');
+    Stream<QuerySnapshot> securityStream = securityMessageCollection
+        .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+        .orderBy("createdAt", descending: true)
+        .snapshots();
+    ZipStream<QuerySnapshot, Pair<QuerySnapshot, QuerySnapshot>>([securityAdminStream, securityStream], (values) => Pair(values[0], values[1])).listen((data) {
+      onMessagesChanged(data);
     });
   }
 
   Widget _buildListItem(BuildContext context, int index) {
+    TalkAroundMessage item = _messages[index];
+    String timestamp = widget.dateFormatter.format(item.timestamp);
     return IncidentMessage(
-      title: titles[index],
-      author: authors[index],
-      message: messages[index],
-      timestamp: timestamps[index],
-      targetGroup: targetGroups[index]);
+        title: "Message",
+        author: item.author,
+        message: item.message,
+        timestamp: timestamp,
+        targetGroup: "");
   }
 
   @override
@@ -113,8 +144,7 @@ class _IncidentManagementState extends State<IncidentManagement> {
                 backgroundColor: Colors.grey.shade200,
                 elevation: 0.0
             ),
-            body:
-            Builder(builder: (context) {
+            body: Builder(builder: (context) {
               if (_isLoading) {
                 return Center(
                     child: CircularProgressIndicator()
@@ -127,16 +157,21 @@ class _IncidentManagementState extends State<IncidentManagement> {
                     Flexible(
                       child: GoogleMap(
                         onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(target: LatLng(33.9018491, -118.1544462), zoom: 16.4),
+                        initialCameraPosition: CameraPosition(target: LatLng(alert.location.latitude, alert.location.longitude), zoom: 16.4),
                         mapType: MapType.satellite,
                         myLocationButtonEnabled: false,
                         indoorViewEnabled: true,
-                        markers: Set<Marker>.from([Marker(markerId: MarkerId("123456789"), position: LatLng(33.902007, -118.1532139), infoWindow: InfoWindow(title: "Armed Assailant Alert", snippet: "Reported by Demo Staff at 9:01 AM"))]),
+                        markers: Set<Marker>.from([
+                          Marker(
+                              markerId: MarkerId(alert.createdById),
+                              position: LatLng(alert.location.latitude, alert.location.longitude),
+                              infoWindow: InfoWindow.noText)
+                        ]),
                       ),
                       flex: 10,
                     ),
                     Flexible(child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                       child: GestureDetector(
                         onTap: () {launch("https://goo.gl/maps/omQy8JRpbV8CqvzV7");},
                         child: Text("14429 Downey Ave, Paramount, CA 90723, USA",
@@ -147,28 +182,35 @@ class _IncidentManagementState extends State<IncidentManagement> {
                     ), flex: 2),
                     Flexible(child:
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                      child: Text("Armed Assailant Alert!",
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                      child: Text(alert.title,
                           textAlign: TextAlign.start,
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
                     ),
                         flex: 1),
+                    Flexible(child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                      child: Text(alert.body,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
+                      ),
+                    ), flex: 2),
                     Flexible(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8.0, 4.0, 4.0, 4.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                           child: Row(
                             children: <Widget>[
                               Text("911 Callback: ",
                                   textAlign: TextAlign.start,
                                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-                              Text("John Smith",
+                              Text(alert.createdBy,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(fontSize: 14.0)),
                               GestureDetector(
-                                onTap: () { launch("tel://9491234567"); },
+                                onTap: () { launch("tel://${alert.reportedByPhone}"); },
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-                                  child: Text("949-123-4568",
+                                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                  child: Text(alert.reportedByPhone,
                                       textAlign: TextAlign.start,
                                       style: TextStyle(fontSize: 14.0, color: Colors.blue)),
                                 ),
@@ -179,32 +221,25 @@ class _IncidentManagementState extends State<IncidentManagement> {
                         flex: 1
                     ),
                     Flexible(child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                      child: Text("An Armed Assailant has been reported at Paramount High School",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(fontSize: 14.0)
-                      ),
-                    ), flex: 2),
-                    Flexible(child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
                       child: Row(
                         children: <Widget>[
                           Text("Reported by: ",
                               textAlign: TextAlign.start,
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
                           ),
-                          Text("Michael Wiggins",
+                          Text(alert.createdBy,
                               style: TextStyle(fontSize: 14.0)),
                           GestureDetector(
-                              onTap: () { launch("tel://9492741789"); },
+                              onTap: () { launch("tel://${alert.reportedByPhone}"); },
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-                                child: Text("949-274-1709",
+                                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                child: Text(alert.reportedByPhone,
                                     style: TextStyle(fontSize: 14.0, color: Colors.blue)),
                               )
                           ),
                           Expanded(
-                              child: Text("4:04 PM",
+                              child: Text(widget.dateFormatter.format(alert.timestamp),
                                   textAlign: TextAlign.end,
                                   style: TextStyle(fontWeight: FontWeight.bold))
                           )
@@ -217,50 +252,59 @@ class _IncidentManagementState extends State<IncidentManagement> {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                  child: Container(
+                                      child: GestureDetector(
+                                          child: Image.asset("assets/images/group_message_btn.png", height: 64),
+                                          onTap: _showBroadcast),
+                                      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                ),
+                                Spacer(),
                                 Container(
                                     child: GestureDetector(
-                                        child: Image.asset("assets/images/group_message_btn.png", width: 64, height: 64),
+                                        child: Image.asset("assets/images/broadcast_btn.png", height: 64),
                                         onTap: _showBroadcast),
-                                    padding: EdgeInsets.all(8)),
+                                    padding: EdgeInsets.all(4)),
                                 Spacer(),
                                 Container(
                                     child: GestureDetector(
-                                        child: Image.asset("assets/images/stop_sign.png", width: 64, height: 64),
+                                        child: Image.asset("assets/images/school_map_btn.png", height: 64),
+                                        onTap: _onSchoolMap),
+                                    padding: EdgeInsets.all(4)),
+                                Spacer(),
+                                Container(
+                                    child: GestureDetector(
+                                        child: Image.asset("assets/images/stop_sign.png", height: 64),
                                         onTap: _showStopAlert),
-                                    padding: EdgeInsets.all(8)),
-                                Spacer(),
-                                Container(
-                                    child: GestureDetector(
-                                        child: Image.asset("assets/images/school_map_btn.png", width: 64, height: 64),
-                                        onTap: () { launch("https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=33.9014382,-118.1531176"); }),
-                                    padding: EdgeInsets.all(8)),
+                                    padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
                               ]),
                         ),
                         flex: 3
                     ),
                     Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text("SECURITY COMMUNICATIONS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                            Spacer(),
-                            Text("Time", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                          child: Row(
+                            children: <Widget>[
+                              Text("SECURITY COMMUNICATIONS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                              Spacer(),
+                              Text("Time", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
+                            ],
+                          ),
                         ),
-                      ),
-                      flex: 1
+                        flex: 1
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
                       child: Divider(color: Colors.red),
                     ),
                     Flexible(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
                           child: ListView.builder(
                             itemBuilder: _buildListItem,
-                            itemCount: 3,
+                            itemCount: _messages.length,
                           ),
                         ),
                         flex: 10
@@ -273,5 +317,11 @@ class _IncidentManagementState extends State<IncidentManagement> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _messageStream.cancel();
+    super.dispose();
   }
 }
