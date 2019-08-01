@@ -10,6 +10,7 @@ import 'package:school_village/model/main_model.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/incident_management/OnMapInterface.dart';
 import 'package:school_village/widgets/messages/messages.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -32,7 +33,7 @@ class IncidentManagement extends StatefulWidget {
   createState() => _IncidentManagementState(alert: alert, role: role);
 }
 
-class _IncidentManagementState extends State<IncidentManagement> {
+class _IncidentManagementState extends State<IncidentManagement> implements OnMapInterface {
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
@@ -43,8 +44,18 @@ class _IncidentManagementState extends State<IncidentManagement> {
   String newMessageConversationId = "";
   final SchoolAlert alert;
   final String role;
+  Set<Marker> markers;
 
-  _IncidentManagementState({this.alert, this.role});
+  _IncidentManagementState({this.alert, this.role}) {
+    this.markers = Set.from([Marker(
+        markerId: MarkerId(alert.createdById),
+        position: LatLng(alert.location.latitude, alert.location.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        infoWindow: InfoWindow(
+            title: alert.title,
+            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
+        ))]);
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
@@ -76,10 +87,28 @@ class _IncidentManagementState extends State<IncidentManagement> {
           data["body"],
           DateTime.fromMillisecondsSinceEpoch(data["createdAt"]),
           data["createdBy"],
+          data["createdById"],
           data["location"]["latitude"],
           data["location"]["longitude"]);
     }).toList();
     updatedList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
+    markers.clear();
+    markers.add(Marker(
+        markerId: MarkerId(alert.createdById),
+        position: LatLng(alert.location.latitude, alert.location.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        infoWindow: InfoWindow(
+            title: alert.title,
+            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
+        )));
+    markers.addAll(updatedList.map((message) => Marker(
+        markerId: MarkerId(message.authorId),
+        position: LatLng(message.latitude, message.longitude),
+        infoWindow: InfoWindow(
+            title: message.author,
+            snippet: message.message)
+    ))
+    );
     setState(() {
       _messages = updatedList;
     });
@@ -118,11 +147,15 @@ class _IncidentManagementState extends State<IncidentManagement> {
     TalkAroundMessage item = _messages[index];
     String timestamp = widget.dateFormatter.format(item.timestamp);
     return IncidentMessage(
-        title: "Message",
-        author: item.author,
-        message: item.message,
+        message: item,
         timestamp: timestamp,
-        targetGroup: "");
+        targetGroup: "",
+        onMapClicked: this);
+  }
+
+  @override
+  void onMapClicked(double latitude, double longitude) {
+    _mapController.animateCamera(CameraUpdate.newLatLng(LatLng(latitude, longitude)));
   }
 
   @override
@@ -155,132 +188,148 @@ class _IncidentManagementState extends State<IncidentManagement> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Flexible(
+                      child: Container(
+                        color: Color.fromARGB(140, 229, 229, 234),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                          child: RichText(
+                            text: TextSpan(
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                                children: <TextSpan>[
+                                  TextSpan(text: "${alert.title}", style: TextStyle(fontSize: 18.0)),
+                                  TextSpan(text: " at ${widget.dateFormatter.format(alert.timestamp)}", style: TextStyle(fontSize: 14.0))
+                                ]
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      flex: 2,
+                    ),
+                    Flexible(
                       child: GoogleMap(
                         onMapCreated: _onMapCreated,
                         initialCameraPosition: CameraPosition(target: LatLng(alert.location.latitude, alert.location.longitude), zoom: 16.4),
                         mapType: MapType.satellite,
                         myLocationButtonEnabled: false,
                         indoorViewEnabled: true,
-                        markers: Set<Marker>.from([
-                          Marker(
-                              markerId: MarkerId(alert.createdById),
-                              position: LatLng(alert.location.latitude, alert.location.longitude),
-                              infoWindow: InfoWindow.noText)
-                        ]),
+                        markers: markers,
                       ),
                       flex: 10,
                     ),
-                    Flexible(child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                      child: GestureDetector(
-                        onTap: () {launch("https://goo.gl/maps/omQy8JRpbV8CqvzV7");},
-                        child: Text("14429 Downey Ave, Paramount, CA 90723, USA",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Colors.blue)
+                    Flexible(child: Container(
+                      color: Color.fromARGB(140, 229, 229, 234),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: GestureDetector(
+                          onTap: () {launch("https://goo.gl/maps/omQy8JRpbV8CqvzV7");},
+                          child: Text("14429 Downey Ave, Paramount, CA 90723, USA",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))
+                          ),
                         ),
                       ),
                     ), flex: 2),
-                    Flexible(child:
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                      child: Text(alert.title,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-                    ),
-                        flex: 1),
-                    Flexible(child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                      child: Text(alert.body,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
+                    Flexible(child: Container(
+                      color: Color.fromARGB(140, 229, 229, 234),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        child: Text(alert.body,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
+                        ),
                       ),
                     ), flex: 2),
                     Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                          child: Row(
-                            children: <Widget>[
-                              Text("911 Callback: ",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-                              Text(alert.createdBy,
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(fontSize: 14.0)),
-                              GestureDetector(
-                                onTap: () { launch("tel://${alert.reportedByPhone}"); },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
-                                  child: Text(alert.reportedByPhone,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(fontSize: 14.0, color: Colors.blue)),
-                                ),
-                              )
-                            ],
+                        child: Container(
+                          color: Color.fromARGB(140, 229, 229, 234),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text("911 Callback: ",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                                Text(alert.createdBy,
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(fontSize: 14.0)),
+                                GestureDetector(
+                                  onTap: () { launch("tel://${alert.reportedByPhone}"); },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                    child: Text(alert.reportedByPhone,
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                         flex: 1
                     ),
-                    Flexible(child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                      child: Row(
-                        children: <Widget>[
-                          Text("Reported by: ",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
-                          ),
-                          Text(alert.createdBy,
-                              style: TextStyle(fontSize: 14.0)),
-                          GestureDetector(
-                              onTap: () { launch("tel://${alert.reportedByPhone}"); },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
-                                child: Text(alert.reportedByPhone,
-                                    style: TextStyle(fontSize: 14.0, color: Colors.blue)),
-                              )
-                          ),
-                          Expanded(
-                              child: Text(widget.dateFormatter.format(alert.timestamp),
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(fontWeight: FontWeight.bold))
-                          )
-                        ],
+                    Flexible(child: Container(
+                      color: Color.fromARGB(140, 229, 229, 234),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        child: Row(
+                          children: <Widget>[
+                            Text("Reported by: ",
+                                textAlign: TextAlign.start,
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
+                            ),
+                            Text(alert.createdBy,
+                                style: TextStyle(fontSize: 14.0)),
+                            GestureDetector(
+                                onTap: () { launch("tel://${alert.reportedByPhone}"); },
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                  child: Text(alert.reportedByPhone,
+                                      style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
+                                )
+                            )
+                          ],
+                        ),
                       ),
                     ), flex: 1),
                     Flexible(
                         child: Container(
-                          color: Color.fromARGB(255, 121, 123, 128),
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                  child: Container(
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                    child: Container(
+                                        child: GestureDetector(
+                                            child: Image.asset("assets/images/group_message_btn.png", height: 64),
+                                            onTap: _showBroadcast),
+                                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                  ),
+                                  Spacer(),
+                                  Container(
                                       child: GestureDetector(
-                                          child: Image.asset("assets/images/group_message_btn.png", height: 64),
+                                          child: Image.asset("assets/images/broadcast_msg_btn_hm.png", height: 64),
                                           onTap: _showBroadcast),
+                                      padding: EdgeInsets.all(4)),
+                                  Spacer(),
+                                  Container(
+                                      child: GestureDetector(
+                                          child: Image.asset("assets/images/school_map_btn.png", height: 64),
+                                          onTap: _onSchoolMap),
+                                      padding: EdgeInsets.all(4)),
+                                  Spacer(),
+                                  Container(
+                                      child: GestureDetector(
+                                          child: Image.asset("assets/images/stop_sign.png", height: 64),
+                                          onTap: _showStopAlert),
                                       padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
-                                ),
-                                Spacer(),
-                                Container(
-                                    child: GestureDetector(
-                                        child: Image.asset("assets/images/broadcast_btn.png", height: 64),
-                                        onTap: _showBroadcast),
-                                    padding: EdgeInsets.all(4)),
-                                Spacer(),
-                                Container(
-                                    child: GestureDetector(
-                                        child: Image.asset("assets/images/school_map_btn.png", height: 64),
-                                        onTap: _onSchoolMap),
-                                    padding: EdgeInsets.all(4)),
-                                Spacer(),
-                                Container(
-                                    child: GestureDetector(
-                                        child: Image.asset("assets/images/stop_sign.png", height: 64),
-                                        onTap: _showStopAlert),
-                                    padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
-                              ]),
+                                ]),
+                          ),
                         ),
-                        flex: 3
+                        flex: 4
                     ),
                     Flexible(
                         child: Padding(

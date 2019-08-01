@@ -1,14 +1,15 @@
 
 import 'package:flutter/material.dart';
+import 'package:school_village/model/talk_around_message.dart';
+import 'package:school_village/widgets/incident_management/OnMapInterface.dart';
 
 class IncidentMessage extends StatelessWidget {
-  final String message;
-  final String author;
-  final String title;
+  final TalkAroundMessage message;
   final String timestamp;
   final String targetGroup;
+  final OnMapInterface onMapClicked;
 
-  IncidentMessage({Key key, this.title, this.author, this.message, this.timestamp, this.targetGroup}) : super(key: key);
+  IncidentMessage({Key key, this.message, this.timestamp, this.targetGroup, this.onMapClicked}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +20,11 @@ class IncidentMessage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
           child: Row(
             children: <Widget>[
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+              Text("Message", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
               Spacer(),
-              Text("Map", style: TextStyle(color: Colors.blue)),
+              GestureDetector(
+                  child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))),
+                  onTap: () => onMapClicked.onMapClicked(message.latitude, message.longitude)),
               Spacer(),
               Text(timestamp, textAlign: TextAlign.end, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
             ],
@@ -37,7 +40,7 @@ class IncidentMessage extends StatelessWidget {
                       child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold)),
                       flex: 2),
                   Flexible(
-                      child: Text(author, style: TextStyle(color: Colors.blue)),
+                      child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))),
                       flex: 4),
                   Spacer(),
                   Flexible(
@@ -54,7 +57,7 @@ class IncidentMessage extends StatelessWidget {
                   Flexible(
                       child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                   Flexible(
-                      child: Text(author, style: TextStyle(color: Colors.blue)))
+                      child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))))
                 ],
               );
             }
@@ -65,7 +68,7 @@ class IncidentMessage extends StatelessWidget {
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(text: "Message: ", style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: message)
+              TextSpan(text: message.message)
             ]
           ),
           textAlign: TextAlign.justify,
