@@ -1,18 +1,17 @@
 import 'dart:async';
+import 'package:async/async.dart' show StreamGroup;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:school_village/base/pair.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/util/user_helper.dart';
-import 'package:school_village/widgets/incident_management/OnMapInterface.dart';
+import 'package:school_village/widgets/incident_management/close_incident_management_alert.dart';
+import 'package:school_village/widgets/incident_management/on_map_interface.dart';
 import 'package:school_village/widgets/messages/messages.dart';
-import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,7 +24,6 @@ class IncidentManagement extends StatefulWidget {
   final SchoolAlert alert;
   final String role;
   final DateFormat dateFormatter = DateFormat("hh:mm a");
-
 
   IncidentManagement({this.key, this.alert, this.role}) : super(key: key);
 
@@ -40,8 +38,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   String _schoolId = '';
   StreamSubscription<QuerySnapshot> _messageStream;
   List<TalkAroundMessage> _messages = List<TalkAroundMessage>();
-  String newMessageText = "";
-  String newMessageConversationId = "";
+  List<TalkAroundMessage> _fullList = List<TalkAroundMessage>();
   final SchoolAlert alert;
   final String role;
   Set<Marker> markers;
@@ -65,8 +62,23 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
 
   }
 
-  void _showStopAlert() {
+  void _showStopAlert() async {
+    bool confirm = await _showStopAlertAsync();
+    if (confirm) {
+      Firestore.instance.document("$_schoolId/notifications/${alert.id}").updateData({"endedAt" : FieldValue.serverTimestamp()}).then((_) {
+        Navigator.pop(context);
+      });
+    }
+  }
 
+  Future<bool> _showStopAlertAsync() async {
+    return showDialog<bool>(
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return CloseIncidentManagementAlert();
+      },
+      context: context,
+    );
   }
 
   void _showBroadcast() async {
@@ -79,19 +91,21 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     );
   }
 
-  void onMessagesChanged(Pair<QuerySnapshot, QuerySnapshot> snapshotPair) {
-    List<DocumentSnapshot> mergedList = snapshotPair.first.documents;
-    mergedList.addAll(snapshotPair.second.documents);
-    List<TalkAroundMessage> updatedList = mergedList.map((data) {
+  void onMessagesChanged(List<DocumentChange> snapshot) {
+    snapshot.removeWhere((document) => DateTime.fromMicrosecondsSinceEpoch(document.document["timestamp"].microsecondsSinceEpoch).isBefore(alert.timestamp));
+    List<TalkAroundMessage> newList = snapshot.map((data) {
       return TalkAroundMessage(
-          data["body"],
-          DateTime.fromMillisecondsSinceEpoch(data["createdAt"]),
-          data["createdBy"],
-          data["createdById"],
-          data["location"]["latitude"],
-          data["location"]["longitude"]);
+          data.document.documentID,
+          data.document.reference.parent().parent().documentID,
+          data.document["body"],
+          DateTime.fromMicrosecondsSinceEpoch(data.document["timestamp"].microsecondsSinceEpoch),
+          data.document["author"],
+          data.document["authorId"],
+          data.document["location"]["latitude"],
+          data.document["location"]["longitude"]);
     }).toList();
-    updatedList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
+    _fullList.addAll(newList);
+    _fullList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
     markers.clear();
     markers.add(Marker(
         markerId: MarkerId(alert.createdById),
@@ -101,7 +115,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
             title: alert.title,
             snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
         )));
-    markers.addAll(updatedList.map((message) => Marker(
+    markers.addAll(_fullList.map((message) => Marker(
         markerId: MarkerId(message.authorId),
         position: LatLng(message.latitude, message.longitude),
         infoWindow: InfoWindow(
@@ -110,7 +124,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     ))
     );
     setState(() {
-      _messages = updatedList;
+      _messages = _fullList;
     });
   }
 
@@ -128,18 +142,15 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   getConversationDetails() async {
-    CollectionReference securityAdminMessageCollection = Firestore.instance.collection('${_schoolId}/conversations/security-admin/messages');
-    Stream<QuerySnapshot> securityAdminStream = securityAdminMessageCollection
-        .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-        .orderBy("createdAt", descending: true)
-        .snapshots();
-    CollectionReference securityMessageCollection = Firestore.instance.collection('${_schoolId}/conversations/security/messages');
-    Stream<QuerySnapshot> securityStream = securityMessageCollection
-        .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-        .orderBy("createdAt", descending: true)
-        .snapshots();
-    ZipStream<QuerySnapshot, Pair<QuerySnapshot, QuerySnapshot>>([securityAdminStream, securityStream], (values) => Pair(values[0], values[1])).listen((data) {
-      onMessagesChanged(data);
+    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("members", arrayContains: _userSnapshot.documentID);
+    QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
+    StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
+    messageChannels.documents.forEach((channelDocument) {
+      messageStreamGroup.add(channelDocument.reference.collection("messages").snapshots());
+    });
+    _messageStream = messageStreamGroup.stream.listen((data) {
+      data.documentChanges.removeWhere((item) => item.type != DocumentChangeType.added);
+      onMessagesChanged(data.documentChanges);
     });
   }
 
@@ -147,9 +158,10 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     TalkAroundMessage item = _messages[index];
     String timestamp = widget.dateFormatter.format(item.timestamp);
     return IncidentMessage(
+        key: Key(item.id),
         message: item,
         timestamp: timestamp,
-        targetGroup: "",
+        targetGroup: item.channel,
         onMapClicked: this);
   }
 
@@ -370,7 +382,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
 
   @override
   void dispose() {
-    _messageStream.cancel();
+    if (_messageStream != null) {
+      _messageStream.cancel();
+    }
     super.dispose();
   }
 }

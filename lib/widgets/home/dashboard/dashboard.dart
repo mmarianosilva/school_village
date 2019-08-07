@@ -45,10 +45,11 @@ class _DashboardState extends State<Dashboard> {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
     alerts.orderBy("createdAt", descending: true).snapshots().first.then((result) {
+      result.documents.removeWhere((alert) => alert["endedAt"] != null);
       if (result.documents.length > 0) {
         DocumentSnapshot latestAlert = result.documents.first;
         if (latestAlert != null) {
-          SchoolAlert alert = SchoolAlert.fromMap(latestAlert.data);
+          SchoolAlert alert = SchoolAlert.fromMap(latestAlert);
           if (this.alertInProgress != alert) {
             this.setState(() {
               this.alertInProgress = alert;

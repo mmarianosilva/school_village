@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:school_village/model/talk_around_message.dart';
-import 'package:school_village/widgets/incident_management/OnMapInterface.dart';
+import 'package:school_village/widgets/incident_management/on_map_interface.dart';
 
 class IncidentMessage extends StatelessWidget {
   final TalkAroundMessage message;
