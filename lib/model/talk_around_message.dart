@@ -1,4 +1,6 @@
 class TalkAroundMessage {
+  final String id;
+  final String channel;
   final String message;
   final DateTime timestamp;
   final String author;
@@ -6,5 +8,5 @@ class TalkAroundMessage {
   final double latitude;
   final double longitude;
 
-  TalkAroundMessage(this.message, this.timestamp, this.author, this.authorId, this.latitude, this.longitude);
+  TalkAroundMessage(this.id, this.channel, this.message, this.timestamp, this.author, this.authorId, this.latitude, this.longitude);
 }
