@@ -36,6 +36,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
   String _schoolId = '';
+  Map<String, bool> _broadcastGroupData;
   StreamSubscription<QuerySnapshot> _messageStream;
   List<TalkAroundMessage> _messages = List<TalkAroundMessage>();
   List<TalkAroundMessage> _fullList = List<TalkAroundMessage>();
@@ -92,19 +93,50 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   void onMessagesChanged(List<DocumentChange> snapshot) {
-    snapshot.removeWhere((document) => DateTime.fromMicrosecondsSinceEpoch(document.document["timestamp"].microsecondsSinceEpoch).isBefore(alert.timestamp));
-    List<TalkAroundMessage> newList = snapshot.map((data) {
-      return TalkAroundMessage(
-          data.document.documentID,
-          data.document.reference.parent().parent().documentID,
-          data.document["body"],
-          DateTime.fromMicrosecondsSinceEpoch(data.document["timestamp"].microsecondsSinceEpoch),
-          data.document["author"],
-          data.document["authorId"],
-          data.document["location"]["latitude"],
-          data.document["location"]["longitude"]);
-    }).toList();
-    _fullList.addAll(newList);
+    if (snapshot.first.document.reference.parent() == Firestore.instance.collection('$_schoolId/broadcasts')) {
+      snapshot.removeWhere((item) {
+        Map<String, bool> targetGroups = item.document.data['groups'];
+        for(String key in targetGroups.keys) {
+          if (_broadcastGroupData.containsKey(key) && _broadcastGroupData['key'] && targetGroups['key']) {
+            return false;
+          }
+        }
+        return true;
+      });
+      List<TalkAroundMessage> newList = snapshot.map((data) {
+        String channel = "";
+        Map<String, dynamic> broadcastGroup = data.document["groups"];
+        for(String key in broadcastGroup.keys) {
+          channel += "$key, ";
+        }
+        channel = channel.substring(0, channel.length - 2);
+        return TalkAroundMessage(
+            data.document.documentID,
+            channel,
+            data.document["body"],
+            DateTime.fromMicrosecondsSinceEpoch(data.document["createdAt"].microsecondsSinceEpoch),
+            data.document["createdBy"],
+            data.document["createdById"],
+            null,
+            null);
+      }).toList();
+      _fullList.addAll(newList);
+    } else {
+      snapshot.removeWhere((document) =>
+          DateTime.fromMicrosecondsSinceEpoch(document.document["timestamp"].microsecondsSinceEpoch).isBefore(alert.timestamp));
+      List<TalkAroundMessage> newList = snapshot.map((data) {
+        return TalkAroundMessage(
+            data.document.documentID,
+            data.document.reference.parent().parent().documentID,
+            data.document["body"],
+            DateTime.fromMicrosecondsSinceEpoch(data.document["timestamp"].microsecondsSinceEpoch),
+            data.document["author"],
+            data.document["authorId"],
+            data.document["location"]["latitude"],
+            data.document["location"]["longitude"]);
+      }).toList();
+      _fullList.addAll(newList);
+    }
     _fullList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
     markers.clear();
     markers.add(Marker(
@@ -115,14 +147,18 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
             title: alert.title,
             snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
         )));
-    markers.addAll(_fullList.map((message) => Marker(
-        markerId: MarkerId(message.authorId),
-        position: LatLng(message.latitude, message.longitude),
-        infoWindow: InfoWindow(
+    for(TalkAroundMessage message in _fullList) {
+      if (message.latitude != null && message.longitude != null) {
+        markers.add(Marker(
+          markerId: MarkerId(message.authorId),
+          position: LatLng(message.latitude, message.longitude),
+          infoWindow: InfoWindow(
             title: message.author,
-            snippet: message.message)
-    ))
-    );
+            snippet: message.message
+          )
+        ));
+      }
+    }
     setState(() {
       _messages = _fullList;
     });
@@ -135,6 +171,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
+        _broadcastGroupData = _userSnapshot.data['associatedSchools'][_schoolId.substring(_schoolId.indexOf('/') + 1)]['groups'];
         _isLoading = false;
       });
       getConversationDetails();
@@ -148,6 +185,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     messageChannels.documents.forEach((channelDocument) {
       messageStreamGroup.add(channelDocument.reference.collection("messages").snapshots());
     });
+    messageStreamGroup.add(Firestore.instance.collection('$_schoolId/broadcasts').snapshots());
     _messageStream = messageStreamGroup.stream.listen((data) {
       data.documentChanges.removeWhere((item) => item.type != DocumentChangeType.added);
       onMessagesChanged(data.documentChanges);
