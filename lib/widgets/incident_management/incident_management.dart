@@ -23,9 +23,10 @@ class IncidentManagement extends StatefulWidget {
   final GlobalKey<_IncidentManagementState> key;
   final SchoolAlert alert;
   final String role;
+  final bool resolved;
   final DateFormat dateFormatter = DateFormat("hh:mm a");
 
-  IncidentManagement({this.key, this.alert, this.role}) : super(key: key);
+  IncidentManagement({this.key, this.alert, this.role, this.resolved = false}) : super(key: key);
 
   @override
   createState() => _IncidentManagementState(alert: alert, role: role);
@@ -93,11 +94,14 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   void onMessagesChanged(List<DocumentChange> snapshot) {
-    if (snapshot.first.document.reference.parent() == Firestore.instance.collection('$_schoolId/broadcasts')) {
+    if (snapshot.isEmpty) {
+      return;
+    }
+    if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
-        Map<String, bool> targetGroups = item.document.data['groups'];
+        Map<String, bool> targetGroups = Map<String, bool>.from(item.document.data['groups']);
         for(String key in targetGroups.keys) {
-          if (_broadcastGroupData.containsKey(key) && _broadcastGroupData['key'] && targetGroups['key']) {
+          if (this._broadcastGroupData.containsKey(key) && this._broadcastGroupData[key] && targetGroups[key]) {
             return false;
           }
         }
@@ -105,16 +109,18 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       });
       List<TalkAroundMessage> newList = snapshot.map((data) {
         String channel = "";
-        Map<String, dynamic> broadcastGroup = data.document["groups"];
+        Map<String, bool> broadcastGroup = Map<String, bool>.from(data.document["groups"]);
         for(String key in broadcastGroup.keys) {
-          channel += "$key, ";
+          if (broadcastGroup[key]) {
+            channel += "$key, ";
+          }
         }
         channel = channel.substring(0, channel.length - 2);
         return TalkAroundMessage(
             data.document.documentID,
             channel,
             data.document["body"],
-            DateTime.fromMicrosecondsSinceEpoch(data.document["createdAt"].microsecondsSinceEpoch),
+            DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
             data.document["createdBy"],
             data.document["createdById"],
             null,
@@ -122,8 +128,6 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       }).toList();
       _fullList.addAll(newList);
     } else {
-      snapshot.removeWhere((document) =>
-          DateTime.fromMicrosecondsSinceEpoch(document.document["timestamp"].microsecondsSinceEpoch).isBefore(alert.timestamp));
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
             data.document.documentID,
@@ -150,12 +154,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     for(TalkAroundMessage message in _fullList) {
       if (message.latitude != null && message.longitude != null) {
         markers.add(Marker(
-          markerId: MarkerId(message.authorId),
-          position: LatLng(message.latitude, message.longitude),
-          infoWindow: InfoWindow(
-            title: message.author,
-            snippet: message.message
-          )
+            markerId: MarkerId(message.authorId),
+            position: LatLng(message.latitude, message.longitude),
+            infoWindow: InfoWindow(
+                title: message.author,
+                snippet: message.message
+            )
         ));
       }
     }
@@ -171,7 +175,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
-        _broadcastGroupData = _userSnapshot.data['associatedSchools'][_schoolId.substring(_schoolId.indexOf('/') + 1)]['groups'];
+        _broadcastGroupData = Map<String, bool>.from(user.data['associatedSchools'][schoolId.substring(schoolId.indexOf('/') + 1)]['groups']);
         _isLoading = false;
       });
       getConversationDetails();
@@ -183,9 +187,31 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.documents.forEach((channelDocument) {
-      messageStreamGroup.add(channelDocument.reference.collection("messages").snapshots());
+      if (alert.resolved) {
+        messageStreamGroup.add(
+            channelDocument.reference.collection("messages")
+                .where("timestamp", isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestamp.millisecondsSinceEpoch))
+                .where("timestamp", isLessThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestampEnded.millisecondsSinceEpoch))
+                .snapshots());
+      } else {
+        messageStreamGroup.add(
+            channelDocument.reference.collection("messages")
+                .where("timestamp", isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestamp.millisecondsSinceEpoch))
+                .snapshots());
+      }
     });
-    messageStreamGroup.add(Firestore.instance.collection('$_schoolId/broadcasts').snapshots());
+    if (alert.resolved) {
+      messageStreamGroup.add(
+          Firestore.instance.collection('$_schoolId/broadcasts')
+              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+              .where("createdAt", isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
+              .snapshots());
+    } else {
+      messageStreamGroup.add(
+          Firestore.instance.collection('$_schoolId/broadcasts')
+              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+              .snapshots());
+    }
     _messageStream = messageStreamGroup.stream.listen((data) {
       data.documentChanges.removeWhere((item) => item.type != DocumentChangeType.added);
       onMessagesChanged(data.documentChanges);
@@ -205,7 +231,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
 
   @override
   void onMapClicked(double latitude, double longitude) {
-    _mapController.animateCamera(CameraUpdate.newLatLng(LatLng(latitude, longitude)));
+    if (latitude != null && longitude != null) {
+      _mapController.animateCamera(CameraUpdate.newLatLng(LatLng(latitude, longitude)));
+    }
   }
 
   @override
@@ -321,66 +349,83 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                     Flexible(child: Container(
                       color: Color.fromARGB(140, 229, 229, 234),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 4.0),
                         child: Row(
                           children: <Widget>[
                             Text("Reported by: ",
                                 textAlign: TextAlign.start,
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.0)
                             ),
                             Text(alert.createdBy,
                                 style: TextStyle(fontSize: 14.0)),
                             GestureDetector(
-                                onTap: () { launch("tel://${alert.reportedByPhone}"); },
+                                onTap: () {
+                                  launch("tel://${alert.reportedByPhone}");
+                                },
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 4.0, vertical: 0.0),
                                   child: Text(alert.reportedByPhone,
-                                      style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
+                                      style: TextStyle(fontSize: 14.0,
+                                          color: Color.fromARGB(
+                                              255, 11, 48, 224))),
                                 )
                             )
                           ],
                         ),
                       ),
                     ), flex: 1),
-                    Flexible(
-                        child: Container(
-                          color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                    child: Container(
-                                        child: GestureDetector(
-                                            child: Image.asset("assets/images/group_message_btn.png", height: 64),
-                                            onTap: _showBroadcast),
-                                        padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
-                                  ),
-                                  Spacer(),
-                                  Container(
-                                      child: GestureDetector(
-                                          child: Image.asset("assets/images/broadcast_msg_btn_hm.png", height: 64),
-                                          onTap: _showBroadcast),
-                                      padding: EdgeInsets.all(4)),
-                                  Spacer(),
-                                  Container(
-                                      child: GestureDetector(
-                                          child: Image.asset("assets/images/school_map_btn.png", height: 64),
-                                          onTap: _onSchoolMap),
-                                      padding: EdgeInsets.all(4)),
-                                  Spacer(),
-                                  Container(
-                                      child: GestureDetector(
-                                          child: Image.asset("assets/images/stop_sign.png", height: 64),
-                                          onTap: _showStopAlert),
-                                      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
-                                ]),
-                          ),
-                        ),
-                        flex: 4
-                    ),
+                    Builder(builder: (context) {
+                      if (widget.resolved) {
+                        return Flexible(
+                            child: Container(),
+                            flex: 0
+                        );
+                      } else {
+                        return Flexible(
+                            child: Container(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                        child: Container(
+                                            child: GestureDetector(
+                                                child: Image.asset("assets/images/group_message_btn.png", height: 64),
+                                                onTap: _showBroadcast),
+                                            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                      ),
+                                      Spacer(),
+                                      Container(
+                                          child: GestureDetector(
+                                              child: Image.asset("assets/images/broadcast_msg_btn_hm.png", height: 64),
+                                              onTap: _showBroadcast),
+                                          padding: EdgeInsets.all(4)),
+                                      Spacer(),
+                                      Container(
+                                          child: GestureDetector(
+                                              child: Image.asset("assets/images/school_map_btn.png", height: 64),
+                                              onTap: _onSchoolMap),
+                                          padding: EdgeInsets.all(4)),
+                                      Spacer(),
+                                      Container(
+                                          child: GestureDetector(
+                                              child: Image.asset("assets/images/stop_sign.png", height: 64),
+                                              onTap: _showStopAlert),
+                                          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                    ]),
+                              ),
+                            ),
+                            flex: 4
+                        );
+                      }
+                    }),
                     Flexible(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),

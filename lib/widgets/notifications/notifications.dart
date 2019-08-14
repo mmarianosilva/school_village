@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/school_alert.dart';
+import 'package:school_village/widgets/incident_management/incident_management.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 import '../notification/notification.dart';
@@ -16,54 +18,51 @@ class Notifications extends StatefulWidget {
 
 class _NotificationsState extends State<Notifications> {
   String _schoolId = '';
-  String _schoolName = '';
+  String _role = '';
   String name = '';
   DocumentReference _school;
   DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
-  List<DocumentSnapshot>  _alerts = [];
+  List<SchoolAlert>  _alerts = [];
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
     _school = Firestore.instance.document(_schoolId);
-    var  alerts = await model.getAlertGroups(_schoolId.split("/")[1]);
-    List<DocumentSnapshot>  notifications = [];
-    for(final alert in alerts){
-      Query ref = Firestore.instance.collection("/$_schoolId/notifications").where('type', isEqualTo: alert).orderBy("createdAt", descending: true).limit(20);
-      ref.snapshots().listen((querySnapshot) {
-        notifications.addAll(querySnapshot.documents);
-        setState(() {
-          isLoaded = true;
-          _alerts = notifications;
-        });
+    _role = await UserHelper.getSelectedSchoolRole();
+    List<SchoolAlert>  notifications = [];
+    Query ref = Firestore.instance.collection("/$_schoolId/notifications")
+        .where('endedAt', isLessThanOrEqualTo: Timestamp.now())
+        .limit(20);
+    ref.getDocuments().then((querySnapshot) {
+      querySnapshot.documents.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+      notifications.addAll(querySnapshot.documents.map((document) => SchoolAlert.fromMap(document)));
+      setState(() {
+        isLoaded = true;
+        _alerts = notifications;
       });
-    }
-    setState(() {
-      isLoaded = true;
-      _alerts = notifications;
     });
   }
 
   Widget _buildList() {
-    _alerts.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+
     return new ListView.builder(
       itemCount: _alerts.length,
       itemBuilder: (_, int index) {
-        final DocumentSnapshot document = _alerts[index];
+        final SchoolAlert alert = _alerts[index];
         return new Card(
           child: new Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 new ListTile(
-                  title: new Text(document['title'], style: new TextStyle(fontWeight: FontWeight.bold),),
-                  subtitle: new Text("${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}"),
+                  title: new Text(alert.title, style: new TextStyle(fontWeight: FontWeight.bold),),
+                  subtitle: new Text("${alert.timestamp}"),
                   trailing: new FlatButton(
                     child: const Text('VIEW'),
                     onPressed: () {
                       Navigator.push(
                         context,
                         new MaterialPageRoute(
-                          builder: (context) => new NotificationDetail(notification: document, title: 'Notification'),
+                          builder: (context) => IncidentManagement(alert: alert, role: _role, resolved: true),
                         ),
                       );
                     },

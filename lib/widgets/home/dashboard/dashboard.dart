@@ -44,7 +44,7 @@ class _DashboardState extends State<Dashboard> {
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
-    alerts.orderBy("createdAt", descending: true).snapshots().first.then((result) {
+    alerts.orderBy("createdAt", descending: true).getDocuments().then((result) {
       result.documents.removeWhere((alert) => alert["endedAt"] != null);
       if (result.documents.length > 0) {
         DocumentSnapshot latestAlert = result.documents.first;
