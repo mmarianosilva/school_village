@@ -26,5 +26,6 @@ class SchoolAlert {
     firebaseModel["createdById"],
     LocationData.fromMap(Map<String, double>.from(firebaseModel["location"])),
     firebaseModel["type"],
-    firebaseModel["reportedByPhone"]);
+    firebaseModel["reportedByPhone"],
+    resolved: firebaseModel["endedAt"] != null);
 }
