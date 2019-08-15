@@ -33,7 +33,6 @@ class _AlertState extends State<Alert> {
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
-  Location _location = new Location();
   final customAlertController = new TextEditingController();
 
   getUserDetails() async {
@@ -132,26 +131,10 @@ class _AlertState extends State<Alert> {
   }
 
   _getLocation() async {
-    Map<String, double> location = new Map();
-    String error;
-    try {
-      LocationData locationData = await _location.getLocation();
-      location['accuracy'] = locationData.accuracy;
-      location['altitude'] = locationData.altitude;
-      location['latitude'] = locationData.latitude;
-      location['longitude'] = locationData.longitude;
-      error = null;
-    } catch (e) {
-//      if (e.code == 'PERMISSION_DENIED') {
-//        error = 'Permission denied';
-//      } else if (e.code == 'PERMISSION_DENIED_NEVER_ASK') {
-//        error = 'Permission denied - please ask the user to enable it from the app settings';
-//      }
-
-      location = null;
-    }
+    Map<String, double> location = await UserHelper.getLocation();
     return location;
   }
+
 
   _saveAlert(alertTitle, alertBody, alertType, context) async{
     CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
