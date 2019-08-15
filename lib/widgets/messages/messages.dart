@@ -63,7 +63,7 @@ class _MessagesState extends State<Messages> {
         _userId = user.documentID;
         name = "${user.data['firstName']} ${user.data['lastName']}";
         _schoolId = schoolId;
-        phone = user.data['phone'];
+        phone = '${user.data['phone']}';
         _groups = groups;
         isLoaded = true;
         _handleMessageCollection();
@@ -205,7 +205,6 @@ class _MessagesState extends State<Messages> {
             for (var value in (document['groups'].keys)) {
               groups.add(value);
             }
-            print(document['isVideo'] ?? false);
 
             return BroadcastMessage(
               text: document['body'],

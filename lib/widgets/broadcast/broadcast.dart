@@ -95,7 +95,7 @@ class _BroadcastState extends State<Broadcast> {
     print('$_schoolId/broadcasts');
     CollectionReference collection  = Firestore.instance.collection('$_schoolId/broadcasts');
     final DocumentReference document = collection.document();
-
+    final Map<String, double> location = await UserHelper.getLocation();
 
     document.setData(<String, dynamic>{
       'body': alertBody,
@@ -104,6 +104,7 @@ class _BroadcastState extends State<Broadcast> {
       'createdBy' : name,
       'createdAt' : DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone' : phone,
+      'location' : location
     });
     print("Added Message");
 

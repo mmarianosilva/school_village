@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'analytics_helper.dart';
@@ -11,6 +12,7 @@ class UserHelper {
   static final Future<SharedPreferences> _prefsFuture =
       SharedPreferences.getInstance();
   static SharedPreferences _prefs;
+  static final Location _location = Location();
 
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
@@ -231,5 +233,22 @@ class UserHelper {
     if (isOwner) {
       _firebaseMessaging.subscribeToTopic("$id-test");
     }
+  }
+
+  static Future<Map<String, double>> getLocation() async {
+    final locationData = await _location.getLocation();
+    Map<String, double> location = new Map();
+    try {
+      location['accuracy'] = locationData.accuracy;
+      location['altitude'] = locationData.altitude;
+      location['latitude'] = locationData.latitude;
+      location['longitude'] = locationData.longitude;
+    } catch (e) {
+      if (e is Error) {
+        print(e.stackTrace);
+      }
+      location = null;
+    }
+    return location;
   }
 }
