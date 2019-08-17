@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
@@ -14,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../util/file_helper.dart';
 import 'dart:io';
 import '../../notifications/notifications.dart';
-import '../../messages/messages.dart';
+import '../../messages/broadcast_messaging.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../../model/main_model.dart';
 import 'package:location/location.dart';
@@ -161,38 +162,16 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  openMessages() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Messages(
-            role: role,
-          )),
-    );
-  }
-
   openTalk() {
     TalkAround.navigate("", context);
   }
 
   openIncidentManagement() {
     Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => IncidentManagement(alert: alertInProgress, role: role))
+        context,
+        MaterialPageRoute(builder: (context) => IncidentManagement(alert: alertInProgress, role: role))
     );
   }
-
-  sendBroadcast() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Messages(
-            role: role,
-          )),
-    );
-  }
-
-  // #043882#048midnightbluehsl(215,94,26)rgb(4,56,130)
 
   _buildSettingsOption() {
     return Column(
@@ -202,7 +181,6 @@ class _DashboardState extends State<Dashboard> {
           onTap: openSettings,
           child: Row(
             children: <Widget>[
-              //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
                 width: 55.0,
                 height: 48.0,
@@ -276,42 +254,6 @@ class _DashboardState extends State<Dashboard> {
 
   _buildMessagesOption(model) {
     return SizedBox();
-
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          onTap: openMessages,
-          child: Row(
-            children: <Widget>[
-              //                                Image.asset('assets/images/logo.png', width: 48.0),
-              Container(
-                width: 48.0,
-                height: 48.0,
-                child: Center(
-                  child: Image.asset('assets/images/broadcast_btn.png',
-                      width: 80.0),
-                ),
-              ),
-              SizedBox(width: 12.0),
-              Expanded(
-                  child: Text(
-                    "Messages",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0),
-                  )),
-              Icon(Icons.chevron_right)
-            ],
-          ),
-        ),
-        const SizedBox(height: 14.0),
-        Container(
-          height: 0.5,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.grey,
-        ),
-      ],
-    );
   }
 
   _buildDocumentOption(snapshot, index) {
@@ -363,38 +305,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   _buildSecurityOptions() {
-    if (role == 'school_student') {
-      return SizedBox();
-    }
-    List<Widget> widgets = List();
-    List<String> securityRoles = ["school_admin", "school_security"];
-    print("Owner $isOwner Role $role");
-    if (securityRoles.contains(role)) {
-      widgets.add(GestureDetector(
-        child: Image.asset('assets/images/security_btn.png', width: 80.0),
-        onTap: openTalk,
-      ));
-      if (alertInProgress != null) {
-        widgets.add(SizedBox(width: 20.0));
-        widgets.add(GestureDetector(
-            child: Image.asset(
-                'assets/images/incident_management_icon.png', width: 80.0),
-            onTap: openIncidentManagement
-        ));
-      }
-    }
-    if (role == "school_admin") {
-      widgets.add(SizedBox(width: 20.0));
-      widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
-        onTap: sendBroadcast,
-      ));
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: widgets,
-    );
+    return HeaderButtons(role: role, alert: alertInProgress);
   }
 
   _buildIncidentReport() {
