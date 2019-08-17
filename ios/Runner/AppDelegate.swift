@@ -26,7 +26,7 @@ import GoogleMaps
             
             let controller : FlutterViewController = window?.rootViewController as! FlutterViewController;
             let pdfViewChannel = FlutterMethodChannel.init(name: "schoolvillage.app/pdf_view",
-                                                           binaryMessenger: controller);
+                                                           binaryMessenger: controller.binaryMessenger);
             pdfViewChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
                 
                 let path = call.arguments as! String
@@ -40,11 +40,11 @@ import GoogleMaps
             })
             
             let audioChannel = FlutterMethodChannel.init(name: "schoolvillage.app/audio",
-                                                           binaryMessenger: controller);
+                                                           binaryMessenger: controller.binaryMessenger);
             audioChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
                 if ("playBackgroundAudio" == call.method) {
                     self.playBackgroundAudio()
-                }else if("stopBackgroundAudio" == call.method){
+                } else if("stopBackgroundAudio" == call.method) {
                     self.stopBackgroundAudio()
                 }
             })
@@ -54,7 +54,7 @@ import GoogleMaps
     
     func playBackgroundAudio(){
         print("playBackgroundAudio")
-        if(UIApplication.shared.applicationState != .active){
+        if(UIApplication.shared.applicationState != .active) {
             do {
                 try audioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)
                 try audioSession.setActive(true)
@@ -62,7 +62,7 @@ import GoogleMaps
                 print("AudioSession error setActive(true)\naudioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)")
             }
             
-            if(self.alarmSound == nil){
+            if(self.alarmSound == nil) {
                 prepareAudioPlayer()
             }
             
@@ -70,11 +70,11 @@ import GoogleMaps
         }
     }
     
-    func stopBackgroundAudio(){
+    func stopBackgroundAudio() {
         self.alarmSound?.stop()
         do {
             try self.audioSession.setActive(false)
-        }catch{
+        } catch {
             print("AudioSession error setActive(false)")
         }
     }
