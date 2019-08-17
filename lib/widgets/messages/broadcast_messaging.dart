@@ -15,16 +15,16 @@ import 'package:school_village/widgets/select_group/select_group.dart';
 import '../../util/user_helper.dart';
 import 'package:school_village/util/constants.dart';
 
-class Messages extends StatefulWidget {
-  final String role;
+class BroadcastMessaging extends StatefulWidget {
+  final bool editable;
 
-  Messages({Key key, this.role}) : super(key: key);
+  BroadcastMessaging({Key key, this.editable}) : super(key: key);
 
   @override
-  _MessagesState createState() => _MessagesState(role: role);
+  _BroadcastMessagingState createState() => _BroadcastMessagingState();
 }
 
-class _MessagesState extends State<Messages> {
+class _BroadcastMessagingState extends State<BroadcastMessaging> {
   static FirebaseStorage storage = FirebaseStorage();
   FirebaseUser _user;
   String _userId;
@@ -41,9 +41,6 @@ class _MessagesState extends State<Messages> {
   final focusNode = FocusNode();
   InputField inputField;
   final selectGroups = SelectGroups();
-  final String role;
-
-  _MessagesState({this.role});
 
   getUserDetails() async {
     _user = await UserHelper.getUser();
@@ -365,7 +362,7 @@ class _MessagesState extends State<Messages> {
             width: 0.0,
             height: 5.0,
           ), //new
-          role == 'school_admin'
+          widget.editable 
               ? Column(children: [
             // selectGroups,
             Container(

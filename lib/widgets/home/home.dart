@@ -13,7 +13,7 @@ import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../messages/messages.dart';
+import '../messages/broadcast_messaging.dart';
 import '../../util/token_helper.dart';
 import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
@@ -257,7 +257,7 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Messages(),
+                    builder: (context) => BroadcastMessaging(),
                   ),
                 );
               },

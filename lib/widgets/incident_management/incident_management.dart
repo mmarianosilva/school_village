@@ -11,7 +11,7 @@ import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_management/close_incident_management_alert.dart';
 import 'package:school_village/widgets/incident_management/on_map_interface.dart';
-import 'package:school_village/widgets/messages/messages.dart';
+import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -87,8 +87,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => Messages(
-            role: role,
+          builder: (context) => BroadcastMessaging(
+            editable: role != 'school_security',
           )),
     );
   }
@@ -404,7 +404,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                       Spacer(),
                                       Container(
                                           child: GestureDetector(
-                                              child: Image.asset("assets/images/broadcast_msg_btn_hm.png", height: 64),
+                                              child: Image.asset("assets/images/broadcast_btn.png", height: 64),
                                               onTap: _showBroadcast),
                                           padding: EdgeInsets.all(4)),
                                       Spacer(),
