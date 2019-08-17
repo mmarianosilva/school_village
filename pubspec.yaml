@@ -77,8 +77,8 @@ flutter:
     - assets/images/group_message_btn.png
     - assets/images/school_map_btn.png
     - assets/images/stop_sign.png
-    - assets/images/broadcast_msg_btn_hm.png
     - assets/images/warning_sign.png
+    - assets/images/anonymous_img.png
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 
