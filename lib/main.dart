@@ -18,6 +18,8 @@ _configureFirestoreOfflinePersistence() {
   Firestore.instance.settings(persistenceEnabled: false);
 }
 
+final RouteObserver<PageRoute> homePageRouteObserver = RouteObserver<PageRoute>();
+
 Future<Null> main() async {
   _configureFirestoreOfflinePersistence();
   FlutterError.onError = (FlutterErrorDetails details) async {
@@ -47,6 +49,7 @@ Future<Null> main() async {
           navigatorObservers: [
             new FirebaseAnalyticsObserver(
                 analytics: AnalyticsHelper.getAnalytics()),
+            homePageRouteObserver
           ],
         ),
       ));

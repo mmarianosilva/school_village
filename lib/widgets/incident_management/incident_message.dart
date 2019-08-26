@@ -20,13 +20,23 @@ class IncidentMessage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
           child: Row(
             children: <Widget>[
-              Text("Message", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-              Spacer(),
-              GestureDetector(
-                  child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))),
-                  onTap: () => onMapClicked.onMapClicked(message.latitude, message.longitude)),
-              Spacer(),
-              Text(timestamp, textAlign: TextAlign.end, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
+              Flexible(
+                  child: Text("${message.origin}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  flex: 2,
+                  fit: FlexFit.tight
+              ),
+              Flexible(
+                  child: GestureDetector(
+                    child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
+                    onTap: () => onMapClicked.onMapClicked(message.latitude, message.longitude)),
+                  flex: 1,
+                  fit: FlexFit.tight
+              ),
+              Flexible(
+                  child: Text(timestamp, textAlign: TextAlign.end, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  flex: 2,
+                  fit: FlexFit.tight
+              )
             ],
           ),
         ),
@@ -38,17 +48,20 @@ class IncidentMessage extends StatelessWidget {
                 children: <Widget>[
                   Flexible(
                       child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                      flex: 2),
+                      flex: 2,
+                      fit: FlexFit.tight),
                   Flexible(
                       child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))),
-                      flex: 4),
-                  Spacer(),
+                      flex: 8,
+                      fit: FlexFit.tight),
                   Flexible(
                       child: Text("To: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                      flex: 1),
+                      flex: 1,
+                      fit: FlexFit.tight),
                   Flexible(
                       child: Text(targetGroup),
-                      flex: 5)
+                      flex: 8,
+                      fit: FlexFit.tight)
                 ],
               );
             } else {

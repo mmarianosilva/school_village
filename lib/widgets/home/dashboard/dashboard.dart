@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
@@ -27,7 +29,7 @@ class Dashboard extends StatefulWidget {
   _DashboardState createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DashboardState extends State<Dashboard> with RouteAware {
   bool hasSchool = false;
   bool isLoaded = false;
   String ref = "";
@@ -42,21 +44,41 @@ class _DashboardState extends State<Dashboard> {
     _checkIfAlertIsInProgress();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    homePageRouteObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  @override
+  void dispose() {
+    homePageRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  void didPopNext() {
+    _checkIfAlertIsInProgress();
+  }
+
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
     alerts.orderBy("createdAt", descending: true).getDocuments().then((result) {
-      result.documents.removeWhere((alert) => alert["endedAt"] != null);
-      if (result.documents.length > 0) {
-        DocumentSnapshot latestAlert = result.documents.first;
-        if (latestAlert != null) {
-          SchoolAlert alert = SchoolAlert.fromMap(latestAlert);
-          if (this.alertInProgress != alert) {
-            this.setState(() {
-              this.alertInProgress = alert;
-            });
-          }
-        }
+      if (result.documents.isEmpty) {
+        this.setState(() {
+          this.alertInProgress = null;
+        });
+        return;
+      }
+      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null);
+      final Timestamp lastResolvedTimestamp = lastResolved["endedAt"];
+      result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+      final latestAlert = result.documents.isNotEmpty ? result.documents.last : null;
+      SchoolAlert alert = latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+      if (this.alertInProgress != alert) {
+        this.setState(() {
+          this.alertInProgress = alert;
+        });
       }
     });
   }

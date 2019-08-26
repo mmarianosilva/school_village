@@ -31,6 +31,7 @@ class _NotificationsState extends State<Notifications> {
     _role = await UserHelper.getSelectedSchoolRole();
     List<SchoolAlert>  notifications = [];
     Query ref = Firestore.instance.collection("/$_schoolId/notifications")
+        .orderBy('endedAt', descending: true)
         .where('endedAt', isLessThanOrEqualTo: Timestamp.now())
         .limit(20);
     ref.getDocuments().then((querySnapshot) {

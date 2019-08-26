@@ -281,12 +281,9 @@ class _HomeState extends State<Home> {
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
     DocumentSnapshot notification;
-    Firestore.instance
+    notification = await Firestore.instance
         .document("/schools/$schoolId/notifications/$notificationId")
-        .get()
-        .then((document) {
-      notification = document;
-    });
+        .get();
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!

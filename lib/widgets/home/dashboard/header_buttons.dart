@@ -56,7 +56,6 @@ class HeaderButtons extends StatelessWidget {
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
-        widgets.add(SizedBox(width: 20.0));
         widgets.add(GestureDetector(
             child: Image.asset(
                 'assets/images/incident_management_icon.png', width: 80.0),

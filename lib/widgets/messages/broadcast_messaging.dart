@@ -21,10 +21,13 @@ class BroadcastMessaging extends StatefulWidget {
   BroadcastMessaging({Key key, this.editable}) : super(key: key);
 
   @override
-  _BroadcastMessagingState createState() => _BroadcastMessagingState();
+  _BroadcastMessagingState createState() => _BroadcastMessagingState(editable);
 }
 
 class _BroadcastMessagingState extends State<BroadcastMessaging> {
+
+  _BroadcastMessagingState(this._editable);
+
   static FirebaseStorage storage = FirebaseStorage();
   FirebaseUser _user;
   String _userId;
@@ -41,6 +44,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   final focusNode = FocusNode();
   InputField inputField;
   final selectGroups = SelectGroups();
+  final bool _editable;
 
   getUserDetails() async {
     _user = await UserHelper.getUser();
@@ -362,7 +366,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             width: 0.0,
             height: 5.0,
           ), //new
-          widget.editable 
+          _editable
               ? Column(children: [
             // selectGroups,
             Container(

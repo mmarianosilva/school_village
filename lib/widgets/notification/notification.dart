@@ -69,7 +69,7 @@ class NotificationDetail extends StatelessWidget {
     print("Width: $iwidth Height: $iheight");
 //    print("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
 
-    if(notification["location"] != null) {
+    if(notification != null && notification["location"] != null) {
       widgets.add(
           new GestureDetector(
             onTap: () {

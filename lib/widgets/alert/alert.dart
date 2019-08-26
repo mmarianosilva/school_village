@@ -49,7 +49,7 @@ class _AlertState extends State<Alert> {
       setState(() {
         name =
             "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
-        phone = _userSnapshot.data['phone'];
+        phone = "${_userSnapshot.data['phone']}";
         isLoaded = true;
       });
       print(name);

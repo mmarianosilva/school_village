@@ -14,3 +14,4 @@ functions/functions/node_modules/
 *.iml
 /ios/Runner.app.dSYM.zip
 /ios/Runner.ipa
+/ios/Flutter/flutter_export_environment.sh

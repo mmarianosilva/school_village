@@ -24,7 +24,8 @@ class IncidentManagement extends StatefulWidget {
   final SchoolAlert alert;
   final String role;
   final bool resolved;
-  final DateFormat dateFormatter = DateFormat("hh:mm a");
+  final DateFormat timeFormatter = DateFormat("hh:mm a");
+  final DateFormat dateFormatter = DateFormat.MMMd();
 
   IncidentManagement({this.key, this.alert, this.role, this.resolved = false}) : super(key: key);
 
@@ -37,11 +38,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
   String _schoolId = '';
+  String _schoolAddress = '';
   Map<String, bool> _broadcastGroupData;
   StreamSubscription<QuerySnapshot> _messageStream;
   List<TalkAroundMessage> _messages = List<TalkAroundMessage>();
   List<TalkAroundMessage> _fullList = List<TalkAroundMessage>();
-  final SchoolAlert alert;
+  SchoolAlert alert;
   final String role;
   Set<Marker> markers;
 
@@ -97,7 +99,21 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     if (snapshot.isEmpty) {
       return;
     }
-    if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/broadcasts').path) {
+    if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/notifications').path) {
+      List<TalkAroundMessage> newList = snapshot.map((data) {
+        return TalkAroundMessage(
+          data.document["title"],
+          data.document.documentID,
+          "",
+          data.document["body"],
+          DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
+          data.document["createdBy"],
+          data.document["createdById"],
+          data.document["location"]["latitude"],
+          data.document["location"]["longitude"]);
+      }).toList();
+      _fullList.addAll(newList);
+    } else if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
         Map<String, bool> targetGroups = Map<String, bool>.from(item.document.data['groups']);
         for(String key in targetGroups.keys) {
@@ -117,6 +133,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         }
         channel = channel.substring(0, channel.length - 2);
         return TalkAroundMessage(
+            "Broadcast Message",
             data.document.documentID,
             channel,
             data.document["body"],
@@ -130,6 +147,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     } else {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
+            "Direct Message",
             data.document.documentID,
             data.document.reference.parent().parent().documentID,
             data.document["body"],
@@ -171,6 +189,10 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
+    if (schoolId != null) {
+      DocumentSnapshot schoolDocument = await Firestore.instance.document(schoolId).get();
+      _schoolAddress = schoolDocument.data['address'];
+    }
     Firestore.instance.document('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
@@ -183,6 +205,43 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   getConversationDetails() async {
+    if (alert.resolved) {
+      _fullList.add(TalkAroundMessage(
+          "Incident Resolved",
+          "alert-resolved-identifier",
+          "",
+          "This incident has been resolved and closed.",
+          alert.timestampEnded,
+          "SCHOOL VILLAGE SYSTEM",
+          "",
+          null,
+          null));
+      setState(() {
+        _messages = _fullList;
+      });
+    } else {
+      Firestore.instance
+          .document("$_schoolId/notifications/${alert.id}")
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.data["endedAt"] != null) {
+          _fullList.add(TalkAroundMessage(
+              "Incident Resolved",
+              "alert-resolved-identifier",
+              "",
+              "This incident has been resolved and closed.",
+              DateTime.fromMillisecondsSinceEpoch(snapshot.data["endedAt"].millisecondsSinceEpoch),
+              "SCHOOL VILLAGE SYSTEM",
+              "",
+              null,
+              null));
+          final alert = SchoolAlert.fromMap(snapshot);
+          setState(() {
+            this.alert = alert;
+          });
+        }
+      });
+    }
     Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("members", arrayContains: _userSnapshot.documentID);
     QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
@@ -201,14 +260,27 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       }
     });
     if (alert.resolved) {
+      // Broadcast messages
       messageStreamGroup.add(
           Firestore.instance.collection('$_schoolId/broadcasts')
               .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
               .where("createdAt", isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
               .snapshots());
+      // Alerts
+      messageStreamGroup.add(
+          Firestore.instance.collection('$_schoolId/notifications')
+              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+              .where("createdAt", isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
+              .snapshots());
     } else {
+      // Broadcast messages
       messageStreamGroup.add(
           Firestore.instance.collection('$_schoolId/broadcasts')
+              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+              .snapshots());
+      // Alerts
+      messageStreamGroup.add(
+          Firestore.instance.collection('$_schoolId/notifications')
               .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
               .snapshots());
     }
@@ -220,7 +292,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
 
   Widget _buildListItem(BuildContext context, int index) {
     TalkAroundMessage item = _messages[index];
-    String timestamp = widget.dateFormatter.format(item.timestamp);
+    String timestamp = widget.timeFormatter.format(item.timestamp);
     return IncidentMessage(
         key: Key(item.id),
         message: item,
@@ -275,7 +347,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                 style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
                                 children: <TextSpan>[
                                   TextSpan(text: "${alert.title}", style: TextStyle(fontSize: 18.0)),
-                                  TextSpan(text: " at ${widget.dateFormatter.format(alert.timestamp)}", style: TextStyle(fontSize: 14.0))
+                                  TextSpan(text: " at ${widget.timeFormatter.format(alert.timestamp)}", style: TextStyle(fontSize: 14.0)),
+                                  TextSpan(text: alert.resolved ? ", ${widget.dateFormatter.format(alert.timestamp)}" : "", style: TextStyle(fontSize: 14.0))
                                 ]
                             ),
                             textAlign: TextAlign.center,
@@ -300,8 +373,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                         child: GestureDetector(
-                          onTap: () {launch("https://goo.gl/maps/omQy8JRpbV8CqvzV7");},
-                          child: Text("14429 Downey Ave, Paramount, CA 90723, USA",
+                          onTap: () {launch("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");},
+                          child: Text("${_schoolAddress}",
                               textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))
                           ),
