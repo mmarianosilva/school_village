@@ -9,11 +9,11 @@ class TalkAroundChannel {
 
   TalkAroundChannel(this.id, this.name, this.direct, this.members);
 
-  factory TalkAroundChannel.fromMap(DocumentSnapshot firebaseModel) {
+  factory TalkAroundChannel.fromMapAndUsers(DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
     return TalkAroundChannel(
         firebaseModel.documentID,
         firebaseModel.data["name"],
         firebaseModel.data["direct"],
-        firebaseModel.data["members"].toList());
+        members);
   }
 }

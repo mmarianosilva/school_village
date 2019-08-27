@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   List<TalkAroundChannel> _directMessages = List<TalkAroundChannel>();
   DocumentSnapshot _userSnapshot;
   String _schoolId;
+  final Firestore _firestore = Firestore.instance;
 
   void getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -30,70 +33,38 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   }
 
   void getMessageList() async {
-    List<TalkAroundUser> channelList1 = List<TalkAroundUser>();
-    TalkAroundChannel channel1 = TalkAroundChannel(
-        "2345678",
-        "Admin",
-        false,
-        channelList1);
-    List<TalkAroundUser> channelList2 = List<TalkAroundUser>();
-    channelList2.add(TalkAroundUser("User1", "GroupExample"));
-    TalkAroundChannel channel2 = TalkAroundChannel(
-        "34567890",
-        "Security",
-        false,
-        channelList2);
-    TalkAroundChannel channel3 = TalkAroundChannel(
-        "234562278",
-        "Council",
-        false,
-        channelList1);
-    TalkAroundChannel channel4 = TalkAroundChannel(
-        "3456789110",
-        "Emergency Responders",
-        false,
-        channelList2);
-    List<TalkAroundChannel> channelList = List<TalkAroundChannel>();
-    channelList.add(channel1);
-    channelList.add(channel2);
-    channelList.add(channel3);
-    channelList.add(channel4);
-
-    List<TalkAroundUser> messageList1 = List<TalkAroundUser>();
-    messageList1.add(TalkAroundUser("${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}", "Self"));
-    messageList1.add(TalkAroundUser("Laythan Armor", "Designers"));
-    TalkAroundChannel groupMessage1 = TalkAroundChannel(
-        "662727",
-        "",
-        true,
-        messageList1);
-    List<TalkAroundUser> messageList2 = List<TalkAroundUser>();
-    messageList2.add(TalkAroundUser("${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}", "Self"));
-    messageList2.add(TalkAroundUser("Laythan Armor", "Designers"));
-    messageList2.add(TalkAroundUser("Johnny Lambada", "Project Managers"));
-    messageList2.add(TalkAroundUser("Michael Wiggins", "Owners"));
-    TalkAroundChannel groupMessage2 = TalkAroundChannel(
-        "72717",
-        "",
-        true,
-        messageList2);
-    List<TalkAroundUser> messageList3 = List<TalkAroundUser>();
-    messageList3.add(TalkAroundUser("${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}", "Self"));
-    messageList3.add(TalkAroundUser("Nemanja Stošić", "Developers"));
-    TalkAroundChannel groupMessage3 = TalkAroundChannel(
-        "1221211",
-        "",
-        true,
-        messageList3);
-    List<TalkAroundChannel> directMessageList = List<TalkAroundChannel>();
-    directMessageList.add(groupMessage1);
-    directMessageList.add(groupMessage2);
-    directMessageList.add(groupMessage3);
-    channelList.sort((item1, item2) => item1.name.compareTo(item2.name));
-    directMessageList.sort((item1, item2) => _buildDirectMessageName(item1).compareTo(_buildDirectMessageName(item2)));
-    setState(() {
-      _channels.addAll(channelList);
-      _directMessages.addAll(directMessageList);
+    _firestore
+        .collection("$_schoolId/messages")
+        .where("members", arrayContains: _userSnapshot.documentID)
+        .getDocuments()
+        .then((channelList) async {
+          List<DocumentSnapshot> documentList = channelList.documents;
+          Iterable<DocumentSnapshot> channels = documentList.where((item) => !item.data["direct"]);
+          Iterable<DocumentSnapshot> groupMessages = documentList.where((item) => item.data["direct"]);
+          List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
+            Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
+              final DocumentSnapshot user = await _firestore.document("users/$id").get();
+              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user.data, channel.data["name"]);
+              return member;
+            });
+            List<TalkAroundUser> users = await members.toList();
+            return TalkAroundChannel.fromMapAndUsers(channel, users);
+          }).toList();
+          List<TalkAroundChannel> retrievedChannels = await Future.wait(processedChannels);
+          List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
+            Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
+              final DocumentSnapshot user = await _firestore.document("users/$id").get();
+              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user.data, "");
+              return member;
+            });
+            List<TalkAroundUser> users = await members.toList();
+            return TalkAroundChannel.fromMapAndUsers(channel, users);
+          }).toList();
+          List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
+          setState(() {
+            _channels = retrievedChannels;
+            _directMessages = retrievedGroupMessages;
+          });
     });
   }
 
