@@ -5,7 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/search/search_bar.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
+import 'package:school_village/widgets/talk_around/talk_around_room_item.dart';
+import 'package:school_village/widgets/talk_around/talk_around_search.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
 
 class TalkAroundHome extends StatefulWidget {
@@ -19,6 +22,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   DocumentSnapshot _userSnapshot;
   String _schoolId;
   final Firestore _firestore = Firestore.instance;
+  final TextEditingController _searchBarController = TextEditingController();
 
   void getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -44,7 +48,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
           List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
             Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
               final DocumentSnapshot user = await _firestore.document("users/$id").get();
-              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user.data, channel.data["name"]);
+              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, channel.data["name"]);
               return member;
             });
             List<TalkAroundUser> users = await members.toList();
@@ -54,7 +58,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
           List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
             Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
               final DocumentSnapshot user = await _firestore.document("users/$id").get();
-              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user.data, "");
+              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, "");
               return member;
             });
             List<TalkAroundUser> users = await members.toList();
@@ -102,85 +106,10 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
 
   Widget _buildDirectMessageItem(BuildContext context, int index) {
     TalkAroundChannel item = _directMessages[index];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: <Widget>[
-          Flexible(
-              child: Builder(builder: (context) {
-                if (item.members.length > 2) {
-                  return Container(
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.all(4.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.all(const Radius.circular(4.0))
-                      ),
-                      child: Text(
-                          "${item.members.length - 1}",
-                          style: TextStyle(color: Color.fromARGB(255, 10, 104, 127), fontSize: 16.0),
-                          textAlign: TextAlign.center),
-                    ),
-                  );
-                } else {
-                  return Text(
-                      "•",
-                      style: TextStyle(color: Colors.white, fontSize: 16.0),
-                      textAlign: TextAlign.center
-                  );
-                }
-              }),
-              flex: 1,
-              fit: FlexFit.tight
-          ),
-          Flexible(
-              child: Text(
-                  _buildDirectMessageName(item),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(color: Colors.white, fontSize: 16.0)
-              ),
-              flex: 12,
-              fit: FlexFit.tight
-          ),
-          Flexible(
-            child: Builder(builder: (context) {
-              if (item.members.length > 2) {
-                return Text(
-                    "Group",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0));
-              } else {
-                return Text(
-                  item.members.first.name != "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}" ?
-                  item.members.first.group : item.members[1].group,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0));
-              }
-            }),
-            flex: 3,
-            fit: FlexFit.tight,
-          )
-        ],
-      ),
+    return TalkAroundRoomItem(
+      item: item,
+      username: "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}",
     );
-  }
-
-  String _buildDirectMessageName(TalkAroundChannel item) {
-    List<String> names = item.members.map((item) => item.name).toList();
-    names.removeWhere((name) => name == "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}");
-    names.sort((name1, name2) => name1.compareTo(name2));
-    String output = "";
-    int i = 0;
-    while ( i < names.length - 1) {
-      output += "${names[i]}, ";
-      i++;
-    }
-    output += names[names.length - 1];
-    return output;
   }
 
   @override
@@ -211,6 +140,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                         padding: const EdgeInsets.all(8.0),
                         child: Image.asset("assets/images/sv_icon_menu.png"),
                       ),
+                      Expanded(
+                        child: SearchBar(
+                          controller: _searchBarController,
+                          onTap: () => { Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundSearch())) },
+                        ),
+                      )
                     ],
                   ),
                 ),
