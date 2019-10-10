@@ -4,19 +4,24 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/incident_management/close_incident_management_alert.dart';
 import 'package:school_village/widgets/incident_management/on_map_interface.dart';
 import 'package:school_village/widgets/messages/broadcast_messaging.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
-import 'incident_message.dart';
+import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
+import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
+import 'package:school_village/widgets/talk_around/talk_around_home.dart';
+import 'package:school_village/widgets/talk_around/talk_around_user.dart';
+import 'package:school_village/widgets/incident_management/incident_message.dart';
 
 
 class IncidentManagement extends StatefulWidget {
@@ -25,7 +30,7 @@ class IncidentManagement extends StatefulWidget {
   final String role;
   final bool resolved;
   final DateFormat timeFormatter = DateFormat("hh:mm a");
-  final DateFormat dateFormatter = DateFormat.MMMd();
+  final DateFormat dateFormatter = DateFormat("EEEE, MMM dd, yyyy", "en_US");
 
   IncidentManagement({this.key, this.alert, this.role, this.resolved = false}) : super(key: key);
 
@@ -54,7 +59,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         infoWindow: InfoWindow(
             title: alert.title,
-            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
+            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}"
         ))]);
   }
 
@@ -67,16 +72,23 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   void _showStopAlert() async {
-    bool confirm = await _showStopAlertAsync();
-    if (confirm) {
-      Firestore.instance.document("$_schoolId/notifications/${alert.id}").updateData({"endedAt" : FieldValue.serverTimestamp()}).then((_) {
+    String closureComment = await _showStopAlertAsync();
+    if (closureComment != null) {
+      final String finalMessage = closureComment.isEmpty ? "Incident closed without resolution message" : closureComment;
+      Firestore.instance.runTransaction((transaction) {
+        DocumentReference alertRef = Firestore.instance.document("$_schoolId/notifications/${alert.id}");
+        return transaction.update(alertRef, {
+          "endedAt" : FieldValue.serverTimestamp(),
+          "resolution": finalMessage
+        });
+      }).then((_) {
         Navigator.pop(context);
       });
     }
   }
 
-  Future<bool> _showStopAlertAsync() async {
-    return showDialog<bool>(
+  Future<String> _showStopAlertAsync() async {
+    return showDialog<String>(
       barrierDismissible: false,
       builder: (BuildContext context) {
         return CloseIncidentManagementAlert();
@@ -85,32 +97,42 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     );
   }
 
-  void _showBroadcast() async {
+  void _showTalkAround() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => TalkAroundHome()
+      ),
+    );
+  }
+
+  void _showBroadcast() {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-            editable: role != 'school_security',
+            editable: role == 'school_admin' || role == 'school_security' || role == 'pd_fire_ems',
           )),
     );
   }
 
-  void onMessagesChanged(List<DocumentChange> snapshot) {
+  void onMessagesChanged(List<DocumentChange> snapshot) async {
     if (snapshot.isEmpty) {
       return;
     }
     if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/notifications').path) {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
-          data.document["title"],
-          data.document.documentID,
-          "",
-          data.document["body"],
-          DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
-          data.document["createdBy"],
-          data.document["createdById"],
-          data.document["location"]["latitude"],
-          data.document["location"]["longitude"]);
+            data.document["title"],
+            data.document.documentID,
+            "",
+            data.document["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
+            data.document["createdBy"],
+            data.document["createdById"],
+            data.document["reportedByPhone"],
+            data.document["location"]["latitude"],
+            data.document["location"]["longitude"]);
       }).toList();
       _fullList.addAll(newList);
     } else if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/broadcasts').path) {
@@ -140,23 +162,31 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
             DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
             data.document["createdBy"],
             data.document["createdById"],
+            data.document["reportedByPhone"],
             null,
             null);
       }).toList();
       _fullList.addAll(newList);
     } else {
-      List<TalkAroundMessage> newList = snapshot.map((data) {
+      List<TalkAroundMessage> newList = await Future.wait(snapshot.map((data) async {
+        final DocumentSnapshot channelSnapshot = await data.document.reference.parent().parent().get();
+        final List<TalkAroundUser> members = await Future.wait(channelSnapshot.data["members"].map((id) async {
+          final DocumentSnapshot user = await id.get();
+          return TalkAroundUser.fromMapAndGroup(user, "");
+        }).cast<Future<TalkAroundUser>>());
+        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(channelSnapshot, members);
         return TalkAroundMessage(
             "Direct Message",
             data.document.documentID,
-            data.document.reference.parent().parent().documentID,
+            channel.groupConversationName("${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}"),
             data.document["body"],
             DateTime.fromMicrosecondsSinceEpoch(data.document["timestamp"].microsecondsSinceEpoch),
             data.document["author"],
             data.document["authorId"],
+            data.document["reportedByPhone"],
             data.document["location"]["latitude"],
             data.document["location"]["longitude"]);
-      }).toList();
+      }).toList());
       _fullList.addAll(newList);
     }
     _fullList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
@@ -167,7 +197,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         infoWindow: InfoWindow(
             title: alert.title,
-            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhone}"
+            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}"
         )));
     for(TalkAroundMessage message in _fullList) {
       if (message.latitude != null && message.longitude != null) {
@@ -210,10 +240,11 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
           "Incident Resolved",
           "alert-resolved-identifier",
           "",
-          "This incident has been resolved and closed.",
+          "${alert.resolution != null ? alert.resolution : "This incident has been resolved and closed."}",
           alert.timestampEnded,
           "SCHOOL VILLAGE SYSTEM",
           "",
+          null,
           null,
           null));
       setState(() {
@@ -229,10 +260,11 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
               "Incident Resolved",
               "alert-resolved-identifier",
               "",
-              "This incident has been resolved and closed.",
+              "${snapshot.data["resolution"] != null ? snapshot.data["resolution"] : "This incident has been resolved and closed."}",
               DateTime.fromMillisecondsSinceEpoch(snapshot.data["endedAt"].millisecondsSinceEpoch),
               "SCHOOL VILLAGE SYSTEM",
               "",
+              null,
               null,
               null));
           final alert = SchoolAlert.fromMap(snapshot);
@@ -242,7 +274,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         }
       });
     }
-    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("members", arrayContains: _userSnapshot.documentID);
+    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("members", arrayContains: _userSnapshot.reference);
     QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.documents.forEach((channelDocument) {
@@ -302,10 +334,17 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   @override
-  void onMapClicked(double latitude, double longitude) {
-    if (latitude != null && longitude != null) {
-      _mapController.animateCamera(CameraUpdate.newLatLng(LatLng(latitude, longitude)));
-    }
+  void onMapClicked(TalkAroundMessage message) {
+    final messageMap = {
+      'location' : {
+        'latitude' : message.latitude,
+        'longitude' : message.longitude
+      },
+      'createdBy' : message.author,
+      'createdAt' : message.timestamp.millisecondsSinceEpoch,
+      'body' : message.message
+    };
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDetail(notification: messageMap)));
   }
 
   @override
@@ -342,16 +381,11 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                         color: Color.fromARGB(140, 229, 229, 234),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                          child: RichText(
-                            text: TextSpan(
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
-                                children: <TextSpan>[
-                                  TextSpan(text: "${alert.title}", style: TextStyle(fontSize: 18.0)),
-                                  TextSpan(text: " at ${widget.timeFormatter.format(alert.timestamp)}", style: TextStyle(fontSize: 14.0)),
-                                  TextSpan(text: alert.resolved ? ", ${widget.dateFormatter.format(alert.timestamp)}" : "", style: TextStyle(fontSize: 14.0))
-                                ]
-                            ),
-                            textAlign: TextAlign.center,
+                          child: Row(
+                              children: [
+                                Text("${alert.title}", style: TextStyle(fontSize: 18.0, color: Colors.red, fontWeight: FontWeight.bold)),
+                                Expanded(child: Text("${widget.dateFormatter.format(alert.timestamp)}", textAlign: TextAlign.end))
+                              ]
                           ),
                         ),
                       ),
@@ -405,10 +439,10 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                     textAlign: TextAlign.start,
                                     style: TextStyle(fontSize: 14.0)),
                                 GestureDetector(
-                                  onTap: () { launch("tel://${alert.reportedByPhone}"); },
+                                  onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
-                                    child: Text(alert.reportedByPhone,
+                                    child: Text(alert.reportedByPhoneFormatted,
                                         textAlign: TextAlign.start,
                                         style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
                                   ),
@@ -435,13 +469,11 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                             Text(alert.createdBy,
                                 style: TextStyle(fontSize: 14.0)),
                             GestureDetector(
-                                onTap: () {
-                                  launch("tel://${alert.reportedByPhone}");
-                                },
+                                onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 4.0, vertical: 0.0),
-                                  child: Text(alert.reportedByPhone,
+                                  child: Text(alert.reportedByPhoneFormatted,
                                       style: TextStyle(fontSize: 14.0,
                                           color: Color.fromARGB(
                                               255, 11, 48, 224))),
@@ -471,7 +503,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                         child: Container(
                                             child: GestureDetector(
                                                 child: Image.asset("assets/images/group_message_btn.png", height: 64),
-                                                onTap: _showBroadcast),
+                                                onTap: _showTalkAround),
                                             padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
                                       ),
                                       Spacer(),

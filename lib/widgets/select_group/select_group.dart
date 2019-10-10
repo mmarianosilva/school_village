@@ -4,9 +4,12 @@ import '../../util/user_helper.dart';
 
 class SelectGroups extends StatefulWidget {
   final GlobalKey<_SelectGroupsState> key = GlobalKey();
+  final Function(bool) onToneSelectedCallback;
+
+  SelectGroups(this.onToneSelectedCallback);
 
   @override
-  _SelectGroupsState createState() => new _SelectGroupsState();
+  _SelectGroupsState createState() => new _SelectGroupsState(onToneSelectedCallback);
 }
 
 class _SelectGroupsState extends State<SelectGroups> {
@@ -17,6 +20,10 @@ class _SelectGroupsState extends State<SelectGroups> {
   final checkBoxHeight = 33.0;
   final textSize = 14.0;
   int numOfRows = 1;
+  bool amberAlert = false;
+  final Function(bool) onToneSelectedCallback;
+
+  _SelectGroupsState(this.onToneSelectedCallback);
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
@@ -115,8 +122,67 @@ class _SelectGroupsState extends State<SelectGroups> {
                       fontWeight: FontWeight.bold))),
         ),
         SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: columns)),
+        Align(
+          child: Container(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: checkBoxHeight / 2.5,
+                    ),
+                    Text("Alert tone:")
+                  ],
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 3,
+                  height: checkBoxHeight,
+                  child: CheckboxListTile(
+                    isThreeLine: false,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      "Amber",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    activeColor: Colors.red,
+                    checkColor: Colors.white,
+                    value: amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 3,
+                  height: checkBoxHeight,
+                  child: CheckboxListTile(
+                    isThreeLine: false,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      "2-Tone",
+                    ),
+                    value: !amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = !value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )
+        )
       ]),
-      height: (checkBoxHeight * _getHeight()) + 30.0,
+      height: (checkBoxHeight * _getHeight()) + checkBoxHeight + 25.0,
     );
   }
 }

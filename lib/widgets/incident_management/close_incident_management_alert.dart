@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CloseIncidentManagementAlert extends StatelessWidget {
+  final TextEditingController _incidentReportController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -38,12 +40,22 @@ class CloseIncidentManagementAlert extends StatelessWidget {
                 padding: const EdgeInsets.all(4.0),
                 child: Text("Do you wish to Terminate?", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
               ),
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: TextField(
+                  controller: _incidentReportController,
+                  decoration: InputDecoration(
+                    hintText: "Describe the incident resolution to let others know why it's being closed"
+                  ),
+                  maxLines: null,
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   MaterialButton(
-                      onPressed: () => Navigator.pop(context, false),
+                      onPressed: () => Navigator.pop(context, null),
                       child: Container(
                         decoration: ShapeDecoration(
                             shape: RoundedRectangleBorder(
@@ -59,7 +71,7 @@ class CloseIncidentManagementAlert extends StatelessWidget {
                       )
                   ),
                   MaterialButton(
-                      onPressed: () => Navigator.pop(context, true),
+                      onPressed: () => Navigator.pop(context, _incidentReportController.text),
                       child: Container(
                         decoration: ShapeDecoration(
                             shape: RoundedRectangleBorder(

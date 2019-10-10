@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:location/location.dart';
+import 'package:intl/intl.dart';
+import 'package:school_village/widgets/notification/notification.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/school_alert.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/widgets/incident_management/incident_management.dart';
-import '../schoollist/school_list.dart';
-import '../../util/user_helper.dart';
-import '../notification/notification.dart';
-import '../../model/main_model.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:school_village/model/main_model.dart';
+import 'package:school_village/util/user_helper.dart';
+
 
 class Notifications extends StatefulWidget {
   @override
@@ -24,6 +24,7 @@ class _NotificationsState extends State<Notifications> {
   DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
   List<SchoolAlert>  _alerts = [];
+  final DateFormat timestampFormat = dateFormatting.messageDateFormatter;
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
@@ -31,11 +32,9 @@ class _NotificationsState extends State<Notifications> {
     _role = await UserHelper.getSelectedSchoolRole();
     List<SchoolAlert>  notifications = [];
     Query ref = Firestore.instance.collection("/$_schoolId/notifications")
-        .orderBy('endedAt', descending: true)
-        .where('endedAt', isLessThanOrEqualTo: Timestamp.now())
-        .limit(20);
+        .orderBy('createdAt', descending: true)
+        .limit(25);
     ref.getDocuments().then((querySnapshot) {
-      querySnapshot.documents.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
       notifications.addAll(querySnapshot.documents.map((document) => SchoolAlert.fromMap(document)));
       setState(() {
         isLoaded = true;
@@ -55,21 +54,55 @@ class _NotificationsState extends State<Notifications> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 new ListTile(
-                  title: new Text(alert.title, style: new TextStyle(fontWeight: FontWeight.bold),),
-                  subtitle: new Text("${alert.timestamp}"),
-                  trailing: new FlatButton(
-                    child: const Text('VIEW'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        new MaterialPageRoute(
-                          builder: (context) => IncidentManagement(alert: alert, role: _role, resolved: true),
-                        ),
+                  title: Text(alert.title, style: TextStyle(fontWeight: FontWeight.bold),),
+                  subtitle: Text("${timestampFormat.format(alert.timestamp)}"),
+                  trailing: Builder(builder: (context) {
+                    if (alert.resolved) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          FlatButton(
+                            child: const Text('IMD', style: TextStyle(color: Colors.blueAccent),),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                new MaterialPageRoute(
+                                  builder: (context) =>
+                                      IncidentManagement(alert: alert,
+                                          role: _role,
+                                          resolved: alert.resolved),
+                                ),
+                              );
+                            },
+                          ),
+                          FlatButton(
+                            child: const Text('VIEW'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                new MaterialPageRoute(
+                                  builder: (context) => NotificationDetail(notification: alert, title: 'Notification'),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       );
-                    },
-                  ),
+                    } else {
+                      return FlatButton(
+                        child: const Text('VIEW'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            new MaterialPageRoute(
+                              builder: (context) => NotificationDetail(notification: alert, title: 'Notification'),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  }),
                 ),
-
               ]
           ),
         );

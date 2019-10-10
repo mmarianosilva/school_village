@@ -4,8 +4,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/notification/notification.dart';
+import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
+import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
+import 'package:school_village/widgets/talk_around/talk_around_home.dart';
+import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
+import 'package:school_village/widgets/talk_around/talk_around_user.dart';
 import './dashboard/dashboard.dart';
 import '../settings/settings.dart';
 import '../holine_list/hotline_list.dart';
@@ -13,9 +19,7 @@ import '../../util/user_helper.dart';
 import '../schoollist/school_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../messages/broadcast_messaging.dart';
 import '../../util/token_helper.dart';
-import '../talk_around/talk_around.dart';
 import '../../model/main_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -58,6 +62,21 @@ class _HomeState extends State<Home> {
     } else {
       platform.invokeMethod('playBackgroundAudio');
     }
+  }
+
+  Future<SchoolAlert> _checkIfAlertIsInProgress() async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
+    return await alerts.orderBy("createdAt", descending: true).getDocuments().then((result) {
+      if (result.documents.isEmpty) {
+        return null;
+      }
+      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
+      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.now();
+      result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+      final latestAlert = result.documents.isNotEmpty ? SchoolAlert.fromMap(result.documents.last) : null;
+      return latestAlert;
+    });
   }
 
   stopSound() {
@@ -103,13 +122,13 @@ class _HomeState extends State<Home> {
     TokenHelper.saveToken();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
-        _onNotification(message);
+        return _onNotification(message, true);
       },
       onLaunch: (Map<String, dynamic> message) {
-        _onNotification(message);
+        return _onNotification(message);
       },
       onResume: (Map<String, dynamic> message) {
-        _onNotification(message);
+        return _onNotification(message);
       },
     );
     _firebaseMessaging.requestNotificationPermissions(
@@ -122,7 +141,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _onNotification(Map<String, dynamic> data) {
+  _onNotification(Map<String, dynamic> data, [bool appInForeground = false]) async {
     Map<String, dynamic> message;
 
     if (data["data"] != null) {
@@ -132,22 +151,51 @@ class _HomeState extends State<Home> {
     }
 
     if (message["type"] == "broadcast") {
-      // playAlarm();
-      playMessageAlert(); //Remove this
-      return _showBroadcastDialog(message);
-    } else if (message["type"] == "security") {
       playMessageAlert();
-      return _goToSecurityChat(message['conversationId'], message['title']);
+      return _showBroadcastDialog(message);
     } else if (message["type"] == "hotline") {
-      // playAlarm();
-      playMessageAlert(); //Remove this
+      playMessageAlert();
       return _showHotLineMessageDialog(message);
     } else if (message["type"] == "incident") {
       playMessageAlert();
       return _shoIncidentReportDialog(message);
-      // return _showHotLineMessageDialog(message);
+    } else if (message["type"] == "alert") {
+      String path = "schools/${message["schoolId"]}/notifications/${message["notificationId"]}";
+      DocumentSnapshot alert = await Firestore.instance.document(path).get();
+      if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] > 7200000) {
+        return true;
+      }
+      SchoolAlert latestAlert = await _checkIfAlertIsInProgress();
+      if (latestAlert != null && latestAlert.id != message["notificationId"]) {
+        playMessageAlert();
+      } else {
+        playAlarm();
+      }
+      return _showItemDialog(message);
+    } else if (message["type"] == "talkaround" && !appInForeground) {
+      final String escapedSchoolId = message["schoolId"];
+      return Firestore
+          .instance
+          .document("schools/$escapedSchoolId/messages/${message["conversationId"]}")
+          .get()
+          .then((data) async {
+        Stream<TalkAroundUser> membersStream = Stream.fromIterable(data["members"]).asyncMap((userId) {
+          return Firestore
+              .instance
+              .document("users/$userId")
+              .get()
+              .then((snapshot) => TalkAroundUser.fromMapAndGroup(snapshot, snapshot.data["associatedSchools"][escapedSchoolId] != null ? snapshot.data["associatedSchools"][escapedSchoolId]["role"] : ""));
+        });
+        final List<TalkAroundUser> members = await membersStream.toList();
+        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(data, members);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => TalkAroundHome()),
+                (route) => route.settings.name == '/home');
+        Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundMessaging(channel: channel,)));
+      });
     }
-    _showItemDialog(message);
+    return _showItemDialog(message);
   }
 
   _shoIncidentReportDialog(message) {
@@ -166,6 +214,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('View All'),
               onPressed: () {
+                stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
@@ -178,6 +227,7 @@ class _HomeState extends State<Home> {
             FlatButton(
               child: Text('Close'),
               onPressed: () {
+                stopSound();
                 Navigator.of(context).pop();
               },
             ),
@@ -227,16 +277,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  _goToSecurityChat(String conversationId, String title) async {
-    if (['school_admin', 'school_security']
-        .contains((await UserHelper.getSelectedSchoolRole()))) {
-      if (TalkAround.navigate(conversationId, context)) {
-        TalkAround.triggerNewMessage(conversationId, title);
-      }
-    }
-  }
-
   _showBroadcastDialog(Map<String, dynamic> message) async {
+    final DocumentSnapshot messageSnapshot = await Firestore.instance.document("schools/${message['schoolId']}/broadcasts/${message['broadcastId']}").get();
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -250,14 +292,14 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View All'),
+              child: Text('View Details'),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BroadcastMessaging(),
+                    builder: (context) => MessageDetail(notification: messageSnapshot.data,),
                   ),
                 );
               },
@@ -276,8 +318,31 @@ class _HomeState extends State<Home> {
   }
 
   _showItemDialog(Map<String, dynamic> message) async {
-    // playAlarm();
-    playMessageAlert(); //Remove this
+    if (message['type'] == "talkaround") {
+      return showDialog<Null>(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: Text(message['title'] ?? ""),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[Text(message['body']) ?? ''],
+                  ),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Close'),
+                    onPressed: () {
+                      stopSound();
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+            );
+          }
+      );
+    }
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
     DocumentSnapshot notification;
@@ -305,7 +370,7 @@ class _HomeState extends State<Home> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        NotificationDetail(notification: notification),
+                        NotificationDetail(notification: SchoolAlert.fromMap(notification)),
                   ),
                 );
               },

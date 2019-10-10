@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
@@ -7,17 +6,16 @@ import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
+import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
 import '../../alert/alert.dart';
 import '../../hotline/hotline.dart';
-import '../../talk_around/talk_around.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../util/file_helper.dart';
 import 'dart:io';
 import '../../notifications/notifications.dart';
-import '../../messages/broadcast_messaging.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../../model/main_model.dart';
 import 'package:location/location.dart';
@@ -70,8 +68,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         });
         return;
       }
-      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null);
-      final Timestamp lastResolvedTimestamp = lastResolved["endedAt"];
+      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
+      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.now();
       result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert = result.documents.isNotEmpty ? result.documents.last : null;
       SchoolAlert alert = latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
@@ -112,7 +110,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       }
       isLoaded = true;
     });
-    TalkAround.role = userRole;
   }
 
   _updateSchool() async {
@@ -137,7 +134,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   checkNewSchool() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != ref) {
-      String schoolName = await UserHelper.getSchoolName();
       setState(() {
         isLoaded = false;
         ref = schoolId;
@@ -184,10 +180,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     );
   }
 
-  openTalk() {
-    TalkAround.navigate("", context);
-  }
-
   openIncidentManagement() {
     Navigator.push(
         context,
@@ -200,15 +192,16 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       children: <Widget>[
         const SizedBox(height: 14.0),
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: openSettings,
           child: Row(
             children: <Widget>[
               Container(
-                width: 55.0,
-                height: 48.0,
+                width: 56.0,
+                height: 56.0,
                 child: Center(
-                  child: Icon(Icons.info,
-                      size: 48.0, color: Color.fromRGBO(4, 56, 130, 1)),
+                  child: Icon(Icons.info_outline,
+                      size: 48.0, color: Color.fromRGBO(23, 58, 163, 1)),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -216,9 +209,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   child: Text(
                     "Support",
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                   )),
-              Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
         )
@@ -237,19 +230,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               alertGroups.data.length == 0) {
             return SizedBox();
           }
-          return Column(
-            children: <Widget>[
-              const SizedBox(height: 14.0),
-              GestureDetector(
-                onTap: openNotifications,
-                child: Row(
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: openNotifications,
+            child: Column(
+              children: <Widget>[
+                const SizedBox(height: 14.0),
+                Row(
                   children: <Widget>[
                     Container(
-                      width: 55.0,
-                      height: 48.0,
+                      width: 56.0,
+                      height: 56.0,
                       child: Center(
-                        child: Image.asset('assets/images/alert.png',
-                            width: 80.0, height: 80.0),
+                        child: Image.asset('assets/images/alert.png'),
                       ),
                     ),
                     SizedBox(width: 12.0),
@@ -257,19 +250,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                         child: Text(
                           "Alert Log",
                           textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                          style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                         )),
-                    Icon(Icons.chevron_right)
+                    Icon(Icons.chevron_right, color: Colors.grey)
                   ],
                 ),
-              ),
-              const SizedBox(height: 14.0),
-              Container(
-                height: 0.5,
-                width: MediaQuery.of(context).size.width,
-                color: Colors.grey,
-              )
-            ],
+                const SizedBox(height: 14.0),
+                Container(
+                  height: 0.5,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey,
+                )
+              ],
+            ),
           );
         });
   }
@@ -279,50 +272,57 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildDocumentOption(snapshot, index) {
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          onTap: () {
-            if (snapshot.data.data["documents"][index - 4]["type"] == "pdf") {
-              _showPDF(context,
-                  snapshot.data.data["documents"][index - 4]["location"]);
-            } else {
-              _launchURL(
-                  snapshot.data.data["documents"][index - 4]["location"]);
-            }
-          },
-          child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (snapshot.data.data["documents"][index - 5]["type"] == "pdf") {
+          _showPDF(context,
+              snapshot.data.data["documents"][index - 5]["location"]);
+        } else {
+          _launchURL(
+              snapshot.data.data["documents"][index - 5]["location"]);
+        }
+      },
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
             children: <Widget>[
-              FutureBuilder(
-                  future: FileHelper.getFileFromStorage(
-                      url: snapshot.data.data["documents"][index - 4]["icon"],
-                      context: context),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<File> snapshot) {
-                    if (snapshot.data == null) {
-                      return Image.asset('assets/images/logo.png', width: 55.0);
-                    }
-                    return Image.file(snapshot.data, width: 55.0);
-                  }),
+              Container(
+                width: 56.0,
+                height: 56.0,
+                child: Center(
+                  child: FutureBuilder(
+                      future: FileHelper.getFileFromStorage(
+                          url: snapshot.data.data["documents"][index - 5]["icon"],
+                          context: context),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<File> snapshot) {
+                        if (snapshot.data == null) {
+                          return Image.asset('assets/images/logo.png', width: 48.0,);
+                        }
+                        return Image.file(snapshot.data, width: 48.0,);
+                      }),
+                ),
+              ),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    snapshot.data.data["documents"][index - 4]["title"],
+                    snapshot.data.data["documents"][index - 5]["title"],
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                   )),
-              Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
-        ),
-        const SizedBox(height: 14.0),
-        Container(
-          height: 0.5,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.grey,
-        )
-      ],
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
+        ],
+      ),
     );
   }
 
@@ -335,25 +335,24 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       return SizedBox();
     }
 
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => IncidentReport()),
-            );
-          },
-          child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => IncidentReport()),
+        );
+      },
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
             children: <Widget>[
-              //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
-                width: 55.0,
-                height: 48.0,
+                width: 56.0,
+                height: 56.0,
                 child: Center(
-                  child: Image.asset('assets/images/feature_image.png',
-                      width: 48.0, height: 48.0),
+                  child: Image.asset('assets/images/feature_image.png'),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -361,19 +360,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   child: Text(
                     "Incident Report Form",
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                   )),
-              Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
-        ),
-        const SizedBox(height: 14.0),
-        Container(
-          height: 0.5,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.grey,
-        ),
-      ],
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          ),
+        ],
+      ),
     );
   }
 
@@ -382,25 +381,24 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       return SizedBox();
     }
 
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => IncidentList()),
-            );
-          },
-          child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => IncidentList()),
+        );
+      },
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
             children: <Widget>[
-              //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
-                width: 55.0,
-                height: 48.0,
+                width: 56.0,
+                height: 56.0,
                 child: Center(
-                  child: Image.asset('assets/images/feature_image.png',
-                      width: 48.0, height: 48.0),
+                  child: Image.asset('assets/images/incident_report_log.png'),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -408,19 +406,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   child: Text(
                     "Incident Report Log",
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                   )),
-              Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
-        ),
-        const SizedBox(height: 14.0),
-        Container(
-          height: 0.5,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.grey,
-        ),
-      ],
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          ),
+        ],
+      ),
     );
   }
 
@@ -453,20 +451,21 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     if (role != 'school_admin') {
       return SizedBox();
     }
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          onTap: openHotLineList,
-          child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: openHotLineList,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
             children: <Widget>[
-              //                                Image.asset('assets/images/logo.png', width: 48.0),
               Container(
-                width: 55.0,
-                height: 48.0,
+                width: 56.0,
+                height: 56.0,
                 child: Center(
                   child: Icon(Icons.record_voice_over,
-                      size: 36.0, color: Colors.green.shade700),
+                      size: 48.0, color: Colors.black),
                 ),
               ),
               SizedBox(width: 12.0),
@@ -474,19 +473,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   child: Text(
                     "Anonymous Hotline Log",
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 16.0, color: SVColors.dashboardItemFontColor),
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
                   )),
-              Icon(Icons.chevron_right)
+              Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
-        ),
-        const SizedBox(height: 14.0),
-        Container(
-          height: 0.5,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.grey,
-        ),
-      ],
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          ),
+        ],
+      ),
     );
   }
 
@@ -498,6 +497,46 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       child:
       Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
       onTap: sendAlert,
+    );
+  }
+
+  _buildBroadcastInList() {
+    if (role != 'school_student' && role != 'school_family') {
+      return SizedBox();
+    }
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BroadcastMessaging(editable: false))),
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
+            children: <Widget>[
+              Container(
+                width: 56.0,
+                height: 56.0,
+                child: Center(
+                  child: Image.asset("assets/images/broadcast_btn.png", width: 48.0),
+                ),
+              ),
+              SizedBox(width: 12.0),
+              Expanded(
+                  child: Text(
+                    "Broadcast Messages",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+                  )),
+              Icon(Icons.chevron_right, color: Colors.grey)
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          ),
+        ],
+      ),
     );
   }
 
@@ -559,25 +598,28 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                           if (index == 3) {
                             return _buildIncidentList();
                           }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 4) {
-                            return _buildMessagesOption(model);
+                          if (index == 4) {
+                            return _buildBroadcastInList();
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 5) {
-                            return _buildNotificationsOption(model);
+                            return _buildMessagesOption(model);
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 6) {
-                            return _buildHotlineMessages();
+                            return _buildNotificationsOption(model);
                           }
                           if (index ==
                               snapshot.data.data["documents"].length + 7) {
+                            return _buildHotlineMessages();
+                          }
+                          if (index ==
+                              snapshot.data.data["documents"].length + 8) {
                             return _buildSettingsOption();
                           }
                           return _buildDocumentOption(snapshot, index);
                         },
-                        itemCount: snapshot.data.data["documents"].length + 8);
+                        itemCount: snapshot.data.data["documents"].length + 9);
               }
             });
       },

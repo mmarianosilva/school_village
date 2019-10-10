@@ -1,3 +1,5 @@
+import 'package:school_village/model/talk_around_message.dart';
+
 abstract class OnMapInterface {
-  void onMapClicked(double latitude, double longitude);
+  void onMapClicked(TalkAroundMessage message);
 }

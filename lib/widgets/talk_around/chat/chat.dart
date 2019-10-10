@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/constants.dart';
-import 'package:school_village/util/date_formatter.dart';
 import '../message/message.dart';
 import 'package:location/location.dart';
 import 'dart:io';
@@ -32,11 +32,11 @@ class _ChatState extends State<Chat> {
   final Firestore firestore = Firestore.instance;
   Location _location = Location();
   List<MessageHolder> messageList = List();
-  bool disposed = false;
   ScrollController _scrollController;
   final focusNode = FocusNode();
   Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
   bool isLoaded = false;
+  StreamSubscription<QuerySnapshot> _messageSubscription;
 
   InputField inputField;
 
@@ -62,8 +62,12 @@ class _ChatState extends State<Chat> {
 
   @override
   dispose() {
-    disposed = true;
-    _scrollController.removeListener(_scrollListener);
+    if (_messageSubscription != null) {
+      _messageSubscription.cancel();
+    }
+    if (_scrollController != null) {
+      _scrollController.removeListener(_scrollListener);
+    }
     super.dispose();
   }
 
@@ -73,39 +77,45 @@ class _ChatState extends State<Chat> {
     }
     CollectionReference collection =
         Firestore.instance.collection('$conversation/messages');
-    final DocumentReference document = collection.document();
-    var path = '';
-    var thumbPath = '';
-    if (image != null) {
-      _showLoading();
-      path =
-          '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
-      String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1
-          ? lookupMimeType(image.path).split("/")[1]
-          : type;
-      path = path + "." + type;
+    Firestore.instance.runTransaction((transaction) async {
+      final DocumentReference document = collection.document();
+      var path = '';
+      var thumbPath = '';
+      if (image != null) {
+        _showLoading();
+        path =
+        '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
+        String type = 'jpeg';
+        type = lookupMimeType(image.path).split("/").length > 1
+            ? lookupMimeType(image.path).split("/")[1]
+            : type;
+        path = path + "." + type;
 
-      thumbPath =
-          '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}' +
-              '.jpeg';
+        thumbPath =
+            '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}' +
+                '.jpeg';
 
-      print(path);
-      await uploadFile(path, image);
-      await uploadFile(thumbPath, thumb);
-      _hideLoading();
-    }
-    document.setData(<String, dynamic>{
-      'body': text,
-      'createdById': user.documentID,
-      'createdBy': "${user.data['firstName']} ${user.data['lastName']}",
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
-      'location': await _getLocation(),
-      'image': image == null ? null : path,
-      'thumb': thumb == null ? null : thumbPath,
-      'reportedByPhone': "${user['phone']}"
+        print(path);
+        await uploadFile(path, image);
+        await uploadFile(thumbPath, thumb);
+        _hideLoading();
+      }
+      await transaction.set(document, <String, dynamic>{
+        'body': text,
+        'authorId': user.documentID,
+        'author': "${user.data['firstName']} ${user.data['lastName']}",
+        'timestamp': FieldValue.serverTimestamp(),
+        'location': await _getLocation(),
+        'image': image == null ? null : path,
+        'thumb': thumb == null ? null : thumbPath
+      });
+    }).then((result) {
+      print("Transaction result: ${result}");
+      inputField.key.currentState.clearState();
+    }).catchError((error) {
+      print(error);
     });
-    inputField.key.currentState.clearState();
+
   }
 
   uploadFile(String path, File file) async {
@@ -144,50 +154,43 @@ class _ChatState extends State<Chat> {
 
   static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
 
-  _convertDateToKey(createdAt) {
-    return DateTime.fromMillisecondsSinceEpoch(createdAt)
-            .millisecondsSinceEpoch ~/
-        Constants.oneDay;
+  _convertDateToKey(Timestamp createdAt) {
+    return createdAt.millisecondsSinceEpoch ~/ Constants.oneDay;
   }
 
-  _getHeaderItem(day) {
-    var time = DateTime.fromMillisecondsSinceEpoch(day);
-    return MessageHolder(getHeaderDate(time.millisecondsSinceEpoch), null);
-  }
-
-  _handleMessageMapInsert(shot) {
-    var day = _convertDateToKey(shot['createdAt']);
+  _handleMessageMapInsert(DocumentSnapshot shot) {
+    print(shot.data['timestamp']);
+    var day = _convertDateToKey(shot['timestamp']);
 
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
     if (messages == null) {
       messages = List();
       messageMap[day] = messages;
-      // messageList.insert(0, _getHeaderItem(shot['createdAt']));
-      messageList.insert(0, message);
-    } else {
-      messageList.insert(0, message);
     }
+    messageList.insert(0, message);
     messageMap[day].add(shot);
-    _updateState();
+    setState(() {
+      messageList = messageList;
+    });
   }
 
   _handleDocumentChanges(documentChanges) {
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
         _handleMessageMapInsert(change.document);
+      } else if (change.type == DocumentChangeType.modified) {
+
+      } else {
+
       }
     });
   }
 
-  _updateState() {
-    if (!disposed) setState(() {});
-  }
-
   _handleMessageCollection() {
-    firestore
+    _messageSubscription = firestore
         .collection("$conversation/messages")
-        .orderBy("createdAt")
+        .orderBy("timestamp")
         .snapshots()
         .listen((data) {
       _handleDocumentChanges(data.documentChanges);
@@ -232,9 +235,9 @@ class _ChatState extends State<Chat> {
             final DocumentSnapshot document = messageList[index].message;
             return ChatMessage(
               text: document['body'],
-              name: "${document['createdBy']}",
-              timestamp: document['createdAt'],
-              self: document['createdById'] == user.documentID,
+              name: "${document['author']}",
+              timestamp: document['timestamp'],
+              self: document['authorId'] == user.documentID,
               location: document['location'],
               imageUrl: document['thumb'] ?? document['image'],
               message: document,
@@ -261,5 +264,4 @@ class _ChatState extends State<Chat> {
           : SizedBox(width: 0.0, height: 10.0)
     ]);
   } //modified
-
 }

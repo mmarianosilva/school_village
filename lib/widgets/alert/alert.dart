@@ -8,7 +8,7 @@ import '../../util/user_helper.dart';
 
 class Alert extends StatefulWidget {
   @override
-  _AlertState createState() => new _AlertState();
+  _AlertState createState() => _AlertState();
 }
 
 class Choice {
@@ -28,12 +28,14 @@ class _AlertState extends State<Alert> {
   String _schoolName = '';
   String _userId = '';
   String _email = '';
+  String _role = '';
   String name = '';
   String phone = '';
   DocumentReference _user;
   DocumentSnapshot _userSnapshot;
   bool isLoaded = false;
-  final customAlertController = new TextEditingController();
+  bool _isTrainingMode = true;
+  final customAlertController = TextEditingController();
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -42,13 +44,17 @@ class _AlertState extends State<Alert> {
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolName = await UserHelper.getSchoolName();
+    Firestore.instance.document(_schoolId).get().then((school) {
+      _isTrainingMode = school['isTraining'];
+    });
+    _role = await UserHelper.getSelectedSchoolRole();
     _user = Firestore.instance.document('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
       _userId = user.documentID;
       setState(() {
         name =
-            "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
+        "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
         phone = "${_userSnapshot.data['phone']}";
         isLoaded = true;
       });
@@ -60,14 +66,14 @@ class _AlertState extends State<Alert> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Send Alert'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
+          return AlertDialog(
+            title: Text('Send Alert'),
+            content: SingleChildScrollView(
+              child: ListBody(
                 children: <Widget>[
                   TextField(
                     controller: customAlertController,
-                    decoration: new InputDecoration(
+                    decoration: InputDecoration(
                         border: const UnderlineInputBorder(),
                         hintText: 'What is the emergency?'),
                   )
@@ -75,14 +81,14 @@ class _AlertState extends State<Alert> {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
-                child: new Text('Cancel'),
+              FlatButton(
+                child: Text('Cancel'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
-              new FlatButton(
-                child: new Text('Send'),
+              FlatButton(
+                child: Text('Send'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _sendAlert("other", "Alert!", "${customAlertController.text} at $_schoolName", context);
@@ -97,37 +103,125 @@ class _AlertState extends State<Alert> {
 
 
   _sendAlert(alertType, alertTitle, alertBody, context) {
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Are you sure you want to send this alert?'),
-          content: new SingleChildScrollView(
-            child: new ListBody(
-              children: <Widget>[
-                new Text('This cannot be undone')
+    if (_role == 'school_security' || _role == 'school_admin') {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) {
+            return AlertDialog(
+              title: Text('Are you sure you want to send this alert?'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text('This cannot be undone')
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  color: Colors.red,
+                  child: Text('911 + Campus', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) {
+                          return AlertDialog(
+                            title: Text('Are you sure you want to send a message to 911?'),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Text('This cannot be undone')
+                                ],
+                              ),
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                  color: Colors.black45,
+                                  child: Text('Yes', style: TextStyle(color: Colors.white)),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    if (_isTrainingMode) {
+                                      Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                "911 alert currently not enabled. Sending campus alert"),
+                                          )
+                                      );
+                                      _saveAlert(alertTitle, alertBody, alertType, context);
+                                    } else {
+                                      // TODO implement 911 alert
+                                    }
+                                  }
+                              ),
+                              FlatButton(
+                                  color: Colors.black45,
+                                  child: Text('No', style: TextStyle(color: Colors.white)),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  }
+                              ),
+                            ],
+                          );
+                        }
+                    );
+                  },
+                ),
+                FlatButton(
+                  color: Colors.red,
+                  child: Text('Only Campus', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _saveAlert(alertTitle, alertBody, alertType, context);
+                  },
+                ),
+                FlatButton(
+                  color: Colors.black45,
+                  child: Text('Cancel', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
               ],
+            );
+          }
+      );
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return AlertDialog(
+            title: Text('Are you sure you want to send this alert?'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('This cannot be undone')
+                ],
+              ),
             ),
-          ),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text('No'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            new FlatButton(
-              child: new Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _saveAlert(alertTitle, alertBody, alertType, context);
-              },
-            )
-          ],
-        );
-      }
-    );
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.black45,
+                child: Text('YES', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _saveAlert(alertTitle, alertBody, alertType, context);
+                },
+              ),
+              FlatButton(
+                color: Colors.black45,
+                child: Text('NO', style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        }
+      );
+    }
   }
 
   _getLocation() async {
@@ -147,7 +241,7 @@ class _AlertState extends State<Alert> {
       'type': alertType,
       'createdById': _userId,
       'createdBy' : name,
-      'createdAt' : new DateTime.now().millisecondsSinceEpoch,
+      'createdAt' : DateTime.now().millisecondsSinceEpoch,
       'location' : await _getLocation(),
       'reportedByPhone' : phone,
     });
@@ -156,18 +250,18 @@ class _AlertState extends State<Alert> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Alert Sent'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
+          return AlertDialog(
+            title: Text('Alert Sent'),
+            content: SingleChildScrollView(
+              child: ListBody(
                 children: <Widget>[
-                  new Text('')
+                  Text('')
                 ],
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
-                child: new Text('Okay'),
+              FlatButton(
+                child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -189,150 +283,153 @@ class _AlertState extends State<Alert> {
       getUserDetails();
     }
 
-    return new Scaffold(
+    return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: new BaseAppBar(
-        title: new Text('Alert',
-            textAlign: TextAlign.center,
-            style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
-        backgroundColor: Colors.grey.shade200,
-        elevation: 0.0,
-        leading: new BackButton(color: Colors.grey.shade800),
-        actions: <Widget>[
-          new PopupMenuButton<Choice>(
-            onSelected: _select,
-            icon: new Icon(Icons.more_vert, color: Colors.grey.shade800),
-            itemBuilder: (BuildContext context) {
-              return choices.map((Choice choice) {
-                return new PopupMenuItem<Choice>(
-                  value: choice,
-                  child: new Row(
-                    children: <Widget>[
-                      new Icon(choice.icon, color: Colors.grey.shade800),
-                      new SizedBox(width: 8.0),
-                      new Text(choice.title)
-                    ],
-                  ),
-                );
-              }).toList();
-            },
-          ),
-        ]
-      ),
-
-      body: new SingleChildScrollView(
-        child: new Column(
-          children: <Widget>[
-            new SizedBox(height: 32.0),
-            new Container(
-                padding: EdgeInsets.all(12.0),
-                child: new Text("TAP AN ICON BELOW TO SEND AN ALERT",
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(
-                      color: Colors.red,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold),
-                )),
-            new SizedBox(height: 32.0),
-            new Image.asset('assets/images/alert_hand_icon.png',
-                width: 48.0, height: 48.0),
-            new SizedBox(height: 16.0),
-            new Container(
-              height: 0.5,
-              margin: EdgeInsets.all(12.0),
-              width: MediaQuery.of(context).size.width,
-              color: Colors.grey,
+      appBar: BaseAppBar(
+          title: Text('Alert',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+          backgroundColor: Colors.grey.shade200,
+          elevation: 0.0,
+          leading: BackButton(color: Colors.grey.shade800),
+          actions: <Widget>[
+            PopupMenuButton<Choice>(
+              onSelected: _select,
+              icon: Icon(Icons.more_vert, color: Colors.grey.shade800),
+              itemBuilder: (BuildContext context) {
+                return choices.map((Choice choice) {
+                  return PopupMenuItem<Choice>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(choice.icon, color: Colors.grey.shade800),
+                        SizedBox(width: 8.0),
+                        Text(choice.title)
+                      ],
+                    ),
+                  );
+                }).toList();
+              },
             ),
-            new SizedBox(height: 16.0),
-            new Card(
-              margin: EdgeInsets.all(8.0),
-              child: new Column(
-                mainAxisSize: MainAxisSize.min,
+          ]
+      ),
+      body: Builder(
+          builder: (BuildContext context) {
+            return SingleChildScrollView(
+              child: Column(
                 children: <Widget>[
-                  new Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-
-                            child: new GestureDetector(
-                                onTap: () {
-                                  _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
-                                },
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_armed.png',
-                                      width: 72.0, height: 108.0),
-                                ])),
-                          )),
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                                onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_fight.png',
-                                      width: 72.0, height: 95.4),
-                                ])),
-                          )),
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                                onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emergency has been reported at $_schoolName", context);},
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_medical.png',
-                                      width: 72.0, height: 109.8),
-                                ])),
-                          ))
-                    ],
+                  SizedBox(height: 32.0),
+                  Container(
+                      padding: EdgeInsets.all(12.0),
+                      child: Text("TAP AN ICON BELOW TO SEND AN ALERT",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold),
+                      )),
+                  SizedBox(height: 32.0),
+                  Image.asset('assets/images/alert_hand_icon.png',
+                      width: 48.0, height: 48.0),
+                  SizedBox(height: 16.0),
+                  Container(
+                    height: 0.5,
+                    margin: EdgeInsets.all(12.0),
+                    width: MediaQuery.of(context).size.width,
+                    color: Colors.grey,
                   ),
-                  new Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                                onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_fire.png',
-                                      width: 72.0, height: 109.8),
-                                ])),
-                          )),
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                                onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_intruder.png',
-                                      width: 72.0, height: 109.8),
-                                ])),
-                          )),
-                      new Expanded(
-                          flex: 1,
-                          child: new Container(
-                            margin: EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                                onTap: () {_sendCustomAlert(context);},
-                                child: new Column(children: [
-                                  new Image.asset('assets/images/alert_other.png',
-                                      width: 72.0, height: 109.8),
-                                ])),
-                          ))
-                    ],
+                  SizedBox(height: 16.0),
+                  Card(
+                    margin: EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
+                                      },
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_armed.png',
+                                            width: 72.0, height: 108.0),
+                                      ])),
+                                )),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_fight.png',
+                                            width: 72.0, height: 95.4),
+                                      ])),
+                                )),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emergency has been reported at $_schoolName", context);},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_medical.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                ))
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_fire.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                )),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_intruder.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                )),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendCustomAlert(context);},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_other.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                ))
+                          ],
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
-            )
-          ],
-        ),
+            );
+          }
       ),
     );
   }

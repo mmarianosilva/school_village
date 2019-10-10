@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/colors.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:image_picker/image_picker.dart';
 
-final dateTimeFormatter = DateFormat('M / dd / y hh:mm a');
+final dateTimeFormatter = dateFormatting.messageDateFormatter;
 
 class IncidentReport extends StatefulWidget {
   @override

@@ -25,7 +25,7 @@ class BroadcastMessage extends StatelessWidget {
   final String name;
   final String imageUrl;
   final String initial;
-  final int timestamp;
+  final Timestamp timestamp;
   final bool self;
   final List<String> groups;
   final DocumentSnapshot message;

@@ -2,23 +2,34 @@ import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
+import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../notification/notification.dart';
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage(
-      {this.text, this.name, this.initial, this.timestamp, this.self, this.location, this.message, this.imageUrl});
+  ChatMessage({
+    this.text,
+    this.name,
+    this.initial,
+    this.timestamp,
+    this.self,
+    this.location,
+    this.message,
+    this.imageUrl,
+    this.unread = false});
 
   final String text;
   final String name;
   final String imageUrl;
   final String initial;
-  final int timestamp;
+  final Timestamp timestamp;
   final bool self;
   final dynamic location;
   final DocumentSnapshot message;
+  final bool unread;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +37,7 @@ class ChatMessage extends StatelessWidget {
   }
 
   final nameTextStyle = TextStyle(
-      color: Color.fromRGBO(25, 24, 24, 1.0), fontWeight: FontWeight.bold, fontSize: 14.0);
+      color: Color.fromARGB(255, 0, 122, 255), fontWeight: FontWeight.bold, fontSize: 16.0);
 
   _getMessageView(context) {
     Widget locationWidget = SizedBox(width: 0.0, height: 0.0);
@@ -60,39 +71,41 @@ class ChatMessage extends StatelessWidget {
     }
     return Container(
         margin: EdgeInsets.only(top: 20.0),
+        color: unread ? Color.fromARGB(255, 226, 245, 251) : Colors.transparent,
         child: Row(
           children: [
             Flexible(
                 child: Column(
-              children: [
-                GestureDetector(
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(children: [
-                          Text(name, style: nameTextStyle),
-                          Container(
-                            child: locationWidget,
-                            margin: const EdgeInsets.only(left: 30.0),
-                          )
-                        ]),
-                        Container(
-                          child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
+                  children: [
+                    GestureDetector(
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Row(children: [
+                              Expanded(
+                                  child: Text(name, style: nameTextStyle)
+                              ),
+                              Container(
+                                child: locationWidget,
+                              )
+                            ]),
+                            Container(
+                              child: Text(getMessageDate(timestamp), style: TextStyle(fontSize: 11.0)),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 8.0),
+                              child: Text(text),
+                            ),
+                          ],
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 5.0),
-                          child: Text(text),
-                        ),
-                      ],
+                      ),
+                      onTap: () => goToDetails(context),
                     ),
-                  ),
-                  onTap: () => goToDetails(context),
-                ),
-                _getImage(context)
-              ],
-            )),
-            SizedBox(width: 32.0)
+                    _getImage(context)
+                  ],
+                ))
           ],
         ));
   }
@@ -101,7 +114,7 @@ class ChatMessage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NotificationDetail(notification: message, title: 'Message Details'),
+        builder: (context) => MessageDetail(notification: message.data),
       ),
     );
   }
@@ -112,10 +125,10 @@ class ChatMessage extends StatelessWidget {
       context,
       MaterialPageRoute(
           builder: (context) => new ImageViewScreen(
-                imageUrl,
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered
-              )),
+              imageUrl,
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered
+          )),
     );
   }
 

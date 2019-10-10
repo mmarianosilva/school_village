@@ -16,4 +16,21 @@ class TalkAroundChannel {
         firebaseModel.data["direct"],
         members);
   }
+
+  String groupConversationName(String username) {
+    if (!direct) {
+      return name;
+    }
+    List<String> names = members.map((item) => item.name).toList();
+    names.removeWhere((name) => name == username);
+    names.sort((name1, name2) => name1.compareTo(name2));
+    String output = "";
+    int i = 0;
+    while (i < names.length - 1) {
+      output += "${names[i]}, ";
+      i++;
+    }
+    output += names[names.length - 1];
+    return output;
+  }
 }

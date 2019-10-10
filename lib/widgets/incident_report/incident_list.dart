@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-final dateTimeFormatter = DateFormat('M / dd / y hh:mm a');
+final dateTimeFormatter = dateFormatting.messageDateFormatter;
 
 class IncidentList extends StatefulWidget {
   final String id;
@@ -29,6 +31,7 @@ class IncidentListState extends State<IncidentList> {
   DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
   List<DocumentSnapshot> reports = [];
+  StreamSubscription<QuerySnapshot> _incidentListSubscription;
 
   IncidentListState({this.id});
 
@@ -43,15 +46,16 @@ class IncidentListState extends State<IncidentList> {
   }
 
   _handleMessageCollection() {
-    Firestore.instance
+    _incidentListSubscription = Firestore.instance
         .collection("$_schoolId/incident_reports")
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-      reports.clear();
-      reports.addAll(data.documents);
-      reports.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
-      setState(() {});
+          List<DocumentSnapshot> updatedList = data.documents;
+          updatedList.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
+          setState(() {
+            reports = updatedList;
+          });
     });
   }
 
@@ -145,5 +149,13 @@ class IncidentListState extends State<IncidentList> {
           ),
           body: !isLoaded ? Text("Loading..") : _buildList());
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_incidentListSubscription != null) {
+      _incidentListSubscription.cancel();
+    }
   }
 }

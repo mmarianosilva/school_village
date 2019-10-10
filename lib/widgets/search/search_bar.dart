@@ -4,8 +4,9 @@ class SearchBar extends StatefulWidget {
   final TextEditingController controller;
   final Function(String) onTextInput;
   final VoidCallback onTap;
+  final FocusNode focusNode;
 
-  const SearchBar({Key key, this.controller, this.onTextInput, this.onTap}) : super(key: key);
+  const SearchBar({Key key, this.controller, this.onTextInput, this.onTap, this.focusNode,}) : super(key: key);
 
   @override
   _SearchBarState createState() => _SearchBarState(this.controller, this.onTextInput);
@@ -21,8 +22,8 @@ class _SearchBarState extends State<SearchBar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4.0),
-        color: Color.fromARGB(205, 0, 88, 110)
+          borderRadius: BorderRadius.circular(4.0),
+          color: Color.fromARGB(205, 0, 88, 110)
       ),
       child: Row(
         children: <Widget>[
@@ -32,13 +33,16 @@ class _SearchBarState extends State<SearchBar> {
               controller: this._controller,
               onChanged: onTextInput,
               decoration: InputDecoration(
-                hintText: "Search",
-                hintStyle: TextStyle(color: Colors.white)
+                  hintText: "Search",
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none
               ),
+              style: TextStyle(color: Colors.white),
               onTap: widget != null ? widget.onTap : null,
+              focusNode: widget.focusNode,
             ),
           ),
-          Icon(Icons.mic, color: Colors.white)
+//          Icon(Icons.mic, color: Colors.white)
         ],
       ),
     );

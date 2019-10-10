@@ -18,7 +18,7 @@ import 'package:school_village/util/constants.dart';
 class BroadcastMessaging extends StatefulWidget {
   final bool editable;
 
-  BroadcastMessaging({Key key, this.editable}) : super(key: key);
+  BroadcastMessaging({Key key, @required this.editable}) : super(key: key);
 
   @override
   _BroadcastMessagingState createState() => _BroadcastMessagingState(editable);
@@ -26,7 +26,9 @@ class BroadcastMessaging extends StatefulWidget {
 
 class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
-  _BroadcastMessagingState(this._editable);
+  _BroadcastMessagingState(this._editable) {
+    this.selectGroups = SelectGroups((value) => amberAlert = value);
+  }
 
   static FirebaseStorage storage = FirebaseStorage();
   FirebaseUser _user;
@@ -43,8 +45,9 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   ScrollController _scrollController;
   final focusNode = FocusNode();
   InputField inputField;
-  final selectGroups = SelectGroups();
+  SelectGroups selectGroups;
   final bool _editable;
+  bool amberAlert = false;
 
   getUserDetails() async {
     _user = await UserHelper.getUser();
@@ -210,7 +213,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             return BroadcastMessage(
               text: document['body'],
               name: "${document['createdBy']}",
-              timestamp: document['createdAt'],
+              timestamp: document['createdAt'] is Timestamp ? document['createdAt'] : Timestamp.fromMillisecondsSinceEpoch(document['createdAt']),
               groups: groups,
               imageUrl: document['image'],
               message: document,
@@ -322,7 +325,8 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       'image': image == null ? null : path,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'reportedByPhone': phone,
-      'isVideo': isVideo
+      'isVideo': isVideo,
+      'amberAlert': amberAlert,
     });
     inputField.key.currentState.clearState();
   }
@@ -358,7 +362,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          selectGroups,
+          _editable ? selectGroups : SizedBox(width: 0.0, height: 0.0,),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),

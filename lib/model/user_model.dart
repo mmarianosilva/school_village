@@ -12,6 +12,9 @@ mixin UserModel on Model {
   Future<DocumentSnapshot> getUser() async {
     if(_user == null){
       FirebaseUser user = await UserHelper.getUser();
+      if (user == null) {
+        return null;
+      }
       print("User ID");
       print(user.uid);
       DocumentReference userRef = Firestore.instance.document('users/${user.uid}');

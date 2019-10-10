@@ -8,6 +8,8 @@ class HeaderButtons extends StatelessWidget {
   final String role;
   final SchoolAlert alert;
 
+  static const double iconSize = 90.0;
+
   const HeaderButtons({Key key, this.role, this.alert}) : super(key: key);
 
   void _openBroadcast(BuildContext context, bool editable) {
@@ -15,7 +17,12 @@ class HeaderButtons extends StatelessWidget {
   }
 
   void _openMessaging(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundHome()));
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => TalkAroundHome(),
+        settings: RouteSettings(
+          name: '/talk-around'
+        )
+    ));
   }
 
   void _openIncidentManagement(BuildContext context) {
@@ -36,55 +43,59 @@ class HeaderButtons extends StatelessWidget {
 
     if (role == 'school_security') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: 80.0),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
         widgets.add(GestureDetector(
             child: Image.asset(
-                'assets/images/incident_management_icon.png', width: 80.0),
+                'assets/images/incident_management_icon.png', width: iconSize),
             onTap: () => _openIncidentManagement(context)
         ));
       }
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
-        onTap: () => _openBroadcast(context, false),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        onTap: () => _openBroadcast(context, true),
       ));
     } else if (role == 'school_admin') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: 80.0),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
         widgets.add(GestureDetector(
             child: Image.asset(
-                'assets/images/incident_management_icon.png', width: 80.0),
+                'assets/images/incident_management_icon.png', width: iconSize),
             onTap: () => _openIncidentManagement(context)
         ));
       }
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
         onTap: () => _openBroadcast(context, true),
       ));
     } else if (role == 'school_staff') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: 80.0),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
         onTap: () => _openMessaging(context),
+      ));
+      widgets.add(GestureDetector(
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        onTap: () => _openBroadcast(context, false),
       ));
     } else {
       // Student, Family
-      widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: 80.0),
-        onTap: () => _openBroadcast(context, false),
-      ));
-      widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: 80.0),
-        onTap: () => _openMessaging(context),
-      ));
-      widgets.add(GestureDetector(
-        child: Image.asset('assets/images/anonymous_img.png', width: 80.0),
-        onTap: () => _openHotline(context),
-      ));
+//      widgets.add(GestureDetector(
+//        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+//        onTap: () => _openBroadcast(context, false),
+//      ));
+//      widgets.add(GestureDetector(
+//        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+//        onTap: () => _openMessaging(context),
+//      ));
+//      widgets.add(GestureDetector(
+//        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
+//        onTap: () => _openHotline(context),
+//      ));
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

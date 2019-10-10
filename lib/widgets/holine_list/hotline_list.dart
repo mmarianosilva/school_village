@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:location/location.dart';
-import '../schoollist/school_list.dart';
-import '../../util/user_helper.dart';
-import '../notification/notification.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 
 class HotLineList extends StatefulWidget {
   @override
@@ -89,7 +87,7 @@ class _HotLineListState extends State<HotLineList> {
                             bottom: 2.0
                         ),
                         alignment: Alignment.centerLeft,
-                        child: new Text("${new DateTime.fromMillisecondsSinceEpoch(document['createdAt'])}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                        child: new Text("${dateFormatting.messageDateFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
                       new Container(
                         padding: EdgeInsets.only(

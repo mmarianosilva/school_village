@@ -12,9 +12,10 @@ class SchoolAlert {
   final LocationData location;
   final String type;
   final String reportedByPhone;
+  final String resolution;
   final bool resolved;
 
-  SchoolAlert(this.id, this.title, this.body, this.timestamp, this.timestampEnded, this.createdBy, this.createdById, this.location, this.type, this.reportedByPhone, {this.resolved = true});
+  SchoolAlert(this.id, this.title, this.body, this.timestamp, this.timestampEnded, this.createdBy, this.createdById, this.location, this.type, this.reportedByPhone, this.resolution, {this.resolved = true});
 
   SchoolAlert.fromMap(DocumentSnapshot firebaseModel) : this(
     firebaseModel.documentID,
@@ -27,5 +28,8 @@ class SchoolAlert {
     LocationData.fromMap(Map<String, double>.from(firebaseModel["location"])),
     firebaseModel["type"],
     firebaseModel["reportedByPhone"],
+    firebaseModel["resolution"],
     resolved: firebaseModel["endedAt"] != null);
+
+  String get reportedByPhoneFormatted => reportedByPhone.length > 6 ? "${reportedByPhone.substring(0, 3)}-${reportedByPhone.substring(3, 6)}-${reportedByPhone.substring(6)}" : reportedByPhone;
 }

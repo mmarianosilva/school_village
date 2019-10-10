@@ -1,13 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:location/location.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/school_alert.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:url_launcher/url_launcher.dart' ;
 
 class NotificationDetail extends StatelessWidget {
-  final DocumentSnapshot notification;
+  final SchoolAlert notification;
 
   String _staticMapKey = "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI";
   String title = 'Notification';
@@ -20,7 +18,7 @@ class NotificationDetail extends StatelessWidget {
         builder: (BuildContext context) {
           return new AlertDialog(
             title: new Text('Contact Reporter'),
-            content: new Text("Do you want to contact ${notification['reportedByPhone']} ?"),
+            content: new Text("Do you want to contact ${notification.reportedByPhoneFormatted} ?"),
             actions: <Widget>[
               new FlatButton(
                 child: new Text('Cancel'),
@@ -32,14 +30,14 @@ class NotificationDetail extends StatelessWidget {
                 child: new Text('SMS'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  launch(Uri.encodeFull("sms:${notification['reportedByPhone']}"));
+                  launch(Uri.encodeFull("sms:${notification.reportedByPhone}"));
                 },
               ),
               new FlatButton(
                 child: new Text('Phone'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  launch(Uri.encodeFull("tel:${notification['reportedByPhone']}"));
+                  launch(Uri.encodeFull("tel:${notification.reportedByPhone}"));
                 },
               )
             ],
@@ -66,17 +64,15 @@ class NotificationDetail extends StatelessWidget {
     int iwidth = width.ceil();
     int iheight = height.ceil();
 
-    print("Width: $iwidth Height: $iheight");
-//    print("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
 
-    if(notification != null && notification["location"] != null) {
+    if(notification != null && notification.location != null) {
       widgets.add(
           new GestureDetector(
             onTap: () {
-              launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
+              launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification.location.latitude},${notification.location.longitude}");
             },
             child: new Image.network(
-                "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
+                "https://maps.googleapis.com/maps/api/staticmap?center=${notification.location.latitude},${notification.location.longitude}&zoom=18&markers=color:red%7Clabel:A%7C${notification.location.latitude},${notification.location.longitude}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
           )
 
       );
@@ -88,15 +84,15 @@ class NotificationDetail extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              new Text(notification["title"] == null ? 'Details' : notification["title"], style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+              new Text(notification.title == null ? 'Details' : notification.title, style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
               new SizedBox(height: 8.0,),
-              new Text(notification["body"]),
+              new Text(notification.body),
               new SizedBox(height: 8.0,),
-              new Text("Reported by ${notification['createdBy']}"),
+              new Text("Reported by ${notification.createdBy}"),
               new SizedBox(height: 8.0,),
-              new Text("Reported at ${new DateTime.fromMillisecondsSinceEpoch(notification['createdAt'])}"),
+              new Text("Reported at ${dateFormatting.messageDateFormatter.format(notification.timestamp)}"),
               new SizedBox(height: 16.0,),
-              (notification['reportedByPhone'] != null && notification['reportedByPhone'].trim() !='' ? new GestureDetector(
+              (notification.reportedByPhone != null && notification.reportedByPhone.trim() !='' ? new GestureDetector(
                   onTap: () => _showCallOptions(context),
                   child: new Text("Contact", style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
               ) : new SizedBox()),

@@ -1,50 +1,19 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:location/location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/date_formatter.dart' as dateFormatting;
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:url_launcher/url_launcher.dart' ;
 
 class MessageDetail extends StatelessWidget {
-  final DocumentSnapshot notification;
+  final Map<String, dynamic> notification;
 
   String _staticMapKey = "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI";
 
   MessageDetail({Key key, this.notification}) : super(key: key);
 
   _showCallOptions(context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Contact Reporter'),
-            content: new Text("Do you want to contact ${notification['reportedByPhone']} ?"),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                child: new Text('SMS'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  launch(Uri.encodeFull("sms:${notification['reportedByPhone']}"));
-                },
-              ),
-              new FlatButton(
-                child: new Text('Phone'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  launch(Uri.encodeFull("tel:${notification['reportedByPhone']}"));
-                },
-              )
-            ],
-          );
-        }
-    );
+    showContactDialog(context, notification['createdBy'], notification['reportedByPhone']);
   }
 
   @override
@@ -65,9 +34,6 @@ class MessageDetail extends StatelessWidget {
     int iwidth = width.ceil();
     int iheight = height.ceil();
 
-    print("Width: $iwidth Height: $iheight");
-    print("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
-
     if(notification["location"] != null) {
       widgets.add(
           new GestureDetector(
@@ -87,13 +53,19 @@ class MessageDetail extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              new Text(notification["title"], style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+              notification['createdBy'] != null ?
+              new Text("Broadcast message from ${notification['createdBy']}", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)) :
+              new Text("Message from ${notification['author']}", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
               new SizedBox(height: 8.0,),
               new Text(notification["body"]),
               new SizedBox(height: 8.0,),
-              new Text("Reported by ${notification['createdBy']}"),
+              notification['createdBy'] != null ?
+              new Text("Created by ${notification['createdBy']}") :
+              new Text("Created by ${notification['author']}"),
               new SizedBox(height: 8.0,),
-              new Text("Reported at ${new DateTime.fromMillisecondsSinceEpoch(notification['createdAt'])}"),
+              notification['createdAt'] != null ?
+              new Text("Created at ${dateFormatting.messageDateFormatter.format(new DateTime.fromMillisecondsSinceEpoch(notification['createdAt']))}") :
+              new Text("Created at ${dateFormatting.messageDateFormatter.format(notification['timestamp'].toDate())}"),
               new SizedBox(height: 16.0,),
               (notification['reportedByPhone'] != null ? new GestureDetector(
                   onTap: () => _showCallOptions(context),

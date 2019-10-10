@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:school_village/model/talk_around_message.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/incident_management/on_map_interface.dart';
 
 class IncidentMessage extends StatelessWidget {
@@ -26,9 +27,17 @@ class IncidentMessage extends StatelessWidget {
                   fit: FlexFit.tight
               ),
               Flexible(
-                  child: GestureDetector(
-                    child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
-                    onTap: () => onMapClicked.onMapClicked(message.latitude, message.longitude)),
+                  child: Builder(
+                    builder: (context) {
+                      if (message.latitude != null && message.longitude != null) {
+                        return GestureDetector(
+                            child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
+                            onTap: () => onMapClicked.onMapClicked(message));
+                      } else {
+                        return SizedBox();
+                      }
+                    },
+                  ),
                   flex: 1,
                   fit: FlexFit.tight
               ),
@@ -51,7 +60,10 @@ class IncidentMessage extends StatelessWidget {
                       flex: 2,
                       fit: FlexFit.tight),
                   Flexible(
-                      child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))),
+                      child: GestureDetector(
+                          onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
+                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)))
+                      ),
                       flex: 8,
                       fit: FlexFit.tight),
                   Flexible(
@@ -59,7 +71,7 @@ class IncidentMessage extends StatelessWidget {
                       flex: 1,
                       fit: FlexFit.tight),
                   Flexible(
-                      child: Text(targetGroup),
+                      child: Text(targetGroup, maxLines: 1, overflow: TextOverflow.ellipsis,),
                       flex: 8,
                       fit: FlexFit.tight)
                 ],
@@ -70,7 +82,11 @@ class IncidentMessage extends StatelessWidget {
                   Flexible(
                       child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
                   Flexible(
-                      child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224))))
+                      child: GestureDetector(
+                          onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
+                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)))
+                      )
+                  )
                 ],
               );
             }
@@ -78,11 +94,11 @@ class IncidentMessage extends StatelessWidget {
         ),
         RichText(
           text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: <TextSpan>[
-              TextSpan(text: "Message: ", style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: message.message)
-            ]
+              style: DefaultTextStyle.of(context).style,
+              children: <TextSpan>[
+                TextSpan(text: "Message: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: message.message)
+              ]
           ),
           textAlign: TextAlign.justify,
         ),
