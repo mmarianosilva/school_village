@@ -54,7 +54,7 @@ import GoogleMaps
     
     func playBackgroundAudio(){
         print("playBackgroundAudio")
-        if(UIApplication.shared.applicationState != .active) {
+//        if(UIApplication.shared.applicationState != .active) {
             do {
                 try audioSession.setCategory(AVAudioSessionCategoryPlayback, with: .duckOthers)
                 try audioSession.setActive(true)
@@ -67,7 +67,7 @@ import GoogleMaps
             }
             
             self.alarmSound?.play()
-        }
+//        }
     }
     
     func stopBackgroundAudio() {
