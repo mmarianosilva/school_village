@@ -80,6 +80,8 @@ flutter:
     - assets/images/warning_sign.png
     - assets/images/anonymous_img.png
     - assets/images/sv_icon_menu.png
+    - assets/images/incident_report_log.png
+    - assets/images/add_dm_user_btn.png
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 
