@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:location/location.dart';
 import 'package:school_village/components/base_appbar.dart';
-import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 
 class Alert extends StatefulWidget {
@@ -91,7 +89,7 @@ class _AlertState extends State<Alert> {
                 child: Text('Send'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _sendAlert("other", "Alert!", "${customAlertController.text} at $_schoolName", context);
+                  _sendAlert("other", "Alert!", "${customAlertController.text} at $_schoolName");
                   customAlertController.text = "";
                 },
               )
@@ -102,7 +100,7 @@ class _AlertState extends State<Alert> {
   }
 
 
-  _sendAlert(alertType, alertTitle, alertBody, context) {
+  _sendAlert(alertType, alertTitle, alertBody) {
     if (_role == 'school_security' || _role == 'school_admin') {
       showDialog(
           context: context,
@@ -146,13 +144,13 @@ class _AlertState extends State<Alert> {
                                       Scaffold.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                                "911 alert currently not enabled. Sending campus alert"),
+                                                "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only."),
                                           )
                                       );
-                                      _saveAlert(alertTitle, alertBody, alertType, context);
                                     } else {
                                       // TODO implement 911 alert
                                     }
+                                    _saveAlert(alertTitle, alertBody, alertType, context);
                                   }
                               ),
                               FlatButton(
@@ -354,7 +352,7 @@ class _AlertState extends State<Alert> {
 
                                   child: GestureDetector(
                                       onTap: () {
-                                        _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName", context);
+                                        _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName");
                                       },
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_armed.png',
@@ -366,7 +364,7 @@ class _AlertState extends State<Alert> {
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                      onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName", context);},
+                                      onTap: () {_sendAlert("fight", "Fight Alert!", "A fight has been reported at $_schoolName");},
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_fight.png',
                                             width: 72.0, height: 95.4),
@@ -377,7 +375,7 @@ class _AlertState extends State<Alert> {
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                      onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emergency has been reported at $_schoolName", context);},
+                                      onTap: () {_sendAlert("medical", "Medical Alert!", "A medical emergency has been reported at $_schoolName");},
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_medical.png',
                                             width: 72.0, height: 109.8),
@@ -393,7 +391,7 @@ class _AlertState extends State<Alert> {
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                      onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName", context);},
+                                      onTap: () {_sendAlert("fire", "Fire Alert!", "A fire has been reported at $_schoolName");},
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_fire.png',
                                             width: 72.0, height: 109.8),
@@ -404,7 +402,7 @@ class _AlertState extends State<Alert> {
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
-                                      onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName", context);},
+                                      onTap: () {_sendAlert("intruder", "Intruder Alert!", "An intruder has been reported at $_schoolName");},
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_intruder.png',
                                             width: 72.0, height: 109.8),
