@@ -1,5 +1,6 @@
 name: school_village
 description: School Village
+version: 1.4.1+1
 
 dependencies:
   flutter:
