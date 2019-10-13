@@ -27,6 +27,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   final FocusNode _searchBarFocusNode = FocusNode();
   DocumentSnapshot _userSnapshot;
   String _schoolId;
+  bool _isLoading = false;
 
   Widget _buildListItem(BuildContext context, int index) {
     final TalkAroundChannel item = _filteredList[index];
@@ -152,7 +153,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       users.documents.removeWhere((doc) =>
       retrievedChannels.firstWhere((item) =>
       item.members.firstWhere((member) =>
-      member.id == doc.documentID,
+      member.id.documentID == doc.documentID,
           orElse: () => null) != null,
           orElse: () => null)
           != null);
@@ -172,6 +173,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     setState(() {
       _chats = fullList;
       _filteredList = _chats;
+      _isLoading = false;
     });
   }
 
@@ -181,6 +183,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     _setupTextInputController();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _searchBarFocusNode.requestFocus();
+      setState(() {
+        _isLoading = true;
+      });
     });
     super.initState();
   }
@@ -210,12 +215,26 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           ),
         ),
       ),
-      body: Container(
-        color: Color.fromARGB(255, 7, 133, 164),
-        child: ListView.builder(
-          itemBuilder: _buildListItem,
-          itemCount: _filteredList != null ? _filteredList.length : 0,
-        ),
+      body: Builder(
+        builder: (BuildContext context) {
+          if (_isLoading) {
+            return Container(
+              color: Color.fromARGB(255, 7, 133, 164),
+              child: Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            );
+          }
+          return Container(
+            color: Color.fromARGB(255, 7, 133, 164),
+            child: ListView.builder(
+              itemBuilder: _buildListItem,
+              itemCount: _filteredList != null ? _filteredList.length : 0,
+            ),
+          );
+        },
       ),
     );
   }

@@ -45,7 +45,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     }
     if (_userSnapshot != null) {
       final String userId = _userSnapshot.documentID;
-      final List<TalkAroundUser> members = channel.members.where((user) => user.id != userId).toList();
+      final List<TalkAroundUser> members = channel.members.where((user) => user.id.documentID != userId).toList();
       members.sort((user1, user2) => user1.name.compareTo(user2.name));
       if (members.length == 1) {
         return members.first.name;
@@ -126,7 +126,8 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
       "authorId" : _userSnapshot.documentID,
       "location" : await UserHelper.getLocation(),
       "timestamp" : FieldValue.serverTimestamp(),
-      "body" : messageInputController.text
+      "body" : messageInputController.text,
+      "phone" : _userSnapshot.data["phone"]
     };
     try {
       Firestore.instance.runTransaction((transaction) async {

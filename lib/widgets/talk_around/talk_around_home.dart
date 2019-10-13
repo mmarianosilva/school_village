@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/search/search_bar.dart';
@@ -25,6 +26,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   final Firestore _firestore = Firestore.instance;
   final TextEditingController _searchBarController = TextEditingController();
   StreamSubscription<QuerySnapshot> _messageListSubscription;
+  bool _isLoading = false;
 
   void getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -70,6 +72,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
           List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
           if (mounted) {
             setState(() {
+              _isLoading = false;
               _channels = retrievedChannels;
               _directMessages = retrievedGroupMessages;
             });
@@ -102,6 +105,11 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   @override
   void initState() {
     getUserDetails();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _isLoading = true;
+      });
+    });
     super.initState();
   }
 
@@ -120,70 +128,84 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         title: Text("Talk Around"),
         backgroundColor: Color.fromARGB(255, 134, 165, 177),
       ),
-      body: Container(
-        color: Color.fromARGB(255, 7, 133, 164),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  color: Color.fromARGB(255, 10, 104, 127),
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Image.asset("assets/images/sv_icon_menu.png"),
+      body: Builder(
+        builder: (BuildContext context) {
+          if (_isLoading) {
+            return Container(
+              color: Color.fromARGB(255, 7, 133, 164),
+              child: Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            );
+          }
+          return Container(
+            color: Color.fromARGB(255, 7, 133, 164),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      color: Color.fromARGB(255, 10, 104, 127),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.asset("assets/images/sv_icon_menu.png"),
+                          ),
+                          Expanded(
+                            child: SearchBar(
+                              controller: _searchBarController,
+                              onTap: () => { Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundSearch(true, null))) },
+                            ),
+                          )
+                        ],
                       ),
-                      Expanded(
-                        child: SearchBar(
-                          controller: _searchBarController,
-                          onTap: () => { Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundSearch(true, null))) },
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                    flex: 1
                 ),
-                flex: 1
-            ),
-            Spacer(flex: 1),
-            Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                      "Channels".toUpperCase(),
-                      style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
-                      textAlign: TextAlign.start
-                  ),
+                Spacer(flex: 1),
+                Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                          "Channels".toUpperCase(),
+                          style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
+                          textAlign: TextAlign.start
+                      ),
+                    )
+                ),
+                Flexible(
+                    child: ListView.builder(
+                      itemBuilder: _buildChannelItem,
+                      itemCount: _channels.length,
+                    ),
+                    flex: 6,
+                    fit: FlexFit.loose
+                ),
+                Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                          "Direct Messages".toUpperCase(),
+                          style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
+                          textAlign: TextAlign.start
+                      ),
+                    )
+                ),
+                Flexible(
+                    child: ListView.builder(
+                      itemBuilder: _buildDirectMessageItem,
+                      itemCount: _directMessages.length,
+                    ),
+                    flex: 6
                 )
+              ],
             ),
-            Flexible(
-                child: ListView.builder(
-                  itemBuilder: _buildChannelItem,
-                  itemCount: _channels.length,
-                ),
-                flex: 6,
-                fit: FlexFit.loose
-            ),
-            Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                      "Direct Messages".toUpperCase(),
-                      style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
-                      textAlign: TextAlign.start
-                  ),
-                )
-            ),
-            Flexible(
-                child: ListView.builder(
-                  itemBuilder: _buildDirectMessageItem,
-                  itemCount: _directMessages.length,
-                ),
-                flex: 6
-            )
-          ],
-        ),
+          );
+        },
       ),
     );
   }

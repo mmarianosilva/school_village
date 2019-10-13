@@ -236,6 +236,7 @@ class _ChatState extends State<Chat> {
             return ChatMessage(
               text: document['body'],
               name: "${document['author']}",
+              phone: "${document['phone']}",
               timestamp: document['timestamp'],
               self: document['authorId'] == user.documentID,
               location: document['location'],

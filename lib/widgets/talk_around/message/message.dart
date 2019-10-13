@@ -4,6 +4,7 @@ import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,6 +17,7 @@ class ChatMessage extends StatelessWidget {
     this.initial,
     this.timestamp,
     this.self,
+    this.phone,
     this.location,
     this.message,
     this.imageUrl,
@@ -23,12 +25,13 @@ class ChatMessage extends StatelessWidget {
 
   final String text;
   final String name;
-  final String imageUrl;
   final String initial;
   final Timestamp timestamp;
   final bool self;
+  final String phone;
   final dynamic location;
   final DocumentSnapshot message;
+  final String imageUrl;
   final bool unread;
 
   @override
@@ -101,7 +104,7 @@ class ChatMessage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      onTap: () => goToDetails(context),
+                      onTap: () => showContactDialog(context, name, phone),
                     ),
                     _getImage(context)
                   ],
