@@ -5,15 +5,17 @@ class TalkAroundChannel {
   final String id;
   final String name;
   final bool direct;
+  final Timestamp timestamp;
   final List<TalkAroundUser> members;
 
-  TalkAroundChannel(this.id, this.name, this.direct, this.members);
+  TalkAroundChannel(this.id, this.name, this.direct, this.timestamp, this.members);
 
   factory TalkAroundChannel.fromMapAndUsers(DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
     return TalkAroundChannel(
         firebaseModel.documentID,
         firebaseModel.data["name"],
-        firebaseModel.data["direct"],
+        firebaseModel.data["direct"] ?? false,
+        firebaseModel.data["timestamp"] ?? Timestamp.now(),
         members);
   }
 

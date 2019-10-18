@@ -104,7 +104,10 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
   }
 
   void _onChannelNameTapped() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundRoomDetail(channel)));
+    if (channel.members != null) {
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => TalkAroundRoomDetail(channel)));
+    }
   }
 
   void _onTakePhoto() {
@@ -134,6 +137,9 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
         CollectionReference messages = Firestore.instance.collection(
             "$_schoolId/messages/${channel.id}/messages");
         await transaction.set(messages.document(), messageData);
+        Firestore.instance.document("$_schoolId/messages/${channel.id}").setData({
+          "timestamp" : FieldValue.serverTimestamp()
+        }, merge: true);
       });
       messageInputController.clear();
     } on Exception catch (ex) {
@@ -228,8 +234,8 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                       Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: _buildChannelFooterOptions()
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: _buildChannelFooterOptions()
                         ),
                       )
                     ],

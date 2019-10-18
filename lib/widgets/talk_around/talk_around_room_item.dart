@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 
 class TalkAroundRoomItem extends StatelessWidget {
@@ -58,7 +59,7 @@ class TalkAroundRoomItem extends StatelessWidget {
                     maxLines: 1,
                     style: TextStyle(color: Colors.white, fontSize: 16.0)
                 ),
-                flex: 12,
+                flex: 8,
                 fit: FlexFit.tight
             ),
             Flexible(
@@ -66,7 +67,15 @@ class TalkAroundRoomItem extends StatelessWidget {
                 if (!item.direct) {
                   return SizedBox();
                 }
-                if (item.members.length > 2) {
+                if (item.timestamp != null) {
+                  return Text(
+                      messageDateFormatter.format(item.timestamp.toDate()),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 12.0),
+                      textAlign: TextAlign.end);
+                }
+                else if (item.members.length > 2) {
                   return Text(
                       "Group",
                       overflow: TextOverflow.ellipsis,

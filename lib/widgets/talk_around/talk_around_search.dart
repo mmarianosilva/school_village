@@ -164,6 +164,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           "",
           "",
           true,
+          null,
           List.of([TalkAroundUser(doc.reference, "${doc.data["firstName"]} ${doc.data["lastName"]}", doc.data["associatedSchools"][escapedSchoolId] != null ? TalkAroundUser.mapGroup(doc.data["associatedSchools"][escapedSchoolId]["role"]) : "")])
       );
     }).toList();

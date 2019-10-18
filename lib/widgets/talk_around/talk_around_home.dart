@@ -23,60 +23,74 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   List<TalkAroundChannel> _directMessages = List<TalkAroundChannel>();
   DocumentSnapshot _userSnapshot;
   String _schoolId;
+  String _schoolRole;
   final Firestore _firestore = Firestore.instance;
   final TextEditingController _searchBarController = TextEditingController();
   StreamSubscription<QuerySnapshot> _messageListSubscription;
+  StreamSubscription<QuerySnapshot> _channelListSubscription;
   bool _isLoading = false;
 
   void getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
-    var schoolId = await UserHelper.getSelectedSchoolID();
+    final schoolId = await UserHelper.getSelectedSchoolID();
+    final schoolRole = await UserHelper.getSelectedSchoolRole();
     Firestore.instance.document('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
+        _schoolRole = schoolRole;
       });
       getMessageList();
     });
   }
 
   void getMessageList() async {
+    _channelListSubscription = _firestore
+        .collection("$_schoolId/messages")
+        .where("roles", arrayContains: _schoolRole)
+        .snapshots()
+        .listen((snapshot) async {
+      List<DocumentSnapshot> documentList = snapshot.documents;
+      Iterable<DocumentSnapshot> channels = documentList;
+      List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
+        return TalkAroundChannel.fromMapAndUsers(channel, null);
+      }).toList();
+      List<TalkAroundChannel> retrievedChannels = await Future.wait(processedChannels);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _channels = retrievedChannels;
+        });
+      }
+    });
     _messageListSubscription = _firestore
         .collection("$_schoolId/messages")
         .where("members", arrayContains: _userSnapshot.reference)
         .snapshots()
         .listen((snapshot) async {
-          final String escapedSchoolId = _schoolId.substring("schools/".length);
-          List<DocumentSnapshot> documentList = snapshot.documents;
-          Iterable<DocumentSnapshot> channels = documentList.where((item) => !item.data["direct"]);
-          Iterable<DocumentSnapshot> groupMessages = documentList.where((item) => item.data["direct"]);
-          List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
-            Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
-              final DocumentSnapshot user = await id.get();
-              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data["associatedSchools"][escapedSchoolId] != null ? user.data["associatedSchools"][escapedSchoolId]["role"] : "");
-              return member;
-            });
-            List<TalkAroundUser> users = await members.toList();
-            return TalkAroundChannel.fromMapAndUsers(channel, users);
-          }).toList();
-          List<TalkAroundChannel> retrievedChannels = await Future.wait(processedChannels);
-          List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
-            Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
-              final DocumentSnapshot user = await id.get();
-              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data["associatedSchools"][escapedSchoolId] != null ? user.data["associatedSchools"][escapedSchoolId]["role"] : "");
-              return member;
-            });
-            List<TalkAroundUser> users = await members.toList();
-            return TalkAroundChannel.fromMapAndUsers(channel, users);
-          }).toList();
-          List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
-          if (mounted) {
-            setState(() {
-              _isLoading = false;
-              _channels = retrievedChannels;
-              _directMessages = retrievedGroupMessages;
-            });
-          }
+      final String escapedSchoolId = _schoolId.substring("schools/".length);
+      List<DocumentSnapshot> documentList = snapshot.documents;
+      Iterable<DocumentSnapshot> groupMessages = documentList;
+      List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
+        Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
+          final DocumentSnapshot user = await id.get();
+          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data["associatedSchools"][escapedSchoolId] != null ? user.data["associatedSchools"][escapedSchoolId]["role"] : "");
+          return member;
+        });
+        List<TalkAroundUser> users = await members.toList();
+        return TalkAroundChannel.fromMapAndUsers(channel, users);
+      }).toList();
+      List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
+      if (retrievedGroupMessages.isNotEmpty) {
+        retrievedGroupMessages.sort((group1, group2) =>
+            group1.timestamp.compareTo(group2.timestamp));
+      }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _directMessages = retrievedGroupMessages;
+        });
+      }
     });
   }
 
@@ -92,9 +106,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   Widget _buildDirectMessageItem(BuildContext context, int index) {
     TalkAroundChannel item = _directMessages[index];
     return TalkAroundRoomItem(
-      item: item,
-      username: "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}",
-      onTap: () => _handleOnTap(item)
+        item: item,
+        username: "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}",
+        onTap: () => _handleOnTap(item)
     );
   }
 
@@ -117,6 +131,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   void dispose() {
     if (_messageListSubscription != null) {
       _messageListSubscription.cancel();
+    }
+    if (_channelListSubscription != null) {
+      _channelListSubscription.cancel();
     }
     super.dispose();
   }
@@ -180,7 +197,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                 Flexible(
                     child: ListView.builder(
                       itemBuilder: _buildChannelItem,
-                      itemCount: _channels.length,
+                      itemCount: _channels != null ? _channels.length : 0,
                     ),
                     flex: 6,
                     fit: FlexFit.loose
@@ -198,7 +215,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                 Flexible(
                     child: ListView.builder(
                       itemBuilder: _buildDirectMessageItem,
-                      itemCount: _directMessages.length,
+                      itemCount: _directMessages != null ? _directMessages.length : 0,
                     ),
                     flex: 6
                 )
