@@ -572,55 +572,65 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             future: Firestore.instance.document(ref).get(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  return Text('Loading...');
-                case ConnectionState.waiting:
-                  return Text('Loading...');
-                case ConnectionState.active:
-                  return Text('Loading...');
-                default:
-                  if (snapshot.hasError)
-                    return Text('Error: ${snapshot.error}');
-                  else
-                    return ListView.builder(
-                        padding: EdgeInsets.all(8.0),
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index == 0) {
-                            return _buildAlertButton();
-                          }
-                          if (index == 1) {
-                            return _buildSecurityOptions();
-                          }
-                          if (index == 2) {
-                            return _buildIncidentReport();
-                          }
-                          if (index == 3) {
-                            return _buildIncidentList();
-                          }
-                          if (index == 4) {
-                            return _buildBroadcastInList();
-                          }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 5) {
-                            return _buildMessagesOption(model);
-                          }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 6) {
-                            return _buildNotificationsOption(model);
-                          }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 7) {
-                            return _buildHotlineMessages();
-                          }
-                          if (index ==
-                              snapshot.data.data["documents"].length + 8) {
-                            return _buildSettingsOption();
-                          }
-                          return _buildDocumentOption(snapshot, index);
-                        },
-                        itemCount: snapshot.data.data["documents"].length + 9);
+              if (snapshot.hasData) {
+                int documentCount = snapshot.data.data["documents"] != null ?
+                snapshot.data.data["documents"].length : 0;
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  case ConnectionState.waiting:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  case ConnectionState.active:
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  default:
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+                    else
+                      return ListView.builder(
+                          padding: EdgeInsets.all(8.0),
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index == 0) {
+                              return _buildAlertButton();
+                            }
+                            if (index == 1) {
+                              return _buildSecurityOptions();
+                            }
+                            if (index == 2) {
+                              return _buildIncidentReport();
+                            }
+                            if (index == 3) {
+                              return _buildIncidentList();
+                            }
+                            if (index == 4) {
+                              return _buildBroadcastInList();
+                            }
+                            if (index == documentCount + 5) {
+                              return _buildMessagesOption(model);
+                            }
+                            if (index == documentCount + 6) {
+                              return _buildNotificationsOption(model);
+                            }
+                            if (index == documentCount + 7) {
+                              return _buildHotlineMessages();
+                            }
+                            if (index == documentCount + 8) {
+                              return _buildSettingsOption();
+                            }
+                            return _buildDocumentOption(snapshot, index);
+                          },
+                          itemCount: documentCount + 9);
+                }
               }
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             });
       },
     );
