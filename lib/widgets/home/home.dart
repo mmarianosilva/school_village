@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
         return null;
       }
       final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.now();
+      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.fromMillisecondsSinceEpoch(0);
       result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert = result.documents.isNotEmpty ? SchoolAlert.fromMap(result.documents.last) : null;
       return latestAlert;
@@ -151,9 +151,17 @@ class _HomeState extends State<Home> {
     }
 
     if (message["type"] == "broadcast") {
-      playMessageAlert();
+      if (message["sound"] == "alarm.wav") {
+        playAlarm();
+      } else {
+        playMessageAlert();
+      }
       return _showBroadcastDialog(message);
     } else if (message["type"] == "hotline") {
+      String role = await UserHelper.getSelectedSchoolRole();
+      if (role == 'school_student' || role == 'school_family') {
+        return true;
+      }
       playMessageAlert();
       return _showHotLineMessageDialog(message);
     } else if (message["type"] == "incident") {
