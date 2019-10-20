@@ -69,7 +69,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         return;
       }
       final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.now();
+      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.fromMillisecondsSinceEpoch(0);
       result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert = result.documents.isNotEmpty ? result.documents.last : null;
       SchoolAlert alert = latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
