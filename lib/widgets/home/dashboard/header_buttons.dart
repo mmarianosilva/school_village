@@ -84,18 +84,18 @@ class HeaderButtons extends StatelessWidget {
       ));
     } else {
       // Student, Family
-//      widgets.add(GestureDetector(
-//        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
-//        onTap: () => _openBroadcast(context, false),
-//      ));
-//      widgets.add(GestureDetector(
-//        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
-//        onTap: () => _openMessaging(context),
-//      ));
-//      widgets.add(GestureDetector(
-//        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
-//        onTap: () => _openHotline(context),
-//      ));
+      widgets.add(GestureDetector(
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        onTap: () => _openBroadcast(context, false),
+      ));
+      widgets.add(GestureDetector(
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+        onTap: () => _openMessaging(context),
+      ));
+      widgets.add(GestureDetector(
+        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
+        onTap: () => _openHotline(context),
+      ));
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

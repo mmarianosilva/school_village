@@ -6,7 +6,7 @@ import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
-import 'package:school_village/widgets/messages/broadcast_messaging.dart';
+//import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
@@ -491,7 +491,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     if (role == 'school_student' || role == 'school_family') {
-      return _buildHotlineButton();
+      return SizedBox(height: 48.0,);
     }
     return GestureDetector(
       child:
@@ -501,43 +501,43 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildBroadcastInList() {
-    if (role != 'school_student' && role != 'school_family') {
+//    if (role != 'school_student' && role != 'school_family') {
       return SizedBox();
-    }
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BroadcastMessaging(editable: false))),
-      child: Column(
-        children: <Widget>[
-          const SizedBox(height: 14.0),
-          Row(
-            children: <Widget>[
-              Container(
-                width: 56.0,
-                height: 56.0,
-                child: Center(
-                  child: Image.asset("assets/images/broadcast_btn.png", width: 48.0),
-                ),
-              ),
-              SizedBox(width: 12.0),
-              Expanded(
-                  child: Text(
-                    "Broadcast Messages",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
-              Icon(Icons.chevron_right, color: Colors.grey)
-            ],
-          ),
-          const SizedBox(height: 14.0),
-          Container(
-            height: 0.5,
-            width: MediaQuery.of(context).size.width,
-            color: Colors.grey,
-          ),
-        ],
-      ),
-    );
+//    }
+//    return GestureDetector(
+//      behavior: HitTestBehavior.opaque,
+//      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BroadcastMessaging(editable: false))),
+//      child: Column(
+//        children: <Widget>[
+//          const SizedBox(height: 14.0),
+//          Row(
+//            children: <Widget>[
+//              Container(
+//                width: 56.0,
+//                height: 56.0,
+//                child: Center(
+//                  child: Image.asset("assets/images/broadcast_btn.png", width: 48.0),
+//                ),
+//              ),
+//              SizedBox(width: 12.0),
+//              Expanded(
+//                  child: Text(
+//                    "Broadcast Messages",
+//                    textAlign: TextAlign.left,
+//                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+//                  )),
+//              Icon(Icons.chevron_right, color: Colors.grey)
+//            ],
+//          ),
+//          const SizedBox(height: 14.0),
+//          Container(
+//            height: 0.5,
+//            width: MediaQuery.of(context).size.width,
+//            color: Colors.grey,
+//          ),
+//        ],
+//      ),
+//    );
   }
 
   @override
