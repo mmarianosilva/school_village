@@ -192,6 +192,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                 Expanded(
                   child: Chat(
                     conversation: "$_schoolId/messages/${channel.id}",
+                    showLocation: channel.showLocation,
                     showInput: false,
                     user: _userSnapshot,
                     reverseInput: true,

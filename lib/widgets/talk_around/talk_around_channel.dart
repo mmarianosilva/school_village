@@ -19,6 +19,8 @@ class TalkAroundChannel {
         members);
   }
 
+  bool get showLocation => !direct && name.contains("Security");
+
   String groupConversationName(String username) {
     if (!direct) {
       return name;

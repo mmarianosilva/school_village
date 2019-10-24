@@ -83,7 +83,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
       if (retrievedGroupMessages.isNotEmpty) {
         retrievedGroupMessages.sort((group1, group2) =>
-            group1.timestamp.compareTo(group2.timestamp));
+            group2.timestamp.compareTo(group1.timestamp));
       }
       if (mounted) {
         setState(() {

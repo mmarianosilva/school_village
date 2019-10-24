@@ -13,11 +13,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class Chat extends StatefulWidget {
   final String conversation;
+  final bool showLocation;
   final DocumentSnapshot user;
   final bool showInput;
   final bool reverseInput;
 
-  Chat({Key key, this.conversation, this.user, this.showInput, this.reverseInput = false})
+  Chat({Key key, this.conversation, this.user, this.showInput, this.showLocation = false, this.reverseInput = false,})
       : super(key: key);
 
   @override
@@ -76,7 +77,7 @@ class _ChatState extends State<Chat> {
       return;
     }
     CollectionReference collection =
-        Firestore.instance.collection('$conversation/messages');
+    Firestore.instance.collection('$conversation/messages');
     Firestore.instance.runTransaction((transaction) async {
       final DocumentReference document = collection.document();
       var path = '';
@@ -105,7 +106,7 @@ class _ChatState extends State<Chat> {
         'authorId': user.documentID,
         'author': "${user.data['firstName']} ${user.data['lastName']}",
         'timestamp': FieldValue.serverTimestamp(),
-        'location': await _getLocation(),
+        'location': widget.showLocation ? await _getLocation() : null,
         'image': image == null ? null : path,
         'thumb': thumb == null ? null : thumbPath
       });
@@ -214,17 +215,17 @@ class _ChatState extends State<Chat> {
                         height: 12.0,
                         child: Center(
                             child: Container(
-                          height: 1.0,
-                          decoration: BoxDecoration(color: Colors.black12),
-                        ))),
+                              height: 1.0,
+                              decoration: BoxDecoration(color: Colors.black12),
+                            ))),
                     Container(
                       color: Colors.white,
                       child: Center(
                           child: Text(
-                        messageList[index].date,
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
-                      )),
+                            messageList[index].date,
+                            maxLines: 1,
+                            style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
+                          )),
                       margin: const EdgeInsets.only(left: 40.0, right: 40.0),
                     )
                   ],
@@ -239,7 +240,7 @@ class _ChatState extends State<Chat> {
               phone: "${document['phone']}",
               timestamp: document['timestamp'],
               self: document['authorId'] == user.documentID,
-              location: document['location'],
+              location: widget.showLocation ? document['location'] : null,
               imageUrl: document['thumb'] ?? document['image'],
               message: document,
             );
@@ -258,10 +259,10 @@ class _ChatState extends State<Chat> {
       ),
       this.showInput
           ? Container(
-              color: Colors.white,
-              padding: EdgeInsets.only(bottom: 14.0),
-              child: inputField,
-            )
+        color: Colors.white,
+        padding: EdgeInsets.only(bottom: 14.0),
+        child: inputField,
+      )
           : SizedBox(width: 0.0, height: 10.0)
     ]);
   } //modified
