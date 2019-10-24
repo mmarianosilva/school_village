@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/model/school_alert.dart';
+import 'package:school_village/widgets/hotline/hotline.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_home.dart';
@@ -34,7 +35,10 @@ class HeaderButtons extends StatelessWidget {
   }
 
   void _openHotline(BuildContext context) {
-
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Hotline()),
+    );
   }
 
   @override

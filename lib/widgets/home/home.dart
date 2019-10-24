@@ -150,8 +150,12 @@ class _HomeState extends State<Home> {
       message = data;
     }
 
+    debugPrint('Incoming notification payload: ');
+    debugPrint(message.toString());
+
     if (message["type"] == "broadcast") {
-      if (message["sound"] == "alarm.wav") {
+      bool alarm = message.toString().contains("sound: alarm.wav");
+      if (alarm) {
         playAlarm();
       } else {
         playMessageAlert();
