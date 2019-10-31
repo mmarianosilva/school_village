@@ -37,6 +37,9 @@ dependencies:
   mime: ^0.9.6+3
   google_maps_flutter: ^0.5.11
   rxdart: ^0.22.1
+  pdftron_flutter:
+    git:
+      url: git://github.com/PDFTron/pdftron-flutter.git
 
 
 

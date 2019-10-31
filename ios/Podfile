@@ -30,6 +30,8 @@ end
 target 'Runner' do
   # use_frameworks!
 
+  pod 'PDFNet', podspec: 'https://www.pdftron.com/downloads/ios/cocoapods/pdfnet/latest.podspec'
+
   # Prepare symlinks folder. We use symlinks to avoid having Podfile.lock
   # referring to absolute paths on developers' machines.
   system('rm -rf Pods/.symlinks')
