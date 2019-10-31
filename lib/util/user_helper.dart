@@ -251,4 +251,8 @@ class UserHelper {
     }
     return location;
   }
+
+  static String getDisplayName([DocumentSnapshot snapshot]) {
+    return "${snapshot.data["firstName"]} ${snapshot.data["lastName"]} ${snapshot.data["room"] != null ? ' (${snapshot.data["room"]})' : ''}";
+  }
 }

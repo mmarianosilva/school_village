@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'widgets/splash/splash.dart';
 import 'widgets/home/home.dart';
 import 'widgets/login/login.dart';
@@ -21,6 +22,7 @@ _configureFirestoreOfflinePersistence() {
 final RouteObserver<PageRoute> homePageRouteObserver = RouteObserver<PageRoute>();
 
 Future<Null> main() async {
+  PdftronFlutter.initialize(Constants.pdftronLicenseKey);
   _configureFirestoreOfflinePersistence();
   FlutterError.onError = (FlutterErrorDetails details) async {
     if (isInDebugMode) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
@@ -6,7 +7,6 @@ import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
-//import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import '../../../util/pdf_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../util/user_helper.dart';
@@ -81,9 +81,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     });
   }
 
-  _showPDF(context, url) {
+  _showPDF(context, url, name, {List<Map<String, dynamic>> connectedFiles}) {
     print(url);
-    PdfHandler.showPdfFromUrl(context, url);
+    Config config = Config();
+    config.multiTabEnabled = true;
+    PdfHandler.showPdfFile(context, url, name, config, connectedFiles: connectedFiles);
   }
 
   _launchURL(url) async {
@@ -276,8 +278,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (snapshot.data.data["documents"][index - 5]["type"] == "pdf") {
+          final List<Map<String, dynamic>> connectedFiles = snapshot.data.data["documents"][index - 5]["connectedFiles"] != null ? snapshot.data.data["documents"][index - 5]["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList() : null;
           _showPDF(context,
-              snapshot.data.data["documents"][index - 5]["location"]);
+            snapshot.data.data["documents"][index - 5]["location"], snapshot.data.data["documents"][index - 5]["title"], connectedFiles: connectedFiles);
         } else {
           _launchURL(
               snapshot.data.data["documents"][index - 5]["location"]);
@@ -502,7 +505,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildBroadcastInList() {
 //    if (role != 'school_student' && role != 'school_family') {
-      return SizedBox();
+    return SizedBox();
 //    }
 //    return GestureDetector(
 //      behavior: HitTestBehavior.opaque,
