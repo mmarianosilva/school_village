@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/permission_matrix.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/search/search_bar.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
@@ -27,13 +28,14 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   final FocusNode _searchBarFocusNode = FocusNode();
   DocumentSnapshot _userSnapshot;
   String _schoolId;
+  String _role;
   bool _isLoading = false;
 
   Widget _buildListItem(BuildContext context, int index) {
     final TalkAroundChannel item = _filteredList[index];
     return TalkAroundRoomItem(
       item: item,
-      username: "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}",
+      username: UserHelper.getDisplayName(_userSnapshot),
       onTap: () => _handleOnTap(item),
     );
   }
@@ -96,6 +98,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   void _getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
+    _role = await UserHelper.getSelectedSchoolRole();
     Firestore.instance.document('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
@@ -107,7 +110,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
 
   void _getChatrooms() async {
     final escapedSchoolId = _schoolId.substring("schools/".length);
-    final username = "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}";
+    final username = UserHelper.getDisplayName(_userSnapshot);
     final QuerySnapshot users = await Firestore
         .instance
         .collection("users")
@@ -158,6 +161,10 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           orElse: () => null)
           != null);
     }
+    
+    
+    final List<String> talkAroundPermissions = PermissionMatrix.getTalkAroundPermissions(_role);
+    users.documents.removeWhere((userSnapshot) => userSnapshot["associatedSchools"][escapedSchoolId] == null || !talkAroundPermissions.contains(userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
 
     final List<TalkAroundChannel> userList = users.documents.map((doc) {
       return TalkAroundChannel(
@@ -165,7 +172,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           "",
           true,
           null,
-          List.of([TalkAroundUser(doc.reference, "${doc.data["firstName"]} ${doc.data["lastName"]}", doc.data["associatedSchools"][escapedSchoolId] != null ? TalkAroundUser.mapGroup(doc.data["associatedSchools"][escapedSchoolId]["role"]) : "")])
+          List.of([TalkAroundUser(doc.reference, UserHelper.getDisplayName(doc), doc.data["associatedSchools"][escapedSchoolId] != null ? TalkAroundUser.mapGroup(doc.data["associatedSchools"][escapedSchoolId]["role"]) : "")])
       );
     }).toList();
 

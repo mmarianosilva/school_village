@@ -125,7 +125,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     final Map<String, dynamic> messageData = {
       "img" : null,
       "thumb" : null,
-      "author" : "${_userSnapshot.data["firstName"]} ${_userSnapshot["lastName"]}",
+      "author" : UserHelper.getDisplayName(_userSnapshot),
       "authorId" : _userSnapshot.documentID,
       "location" : await UserHelper.getLocation(),
       "timestamp" : FieldValue.serverTimestamp(),

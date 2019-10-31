@@ -107,7 +107,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     TalkAroundChannel item = _directMessages[index];
     return TalkAroundRoomItem(
         item: item,
-        username: "${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}",
+        username: UserHelper.getDisplayName(_userSnapshot),
         onTap: () => _handleOnTap(item)
     );
   }

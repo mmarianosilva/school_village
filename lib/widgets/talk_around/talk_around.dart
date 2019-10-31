@@ -122,7 +122,7 @@ class _TalkAroundState extends State<TalkAround>
       appBar: BaseAppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          title: new Text(conversation.direct ? conversation.groupConversationName("${_userSnapshot.data["firstName"]} ${_userSnapshot.data["lastName"]}") : '${conversation.name}',
+          title: new Text(conversation.direct ? conversation.groupConversationName(UserHelper.getDisplayName(_userSnapshot)) : '${conversation.name}',
               textAlign: TextAlign.center,
               style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
           leading: new BackButton(color: Colors.grey.shade800),
