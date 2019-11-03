@@ -170,11 +170,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     } else {
       List<TalkAroundMessage> newList = await Future.wait(snapshot.map((data) async {
         final DocumentSnapshot channelSnapshot = await data.document.reference.parent().parent().get();
-        final List<TalkAroundUser> members = await Future.wait(channelSnapshot.data["members"].map((id) async {
-          final DocumentSnapshot user = await id.get();
-          return TalkAroundUser.fromMapAndGroup(user, "");
-        }).cast<Future<TalkAroundUser>>());
-        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(channelSnapshot, members);
+        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
         return TalkAroundMessage(
             "Direct Message",
             data.document.documentID,
@@ -274,7 +270,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         }
       });
     }
-    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("members", arrayContains: _userSnapshot.reference);
+    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("roles", arrayContains: role);
     QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.documents.forEach((channelDocument) {
