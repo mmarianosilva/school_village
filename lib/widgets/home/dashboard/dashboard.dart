@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/main.dart';
@@ -35,6 +37,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   String role = "";
   Location _location = Location();
   SchoolAlert alertInProgress = null;
+  StreamSubscription<QuerySnapshot> _alertSubscription;
 
   @override
   void initState() {
@@ -51,6 +54,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   @override
   void dispose() {
     homePageRouteObserver.unsubscribe(this);
+    if (_alertSubscription != null) {
+      _alertSubscription.cancel();
+    }
     super.dispose();
   }
 
@@ -61,7 +67,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
-    alerts.orderBy("createdAt", descending: true).getDocuments().then((result) {
+    _alertSubscription = alerts.orderBy("createdAt", descending: true).snapshots().listen((result) {
       if (result.documents.isEmpty) {
         this.setState(() {
           this.alertInProgress = null;
