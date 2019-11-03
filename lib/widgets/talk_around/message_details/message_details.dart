@@ -67,10 +67,10 @@ class MessageDetail extends StatelessWidget {
               new Text("Created at ${dateFormatting.messageDateFormatter.format(new DateTime.fromMillisecondsSinceEpoch(notification['createdAt']))}") :
               new Text("Created at ${dateFormatting.messageDateFormatter.format(notification['timestamp'].toDate())}"),
               new SizedBox(height: 16.0,),
-              (notification['reportedByPhone'] != null ? new GestureDetector(
-                  onTap: () => _showCallOptions(context),
-                  child: new Text("Contact", style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
-              ) : new SizedBox()),
+//              (notification['reportedByPhone'] != null ? new GestureDetector(
+//                  onTap: () => _showCallOptions(context),
+//                  child: new Text("Contact", style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
+//              ) : new SizedBox()),
 
             ],
           ),
