@@ -11,9 +11,11 @@ import 'package:pdftron_flutter/pdftron_flutter.dart';
 class PdfHandler {
   static const platform = const MethodChannel('schoolvillage.app/pdf_view');
   static FirebaseStorage storage = new FirebaseStorage();
+  static bool _canceled;
 
   static showPdfFile(BuildContext context, String url, String name, Config config, {List<Map<String, dynamic>> connectedFiles}) async {
     String root;
+    _canceled = false;
     if (connectedFiles != null) {
       root = name;
     }
@@ -24,8 +26,10 @@ class PdfHandler {
           preparePdfFromUrl(context, file["url"], file["name"], parent: root));
       await Future.wait(transfer);
     }
-    hideLoading(context);
-    PdftronFlutter.openDocument(pdfFilePath, config: config);
+    if (!_canceled) {
+      hideLoading(context);
+      PdftronFlutter.openDocument(pdfFilePath, config: config);
+    }
   }
 
   static Future<String> preparePdfFromUrl(BuildContext context, String url, String name, {String parent}) async {
@@ -66,8 +70,17 @@ class PdfHandler {
           new Expanded(child: new Text("Please wait.."))
         ],
       ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Cancel'.toUpperCase()),
+          onPressed: () {
+            _canceled = true;
+            Navigator.pop(context);
+          },
+        )
+      ],
     );
-    showDialog(context: context, builder: (context) => alert);
+    showDialog(context: context, barrierDismissible: false, builder: (context) => alert,);
   }
 
   static void hideLoading(BuildContext context) {
