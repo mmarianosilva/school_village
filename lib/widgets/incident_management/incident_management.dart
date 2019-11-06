@@ -75,11 +75,13 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     String closureComment = await _showStopAlertAsync();
     if (closureComment != null) {
       final String finalMessage = closureComment.isEmpty ? "Incident closed without resolution message" : closureComment;
+      final String author = UserHelper.getDisplayName(_userSnapshot);
       Firestore.instance.runTransaction((transaction) {
         DocumentReference alertRef = Firestore.instance.document("$_schoolId/notifications/${alert.id}");
         return transaction.update(alertRef, {
           "endedAt" : FieldValue.serverTimestamp(),
-          "resolution": finalMessage
+          "resolution" : finalMessage,
+          "resolvedBy" : author,
         });
       }).then((_) {
         Navigator.pop(context);
@@ -172,7 +174,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         final DocumentSnapshot channelSnapshot = await data.document.reference.parent().parent().get();
         final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
         return TalkAroundMessage(
-            "Direct Message",
+            "Channel Message",
             data.document.documentID,
             channel.groupConversationName("${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}"),
             data.document["body"],
@@ -233,12 +235,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   getConversationDetails() async {
     if (alert.resolved) {
       _fullList.add(TalkAroundMessage(
-          "Incident Resolved",
+          "Incident Record Closed",
           "alert-resolved-identifier",
           "",
           "${alert.resolution != null ? alert.resolution : "This incident has been resolved and closed."}",
           alert.timestampEnded,
-          "SCHOOL VILLAGE SYSTEM",
+          alert.resolvedBy ?? "SCHOOL VILLAGE SYSTEM",
           "",
           null,
           null,
@@ -253,12 +255,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
           .listen((snapshot) {
         if (snapshot.data["endedAt"] != null) {
           _fullList.add(TalkAroundMessage(
-              "Incident Resolved",
+              "Incident Record Closed",
               "alert-resolved-identifier",
               "",
               "${snapshot.data["resolution"] != null ? snapshot.data["resolution"] : "This incident has been resolved and closed."}",
               DateTime.fromMillisecondsSinceEpoch(snapshot.data["endedAt"].millisecondsSinceEpoch),
-              "SCHOOL VILLAGE SYSTEM",
+              snapshot.data["resolvedBy"] ?? "SCHOOL VILLAGE SYSTEM",
               "",
               null,
               null,
