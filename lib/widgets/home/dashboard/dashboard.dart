@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
@@ -89,9 +88,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _showPDF(context, url, name, {List<Map<String, dynamic>> connectedFiles}) {
     print(url);
-    Config config = Config();
-    config.multiTabEnabled = true;
-    PdfHandler.showPdfFile(context, url, name, config, connectedFiles: connectedFiles);
+    PdfHandler.showPdfFile(context, url, name, connectedFiles: connectedFiles);
   }
 
   _launchURL(url) async {

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +12,7 @@ class PdfHandler {
   static FirebaseStorage storage = new FirebaseStorage();
   static bool _canceled;
 
-  static showPdfFile(BuildContext context, String url, String name, Config config, {List<Map<String, dynamic>> connectedFiles}) async {
+  static showPdfFile(BuildContext context, String url, String name, {List<Map<String, dynamic>> connectedFiles}) async {
     String root;
     _canceled = false;
     if (connectedFiles != null) {
@@ -28,6 +27,8 @@ class PdfHandler {
     }
     if (!_canceled) {
       hideLoading(context);
+      final Config config = Config();
+      config.multiTabEnabled = true;
       PdftronFlutter.openDocument(pdfFilePath, config: config);
     }
   }
