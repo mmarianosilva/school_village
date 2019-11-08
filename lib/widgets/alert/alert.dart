@@ -235,7 +235,7 @@ class _AlertState extends State<Alert> {
 
     document.setData(<String, dynamic>{
       'title': alertTitle,
-      'body': alertBody,
+      'body': '$alertBody by ${UserHelper.getDisplayName(_userSnapshot)}',
       'type': alertType,
       'createdById': _userId,
       'createdBy' : name,
@@ -351,9 +351,7 @@ class _AlertState extends State<Alert> {
                                   margin: EdgeInsets.all(8.0),
 
                                   child: GestureDetector(
-                                      onTap: () {
-                                        _sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName");
-                                      },
+                                      onTap: () {_sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName");},
                                       child: Column(children: [
                                         Image.asset('assets/images/alert_armed.png',
                                             width: 72.0, height: 108.0),
