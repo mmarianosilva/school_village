@@ -20,7 +20,6 @@ import 'package:school_village/widgets/messages/broadcast_messaging.dart';
 import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_home.dart';
-import 'package:school_village/widgets/talk_around/talk_around_user.dart';
 import 'package:school_village/widgets/incident_management/incident_message.dart';
 
 
@@ -46,6 +45,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   String _schoolAddress = '';
   Map<String, bool> _broadcastGroupData;
   StreamSubscription<QuerySnapshot> _messageStream;
+  StreamSubscription<DocumentSnapshot> _alertSubscription;
   List<TalkAroundMessage> _messages = List<TalkAroundMessage>();
   List<TalkAroundMessage> _fullList = List<TalkAroundMessage>();
   SchoolAlert alert;
@@ -249,7 +249,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         _messages = _fullList;
       });
     } else {
-      Firestore.instance
+      _alertSubscription = Firestore.instance
           .document("$_schoolId/notifications/${alert.id}")
           .snapshots()
           .listen((snapshot) {
@@ -570,6 +570,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   void dispose() {
     if (_messageStream != null) {
       _messageStream.cancel();
+    }
+    if (_alertSubscription != null) {
+      _alertSubscription.cancel();
     }
     super.dispose();
   }
