@@ -78,10 +78,10 @@ class IncidentListState extends State<IncidentList> {
 
         items.forEach((value) {
           print(value);
-          report += UserHelper.negativeIncidents[value] + ', ';
+          report += '${UserHelper.negativeIncidents[value] ?? 'Unknown incident'}' + ', ';
         });
         posItems.forEach((value) {
-          report += UserHelper.positiveIncidents[value] + ', ';
+          report += '${UserHelper.positiveIncidents[value] ?? 'Unknown incident'}' + ', ';
         });
 
         var other = document['other'];

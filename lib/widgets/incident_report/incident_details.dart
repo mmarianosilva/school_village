@@ -232,7 +232,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       await uploadFile(path, imageFile);
     }
 
-    document.setData(<String, dynamic>{
+    await document.setData(<String, dynamic>{
       'positiveIncidents': posItems,
       'incidents': items,
       'createdBy': name,
