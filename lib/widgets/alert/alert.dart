@@ -232,10 +232,10 @@ class _AlertState extends State<Alert> {
     CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.document();
 
-
+    final String room = UserHelper.getRoomNumber(_userSnapshot);
     document.setData(<String, dynamic>{
-      'title': alertTitle,
-      'body': '$alertBody by ${UserHelper.getDisplayName(_userSnapshot)}',
+      'title': room != null ? '$alertTitle at room #$room' : alertTitle,
+      'body': alertBody,
       'type': alertType,
       'createdById': _userId,
       'createdBy' : name,
