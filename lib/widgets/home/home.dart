@@ -481,6 +481,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    stopSound();
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
         model.setToken(_token);

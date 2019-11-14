@@ -39,8 +39,6 @@ class _SchoolListState extends State<SchoolList> {
       body: FutureBuilder(
           future: UserHelper.getSchools(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            print(snapshot.data);
-            print(snapshot.connectionState);
             switch (snapshot.connectionState) {
               case ConnectionState.none:
                 return Text('Loading...');
@@ -49,8 +47,7 @@ class _SchoolListState extends State<SchoolList> {
               default:
                 if (snapshot.hasError)
                   return Text('Error: ${snapshot.error}');
-                else {
-
+                else if (snapshot.hasData) {
                   return ListView.builder(
                     padding: EdgeInsets.all(22.0),
 //                    itemExtent: 20.0,
@@ -110,6 +107,13 @@ class _SchoolListState extends State<SchoolList> {
                       );
                     },
                     itemCount: snapshot.data.length,
+                  );
+                }
+                else {
+                  return Container(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   );
                 }
             }
