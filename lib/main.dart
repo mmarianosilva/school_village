@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
+import 'package:school_village/util/token_helper.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'widgets/splash/splash.dart';
 import 'widgets/home/home.dart';
 import 'widgets/login/login.dart';
@@ -20,10 +23,45 @@ _configureFirestoreOfflinePersistence() {
 }
 
 final RouteObserver<PageRoute> homePageRouteObserver = RouteObserver<PageRoute>();
+final model = MainModel();
 
 Future<Null> main() async {
   PdftronFlutter.initialize(Constants.pdftronLicenseKey);
   _configureFirestoreOfflinePersistence();
+  ErrorWidget.builder = (FlutterErrorDetails error) {
+    if (FirebaseAuth.instance.currentUser() != null) {
+      return Builder(
+        builder: (context) => Scaffold(
+          appBar: null,
+          body: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+            child: Column(
+              children: <Widget>[
+                Text(
+                    'An unexpected error has occurred. Please login again to resolve the issue.'),
+                Text('We apologize for the inconvenience.'),
+                FlatButton(
+                  color: Colors.blueAccent,
+                  child: Text('Logout'.toUpperCase(), style: TextStyle(color: Colors.white),),
+                  onPressed: () async {
+                    final String token = model.getToken();
+                    final FirebaseUser user = (await UserHelper.getUser());
+                    await TokenHelper.deleteToken(token, user.uid);
+                    await UserHelper.logout(token);
+                    model.setUser(null);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        '/login', (Route<dynamic> route) => false);
+                  },
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      return ErrorWidget(error.exception);
+    }
+  };
   FlutterError.onError = (FlutterErrorDetails details) async {
     if (isInDebugMode) {
       FlutterError.dumpErrorToConsole(details);
@@ -35,7 +73,7 @@ Future<Null> main() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
         .then((_) {
       runApp(new ScopedModel<MainModel>(
-        model: MainModel(),
+        model: model,
         child: new MaterialApp(
           home: Splash(),
           theme: new ThemeData(
