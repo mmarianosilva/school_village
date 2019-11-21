@@ -184,28 +184,36 @@ class _HomeState extends State<Home> {
         playAlarm();
       }
       return _showItemDialog(message);
-    } else if (message["type"] == "talkaround" && !appInForeground) {
-      final String escapedSchoolId = message["schoolId"];
-      return Firestore
-          .instance
-          .document("schools/$escapedSchoolId/messages/${message["conversationId"]}")
-          .get()
-          .then((data) async {
-        Stream<TalkAroundUser> membersStream = Stream.fromIterable(data["members"]).asyncMap((userId) {
-          return Firestore
-              .instance
-              .document("users/$userId")
-              .get()
-              .then((snapshot) => TalkAroundUser.fromMapAndGroup(snapshot, snapshot.data["associatedSchools"][escapedSchoolId] != null ? snapshot.data["associatedSchools"][escapedSchoolId]["role"] : ""));
+    } else if (message["type"] == "talkaround") {
+      playMessageAlert();
+      if (!appInForeground) {
+        final String escapedSchoolId = message["schoolId"];
+        return Firestore
+            .instance
+            .document(
+            "schools/$escapedSchoolId/messages/${message["conversationId"]}")
+            .get()
+            .then((data) async {
+          Stream<TalkAroundUser> membersStream = Stream.fromIterable(
+              data["members"]).asyncMap((userId) async {
+            final DocumentSnapshot snapshot = await userId.get();
+            return TalkAroundUser.fromMapAndGroup(snapshot,
+                snapshot.data["associatedSchools"][escapedSchoolId] != null
+                    ? snapshot
+                    .data["associatedSchools"][escapedSchoolId]["role"]
+                    : "");
+          });
+          final List<TalkAroundUser> members = await membersStream.toList();
+          final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(
+              data, members);
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => TalkAroundHome()),
+                  (route) => route.settings.name == '/home');
+          Navigator.push(context, MaterialPageRoute(
+              builder: (context) => TalkAroundMessaging(channel: channel,)));
         });
-        final List<TalkAroundUser> members = await membersStream.toList();
-        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(data, members);
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => TalkAroundHome()),
-                (route) => route.settings.name == '/home');
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundMessaging(channel: channel,)));
-      });
+      }
     }
     return _showItemDialog(message);
   }
