@@ -4,6 +4,7 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:school_village/util/pdf_handler.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,6 +52,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   SchoolAlert alert;
   final String role;
   Set<Marker> markers;
+  Map<String, dynamic> _mapData;
 
   _IncidentManagementState({this.alert, this.role}) {
     this.markers = Set.from([Marker(
@@ -68,7 +70,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   void _onSchoolMap() {
-
+    PdfHandler.showPdfFile(context, _mapData["location"], _mapData["title"], connectedFiles: _mapData["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList());
   }
 
   void _showStopAlert() async {
@@ -219,6 +221,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
       DocumentSnapshot schoolDocument = await Firestore.instance.document(schoolId).get();
+      _mapData = _getMapData(schoolDocument);
       _schoolAddress = schoolDocument.data['address'];
     }
     Firestore.instance.document('users/${user.uid}').get().then((user) {
@@ -230,6 +233,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       });
       getConversationDetails();
     });
+  }
+
+  Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
+    final List<Map<String, dynamic>> documents = snapshot["documents"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList();
+    final Map<String, dynamic> map = documents.firstWhere((document) => document["category"] == "MAP", orElse: null);
+    return map;
   }
 
   getConversationDetails() async {
@@ -400,87 +409,104 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                       ),
                       flex: 10,
                     ),
-                    Flexible(child: Container(
-                      color: Color.fromARGB(140, 229, 229, 234),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: GestureDetector(
-                          onTap: () {launch("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");},
-                          child: Text("${_schoolAddress}",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))
-                          ),
-                        ),
-                      ),
-                    ), flex: 2),
-                    Flexible(child: Container(
-                      color: Color.fromARGB(140, 229, 229, 234),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                        child: Text(alert.body,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ), flex: 2),
                     Flexible(
-                        child: Container(
-                          color: Color.fromARGB(140, 229, 229, 234),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                            child: Row(
-                              children: <Widget>[
-                                Text("911 Callback: ",
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-                                Text(alert.createdBy,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(fontSize: 14.0)),
-                                GestureDetector(
-                                  onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
-                                    child: Text(alert.reportedByPhoneFormatted,
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              color: Color.fromARGB(140, 229, 229, 234),
+                              child: Column(
+                                children: <Widget>[
+                                  Flexible(child: Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                      child: GestureDetector(
+                                        onTap: () {launch("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");},
+                                        child: Text("${_schoolAddress}",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))
+                                        ),
+                                      ),
+                                    ),
+                                  ),),
+                                  Flexible(child: Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                      child: Text(alert.body,
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
+                                      ),
+                                    ),
+                                  ),),
+                                  Flexible(
+                                    child: Container(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text("911 Callback: ",
+                                                textAlign: TextAlign.start,
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                                            Text(alert.createdBy,
+                                                textAlign: TextAlign.start,
+                                                style: TextStyle(fontSize: 14.0)),
+                                            GestureDetector(
+                                              onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
+                                                child: Text(alert.reportedByPhoneFormatted,
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                )
-                              ],
+                                  Flexible(child: Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 4.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Text("Reported by: ",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14.0)
+                                          ),
+                                          Text(alert.createdBy,
+                                              style: TextStyle(fontSize: 14.0)),
+                                          GestureDetector(
+                                              onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 4.0, vertical: 0.0),
+                                                child: Text(alert.reportedByPhoneFormatted,
+                                                    style: TextStyle(fontSize: 14.0,
+                                                        color: Color.fromARGB(
+                                                            255, 11, 48, 224))),
+                                              )
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        flex: 1
-                    ),
-                    Flexible(child: Container(
-                      color: Color.fromARGB(140, 229, 229, 234),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text("Reported by: ",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.0)
-                            ),
-                            Text(alert.createdBy,
-                                style: TextStyle(fontSize: 14.0)),
-                            GestureDetector(
-                                onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 4.0, vertical: 0.0),
-                                  child: Text(alert.reportedByPhoneFormatted,
-                                      style: TextStyle(fontSize: 14.0,
-                                          color: Color.fromARGB(
-                                              255, 11, 48, 224))),
-                                )
-                            )
-                          ],
-                        ),
+                          _mapData != null ? FlatButton(
+                            child: Image.asset("assets/images/school_map_btn.png", height: 64.0),
+                            onPressed: () {
+                              _onSchoolMap();
+                            },
+                          ): SizedBox(width: 0.0,),
+                        ],
                       ),
-                    ), flex: 1),
+                      flex: 4,
+                    ),
                     Builder(builder: (context) {
                       if (widget.resolved) {
                         return Flexible(
@@ -513,7 +539,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                       Spacer(),
                                       Container(
                                           child: GestureDetector(
-                                              child: Image.asset("assets/images/school_map_btn.png", height: 64),
+                                              child: Image.asset("assets/images/sop_btn.png", height: 64),
                                               onTap: _onSchoolMap),
                                           padding: EdgeInsets.all(4)),
                                       Spacer(),

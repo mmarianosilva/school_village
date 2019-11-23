@@ -79,13 +79,14 @@ flutter:
     - assets/images/feature_image.png
     - assets/images/incident_management_icon.png
     - assets/images/group_message_btn.png
-    - assets/images/school_map_btn.png
+    - assets/images/sop_btn.png
     - assets/images/stop_sign.png
     - assets/images/warning_sign.png
     - assets/images/anonymous_img.png
     - assets/images/sv_icon_menu.png
     - assets/images/incident_report_log.png
     - assets/images/add_dm_user_btn.png
+    - assets/images/school_map_btn.png
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 
