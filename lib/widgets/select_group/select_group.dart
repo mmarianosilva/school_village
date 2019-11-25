@@ -12,6 +12,14 @@ class SelectGroups extends StatefulWidget {
   _SelectGroupsState createState() => new _SelectGroupsState(onToneSelectedCallback);
 }
 
+List<String> allowedGroups() {
+  return [
+    "family",
+    "students",
+    "staff"
+  ];
+}
+
 class _SelectGroupsState extends State<SelectGroups> {
   bool _isLoading = true;
   Map<String, bool> selectedGroups = {};
@@ -59,6 +67,7 @@ class _SelectGroupsState extends State<SelectGroups> {
       String name = '${dataVal["name"]}';
       names.add(name);
     }
+    names.removeWhere((name) => !allowedGroups().contains(name));
     names.sort();
 
     for (var i = 0; i < names.length; i++) {
