@@ -337,7 +337,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentReport() {
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'school_student' || role == 'school_family' || role == 'pd-fire-ems') {
       return SizedBox();
     }
 
@@ -383,7 +383,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentList() {
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'school_student' || role == 'school_family' || role == 'pd-fire-ems') {
       return SizedBox();
     }
 
@@ -506,46 +506,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     );
   }
 
-  _buildBroadcastInList() {
-//    if (role != 'school_student' && role != 'school_family') {
-    return SizedBox();
-//    }
-//    return GestureDetector(
-//      behavior: HitTestBehavior.opaque,
-//      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => BroadcastMessaging(editable: false))),
-//      child: Column(
-//        children: <Widget>[
-//          const SizedBox(height: 14.0),
-//          Row(
-//            children: <Widget>[
-//              Container(
-//                width: 56.0,
-//                height: 56.0,
-//                child: Center(
-//                  child: Image.asset("assets/images/broadcast_btn.png", width: 48.0),
-//                ),
-//              ),
-//              SizedBox(width: 12.0),
-//              Expanded(
-//                  child: Text(
-//                    "Broadcast Messages",
-//                    textAlign: TextAlign.left,
-//                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-//                  )),
-//              Icon(Icons.chevron_right, color: Colors.grey)
-//            ],
-//          ),
-//          const SizedBox(height: 14.0),
-//          Container(
-//            height: 0.5,
-//            width: MediaQuery.of(context).size.width,
-//            color: Colors.grey,
-//          ),
-//        ],
-//      ),
-//    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -615,7 +575,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                               return _buildIncidentList();
                             }
                             if (index == 4) {
-                              return _buildBroadcastInList();
+                              return SizedBox();
                             }
                             if (index == documentCount + 5) {
                               return _buildMessagesOption(model);
