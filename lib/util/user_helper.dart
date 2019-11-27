@@ -253,7 +253,7 @@ class UserHelper {
   }
 
   static String getDisplayName([DocumentSnapshot snapshot]) {
-    return "${snapshot.data["firstName"]} ${snapshot.data["lastName"]} ${snapshot.data["room"] != null ? ' (${snapshot.data["room"]})' : ''}";
+    return "${snapshot.data["firstName"]} ${snapshot.data["lastName"]} ${snapshot.data["room"] != null && snapshot.data["room"].isNotEmpty ? ' (${snapshot.data["room"]})' : ''}";
   }
 
   static String getRoomNumber([DocumentSnapshot snapshot]) {
