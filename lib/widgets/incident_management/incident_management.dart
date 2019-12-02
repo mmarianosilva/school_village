@@ -115,7 +115,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-            editable: role == 'school_admin' || role == 'school_security' || role == 'pd_fire_ems',
+            editable: role == 'school_admin' || role == 'school_security' || role == 'pd_fire_ems' || role == 'district',
           )),
     );
   }
