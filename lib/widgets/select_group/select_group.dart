@@ -34,6 +34,10 @@ class _SelectGroupsState extends State<SelectGroups> {
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
+    var role = await UserHelper.getSelectedSchoolRole();
+    if (role == 'school_security') {
+      schoolGroups.removeWhere((item) => item["name"] == 'family');
+    }
 
     setState(() {
       groups.addAll(schoolGroups);

@@ -92,11 +92,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         Constants.oneDay;
   }
 
-  _getHeaderItem(day) {
-    var time = DateTime.fromMillisecondsSinceEpoch(day * Constants.oneDay);
-    return MessageHolder(getHeaderDate(time.millisecondsSinceEpoch), null);
-  }
-
   _handleMessageMapInsert(shot) {
     if (!belongsToGroup(shot['groups'].keys)) {
       return;
@@ -108,7 +103,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     if (messages == null) {
       messages = List();
       messageMap[day] = messages;
-      // messageList.insert(0, _getHeaderItem(day));
       messageList.insert(0, message);
     } else {
       messageList.insert(0, message);
