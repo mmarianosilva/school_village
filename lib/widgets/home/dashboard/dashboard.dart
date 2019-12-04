@@ -428,33 +428,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     );
   }
 
-  _buildHotlineButton() {
-    return GestureDetector(
-      child: Column(
-        children: <Widget>[
-          Text("Anonymous Safety Hotline",
-              style: TextStyle(fontSize: 16.0, color: Constants.hotLineBlue),
-              textAlign: TextAlign.center),
-          Image.asset(
-            'assets/images/hotline_header.png',
-            width: 160.0,
-            height: 160.0,
-          ),
-          Text(
-            "Safety is Everybody's Business!\nYou can make a difference",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 16.0,
-                color: Constants.hotLineBlue),
-          )
-        ],
-      ),
-      onTap: openHotline,
-    );
-  }
-
   _buildHotlineMessages() {
-    if (role != 'school_admin') {
+    if (role != 'school_admin' && role != 'school_security' && role != 'district') {
       return SizedBox();
     }
     return GestureDetector(
