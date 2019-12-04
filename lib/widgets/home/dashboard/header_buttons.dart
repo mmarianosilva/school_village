@@ -86,6 +86,10 @@ class HeaderButtons extends StatelessWidget {
         child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
         onTap: () => _openBroadcast(context, false),
       ));
+      widgets.add(GestureDetector(
+        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
+        onTap: () => _openHotline(context),
+      ));
     } else {
       // Student, Family
       widgets.add(GestureDetector(
