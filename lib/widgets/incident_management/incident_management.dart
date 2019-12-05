@@ -73,6 +73,15 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     PdfHandler.showPdfFile(context, _mapData["location"], _mapData["title"], connectedFiles: _mapData["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList());
   }
 
+  void _onSop() async {
+    DocumentSnapshot schoolData = await Firestore.instance.document(_schoolId).get();
+    if (schoolData["sop"][alert.type] != null) {
+      PdfHandler.showPdfFile(context, schoolData["sop"][alert.type]["location"], schoolData["sop"][alert.type]["title"]);
+    } else {
+      PdfHandler.showPdfFile(context, schoolData["sop"]["other"]["location"], schoolData["sop"]["other"]["title"]);
+    }
+  }
+
   void _showStopAlert() async {
     String closureComment = await _showStopAlertAsync();
     if (closureComment != null) {
@@ -540,7 +549,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                       Container(
                                           child: GestureDetector(
                                               child: Image.asset("assets/images/sop_btn.png", height: 64),
-                                              onTap: _onSchoolMap),
+                                              onTap: _onSop),
                                           padding: EdgeInsets.all(4)),
                                       Spacer(),
                                       Container(
