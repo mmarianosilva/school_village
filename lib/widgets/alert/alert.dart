@@ -234,11 +234,11 @@ class _AlertState extends State<Alert> {
 
     final String room = UserHelper.getRoomNumber(_userSnapshot);
     document.setData(<String, dynamic>{
-      'title': room != null ? '$alertTitle at room #$room' : alertTitle,
+      'title': alertTitle,
       'body': alertBody,
       'type': alertType,
       'createdById': _userId,
-      'createdBy' : name,
+      'createdBy' : '$name${room != null ? ', Room $room' : ''}',
       'createdAt' : DateTime.now().millisecondsSinceEpoch,
       'location' : await _getLocation(),
       'reportedByPhone' : phone,
