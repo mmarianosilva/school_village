@@ -118,7 +118,8 @@ class IncidentListState extends State<IncidentList> {
                           subjectNames: subjectNames,
                           items: items,
                           posItems: posItems,
-                          imgUrl: document['image']),
+                          imgUrl: document['image'],
+                          other: document['other'],),
                     ),
                   );
                 },

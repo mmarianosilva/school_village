@@ -259,7 +259,7 @@ class IncidentState extends State<IncidentReport> {
       if (posItems[key]) atLeastOnePosSelected = true;
     });
 
-    if (!atLeastOnePosSelected && !atLeastOneSelected) {
+    if (!atLeastOnePosSelected && !atLeastOneSelected && !otherEnabled) {
       _showSnackBar('Please select incident type', context);
       return false;
     }
@@ -521,6 +521,7 @@ class IncidentState extends State<IncidentReport> {
               child: TextField(
                 onChanged: (val) {
                   setState(() {
+                    otherEnabled = val.isNotEmpty;
                     other = val;
                   });
                 },
