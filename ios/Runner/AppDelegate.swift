@@ -30,7 +30,7 @@ import GoogleMaps
             pdfViewChannel.setMethodCallHandler({(call: FlutterMethodCall, result: FlutterResult) -> Void in
                 
                 let path = call.arguments as! String
-                _ = controller.lookupKey(forAsset: path)!
+                _ = controller.lookupKey(forAsset: path)
                 
                 let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
                 let newViewController = storyBoard.instantiateViewController(withIdentifier: "webViewController") as! WebViewController
