@@ -24,6 +24,7 @@ class TokenHelper {
     if (userSnapshot['devices'] != null &&
         userSnapshot['devices'].keys.contains(token)) {
       print("Not adding Token to user");
+      (await SharedPreferences.getInstance()).setString("fcmToken", token);
       return;
     }
     addToken(token, user.uid);
@@ -36,7 +37,7 @@ class TokenHelper {
     DocumentReference userRef = Firestore.instance.document(userPath);
 
     DocumentSnapshot userSnapshot = await userRef.get();
-    dynamic devices = userSnapshot.data['devices'];
+    Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot.data['devices']);
 
     print(devices);
 
@@ -44,7 +45,7 @@ class TokenHelper {
     
       devices[token] = FieldValue.delete();
 
-      Firestore.instance
+      await Firestore.instance
           .document("/users/$userId")
           .setData(<String, dynamic>{'devices': devices}, merge: true);
       print(devices);
@@ -57,9 +58,10 @@ class TokenHelper {
     String deviceInfo = await getDeviceInfo();
     Map<String, String> device = {token: deviceInfo};
 
-    Firestore.instance
+    await Firestore.instance
         .document("/users/$userId")
         .setData(<String, dynamic>{'devices': device}, merge: true);
+    (await SharedPreferences.getInstance()).setString("fcmToken", token);
   }
 
   static getDeviceInfo() async {

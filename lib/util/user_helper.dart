@@ -53,8 +53,7 @@ class UserHelper {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }
-    _prefs.setString("email", null);
-    _prefs.setString("password", null);
+    await _prefs.clear();
     setSelectedSchool(schoolRole: null, schoolName: null, schoolId: null);
     return;
   }

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/util/token_helper.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'widgets/splash/splash.dart';
 import 'widgets/home/home.dart';
 import 'widgets/login/login.dart';
@@ -26,6 +27,7 @@ final RouteObserver<PageRoute> homePageRouteObserver = RouteObserver<PageRoute>(
 final model = MainModel();
 
 Future<Null> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   PdftronFlutter.initialize(Constants.pdftronLicenseKey);
   _configureFirestoreOfflinePersistence();
   ErrorWidget.builder = (FlutterErrorDetails error) {
@@ -44,7 +46,7 @@ Future<Null> main() async {
                   color: Colors.blueAccent,
                   child: Text('Logout'.toUpperCase(), style: TextStyle(color: Colors.white),),
                   onPressed: () async {
-                    final String token = model.getToken();
+                    final String token = (await SharedPreferences.getInstance()).getString("fcmToken");
                     final FirebaseUser user = (await UserHelper.getUser());
                     await TokenHelper.deleteToken(token, user.uid);
                     await UserHelper.logout(token);

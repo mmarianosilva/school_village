@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../schoollist/school_list.dart';
 import '../../util/user_helper.dart';
 import '../../model/main_model.dart';
@@ -65,7 +66,7 @@ class _SettingsState extends State<Settings> {
         );
       },
     );
-    String token = model.getToken();
+    String token = (await SharedPreferences.getInstance()).getString("fcmToken");
     print(token);
     print(_userId);
     await TokenHelper.deleteToken(token, _userId);
