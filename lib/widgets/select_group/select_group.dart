@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/util/colors.dart';
 import '../../util/user_helper.dart';
@@ -29,6 +30,8 @@ class _SelectGroupsState extends State<SelectGroups> {
   int numOfRows = 1;
   bool amberAlert = false;
   final Function(bool) onToneSelectedCallback;
+  List<DocumentSnapshot> schoolSnapshots;
+  DocumentSnapshot selectedSchool;
 
   _SelectGroupsState(this.onToneSelectedCallback);
 
@@ -37,12 +40,38 @@ class _SelectGroupsState extends State<SelectGroups> {
     var role = await UserHelper.getSelectedSchoolRole();
     if (role == 'school_security') {
       schoolGroups.removeWhere((item) => item["name"] == 'family');
+    } else if (role == 'district') {
+      List<Map<String, dynamic>> schools = (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
+      schools.removeWhere((item) => item["role"] != "district");
+      List<DocumentSnapshot> unwrappedSchools = await _fetchSchoolSnapshots(schools);
+      setState(() {
+        schoolSnapshots = unwrappedSchools;
+        _isLoading = false;
+      });
     }
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = false;
+      _isLoading = role != 'district' && schoolSnapshots == null;
     });
+  }
+
+  List<DropdownMenuItem> _districtSchools() {
+    List<String> _schools = List<String>();
+    _schools.add("All Schools");
+    _schools.addAll(schoolSnapshots.map((item) => item["name"]));
+    return _schools.map((value) => DropdownMenuItem(
+      value: value,
+      child: Text(value),
+    )).toList();
+  }
+
+  Future<List<DocumentSnapshot>> _fetchSchoolSnapshots(List<Map<String, dynamic>> schoolRef) async {
+    List<DocumentSnapshot> list = List<DocumentSnapshot>(schoolRef.length);
+    for (int i = 0; i < schoolRef.length; i++) {
+      list[i] = await Firestore.instance.document(schoolRef[i]["ref"]).get();
+    }
+    return list;
   }
 
   @override
@@ -70,27 +99,30 @@ class _SelectGroupsState extends State<SelectGroups> {
         height: checkBoxHeight,
         child: Theme(
           data: ThemeData(unselectedWidgetColor: SVColors.talkAroundBlue),
-          child: CheckboxListTile(
-              isThreeLine: false,
-              dense: true,
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(name.substring(0, 1).toUpperCase() + name.substring(1),
-                  style: TextStyle(
-                      color: selectedGroups.containsKey(name)
-                          ? SVColors.colorFromHex("#6d98cb")
-                          : SVColors.talkAroundBlue,
-                      decoration:
-                      selectedGroups.containsKey(name) ? TextDecoration.underline : TextDecoration.none)),
-              value: selectedGroups.containsKey(name),
-              onChanged: (bool value) {
-                setState(() {
-                  if (!value) {
-                    selectedGroups.remove(name);
-                  } else {
-                    selectedGroups[name] = true;
-                  }
-                });
-              }),),);
+          child: Row(
+            children: <Widget>[
+              Checkbox(
+                value: selectedGroups.containsKey(name),
+                onChanged: (bool value) {
+                  setState(() {
+                    if (value) {
+                      selectedGroups[name] = value;
+                    } else {
+                      selectedGroups.remove(name);
+                    }
+                  });
+                },
+              ),
+              Text('${name.substring(0, 1).toUpperCase()}${name.substring(1)}',
+                style: TextStyle(
+                    color: selectedGroups.containsKey(name)
+                        ? SVColors.colorFromHex('#6d98cb')
+                        : SVColors.talkAroundBlue,
+                    decoration: selectedGroups.containsKey(name) ? TextDecoration.underline : TextDecoration.none),),
+
+            ],
+          ) ,
+        ),);
       index++;
     });
 
@@ -166,9 +198,34 @@ class _SelectGroupsState extends State<SelectGroups> {
                 ],
               ),
             )
-        )
+        ),
+        schoolSnapshots != null ? Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text("Send to: "),
+              DropdownButton(
+                items: _districtSchools(),
+                onChanged: (value) {
+                  if (schoolSnapshots.where((item) => item["name"] == value).isNotEmpty) {
+                    setState(() {
+                      selectedSchool = schoolSnapshots.firstWhere((item) => item["name"] == value);
+                    });
+                  } else {
+                    setState(() {
+                      selectedSchool = null;
+                    });
+                  }
+                },
+                value: selectedSchool != null ? selectedSchool["name"] : "All Schools",
+              )
+            ],
+          ),
+        ): SizedBox(),
       ]),
-      height: (checkBoxHeight * 2) + 25.0,
+      height: schoolSnapshots == null ? (checkBoxHeight * 2) + 25.0 : (checkBoxHeight * 2) + 65.0,
     );
   }
 }

@@ -36,6 +36,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   String name = '';
   String _schoolId = '';
   String phone = '';
+  String role;
   var isLoaded = false;
   DocumentReference _userRef;
   List<String> _groups = List<String>();
@@ -51,6 +52,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   getUserDetails() async {
     _user = await UserHelper.getUser();
+    role = await UserHelper.getSelectedSchoolRole();
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
     _userRef = Firestore.instance.document("users/${_user.uid}");
     _userRef.get().then((user) {
@@ -275,7 +277,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
                 child: Text('Yes'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _saveBroadcast(image, text, isVideo);
+                  _sendBroadcasts(image, text, isVideo);
                 },
               )
             ],
@@ -283,12 +285,30 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         });
   }
 
+  _sendBroadcasts(image, alertBody, isVideo) {
+    if (role == 'district') {
+      DocumentSnapshot selectedSchool = selectGroups.key.currentState.selectedSchool;
+      if (selectedSchool == null) {
+        selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
+          _saveBroadcast(image, alertBody, isVideo, schoolDocument.documentID);
+        });
+      } else {
+        _saveBroadcast(image, alertBody, isVideo, selectedSchool.documentID);
+      }
+    } else {
+      _saveBroadcast(image, alertBody, isVideo);
+    }
+  }
+
   _showLoading() {}
 
   _hideLoading() {}
 
-  _saveBroadcast(image, alertBody, bool isVideo) async {
-    final broadcastPath = 'schools/$_schoolId/broadcasts';
+  _saveBroadcast(image, alertBody, bool isVideo, [String schoolId]) async {
+    if (schoolId == null) {
+      schoolId = _schoolId;
+    }
+    final broadcastPath = 'schools/$schoolId/broadcasts';
     CollectionReference collection =
     Firestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.document();
