@@ -121,7 +121,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     if (!widget._createMode) {
       users.documents.removeWhere((doc) =>
       widget._channel.members.firstWhere((member) =>
-      member.id == doc.documentID,
+      member.id == doc.reference,
           orElse: () => null)
           != null);
     }
