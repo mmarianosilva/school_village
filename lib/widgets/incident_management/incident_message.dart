@@ -22,7 +22,7 @@ class IncidentMessage extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Flexible(
-                  child: Text("${message.origin}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  child: Text("${message.origin}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red), maxLines: 1, overflow: TextOverflow.ellipsis,),
                   flex: 2,
                   fit: FlexFit.tight
               ),
@@ -56,23 +56,23 @@ class IncidentMessage extends StatelessWidget {
               return Row(
                 children: <Widget>[
                   Flexible(
-                      child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text("From:", style: TextStyle(fontWeight: FontWeight.bold)),
                       flex: 2,
                       fit: FlexFit.tight),
                   Flexible(
                       child: GestureDetector(
                           onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
-                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)))
+                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), maxLines: 1, overflow: TextOverflow.ellipsis,)
                       ),
-                      flex: 8,
+                      flex: 7,
                       fit: FlexFit.tight),
                   Flexible(
-                      child: Text("To: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text("To:", style: TextStyle(fontWeight: FontWeight.bold), maxLines: 1,),
                       flex: 1,
                       fit: FlexFit.tight),
                   Flexible(
                       child: Text(targetGroup, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                      flex: 8,
+                      flex: 7,
                       fit: FlexFit.tight)
                 ],
               );
