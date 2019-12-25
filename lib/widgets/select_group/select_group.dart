@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:school_village/util/colors.dart';
 import '../../util/user_helper.dart';
 
@@ -52,7 +53,7 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = role != 'district' && schoolSnapshots == null;
+      _isLoading = role == 'district' && schoolSnapshots == null;
     });
   }
 
@@ -75,10 +76,15 @@ class _SelectGroupsState extends State<SelectGroups> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       getGroups();
-    }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return _isLoading ? Center(child: Text('Loading...')) : _getList();
   }
 
