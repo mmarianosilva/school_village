@@ -13,6 +13,7 @@ import 'package:school_village/util/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 
 final dateFormatter = DateFormat('M / dd / y');
 final timeFormatter = DateFormat('hh:mm a');
@@ -29,6 +30,7 @@ class IncidentDetails extends StatefulWidget {
   final bool demo;
   final File imageFile;
   final String name;
+  final String reportedById;
   final String imgUrl;
 
   IncidentDetails(
@@ -44,6 +46,7 @@ class IncidentDetails extends StatefulWidget {
         this.demo,
         this.imageFile,
         this.name,
+        this.reportedById,
         this.imgUrl})
       : super(key: key);
 
@@ -61,6 +64,7 @@ class IncidentDetails extends StatefulWidget {
         imageFile: imageFile,
         demo: demo,
         name: name,
+        reportedById: reportedById,
         imgUrl: imgUrl);
   }
 }
@@ -78,11 +82,13 @@ class IncidentDetailsState extends State<IncidentDetails> {
   final String details;
   final bool demo;
   final File imageFile;
-  String name = '';
+  final String reportedById;
+  String name;
+  String phone;
   String schoolId;
   String userId;
   String imgUrl = '';
-  bool loading = false;
+  bool loading = true;
 
   @override
   void initState() {
@@ -102,6 +108,11 @@ class IncidentDetailsState extends State<IncidentDetails> {
         this.schoolId = schoolId;
       });
     });
+    final DocumentSnapshot snapshot = await Firestore.instance.document("users/$reportedById").get();
+    setState(() {
+      this.phone = snapshot["phone"];
+      this.loading = false;
+    });
   }
 
   IncidentDetailsState(
@@ -116,6 +127,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
         this.demo,
         this.imageFile,
         this.name,
+        this.reportedById,
         this.imgUrl});
 
   @override
@@ -197,6 +209,10 @@ class IncidentDetailsState extends State<IncidentDetails> {
               ),
               _buildImagePreview(),
               _buildKeyValueText('Reported by', name),
+              !demo ? GestureDetector(
+                child: Text('Contact', style: TextStyle(color: SVColors.talkAroundBlue),),
+                onTap: () => showContactDialog(context, name, phone),
+              ) : SizedBox(),
               SizedBox.fromSize(size: Size(0, 26.0)),
               demo
                   ? Center(

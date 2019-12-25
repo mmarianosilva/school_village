@@ -113,6 +113,7 @@ class IncidentListState extends State<IncidentList> {
                           date: DateTime.fromMillisecondsSinceEpoch(
                               document['date']),
                           name: document['createdBy'],
+                          reportedById: document['createdById'],
                           location: document['location'],
                           witnessNames: witnessNames,
                           subjectNames: subjectNames,
