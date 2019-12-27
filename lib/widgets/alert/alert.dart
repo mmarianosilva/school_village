@@ -101,7 +101,7 @@ class _AlertState extends State<Alert> {
 
 
   _sendAlert(alertType, alertTitle, alertBody) {
-    if (_role == 'school_security' || _role == 'school_admin') {
+    if (_role == 'school_security' || _role == 'school_admin' || _role == 'school_staff' || _role == 'district') {
       showDialog(
           context: context,
           barrierDismissible: false,
