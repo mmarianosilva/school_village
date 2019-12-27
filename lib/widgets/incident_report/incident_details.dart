@@ -104,15 +104,21 @@ class IncidentDetailsState extends State<IncidentDetails> {
     _userRef.get().then((user) {
       userId = user.documentID;
       setState(() {
-        if (demo) name = "${user.data['firstName']} ${user.data['lastName']}";
+        if (demo) {
+          name = "${user.data['firstName']} ${user.data['lastName']}";
+          this.loading = false;
+        }
         this.schoolId = schoolId;
       });
     });
-    final DocumentSnapshot snapshot = await Firestore.instance.document("users/$reportedById").get();
-    setState(() {
-      this.phone = snapshot["phone"];
-      this.loading = false;
-    });
+    if (!demo) {
+      final DocumentSnapshot snapshot = await Firestore.instance.document(
+          "users/$reportedById").get();
+      setState(() {
+        this.phone = snapshot["phone"];
+        this.loading = false;
+      });
+    }
   }
 
   IncidentDetailsState(
