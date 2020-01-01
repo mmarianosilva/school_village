@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/usecase/select_image_usecase.dart';
+import 'package:school_village/usecase/upload_image_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
@@ -23,7 +27,11 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
   DocumentSnapshot _userSnapshot;
   String _schoolId;
   bool isLoading = true;
+  bool sending = false;
+  File selectedImage;
   final TextEditingController messageInputController = TextEditingController();
+  final SelectImageUsecase selectImageUsecase = SelectImageUsecase();
+  final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
 
   _TalkAroundMessagingState(this.channel);
 
@@ -110,21 +118,53 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     }
   }
 
-  void _onTakePhoto() {
-
+  void _onTakePhoto() async {
+    final File photo = await selectImageUsecase.takeImage();
+    setState(() {
+      selectedImage = photo;
+    });
   }
 
-  void _onSelectPhoto() {
-
+  void _onSelectPhoto() async {
+    final File photo = await selectImageUsecase.selectImage();
+    setState(() {
+      selectedImage = photo;
+    });
   }
 
   void _onSend() async {
-    if (messageInputController.text.isEmpty) {
+    if (messageInputController.text.isEmpty && selectedImage == null) {
       return;
     }
+    setState(() {
+      sending = true;
+    });
+    String imageUri;
+    if (selectedImage != null) {
+      try {
+        final String storagePath = '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${selectedImage.path.substring(selectedImage.parent.path.length + 1)}';
+        await uploadFileUsecase.uploadFile(storagePath, selectedImage);
+        imageUri = storagePath;
+      } on Exception catch (ex) {
+        setState(() {
+          sending = false;
+        });
+        showDialog(context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text('An error occurred'),
+          content: Text('$ex'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ));
+        return;
+      }
+    }
     final Map<String, dynamic> messageData = {
-      "img" : null,
-      "thumb" : null,
+      "image" : imageUri,
       "author" : UserHelper.getDisplayName(_userSnapshot),
       "authorId" : _userSnapshot.documentID,
       "location" : await UserHelper.getLocation(),
@@ -145,6 +185,10 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     } on Exception catch (ex) {
       print("$ex");
     }
+    setState(() {
+      selectedImage = null;
+      sending = false;
+    });
   }
 
   @override
@@ -187,61 +231,84 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                 )
             );
           } else {
-            return Column(
+            return Stack(
               children: <Widget>[
-                Expanded(
-                  child: Chat(
-                    conversation: "$_schoolId/messages/${channel.id}",
-                    showLocation: channel.showLocation,
-                    showInput: false,
-                    user: _userSnapshot,
-                    reverseInput: true,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                Container(
+                  color: Color.fromARGB(255, 241, 241, 245),
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            color: Colors.black,
-                            border: Border.all(
-                                color: Colors.white,
-                                width: 1.0
-                            )
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextField(
-                                controller: messageInputController,
-                                decoration: InputDecoration(
-                                    hintText: "Message ${_buildChannelName()}",
-                                    hintStyle: TextStyle(color: Color.fromARGB(255, 187, 187, 187))
-                                ),
-                                maxLines: null,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            GestureDetector(
-                              child: Icon(Icons.send, color: Color.fromARGB(255, 187, 187, 187)),
-                              onTap: _onSend,
-                            )
-                          ],
+                      Expanded(
+                        child: Chat(
+                          conversation: "$_schoolId/messages/${channel.id}",
+                          showLocation: channel.showLocation,
+                          showInput: false,
+                          user: _userSnapshot,
+                          reverseInput: true,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: _buildChannelFooterOptions()
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                        child: Column(
+                          children: <Widget>[
+                            selectedImage != null ?
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Image.file(selectedImage, height: 120.0, fit: BoxFit.scaleDown,)
+                                  ],
+                                ) :
+                                SizedBox(),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  color: Colors.black,
+                                  border: Border.all(
+                                      color: Colors.white,
+                                      width: 1.0
+                                  )
+                              ),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextField(
+                                      controller: messageInputController,
+                                      decoration: InputDecoration(
+                                          hintText: "Message ${_buildChannelName()}",
+                                          hintStyle: TextStyle(color: Color.fromARGB(255, 187, 187, 187))
+                                      ),
+                                      maxLines: null,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    child: Icon(Icons.send, color: Color.fromARGB(255, 187, 187, 187)),
+                                    onTap: _onSend,
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: _buildChannelFooterOptions()
+                              ),
+                            )
+                          ],
                         ),
                       )
                     ],
                   ),
-                )
+                ),
+                sending ?
+                    Container(
+                      color: Color.fromARGB(112, 0, 0, 0),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ) :
+                SizedBox(),
               ],
             );
           }

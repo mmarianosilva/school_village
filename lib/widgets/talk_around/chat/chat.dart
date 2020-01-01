@@ -107,8 +107,7 @@ class _ChatState extends State<Chat> {
         'author': "${user.data['firstName']} ${user.data['lastName']}",
         'timestamp': FieldValue.serverTimestamp(),
         'location': widget.showLocation ? await _getLocation() : null,
-        'image': image == null ? null : path,
-        'thumb': thumb == null ? null : thumbPath
+        'image': image == null ? null : path
       });
     }).then((result) {
       print("Transaction result: ${result}");
@@ -241,7 +240,7 @@ class _ChatState extends State<Chat> {
               timestamp: document['timestamp'],
               self: document['authorId'] == user.documentID,
               location: widget.showLocation ? document['location'] : null,
-              imageUrl: document['thumb'] ?? document['image'],
+              imageUrl: document['image'],
               message: document,
             );
           });
