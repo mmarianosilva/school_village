@@ -9,10 +9,9 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/colors.dart';
-import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/widgets/messages/broadcast_message.dart';
 import 'package:school_village/widgets/select_group/select_group.dart';
-import '../../util/user_helper.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/constants.dart';
 
 class BroadcastMessaging extends StatefulWidget {
@@ -309,8 +308,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       schoolId = _schoolId;
     }
     final broadcastPath = 'schools/$schoolId/broadcasts';
-    CollectionReference collection =
-    Firestore.instance.collection(broadcastPath);
+    CollectionReference collection = Firestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.document();
 
     var path = '';

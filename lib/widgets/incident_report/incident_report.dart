@@ -385,7 +385,7 @@ class IncidentState extends State<IncidentReport> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.file(image, height: 120.0),
+                Image.file(image, height: 120.0, fit: BoxFit.scaleDown,),
                 SizedBox(width: 16.0),
                 GestureDetector(
                   onTap: () {

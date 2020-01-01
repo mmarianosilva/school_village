@@ -314,7 +314,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
     return Center(
         child: Container(
             padding: EdgeInsets.symmetric(vertical: 10),
-            child: Image.file(imageFile, height: 150)));
+            child: Image.file(imageFile, height: 150, fit: BoxFit.scaleDown,)));
   }
 
   _buildKeyValueText(key, value) {
