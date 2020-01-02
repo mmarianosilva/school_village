@@ -34,6 +34,7 @@ class _AlertState extends State<Alert> {
   bool isLoaded = false;
   bool _isTrainingMode = true;
   final customAlertController = TextEditingController();
+  BuildContext _scaffold;
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -141,7 +142,7 @@ class _AlertState extends State<Alert> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     if (_isTrainingMode) {
-                                      Scaffold.of(context).showSnackBar(
+                                      Scaffold.of(_scaffold).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                                 "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only."),
@@ -313,6 +314,7 @@ class _AlertState extends State<Alert> {
       ),
       body: Builder(
           builder: (BuildContext context) {
+            _scaffold = context;
             return SingleChildScrollView(
               child: Column(
                 children: <Widget>[
