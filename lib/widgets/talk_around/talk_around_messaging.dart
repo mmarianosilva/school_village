@@ -119,6 +119,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
   }
 
   void _onTakePhoto() async {
+    FocusScope.of(context).requestFocus(FocusNode());
     final File photo = await selectImageUsecase.takeImage();
     setState(() {
       selectedImage = photo;
@@ -126,6 +127,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
   }
 
   void _onSelectPhoto() async {
+    FocusScope.of(context).requestFocus(FocusNode());
     final File photo = await selectImageUsecase.selectImage();
     setState(() {
       selectedImage = photo;
