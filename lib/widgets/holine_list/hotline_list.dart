@@ -46,38 +46,39 @@ class _HotLineListState extends State<HotLineList> {
     }
     print(_groups);
     print("/$_schoolId/hotline");
-    return new Scaffold(
+    return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: new AppBar(
-        title: new Text('Anonymous Hotline Log',
+      appBar: AppBar(
+        title: Text('Anonymous Hotline Log',
             textAlign: TextAlign.center,
-            style: new TextStyle(color: Colors.black)),
+            style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
-        leading: new BackButton(color: Colors.grey.shade800),
+        leading: BackButton(color: Colors.grey.shade800),
       ),
-      body: !isLoaded ?  new Text("Loading..") :  new StreamBuilder(
+      body: !isLoaded ?  Text("Loading...") :  StreamBuilder(
           stream: Firestore.instance.collection("schools/$_schoolId/hotline").orderBy("createdAt", descending: true).snapshots(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (!snapshot.hasData) return const Text('Loading...');
             final int messageCount = snapshot.data.documents.length;
             print(messageCount);
-            return new ListView.builder(
+            return ListView.builder(
               itemCount: messageCount,
               itemBuilder: (_, int index) {
                 final DocumentSnapshot document = snapshot.data.documents[index];
-                print(document['body']);
-                return new Container(child: new Column(
+                debugPrint(document['body']);
+
+                return Container(child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      new Container(
+                      Container(
                         padding: EdgeInsets.only(
                             left: 8.0,
                             right: 8.0,
                             top: 8.0
                         ),
                         alignment: Alignment.centerLeft,
-                        child: new Text(document['body'] + ""),
+                        child: Text(document['body'] + ""),
                       ),
                       new Container(
                         padding: EdgeInsets.only(
@@ -87,24 +88,47 @@ class _HotLineListState extends State<HotLineList> {
                             bottom: 2.0
                         ),
                         alignment: Alignment.centerLeft,
-                        child: new Text("${dateFormatting.messageDateFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}", style: new TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
+                        child: Text("${dateFormatting.messageDateFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}", style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic)),
                       ),
-                      new Container(
-                        padding: EdgeInsets.only(
-                            left: 8.0,
-                            right: 8.0,
-                            bottom: 8.0
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: document['createdBy']== null ? new Text('') : new Text("${document['createdBy']}", style: new TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                      Row(
+                        children: <Widget>[
+                          Flexible(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 8.0,
+                                  right: 8.0,
+                                  bottom: 8.0
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: Text(document['createdBy'] ?? '', style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 8.0,
+                                  right: 8.0,
+                                  bottom: 8.0
+                              ),
+                              alignment: Alignment.centerLeft,
+                              child: FutureBuilder(
+                future: Firestore.instance.document(document['schoolId'] ?? '').get(),
+                initialData: document,
+                builder: (BuildContext context, schoolData) => Text(schoolData.hasData ? schoolData.data['name'] ?? '' : '', style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                )
+                            ),
+                          ),
+                        ],
                       ),
                     ]
                 ),
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  margin: new EdgeInsets.all(8.0),
+                  margin: EdgeInsets.all(8.0),
                 );
 
               },
