@@ -82,26 +82,26 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     if (channel.direct) {
       return [
         GestureDetector(
-          child: Icon(Icons.photo_camera, color: Colors.black26,),
+          child: Icon(Icons.photo_camera, color: Colors.black54),
           onTap: _onTakePhoto,
         ),
         GestureDetector(
-          child: Icon(Icons.photo_size_select_actual, color: Colors.black26),
+          child: Icon(Icons.photo_size_select_actual, color: Colors.black54),
           onTap: _onSelectPhoto,
         ),
         GestureDetector(
-          child: Icon(Icons.add_circle_outline, color: Colors.black26),
+          child: Icon(Icons.add_circle_outline, color: Colors.black54),
           onTap: _onAddTapped,
         ),
       ];
     }
     return [
       GestureDetector(
-        child: Icon(Icons.photo_camera, color: Colors.black26,),
+        child: Icon(Icons.photo_camera, color: Colors.black54),
         onTap: _onTakePhoto,
       ),
       GestureDetector(
-        child: Icon(Icons.photo_size_select_actual, color: Colors.black26),
+        child: Icon(Icons.photo_size_select_actual, color: Colors.black54),
         onTap: _onSelectPhoto,
       ),
     ];
@@ -284,7 +284,11 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                                     ),
                                   ),
                                   GestureDetector(
-                                    child: Icon(Icons.send, color: Color.fromARGB(255, 187, 187, 187)),
+                                    child: Icon(
+                                        Icons.send,
+                                        color: Color.fromARGB(255, 187, 187, 187),
+                                        size: 32.0,
+                                    ),
                                     onTap: _onSend,
                                   )
                                 ],
