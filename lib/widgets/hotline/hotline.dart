@@ -175,7 +175,8 @@ class _HotlineState extends State<Hotline> {
     document.setData(<String, dynamic>{
       'body': message,
       'createdAt': new DateTime.now().millisecondsSinceEpoch,
-      'createdBy': await UserHelper.getAnonymousRole()
+      'createdBy': await UserHelper.getSelectedSchoolRole(),
+      'schoolId': await UserHelper.getSelectedSchoolID(),
     });
     print("Added hotline");
 
