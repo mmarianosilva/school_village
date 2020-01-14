@@ -187,35 +187,48 @@ class _HomeState extends State<Home> {
     } else if (message["type"] == "talkaround") {
       playMessageAlert();
       if (!appInForeground) {
-        final String escapedSchoolId = message["schoolId"];
-        return Firestore
-            .instance
-            .document(
-            "schools/$escapedSchoolId/messages/${message["conversationId"]}")
-            .get()
-            .then((data) async {
-          Stream<TalkAroundUser> membersStream = Stream.fromIterable(
-              data["members"]).asyncMap((userId) async {
-            final DocumentSnapshot snapshot = await userId.get();
-            return TalkAroundUser.fromMapAndGroup(snapshot,
-                snapshot.data["associatedSchools"][escapedSchoolId] != null
-                    ? snapshot
-                    .data["associatedSchools"][escapedSchoolId]["role"]
-                    : "");
-          });
-          final List<TalkAroundUser> members = await membersStream.toList();
-          final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(
-              data, members);
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => TalkAroundHome()),
-                  (route) => route.settings.name == '/home');
-          Navigator.push(context, MaterialPageRoute(
-              builder: (context) => TalkAroundMessaging(channel: channel,)));
-        });
+        _openTalkAroundChannel(message);
       }
     }
     return _showItemDialog(message);
+  }
+
+  _openTalkAroundChannel(Map<String, dynamic> incomingMessageData) {
+    final String escapedSchoolId = incomingMessageData["schoolId"];
+    debugPrint(escapedSchoolId);
+    debugPrint(incomingMessageData["conversationId"]);
+    return Firestore
+        .instance
+        .document(
+        "schools/$escapedSchoolId/messages/${incomingMessageData["conversationId"]}")
+        .get()
+        .then((data) async {
+      debugPrint('Retrieved channelInformation information');
+      debugPrint(data.data.toString());
+      TalkAroundChannel channel;
+      if (data["direct"] ?? false) {
+        Stream<TalkAroundUser> membersStream = Stream.fromIterable(
+            data["members"]).asyncMap((userId) async {
+          final DocumentSnapshot snapshot = await userId.get();
+          return TalkAroundUser.fromMapAndGroup(snapshot,
+              snapshot.data["associatedSchools"][escapedSchoolId] != null
+                  ? snapshot
+                  .data["associatedSchools"][escapedSchoolId]["role"]
+                  : "");
+        });
+        final List<TalkAroundUser> members = await membersStream.toList();
+        channel = TalkAroundChannel.fromMapAndUsers(
+            data, members);
+      } else {
+        channel = TalkAroundChannel.fromMapAndUsers(data, null);
+      }
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => TalkAroundHome()),
+              (route) => route.settings.name == '/home');
+      Navigator.push(context, MaterialPageRoute(
+          builder: (context) => TalkAroundMessaging(channel: channel,)));
+    });
   }
 
   _shoIncidentReportDialog(message) {
@@ -351,6 +364,13 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 actions: <Widget>[
+                  FlatButton(
+                    child: Text('Open'),
+                    onPressed: () {
+                      stopSound();
+                      _openTalkAroundChannel(message);
+                    },
+                  ),
                   FlatButton(
                     child: Text('Close'),
                     onPressed: () {
