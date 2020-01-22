@@ -8,8 +8,6 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
 import 'package:image_picker/image_picker.dart';
 
-final dateTimeFormatter = dateFormatting.messageDateFormatter;
-
 class IncidentReport extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -306,7 +304,7 @@ class IncidentState extends State<IncidentReport> {
                   child: OutlineButton(
                       child: Text(date == null
                           ? 'Select Time and Date'
-                          : dateTimeFormatter.format(date)),
+                          : dateFormatting.messageDateFormatter.format(date)),
                       onPressed: () {
                         _selectDate();
                       }),

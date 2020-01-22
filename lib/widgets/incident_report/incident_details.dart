@@ -11,13 +11,10 @@ import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
-
-final dateFormatter = DateFormat('M / dd / y');
-final timeFormatter = DateFormat('hh:mm a');
-
 class IncidentDetails extends StatefulWidget {
   final List<String> items;
   final List<String> posItems;
