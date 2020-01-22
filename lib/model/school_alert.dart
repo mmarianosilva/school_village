@@ -3,6 +3,7 @@ import 'package:location/location.dart';
 
 class SchoolAlert {
   final String id;
+  final String firestorePath;
   final String title;
   final String body;
   final DateTime timestamp;
@@ -16,10 +17,11 @@ class SchoolAlert {
   final bool resolved;
   final String resolvedBy;
 
-  SchoolAlert(this.id, this.title, this.body, this.timestamp, this.timestampEnded, this.createdBy, this.createdById, this.location, this.type, this.reportedByPhone, this.resolution, {this.resolved = true, this.resolvedBy});
+  SchoolAlert(this.id, this.firestorePath, this.title, this.body, this.timestamp, this.timestampEnded, this.createdBy, this.createdById, this.location, this.type, this.reportedByPhone, this.resolution, {this.resolved = true, this.resolvedBy});
 
   SchoolAlert.fromMap(DocumentSnapshot firebaseModel) : this(
     firebaseModel.documentID,
+    firebaseModel.reference.path,
     firebaseModel["title"],
     firebaseModel["body"],
     DateTime.fromMillisecondsSinceEpoch(firebaseModel["createdAt"]),
