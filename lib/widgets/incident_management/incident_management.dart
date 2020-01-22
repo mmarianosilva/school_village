@@ -4,6 +4,7 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/pdf_handler.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,8 +30,6 @@ class IncidentManagement extends StatefulWidget {
   final SchoolAlert alert;
   final String role;
   final bool resolved;
-  final DateFormat timeFormatter = DateFormat("hh:mm a");
-  final DateFormat dateFormatter = DateFormat("EEEE, MMM dd, yyyy", "en_US");
 
   IncidentManagement({this.key, this.alert, this.role, this.resolved = false}) : super(key: key);
 
@@ -340,13 +339,17 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
 
   Widget _buildListItem(BuildContext context, int index) {
     TalkAroundMessage item = _messages[index];
-    String timestamp = widget.timeFormatter.format(item.timestamp);
+    String timestamp = timeFormatter.format(item.timestamp);
     return IncidentMessage(
         key: Key(item.id),
         message: item,
         timestamp: timestamp,
         targetGroup: item.channel,
         onMapClicked: this);
+  }
+
+  bool _isDifferentReporter() {
+    return false;
   }
 
   @override
@@ -375,7 +378,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       builder: (context, child, model) {
         return Scaffold(
             appBar: BaseAppBar(
-                title: Text("Incident Management Dashboard",
+                title: Text("Incident Dashboard",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
                 leading: BackButton(color: Colors.grey.shade800),
@@ -400,7 +403,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                           child: Row(
                               children: [
                                 Text("${alert.title}", style: TextStyle(fontSize: 18.0, color: Colors.red, fontWeight: FontWeight.bold)),
-                                Expanded(child: Text("${widget.dateFormatter.format(alert.timestamp)}", textAlign: TextAlign.end))
+                                Expanded(child: Text("${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}", textAlign: TextAlign.end))
                               ]
                           ),
                         ),
@@ -473,7 +476,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                       ),
                                     ),
                                   ),
-                                  Flexible(child: Container(
+                                  _isDifferentReporter() ? Flexible(child: Container(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 16.0, vertical: 4.0),
@@ -501,7 +504,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                         ],
                                       ),
                                     ),
-                                  ),),
+                                  ),) : SizedBox(),
                                 ],
                               ),
                             ),
