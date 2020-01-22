@@ -13,7 +13,7 @@ import 'package:school_village/util/user_helper.dart';
 
 class Notifications extends StatefulWidget {
   @override
-  _NotificationsState createState() => new _NotificationsState();
+  _NotificationsState createState() => _NotificationsState();
 }
 
 class _NotificationsState extends State<Notifications> {
@@ -45,15 +45,15 @@ class _NotificationsState extends State<Notifications> {
 
   Widget _buildList() {
 
-    return new ListView.builder(
+    return ListView.builder(
       itemCount: _alerts.length,
       itemBuilder: (_, int index) {
         final SchoolAlert alert = _alerts[index];
-        return new Card(
-          child: new Column(
+        return Card(
+          child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                new ListTile(
+                ListTile(
                   title: Text(alert.title, style: TextStyle(fontWeight: FontWeight.bold),),
                   subtitle: Text("${timestampFormat.format(alert.timestamp)}"),
                   trailing: Builder(builder: (context) {
@@ -62,11 +62,11 @@ class _NotificationsState extends State<Notifications> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           FlatButton(
-                            child: const Text('IMD', style: TextStyle(color: Colors.blueAccent),),
+                            child: const Text('ID', style: TextStyle(color: Colors.blueAccent),),
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                new MaterialPageRoute(
+                                MaterialPageRoute(
                                   builder: (context) =>
                                       IncidentManagement(alert: alert,
                                           role: _role,
@@ -80,7 +80,7 @@ class _NotificationsState extends State<Notifications> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                new MaterialPageRoute(
+                                MaterialPageRoute(
                                   builder: (context) => NotificationDetail(notification: alert, title: 'Notification'),
                                 ),
                               );
@@ -94,7 +94,7 @@ class _NotificationsState extends State<Notifications> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            new MaterialPageRoute(
+                            MaterialPageRoute(
                               builder: (context) => NotificationDetail(notification: alert, title: 'Notification'),
                             ),
                           );
@@ -113,23 +113,23 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant<MainModel>(
         builder: (context, child, model) {
           if (!isLoaded) {
             getUserDetails(model);
           }
           print("/$_schoolId/notifications");
-          return new Scaffold(
+          return Scaffold(
               backgroundColor: Colors.grey.shade100,
-              appBar: new BaseAppBar(
-                title: new Text('Alert Log',
+              appBar: BaseAppBar(
+                title: Text('Alert Log',
                     textAlign: TextAlign.center,
-                    style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+                    style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
                 backgroundColor: Colors.grey.shade200,
                 elevation: 0.0,
-                leading: new BackButton(color: Colors.grey.shade800),
+                leading: BackButton(color: Colors.grey.shade800),
               ),
-              body: !isLoaded ?  new Text("Loading..") :
+              body: !isLoaded ?  Text("Loading..") :
               _buildList()
           );
 
