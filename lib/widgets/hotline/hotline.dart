@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/usecase/select_image_usecase.dart';
+import 'package:school_village/usecase/upload_image_usecase.dart';
+import 'package:sentry/sentry.dart';
 import '../../util/user_helper.dart';
 
 class Hotline extends StatefulWidget {
   @override
-  _HotlineState createState() => new _HotlineState();
+  _HotlineState createState() => _HotlineState();
 }
 
 class _HotlineState extends State<Hotline> {
@@ -17,7 +22,9 @@ class _HotlineState extends State<Hotline> {
   bool isLoaded = false;
   bool isEnglish = true;
   int numCharacters = 0;
-  final customAlertController = new TextEditingController();
+  File _selectedMedia;
+  bool _isVideo = false;
+  final customAlertController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String englishTitle = "Anonymous Safety Hotline";
@@ -43,8 +50,10 @@ class _HotlineState extends State<Hotline> {
       if (focusNode.hasFocus) {
         Timer(const Duration(milliseconds: 200), () {
           print("${_scrollController.position.maxScrollExtent}");
-          _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 150), curve: Curves.ease);
+          _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.ease);
         });
       }
     });
@@ -53,45 +62,57 @@ class _HotlineState extends State<Hotline> {
   }
 
   _englishText() {
-    return new Column(
+    return Column(
       children: <Widget>[
-        new RichText(
-          text: new TextSpan(
+        RichText(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(text: 'YOU', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(text: ' can make a difference in your school\'s safety. Here you can anonymously report:'),
+              TextSpan(
+                  text: 'YOU', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      ' can make a difference in your school\'s safety. Here you can anonymously report:'),
             ],
           ),
         ),
-        new RichText(
+        RichText(
           textAlign: TextAlign.center,
-          text: new TextSpan(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(
-                  text: '\nBULLYING\nTHREATS\nASSAULT\nSEXUAL HARRASSMENT\nSAFETY ISSUES',
+              TextSpan(
+                  text:
+                      '\nBULLYING\nTHREATS\nASSAULT\nSEXUAL HARRASSMENT\nSAFETY ISSUES',
                   style: TextStyle(fontWeight: FontWeight.bold))
             ],
           ),
         ),
-        new RichText(
-          text: new TextSpan(
+        RichText(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(
+              TextSpan(
                   text:
-                      '\nAnonymously text a message below and tap SEND to make a report. This Hotline can also record voice messages and take photos.'),
-              new TextSpan(text: '\n\nIF YOU', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(text: ' DO', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
-                  text: ' want someone  to contact  you  back,', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(text: ' just include your phone number or email address in your text.'),
-              new TextSpan(text: ' — That is your choice.', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
+                      '\nAnonymously text a message below and tap SEND to make a report. This Hotline can also send photos.'),
+              TextSpan(
+                  text: '\n\nIF YOU',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text: ' DO', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text: ' want someone  to contact  you  back,',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      ' just include your phone number or email address in your text.'),
+              TextSpan(
+                  text: ' — That is your choice.',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
                   text:
                       '\n\nIf  you  or  someone  you  know  is  depressed  or  thinking  about suicide call 1-800-273-8255 now.\n\n'),
             ],
@@ -102,48 +123,58 @@ class _HotlineState extends State<Hotline> {
   }
 
   _spanishText() {
-    return new Column(
+    return Column(
       children: [
-        new RichText(
-          text: new TextSpan(
+        RichText(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(text: 'USTED', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
-                  text: ' puede hacer una diferencia en la seguridad de su escuela. Aquí puede informar anónimamente:'),
+              TextSpan(
+                  text: 'USTED', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      ' puede hacer una diferencia en la seguridad de su escuela. Aquí puede informar anónimamente:'),
             ],
           ),
         ),
-        new RichText(
+        RichText(
           textAlign: TextAlign.center,
-          text: new TextSpan(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(
-                  text: '\nACOSO\nAMENAZAS\nASALTO\nHARRASSMENT SEXUAL \nPROBLEMAS DE SEGURIDAD',
+              TextSpan(
+                  text:
+                      '\nACOSO\nAMENAZAS\nASALTO\nHARRASSMENT SEXUAL \nPROBLEMAS DE SEGURIDAD',
                   style: TextStyle(fontWeight: FontWeight.bold))
             ],
           ),
         ),
-        new RichText(
-          text: new TextSpan(
+        RichText(
+          text: TextSpan(
             text: '',
             style: TextStyle(fontSize: 14.0, color: Colors.white),
             children: <TextSpan>[
-              new TextSpan(
+              TextSpan(
                   text:
-                      '\nAnónimamente envíe un mensaje de texto a continuación y toque ENVIAR para hacer un informe. Esta línea directa también puede grabar mensajes de voz y tomar fotos.'),
-              new TextSpan(text: '\n\nSI', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(text: ' DESEA', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
+                      '\nAnónimamente envíe un mensaje de texto a continuación y toque ENVIAR para hacer un informe. Esta línea directa también puede enviar fotos.'),
+              TextSpan(
+                  text: '\n\nSI',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text: ' DESEA',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
                   text: ' que alguien se ponga en contacto con usted,',
-                  style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
-                  text: ' simplemente incluya su número de teléfono o dirección de correo electrónico en su texto'),
-              new TextSpan(text: ' — Esa es su elección.', style: new TextStyle(fontWeight: FontWeight.bold)),
-              new TextSpan(
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      ' simplemente incluya su número de teléfono o dirección de correo electrónico en su texto'),
+              TextSpan(
+                  text: ' — Esa es su elección.',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
                   text:
                       '\n\nSi usted o alguien que conoce está deprimido o está pensando en suicidarse, llame al 1-800-273-8255 ahora.\n\n'),
             ],
@@ -163,36 +194,53 @@ class _HotlineState extends State<Hotline> {
 
   _sendMessage() {
     var text = customAlertController.text;
-    if (text.length < 1) return;
+    if (text.length < 1 && _selectedMedia != null) return;
     _saveMessage(text);
   }
 
   _saveMessage(message) async {
-    print('$_schoolId/hotline');
-    CollectionReference collection = Firestore.instance.collection('$_schoolId/hotline');
+    final String hotlinePath = '$_schoolId/hotline';
+    CollectionReference collection = Firestore.instance.collection(hotlinePath);
     final DocumentReference document = collection.document();
+
+    String firebaseStoragePath;
+    if (_selectedMedia != null) {
+      setState(() {
+        isLoaded = false;
+      });
+      final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+      firebaseStoragePath = await uploadFileUsecase.uploadFile(
+          '$hotlinePath/${DateTime.now().millisecondsSinceEpoch.toString()}/${_selectedMedia.path.substring(_selectedMedia.parent.path.length + 1)}',
+          _selectedMedia);
+
+      setState(() {
+        isLoaded = true;
+      });
+    }
 
     document.setData(<String, dynamic>{
       'body': message,
-      'createdAt': new DateTime.now().millisecondsSinceEpoch,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
       'createdBy': await UserHelper.getSelectedSchoolRole(),
       'schoolId': await UserHelper.getSelectedSchoolID(),
+      'isVideo': _isVideo,
+      'media': firebaseStoragePath,
     });
     print("Added hotline");
 
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-            title: new Text('Sent'),
-            content: new SingleChildScrollView(
-              child: new ListBody(
-                children: <Widget>[new Text('Your message has been sent')],
+          return AlertDialog(
+            title: Text('Sent'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[Text('Your message has been sent')],
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
-                child: new Text('Okay'),
+              FlatButton(
+                child: Text('Okay'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
@@ -203,10 +251,48 @@ class _HotlineState extends State<Hotline> {
         });
   }
 
+  _buildPreviewBox() {
+    if (_selectedMedia == null) {
+      return SizedBox();
+    }
+    return Container(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: Image.file(
+              _selectedMedia,
+              fit: BoxFit.scaleDown,
+            ),
+          ),
+          FlatButton(
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(8.0)),
+                child: Text(
+                  'x',
+                  style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                )),
+            onPressed: () {
+              setState(() {
+                _selectedMedia = null;
+              });
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   _buildInputBox() {
-    return new Theme(
-      data: new ThemeData(primaryColor: Colors.white, primaryColorDark: Colors.white, hintColor: Colors.white),
-      child: new TextField(
+    return Theme(
+      data: ThemeData(
+          primaryColor: Colors.white,
+          primaryColorDark: Colors.white,
+          hintColor: Colors.white),
+      child: TextField(
         maxLines: 1,
         focusNode: focusNode,
         controller: customAlertController,
@@ -216,12 +302,13 @@ class _HotlineState extends State<Hotline> {
             numCharacters = customAlertController.text.length;
           });
         },
-        decoration: new InputDecoration(
+        decoration: InputDecoration(
             filled: true,
             hintStyle: TextStyle(color: Colors.grey.shade400),
             fillColor: Colors.grey.shade800,
             border: const OutlineInputBorder(
-                borderRadius: const BorderRadius.all(const Radius.circular(12.0)),
+                borderRadius:
+                    const BorderRadius.all(const Radius.circular(12.0)),
                 borderSide: const BorderSide(color: Colors.white)),
             suffixIcon: IconButton(
                 icon: Icon(Icons.send),
@@ -233,22 +320,93 @@ class _HotlineState extends State<Hotline> {
     );
   }
 
+  _buildMediaInputRow() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white70,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.photo_camera, color: Colors.black54, size: 32.0),
+              onPressed: () async {
+                final SelectImageUsecase selectImageUsecase =
+                    SelectImageUsecase();
+                File image = await selectImageUsecase.takeImage();
+                if (image != null) {
+                  setState(() {
+                    _selectedMedia = image;
+                    _isVideo = false;
+                  });
+                }
+              },
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white70,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.videocam, color: Colors.black54, size: 32.0),
+              onPressed: () async {
+                final SelectImageUsecase selectImageUsecase =
+                    SelectImageUsecase();
+                File video = await selectImageUsecase.selectVideo();
+                if (video != null) {
+                  setState(() {
+                    _selectedMedia = video;
+                    _isVideo = true;
+                  });
+                }
+              },
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white70,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: IconButton(
+              icon: Icon(Icons.photo, color: Colors.black54, size: 32.0),
+              onPressed: () async {
+                final SelectImageUsecase selectImageUsecase =
+                    SelectImageUsecase();
+                File image = await selectImageUsecase.selectImage();
+                if (image != null) {
+                  setState(() {
+                    _selectedMedia = image;
+                    _isVideo = false;
+                  });
+                }
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   _buildContent() {
-    return new SingleChildScrollView(
+    return SingleChildScrollView(
       controller: _scrollController,
-      child: new Form(
+      child: Form(
         key: _formKey,
-        child: new Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            new SizedBox(height: 12.0),
-            new Row(
+            SizedBox(height: 12.0),
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text("English", style: TextStyle(color: Colors.white)),
-                new Switch(
+                Switch(
                     value: !isEnglish,
                     activeColor: Colors.grey.shade300,
                     activeTrackColor: Colors.grey.shade300,
@@ -262,7 +420,9 @@ class _HotlineState extends State<Hotline> {
               ],
             ),
             _buildText(),
-            _buildInputBox()
+            _buildPreviewBox(),
+            _buildInputBox(),
+            _buildMediaInputRow(),
           ],
         ),
       ),
@@ -275,27 +435,33 @@ class _HotlineState extends State<Hotline> {
       getUserDetails();
     }
 
-    return new Scaffold(
+    return Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: new AppBar(
-          title: new Text(isEnglish ? englishTitle : spanishTitle,
-              textAlign: TextAlign.center, style: new TextStyle(color: Colors.red.shade500)),
+        appBar: AppBar(
+          title: Text(isEnglish ? englishTitle : spanishTitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red.shade500)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          leading: new BackButton(color: Colors.grey.shade800),
+          leading: BackButton(color: Colors.grey.shade800),
         ),
-        body: new Container(
+        body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(12.0),
-          decoration: new BoxDecoration(
+          decoration: BoxDecoration(
             color: Theme.of(context).primaryColorDark,
-            image: new DecorationImage(
-                image: new AssetImage("assets/images/hotline_bg.png"),
+            image: DecorationImage(
+                image: AssetImage("assets/images/hotline_bg.png"),
                 fit: BoxFit.cover,
-                colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken)),
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.5), BlendMode.darken)),
           ),
-          child: isLoaded ? _buildContent() : Text("Loading...") /* add child content content here */,
+          child: isLoaded
+              ? _buildContent()
+              : Center(
+                  child: CircularProgressIndicator(),
+                ) /* add child content content here */,
         ));
   }
 }
