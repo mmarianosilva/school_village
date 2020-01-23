@@ -108,6 +108,7 @@ class IncidentListState extends State<IncidentList> {
                     context,
                     new MaterialPageRoute(
                       builder: (context) => IncidentDetails(
+                          firestoreDocument: document,
                           demo: false,
                           details: document['details'],
                           date: DateTime.fromMillisecondsSinceEpoch(
