@@ -4,6 +4,7 @@ import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/util/navigation_helper.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -122,19 +123,6 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  _openImage(context, imageUrl) {
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => new ImageViewScreen(
-              imageUrl,
-              minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered
-          )),
-    );
-  }
-
   _getImage(context) {
     if (imageUrl == null || imageUrl.trim() == '') {
       return SizedBox();
@@ -144,7 +132,7 @@ class ChatMessage extends StatelessWidget {
       height: 160.0,
       firebasePath: imageUrl,
       onTap: (imgUrl) {
-        _openImage(context, imgUrl);
+        NavigationHelper.openMedia(context, imgUrl);
       },
     );
   }

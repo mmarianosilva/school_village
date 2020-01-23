@@ -8,6 +8,7 @@ import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/util/navigation_helper.dart';
 
 class BroadcastMessage extends StatelessWidget {
   BroadcastMessage(
@@ -92,25 +93,6 @@ class BroadcastMessage extends StatelessWidget {
     );
   }
 
-  _openImage(context, imageUrl) {
-    if (!isVideo) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => new ImageViewScreen(imageUrl,
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered)),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                FullScreenVideoView(url: imageUrl, message: text)),
-      );
-    }
-  }
-
   _getImage(context) {
     if (imageUrl == null || imageUrl.trim() == '') {
       return SizedBox();
@@ -121,7 +103,7 @@ class BroadcastMessage extends StatelessWidget {
       firebasePath: imageUrl,
       isVideo: isVideo,
       onTap: (imgUrl) {
-        _openImage(context, imgUrl);
+        NavigationHelper.openMedia(context, imgUrl, isVideo: isVideo, title: text);
       },
     );
   }
