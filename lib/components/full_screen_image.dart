@@ -5,10 +5,7 @@ import 'package:school_village/components/icon_button.dart';
 class ImageViewScreen extends StatelessWidget {
   final String imageAddress;
 
-  final maxScale;
-  final minScale;
-
-  ImageViewScreen(this.imageAddress, {this.minScale, this.maxScale});
+  ImageViewScreen(this.imageAddress);
 
   @override
   build(BuildContext context) {
@@ -18,7 +15,6 @@ class ImageViewScreen extends StatelessWidget {
         imageProvider: NetworkImage(imageAddress),
         loadingChild: Text("Loading", style: TextStyle(color: Colors.white)),
         initialScale:  1.0,
-        minScale: 1.0,
         // maxScale: maxScale,
       ),
       Container(
