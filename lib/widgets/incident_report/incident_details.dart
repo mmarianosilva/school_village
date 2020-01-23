@@ -12,10 +12,14 @@ import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/util/navigation_helper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
+import 'package:school_village/widgets/followup/followup.dart';
+
 class IncidentDetails extends StatefulWidget {
+  final DocumentSnapshot firestoreDocument;
   final List<String> items;
   final List<String> posItems;
   final String other;
@@ -32,19 +36,20 @@ class IncidentDetails extends StatefulWidget {
 
   IncidentDetails(
       {Key key,
-        this.items,
-        this.posItems,
-        this.other,
-        this.subjectNames,
-        this.witnessNames,
-        this.date,
-        this.location,
-        this.details,
-        this.demo,
-        this.imageFile,
-        this.name,
-        this.reportedById,
-        this.imgUrl})
+      this.firestoreDocument,
+      this.items,
+      this.posItems,
+      this.other,
+      this.subjectNames,
+      this.witnessNames,
+      this.date,
+      this.location,
+      this.details,
+      this.demo,
+      this.imageFile,
+      this.name,
+      this.reportedById,
+      this.imgUrl})
       : super(key: key);
 
   @override
@@ -96,7 +101,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
   getDetails() async {
     FirebaseUser _user = await UserHelper.getUser();
     DocumentReference _userRef =
-    Firestore.instance.document("users/${_user.uid}");
+        Firestore.instance.document("users/${_user.uid}");
     var schoolId = await UserHelper.getSelectedSchoolID();
     _userRef.get().then((user) {
       userId = user.documentID;
@@ -109,8 +114,8 @@ class IncidentDetailsState extends State<IncidentDetails> {
       });
     });
     if (!demo) {
-      final DocumentSnapshot snapshot = await Firestore.instance.document(
-          "users/$reportedById").get();
+      final DocumentSnapshot snapshot =
+          await Firestore.instance.document("users/$reportedById").get();
       setState(() {
         this.phone = snapshot["phone"];
         this.loading = false;
@@ -120,18 +125,18 @@ class IncidentDetailsState extends State<IncidentDetails> {
 
   IncidentDetailsState(
       {this.items,
-        this.posItems,
-        this.other,
-        this.subjectNames,
-        this.witnessNames,
-        this.date,
-        this.location,
-        this.details,
-        this.demo,
-        this.imageFile,
-        this.name,
-        this.reportedById,
-        this.imgUrl});
+      this.posItems,
+      this.other,
+      this.subjectNames,
+      this.witnessNames,
+      this.date,
+      this.location,
+      this.details,
+      this.demo,
+      this.imageFile,
+      this.name,
+      this.reportedById,
+      this.imgUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +187,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
         child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
             child:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _buildKeyValueText('Incident', incident),
               SizedBox.fromSize(size: Size(0, 10.0)),
               _buildKeyValueText('Subject', subject),
@@ -212,23 +217,41 @@ class IncidentDetailsState extends State<IncidentDetails> {
               ),
               _buildImagePreview(),
               _buildKeyValueText('Reported by', name),
-              !demo ? GestureDetector(
-                child: Text('Contact', style: TextStyle(color: SVColors.talkAroundBlue),),
-                onTap: () => showContactDialog(context, name, phone),
-              ) : SizedBox(),
+              !demo
+                  ? GestureDetector(
+                      child: Text(
+                        'Contact',
+                        style: TextStyle(color: SVColors.talkAroundBlue),
+                      ),
+                      onTap: () => showContactDialog(context, name, phone),
+                    )
+                  : SizedBox(),
               SizedBox.fromSize(size: Size(0, 26.0)),
               demo
                   ? Center(
-                  child: RaisedButton(
-                      onPressed: () {
-                        _sendReport();
-                      },
-                      color: SVColors.incidentReportRed,
-                      child: Text("SEND REPORT",
-                          style: TextStyle(color: Colors.white))))
-                  : SizedBox.fromSize(size: Size(0, 0)),
+                      child: RaisedButton(
+                          onPressed: () {
+                            _sendReport();
+                          },
+                          color: SVColors.incidentReportRed,
+                          child: Text("SEND REPORT",
+                              style: TextStyle(color: Colors.white))))
+                  : FlatButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => Followup(
+                              'Incident Report',
+                              widget.firestoreDocument.reference.path),
+                        ),
+                      ),
+                      child: Text(
+                        'Follow-up',
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
+                    ),
               SizedBox.fromSize(size: Size(0, 15.0)),
-            ])));
+            ]),),);
   }
 
   _sendReport() async {
@@ -236,7 +259,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       loading = true;
     });
     CollectionReference collection =
-    Firestore.instance.collection('$schoolId/incident_reports');
+        Firestore.instance.collection('$schoolId/incident_reports');
     final DocumentReference document = collection.document();
     var path = '';
 
@@ -282,18 +305,9 @@ class IncidentDetailsState extends State<IncidentDetails> {
     return downloadUrl;
   }
 
-  _openImage(context, imageUrl) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => new ImageViewScreen(imageUrl,
-              minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered)),
-    );
-  }
+
 
   _buildImagePreview() {
-
     if (imageFile == null && (imgUrl == null || imgUrl.isEmpty)) {
       return SizedBox();
     }
@@ -303,7 +317,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
         firebasePath: imgUrl,
         isVideo: false,
         onTap: (imgUrl) {
-          _openImage(context, imgUrl);
+          NavigationHelper.openMedia(context, imgUrl);
         },
       );
     }
@@ -311,7 +325,11 @@ class IncidentDetailsState extends State<IncidentDetails> {
     return Center(
         child: Container(
             padding: EdgeInsets.symmetric(vertical: 10),
-            child: Image.file(imageFile, height: 150, fit: BoxFit.scaleDown,)));
+            child: Image.file(
+              imageFile,
+              height: 150,
+              fit: BoxFit.scaleDown,
+            )));
   }
 
   _buildKeyValueText(key, value) {
@@ -324,7 +342,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       Expanded(
           child: Text(value == null ? '' : value,
               style:
-              TextStyle(color: SVColors.incidentReportGray, fontSize: 16)))
+                  TextStyle(color: SVColors.incidentReportGray, fontSize: 16)))
     ]);
   }
 }
