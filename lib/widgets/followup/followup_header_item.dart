@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/util/navigation_helper.dart';
 
 class FollowupHeaderItem extends StatelessWidget {
   final Map<String, dynamic> _data;
@@ -46,10 +47,14 @@ class FollowupHeaderItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
             child: _data['img'] != null
-                ? Image.network(
-                    _data['image'],
-                    height: 96.0,
-                    fit: BoxFit.scaleDown,
+                ? GestureDetector(
+                    onTap: () =>
+                        NavigationHelper.openMedia(context, _data['img']),
+                    child: Image.network(
+                      _data['img'],
+                      height: 96.0,
+                      fit: BoxFit.scaleDown,
+                    ),
                   )
                 : SizedBox(),
           ),

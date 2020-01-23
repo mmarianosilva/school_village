@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/util/navigation_helper.dart';
 
 class FollowupListItem extends StatelessWidget {
   final Map<String, dynamic> _data;
@@ -19,11 +20,20 @@ class FollowupListItem extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text(_data['createdBy'], style: TextStyle(color: Colors.blueAccent),),
+              Text(
+                _data['createdBy'],
+                style: TextStyle(color: Colors.blueAccent),
+              ),
               Spacer(),
-              Text(dateFormatter.format(_data['timestamp'].toDate()), style: TextStyle(fontWeight: FontWeight.bold),),
+              Text(
+                dateFormatter.format(_data['timestamp'].toDate()),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Spacer(),
-              Text(timeFormatter.format(_data['timestamp'].toDate()), style: TextStyle(fontWeight: FontWeight.bold),),
+              Text(
+                timeFormatter.format(_data['timestamp'].toDate()),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           Padding(
@@ -36,10 +46,14 @@ class FollowupListItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
             child: _data['img'] != null
-                ? Image.network(
-                    _data['img'],
-                    height: 96.0,
-                    fit: BoxFit.scaleDown,
+                ? GestureDetector(
+                    onTap: () =>
+                        NavigationHelper.openMedia(context, _data['img']),
+                    child: Image.network(
+                      _data['img'],
+                      height: 96.0,
+                      fit: BoxFit.scaleDown,
+                    ),
                   )
                 : SizedBox(),
           ),

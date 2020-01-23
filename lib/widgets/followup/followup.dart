@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/followup/followup_comment_box.dart';
 import 'package:school_village/widgets/followup/followup_header_item.dart';
+import 'package:school_village/widgets/followup/followup_incident_report_header.dart';
 import 'package:school_village/widgets/followup/followup_list_item.dart';
 
 class Followup extends StatefulWidget {
@@ -21,9 +24,54 @@ class _FollowupState extends State<Followup> {
   @override
   void initState() {
     super.initState();
-    Firestore.instance.document(widget._firestorePath).get().then((snapshot) {
+    Firestore.instance.document(widget._firestorePath).get().then((snapshot) async {
+      if (widget._title.toLowerCase() == 'incident report') {
+        // Flatten incidents
+        await UserHelper.loadIncidentTypes();
+        final Map<String, String> positiveIncidents = UserHelper.positiveIncidents;
+        final Map<String, String> negativeIncidents = UserHelper.negativeIncidents;
+        String flattenedIncidents = '';
+        for(String incident in snapshot.data['incidents']) {
+          if (positiveIncidents.containsKey(incident)) {
+            flattenedIncidents = '$flattenedIncidents${positiveIncidents[incident]}, ';
+          } else if (negativeIncidents.containsKey(incident)) {
+            flattenedIncidents = '$flattenedIncidents${negativeIncidents[incident]}, ';
+          }
+        }
+        if (flattenedIncidents.length > 2) {
+          snapshot.data['flattenedIncidents'] = flattenedIncidents.substring(0, flattenedIncidents.length - 2);
+        } else {
+          snapshot.data['flattenedIncidents'] = 'Missing data';
+        }
+        // Flatten subjects
+        String flattenedSubjects = '';
+        for(String subject in snapshot.data['subjects']) {
+          flattenedSubjects = '$flattenedSubjects$subject, ';
+        }
+        if (flattenedSubjects.length > 2) {
+          snapshot.data['flattenedSubjects'] = flattenedSubjects.substring(0, flattenedSubjects.length - 2);
+        } else {
+          snapshot.data['flattenedSubjects'] = 'Missing data';
+        }
+        // Flatten witnesses
+        String flattenedWitnesses = '';
+        for(String witness in snapshot.data['witnesses']) {
+          flattenedWitnesses = '$flattenedWitnesses$witness, ';
+        }
+        if (flattenedWitnesses.length > 2) {
+          snapshot.data['flattenedWitnesses'] = flattenedWitnesses.substring(0, flattenedWitnesses.length - 2);
+        } else {
+          snapshot.data['flattenedWitnesses'] = 'Missing data';
+        }
+        // Flatten image URL
+        if (snapshot.data['image'] != null) {
+          String url = await FirebaseStorage.instance.ref().child(snapshot.data['image']).getDownloadURL();
+          snapshot.data['flattenedImageUrl'] = url;
+        }
+      }
       setState(() {
         _originalData = snapshot.data;
+
       });
     });
   }
@@ -49,7 +97,7 @@ class _FollowupState extends State<Followup> {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               _originalData != null
-                  ? FollowupHeaderItem(_originalData)
+                  ? widget._title.toLowerCase() != 'incident report' ? FollowupHeaderItem(_originalData) : FollowupIncidentReportHeader(_originalData)
                   : CircularProgressIndicator(),
               StreamBuilder<QuerySnapshot>(
                 stream: Firestore.instance
