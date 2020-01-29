@@ -32,7 +32,7 @@ dependencies:
   package_info: ^0.4.0+3
   video_player: ^0.10.1+3
   modal_progress_hud: ^0.1.3
-  flutter_ffmpeg: ^0.2.1
+  flutter_ffmpeg: ^0.2.10
   progress_hud: ^1.1.0
   mime: ^0.9.6+3
   google_maps_flutter: ^0.5.11
