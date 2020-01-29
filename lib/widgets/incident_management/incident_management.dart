@@ -24,20 +24,21 @@ import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_home.dart';
 import 'package:school_village/widgets/incident_management/incident_message.dart';
 
-
 class IncidentManagement extends StatefulWidget {
   final GlobalKey<_IncidentManagementState> key;
   final SchoolAlert alert;
   final String role;
   final bool resolved;
 
-  IncidentManagement({this.key, this.alert, this.role, this.resolved = false}) : super(key: key);
+  IncidentManagement({this.key, this.alert, this.role, this.resolved = false})
+      : super(key: key);
 
   @override
   createState() => _IncidentManagementState(alert: alert, role: role);
 }
 
-class _IncidentManagementState extends State<IncidentManagement> implements OnMapInterface {
+class _IncidentManagementState extends State<IncidentManagement>
+    implements OnMapInterface {
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
@@ -54,14 +55,17 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   Map<String, dynamic> _mapData;
 
   _IncidentManagementState({this.alert, this.role}) {
-    this.markers = Set.from([Marker(
-        markerId: MarkerId(alert.createdById),
-        position: LatLng(alert.location.latitude, alert.location.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        infoWindow: InfoWindow(
-            title: alert.title,
-            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}"
-        ))]);
+    this.markers = Set.from([
+      Marker(
+          markerId: MarkerId(alert.createdById),
+          position: LatLng(alert.location.latitude, alert.location.longitude),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          infoWindow: InfoWindow(
+              title: alert.title,
+              snippet:
+                  "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}"))
+    ]);
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -69,29 +73,39 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   void _onSchoolMap() {
-    PdfHandler.showPdfFile(context, _mapData["location"], _mapData["title"], connectedFiles: _mapData["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList());
+    PdfHandler.showPdfFile(context, _mapData["location"], _mapData["title"],
+        connectedFiles: _mapData["connectedFiles"]
+            .map<Map<String, dynamic>>(
+                (untyped) => Map<String, dynamic>.from(untyped))
+            .toList());
   }
 
   void _onSop() async {
-    DocumentSnapshot schoolData = await Firestore.instance.document(_schoolId).get();
+    DocumentSnapshot schoolData =
+        await Firestore.instance.document(_schoolId).get();
     if (schoolData["sop"][alert.type] != null) {
-      PdfHandler.showPdfFile(context, schoolData["sop"][alert.type]["location"], schoolData["sop"][alert.type]["title"]);
+      PdfHandler.showPdfFile(context, schoolData["sop"][alert.type]["location"],
+          schoolData["sop"][alert.type]["title"]);
     } else {
-      PdfHandler.showPdfFile(context, schoolData["sop"]["other"]["location"], schoolData["sop"]["other"]["title"]);
+      PdfHandler.showPdfFile(context, schoolData["sop"]["other"]["location"],
+          schoolData["sop"]["other"]["title"]);
     }
   }
 
   void _showStopAlert() async {
     String closureComment = await _showStopAlertAsync();
     if (closureComment != null) {
-      final String finalMessage = closureComment.isEmpty ? "Incident closed without resolution message" : closureComment;
+      final String finalMessage = closureComment.isEmpty
+          ? "Incident closed without resolution message"
+          : closureComment;
       final String author = UserHelper.getDisplayName(_userSnapshot);
       Firestore.instance.runTransaction((transaction) {
-        DocumentReference alertRef = Firestore.instance.document("$_schoolId/notifications/${alert.id}");
+        DocumentReference alertRef =
+            Firestore.instance.document("$_schoolId/notifications/${alert.id}");
         return transaction.update(alertRef, {
-          "endedAt" : FieldValue.serverTimestamp(),
-          "resolution" : finalMessage,
-          "resolvedBy" : author,
+          "endedAt": FieldValue.serverTimestamp(),
+          "resolution": finalMessage,
+          "resolvedBy": author,
         });
       }).then((_) {
         Navigator.pop(context);
@@ -112,9 +126,7 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   void _showTalkAround() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => TalkAroundHome()
-      ),
+      MaterialPageRoute(builder: (context) => TalkAroundHome()),
     );
   }
 
@@ -123,8 +135,11 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-            editable: role == 'school_admin' || role == 'school_security' || role == 'pd_fire_ems' || role == 'district',
-          )),
+                editable: role == 'school_admin' ||
+                    role == 'school_security' ||
+                    role == 'pd_fire_ems' ||
+                    role == 'district',
+              )),
     );
   }
 
@@ -132,7 +147,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     if (snapshot.isEmpty) {
       return;
     }
-    if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/notifications').path) {
+    if (snapshot.first.document.reference.parent().path ==
+        Firestore.instance.collection('$_schoolId/notifications').path) {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
             data.document["title"],
@@ -147,11 +163,15 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
             data.document["location"]["longitude"]);
       }).toList();
       _fullList.addAll(newList);
-    } else if (snapshot.first.document.reference.parent().path == Firestore.instance.collection('$_schoolId/broadcasts').path) {
+    } else if (snapshot.first.document.reference.parent().path ==
+        Firestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
-        Map<String, bool> targetGroups = Map<String, bool>.from(item.document.data['groups']);
-        for(String key in targetGroups.keys) {
-          if (this._broadcastGroupData.containsKey(key) && this._broadcastGroupData[key] && targetGroups[key]) {
+        Map<String, bool> targetGroups =
+            Map<String, bool>.from(item.document.data['groups']);
+        for (String key in targetGroups.keys) {
+          if (this._broadcastGroupData.containsKey(key) &&
+              this._broadcastGroupData[key] &&
+              targetGroups[key]) {
             return false;
           }
         }
@@ -159,8 +179,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       });
       List<TalkAroundMessage> newList = snapshot.map((data) {
         String channel = "";
-        Map<String, bool> broadcastGroup = Map<String, bool>.from(data.document["groups"]);
-        for(String key in broadcastGroup.keys) {
+        Map<String, bool> broadcastGroup =
+            Map<String, bool>.from(data.document["groups"]);
+        for (String key in broadcastGroup.keys) {
           if (broadcastGroup[key]) {
             channel += "$key, ";
           }
@@ -180,15 +201,20 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       }).toList();
       _fullList.addAll(newList);
     } else {
-      List<TalkAroundMessage> newList = await Future.wait(snapshot.map((data) async {
-        final DocumentSnapshot channelSnapshot = await data.document.reference.parent().parent().get();
-        final TalkAroundChannel channel = TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
+      List<TalkAroundMessage> newList =
+          await Future.wait(snapshot.map((data) async {
+        final DocumentSnapshot channelSnapshot =
+            await data.document.reference.parent().parent().get();
+        final TalkAroundChannel channel =
+            TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
         return TalkAroundMessage(
             "Channel Message",
             data.document.documentID,
-            channel.groupConversationName("${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}"),
+            channel.groupConversationName(
+                "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}"),
             data.document["body"],
-            DateTime.fromMicrosecondsSinceEpoch(data.document["timestamp"].microsecondsSinceEpoch),
+            DateTime.fromMicrosecondsSinceEpoch(
+                data.document["timestamp"].microsecondsSinceEpoch),
             data.document["author"],
             data.document["authorId"],
             data.document["reportedByPhone"],
@@ -197,7 +223,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       }).toList());
       _fullList.addAll(newList);
     }
-    _fullList.sort((message1, message2) => message2.timestamp.millisecondsSinceEpoch - message1.timestamp.millisecondsSinceEpoch);
+    _fullList.sort((message1, message2) =>
+        message2.timestamp.millisecondsSinceEpoch -
+        message1.timestamp.millisecondsSinceEpoch);
     markers.clear();
     markers.add(Marker(
         markerId: MarkerId(alert.createdById),
@@ -205,18 +233,15 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         infoWindow: InfoWindow(
             title: alert.title,
-            snippet: "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}"
-        )));
-    for(TalkAroundMessage message in _fullList) {
+            snippet:
+                "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}")));
+    for (TalkAroundMessage message in _fullList) {
       if (message.latitude != null && message.longitude != null) {
         markers.add(Marker(
             markerId: MarkerId(message.authorId),
             position: LatLng(message.latitude, message.longitude),
-            infoWindow: InfoWindow(
-                title: message.author,
-                snippet: message.message
-            )
-        ));
+            infoWindow:
+                InfoWindow(title: message.author, snippet: message.message)));
       }
     }
     setState(() {
@@ -228,7 +253,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
-      DocumentSnapshot schoolDocument = await Firestore.instance.document(schoolId).get();
+      DocumentSnapshot schoolDocument =
+          await Firestore.instance.document(schoolId).get();
       _mapData = _getMapData(schoolDocument);
       _schoolAddress = schoolDocument.data['address'];
     }
@@ -236,7 +262,9 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
-        _broadcastGroupData = Map<String, bool>.from(user.data['associatedSchools'][schoolId.substring(schoolId.indexOf('/') + 1)]['groups']);
+        _broadcastGroupData = Map<String, bool>.from(
+            user.data['associatedSchools']
+                [schoolId.substring(schoolId.indexOf('/') + 1)]['groups']);
         _isLoading = false;
       });
       getConversationDetails();
@@ -244,8 +272,12 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   }
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
-    final List<Map<String, dynamic>> documents = snapshot["documents"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList();
-    final Map<String, dynamic> map = documents.firstWhere((document) => document["category"] == "MAP", orElse: null);
+    final List<Map<String, dynamic>> documents = snapshot["documents"]
+        .map<Map<String, dynamic>>(
+            (untyped) => Map<String, dynamic>.from(untyped))
+        .toList();
+    final Map<String, dynamic> map = documents
+        .firstWhere((document) => document["category"] == "MAP", orElse: null);
     return map;
   }
 
@@ -276,7 +308,8 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
               "alert-resolved-identifier",
               "",
               "${snapshot.data["resolution"] != null ? snapshot.data["resolution"] : "This incident has been resolved and closed."}",
-              DateTime.fromMillisecondsSinceEpoch(snapshot.data["endedAt"].millisecondsSinceEpoch),
+              DateTime.fromMillisecondsSinceEpoch(
+                  snapshot.data["endedAt"].millisecondsSinceEpoch),
               snapshot.data["resolvedBy"] ?? "SCHOOL VILLAGE SYSTEM",
               "",
               null,
@@ -289,50 +322,65 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
         }
       });
     }
-    Query userMessageChannels = Firestore.instance.collection('$_schoolId/messages').where("roles", arrayContains: role);
+    Query userMessageChannels = Firestore.instance
+        .collection('$_schoolId/messages')
+        .where("roles", arrayContains: role);
     QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.documents.forEach((channelDocument) {
       if (alert.resolved) {
-        messageStreamGroup.add(
-            channelDocument.reference.collection("messages")
-                .where("timestamp", isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestamp.millisecondsSinceEpoch))
-                .where("timestamp", isLessThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestampEnded.millisecondsSinceEpoch))
-                .snapshots());
+        messageStreamGroup.add(channelDocument.reference
+            .collection("messages")
+            .where("timestamp",
+                isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(
+                    alert.timestamp.millisecondsSinceEpoch))
+            .where("timestamp",
+                isLessThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(
+                    alert.timestampEnded.millisecondsSinceEpoch))
+            .snapshots());
       } else {
-        messageStreamGroup.add(
-            channelDocument.reference.collection("messages")
-                .where("timestamp", isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(alert.timestamp.millisecondsSinceEpoch))
-                .snapshots());
+        messageStreamGroup.add(channelDocument.reference
+            .collection("messages")
+            .where("timestamp",
+                isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(
+                    alert.timestamp.millisecondsSinceEpoch))
+            .snapshots());
       }
     });
     if (alert.resolved) {
       // Broadcast messages
-      messageStreamGroup.add(
-          Firestore.instance.collection('$_schoolId/broadcasts')
-              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-              .where("createdAt", isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
-              .snapshots());
+      messageStreamGroup.add(Firestore.instance
+          .collection('$_schoolId/broadcasts')
+          .where("createdAt",
+              isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+          .where("createdAt",
+              isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
+          .snapshots());
       // Alerts
-      messageStreamGroup.add(
-          Firestore.instance.collection('$_schoolId/notifications')
-              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-              .where("createdAt", isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
-              .snapshots());
+      messageStreamGroup.add(Firestore.instance
+          .collection('$_schoolId/notifications')
+          .where("createdAt",
+              isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+          .where("createdAt",
+              isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
+          .snapshots());
     } else {
       // Broadcast messages
-      messageStreamGroup.add(
-          Firestore.instance.collection('$_schoolId/broadcasts')
-              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-              .snapshots());
+      messageStreamGroup.add(Firestore.instance
+          .collection('$_schoolId/broadcasts')
+          .where("createdAt",
+              isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+          .snapshots());
       // Alerts
-      messageStreamGroup.add(
-          Firestore.instance.collection('$_schoolId/notifications')
-              .where("createdAt", isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
-              .snapshots());
+      messageStreamGroup.add(Firestore.instance
+          .collection('$_schoolId/notifications')
+          .where("createdAt",
+              isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
+          .snapshots());
     }
     _messageStream = messageStreamGroup.stream.listen((data) {
-      data.documentChanges.removeWhere((item) => item.type != DocumentChangeType.added);
+      data.documentChanges
+          .removeWhere((item) => item.type != DocumentChangeType.added);
       onMessagesChanged(data.documentChanges);
     });
   }
@@ -355,15 +403,18 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
   @override
   void onMapClicked(TalkAroundMessage message) {
     final messageMap = {
-      'location' : {
-        'latitude' : message.latitude,
-        'longitude' : message.longitude
+      'location': {
+        'latitude': message.latitude,
+        'longitude': message.longitude
       },
-      'createdBy' : message.author,
-      'createdAt' : message.timestamp.millisecondsSinceEpoch,
-      'body' : message.message
+      'createdBy': message.author,
+      'createdAt': message.timestamp.millisecondsSinceEpoch,
+      'body': message.message
     };
-    Navigator.push(context, MaterialPageRoute(builder: (context) => MessageDetail(notification: messageMap)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MessageDetail(notification: messageMap)));
   }
 
   @override
@@ -383,13 +434,10 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                     style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
                 leading: BackButton(color: Colors.grey.shade800),
                 backgroundColor: Colors.grey.shade200,
-                elevation: 0.0
-            ),
+                elevation: 0.0),
             body: Builder(builder: (context) {
               if (_isLoading) {
-                return Center(
-                    child: CircularProgressIndicator()
-                );
+                return Center(child: CircularProgressIndicator());
               } else {
                 return Column(
                   mainAxisSize: MainAxisSize.max,
@@ -399,13 +447,19 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                       child: Container(
                         color: Color.fromARGB(140, 229, 229, 234),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                          child: Row(
-                              children: [
-                                Text("${alert.title}", style: TextStyle(fontSize: 18.0, color: Colors.red, fontWeight: FontWeight.bold)),
-                                Expanded(child: Text("${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}", textAlign: TextAlign.end))
-                              ]
-                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
+                          child: Row(children: [
+                            Text("${alert.title}",
+                                style: TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold)),
+                            Expanded(
+                                child: Text(
+                                    "${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}",
+                                    textAlign: TextAlign.end))
+                          ]),
                         ),
                       ),
                       flex: 2,
@@ -413,7 +467,10 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                     Flexible(
                       child: GoogleMap(
                         onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(target: LatLng(alert.location.latitude, alert.location.longitude), zoom: 16.4),
+                        initialCameraPosition: CameraPosition(
+                            target: LatLng(alert.location.latitude,
+                                alert.location.longitude),
+                            zoom: 16.4),
                         mapType: MapType.satellite,
                         myLocationButtonEnabled: false,
                         indoorViewEnabled: true,
@@ -428,103 +485,157 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                             child: Container(
                               color: Color.fromARGB(140, 229, 229, 234),
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Flexible(child: Container(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                      child: GestureDetector(
-                                        onTap: () {launch("https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");},
-                                        child: Text("${_schoolAddress}",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))
-                                        ),
-                                      ),
-                                    ),
-                                  ),),
-                                  Flexible(child: Container(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                      child: Text(alert.body,
-                                          textAlign: TextAlign.start,
-                                          style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)
-                                      ),
-                                    ),
-                                  ),),
                                   Flexible(
                                     child: Container(
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Text("911 Callback: ",
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
-                                            Text(alert.createdBy,
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(fontSize: 14.0)),
-                                            GestureDetector(
-                                              onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0.0),
-                                                child: Text(alert.reportedByPhoneFormatted,
-                                                    textAlign: TextAlign.start,
-                                                    style: TextStyle(fontSize: 14.0, color: Color.fromARGB(255, 11, 48, 224))),
-                                              ),
-                                            )
-                                          ],
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0, vertical: 4.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            launch(
+                                                "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
+                                          },
+                                          child: Container(
+                                            child: Text("${_schoolAddress}",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14.0,
+                                                    color: Color.fromARGB(
+                                                        255, 11, 48, 224))),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                  _isDifferentReporter() ? Flexible(child: Container(
+                                  Container(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0, vertical: 4.0),
+                                          horizontal: 8.0),
+                                      child: Text(
+                                        "${alert.body}",
+                                        textAlign: TextAlign.start,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.bold),
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 4.0),
                                       child: Row(
                                         children: <Widget>[
-                                          Text("Reported by: ",
+                                          Text("911 Callback: ",
                                               textAlign: TextAlign.start,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 14.0)
-                                          ),
+                                                  fontSize: 14.0)),
                                           Text(alert.createdBy,
+                                              textAlign: TextAlign.start,
                                               style: TextStyle(fontSize: 14.0)),
                                           GestureDetector(
-                                              onTap: () => showContactDialog(context, alert.createdBy, alert.reportedByPhone),
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 4.0, vertical: 0.0),
-                                                child: Text(alert.reportedByPhoneFormatted,
-                                                    style: TextStyle(fontSize: 14.0,
-                                                        color: Color.fromARGB(
-                                                            255, 11, 48, 224))),
-                                              )
+                                            onTap: () => showContactDialog(
+                                                context,
+                                                alert.createdBy,
+                                                alert.reportedByPhone),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 4.0,
+                                                      vertical: 0.0),
+                                              child: Text(
+                                                  alert
+                                                      .reportedByPhoneFormatted,
+                                                  textAlign: TextAlign.start,
+                                                  style: TextStyle(
+                                                      fontSize: 14.0,
+                                                      color: Color.fromARGB(
+                                                          255, 11, 48, 224))),
+                                            ),
                                           )
                                         ],
                                       ),
                                     ),
-                                  ),) : SizedBox(),
+                                  ),
+                                  true
+                                      ? Flexible(
+                                          child: Container(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0,
+                                                      vertical: 0.0),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text("Reported by: ",
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0)),
+                                                  Text(alert.createdBy,
+                                                      style: TextStyle(
+                                                          fontSize: 14.0)),
+                                                  GestureDetector(
+                                                      onTap: () =>
+                                                          showContactDialog(
+                                                              context,
+                                                              alert.createdBy,
+                                                              alert
+                                                                  .reportedByPhone),
+                                                      child: Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 4.0,
+                                                                vertical: 0.0),
+                                                        child: Text(
+                                                            alert
+                                                                .reportedByPhoneFormatted,
+                                                            style: TextStyle(
+                                                                fontSize: 14.0,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        11,
+                                                                        48,
+                                                                        224))),
+                                                      ))
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox(),
                                 ],
                               ),
                             ),
                           ),
-                          _mapData != null ? FlatButton(
-                            child: Image.asset("assets/images/school_map_btn.png", height: 64.0),
-                            onPressed: () {
-                              _onSchoolMap();
-                            },
-                          ): SizedBox(width: 0.0,),
+                          _mapData != null
+                              ? FlatButton(
+                                  child: Image.asset(
+                                      "assets/images/school_map_btn.png",
+                                      height: 56.0),
+                                  onPressed: () {
+                                    _onSchoolMap();
+                                  },
+                                )
+                              : SizedBox(
+                                  width: 0.0,
+                                ),
                         ],
                       ),
                       flex: 4,
                     ),
                     Builder(builder: (context) {
                       if (widget.resolved) {
-                        return Flexible(
-                            child: Container(),
-                            flex: 0
-                        );
+                        return Flexible(child: Container(), flex: 0);
                       } else {
                         return Flexible(
                             child: Container(
@@ -535,71 +646,87 @@ class _IncidentManagementState extends State<IncidentManagement> implements OnMa
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 4.0),
                                         child: Container(
                                             child: GestureDetector(
-                                                child: Image.asset("assets/images/group_message_btn.png", height: 64),
+                                                child: Image.asset(
+                                                    "assets/images/group_message_btn.png",
+                                                    height: 64),
                                                 onTap: _showTalkAround),
-                                            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 4.0,
+                                                horizontal: 8.0)),
                                       ),
                                       Spacer(),
                                       Container(
                                           child: GestureDetector(
-                                              child: Image.asset("assets/images/broadcast_btn.png", height: 64),
+                                              child: Image.asset(
+                                                  "assets/images/broadcast_btn.png",
+                                                  height: 64),
                                               onTap: _showBroadcast),
                                           padding: EdgeInsets.all(4)),
                                       Spacer(),
                                       Container(
                                           child: GestureDetector(
-                                              child: Image.asset("assets/images/sop_btn.png", height: 64),
+                                              child: Image.asset(
+                                                  "assets/images/sop_btn.png",
+                                                  height: 64),
                                               onTap: _onSop),
                                           padding: EdgeInsets.all(4)),
                                       Spacer(),
                                       Container(
                                           child: GestureDetector(
-                                              child: Image.asset("assets/images/stop_sign.png", height: 64),
+                                              child: Image.asset(
+                                                  "assets/images/stop_sign.png",
+                                                  height: 64),
                                               onTap: _showStopAlert),
-                                          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 4.0, horizontal: 8.0)),
                                     ]),
                               ),
                             ),
-                            flex: 4
-                        );
+                            flex: 4);
                       }
                     }),
                     Flexible(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 4.0),
                           child: Row(
                             children: <Widget>[
-                              Text("SECURITY COMMUNICATIONS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                              Text("SECURITY COMMUNICATIONS",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red)),
                               Spacer(),
-                              Text("Time", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
+                              Text("Time",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red))
                             ],
                           ),
                         ),
-                        flex: 1
-                    ),
+                        flex: 1),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 0.0),
                       child: Divider(color: Colors.red),
                     ),
                     Flexible(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 0.0),
                           child: ListView.builder(
                             itemBuilder: _buildListItem,
                             itemCount: _messages.length,
                           ),
                         ),
-                        flex: 10
-                    )
+                        flex: 10)
                   ],
                 );
               }
-            })
-
-        );
+            }));
       },
     );
   }
