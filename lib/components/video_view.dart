@@ -18,12 +18,15 @@ class VideoViewState extends State<VideoView> {
   final String url;
   final double height;
   final double width;
+  Future<void> _videoPlayerInitialization;
 
   VideoPlayerController _controller;
 
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(url);
+    _videoPlayerInitialization = _controller.initialize();
+    _controller.setLooping(true);
   }
 
   VideoViewState({this.url, this.height, this.width});
@@ -35,7 +38,7 @@ class VideoViewState extends State<VideoView> {
       width: this.width,
       child: Stack(children: [
         FutureBuilder(
-          future: _controller.initialize(),
+          future: _videoPlayerInitialization,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return AspectRatio(

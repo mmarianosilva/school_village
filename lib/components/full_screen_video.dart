@@ -13,7 +13,7 @@ class FullScreenVideoView extends StatefulWidget {
 
 class _VideoAppState extends State<FullScreenVideoView> {
   VideoPlayerController _controller;
-  bool _isPlaying = false;
+  Future<void> _initializeVideoPlayer;
   final String url;
   final String message;
 
@@ -22,19 +22,9 @@ class _VideoAppState extends State<FullScreenVideoView> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network('https://www.w3schools.com/html/mov_bbb.mp4')
-      ..addListener(() {
-        final bool isPlaying = _controller.value.isPlaying;
-        if (isPlaying != _isPlaying) {
-          setState(() {
-            _isPlaying = isPlaying;
-          });
-        }
-      })
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
+    _controller = VideoPlayerController.network(url);
+    _initializeVideoPlayer = _controller.initialize();
+    _controller.setLooping(true);
   }
 
   @override
@@ -43,12 +33,12 @@ class _VideoAppState extends State<FullScreenVideoView> {
       title: this.message,
       home: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
           child: Stack(
             children: <Widget>[
               Center(
                 child: FutureBuilder(
-                  future: _controller.initialize(),
+                  future: _initializeVideoPlayer,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       return AspectRatio(
@@ -62,7 +52,6 @@ class _VideoAppState extends State<FullScreenVideoView> {
                 ),
               ),
               IconButton(
-
                 onPressed: () => Navigator.pop(context),
                 icon: Icon(Icons.close),
               )
@@ -70,11 +59,17 @@ class _VideoAppState extends State<FullScreenVideoView> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _controller.value.isPlaying
-              ? _controller.pause
-              : _controller.play,
+          onPressed: () {
+            setState(() {
+              if (_controller.value.isPlaying) {
+                _controller.pause();
+              } else {
+                _controller.play();
+              }
+            });
+          },
           child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow
           ),
         ),
       ),
