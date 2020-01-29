@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
-import 'package:school_village/usecase/upload_image_usecase.dart';
+import 'package:school_village/usecase/upload_file_usecase.dart';
+import 'package:school_village/util/video_helper.dart';
 import 'package:sentry/sentry.dart';
 import '../../util/user_helper.dart';
 
@@ -57,7 +58,7 @@ class _HotlineState extends State<Hotline> {
         });
       }
     });
-
+    getUserDetails();
     super.initState();
   }
 
@@ -208,17 +209,19 @@ class _HotlineState extends State<Hotline> {
       setState(() {
         isLoaded = false;
       });
+      final File uploadFile = _isVideo
+          ? File(VideoHelper.convertedVideoPath(_selectedMedia))
+          : _selectedMedia;
       final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
       firebaseStoragePath = await uploadFileUsecase.uploadFile(
-          '$hotlinePath/${DateTime.now().millisecondsSinceEpoch.toString()}/${_selectedMedia.path.substring(_selectedMedia.parent.path.length + 1)}',
-          _selectedMedia);
-
+          '$hotlinePath/${DateTime.now().millisecondsSinceEpoch.toString()}/${uploadFile.path.substring(uploadFile.parent.path.length + 1)}',
+          uploadFile);
       setState(() {
         isLoaded = true;
       });
     }
 
-    document.setData(<String, dynamic>{
+    document.setData({
       'body': message,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'createdBy': await UserHelper.getSelectedSchoolRole(),
@@ -226,7 +229,6 @@ class _HotlineState extends State<Hotline> {
       'isVideo': _isVideo,
       'media': firebaseStoragePath,
     });
-    print("Added hotline");
 
     showDialog(
         context: context,
@@ -261,13 +263,15 @@ class _HotlineState extends State<Hotline> {
         children: <Widget>[
           Expanded(
             child: Image.file(
-              _selectedMedia,
+              _isVideo
+                  ? File(VideoHelper.thumbnailPath(_selectedMedia))
+                  : _selectedMedia,
               fit: BoxFit.scaleDown,
             ),
           ),
           FlatButton(
             child: Container(
-              padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
                     color: Colors.white70,
                     borderRadius: BorderRadius.circular(8.0)),
@@ -359,6 +363,12 @@ class _HotlineState extends State<Hotline> {
                 File video = await selectImageUsecase.selectVideo();
                 if (video != null) {
                   setState(() {
+                    isLoaded = false;
+                  });
+                  await VideoHelper.buildThumbnail(video);
+                  await VideoHelper.processVideoForUpload(video);
+                  setState(() {
+                    isLoaded = true;
                     _selectedMedia = video;
                     _isVideo = true;
                   });
@@ -431,10 +441,6 @@ class _HotlineState extends State<Hotline> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isLoaded) {
-      getUserDetails();
-    }
-
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: AppBar(

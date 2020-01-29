@@ -15,20 +15,15 @@ class VideoView extends StatefulWidget {
 }
 
 class VideoViewState extends State<VideoView> {
-
   final String url;
   final double height;
   final double width;
 
   VideoPlayerController _controller;
 
-
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(url);
-    _controller.initialize().then((_) {
-      setState(() {});
-    });
   }
 
   VideoViewState({this.url, this.height, this.width});
@@ -39,14 +34,29 @@ class VideoViewState extends State<VideoView> {
       height: this.height,
       width: this.width,
       child: Stack(children: [
-        _controller.value.initialized
-            ? AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: VideoPlayer(_controller),
-            )
-            : Container(),
+        FutureBuilder(
+          future: _controller.initialize(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
         Icon(Icons.play_circle_outline)
       ]),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_controller != null) {
+      _controller.dispose();
+    }
+    super.dispose();
   }
 }

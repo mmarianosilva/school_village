@@ -7,7 +7,7 @@ class UploadFileUsecase {
   FirebaseStorage _storage = FirebaseStorage();
 
   Future<String> uploadFile(String path, File file) async {
-    final StorageReference storagePath = _storage.ref().child(path);
+    final StorageReference storagePath = _storage.ref().child('${path[0]}${path.substring(1)}');
     final StorageUploadTask uploadTask = storagePath.putFile(file);
     final StorageTaskSnapshot result = await uploadTask.onComplete;
     if (result.error == null) {

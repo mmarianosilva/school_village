@@ -22,7 +22,7 @@ class _VideoAppState extends State<FullScreenVideoView> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(url)
+    _controller = VideoPlayerController.network('https://www.w3schools.com/html/mov_bbb.mp4')
       ..addListener(() {
         final bool isPlaying = _controller.value.isPlaying;
         if (isPlaying != _isPlaying) {
@@ -42,13 +42,32 @@ class _VideoAppState extends State<FullScreenVideoView> {
     return MaterialApp(
       title: this.message,
       home: Scaffold(
-        body: Center(
-          child: _controller.value.initialized
-              ? AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                )
-              : Container(),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+          child: Stack(
+            children: <Widget>[
+              Center(
+                child: FutureBuilder(
+                  future: _controller.initialize(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+              IconButton(
+
+                onPressed: () => Navigator.pop(context),
+                icon: Icon(Icons.close),
+              )
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _controller.value.isPlaying
@@ -60,5 +79,13 @@ class _VideoAppState extends State<FullScreenVideoView> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    if (_controller != null) {
+      _controller.dispose();
+    }
+    super.dispose();
   }
 }

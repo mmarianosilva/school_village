@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/components/video_view.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/navigation_helper.dart';
 
+const double _videoWidth = 480;
+const double _videoHeight = 270;
+
 class FollowupListItem extends StatelessWidget {
   final Map<String, dynamic> _data;
+
+  String get _media => _data['media'] != null ? _data['media'] : _data['img'];
 
   FollowupListItem(this._data);
 
@@ -45,15 +51,21 @@ class FollowupListItem extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
-            child: _data['img'] != null
+            child: _media != null
                 ? GestureDetector(
-                    onTap: () =>
-                        NavigationHelper.openMedia(context, _data['img']),
-                    child: Image.network(
-                      _data['img'],
-                      height: 96.0,
-                      fit: BoxFit.scaleDown,
-                    ),
+                    onTap: () => NavigationHelper.openMedia(context, _media,
+                        isVideo: _data['isVideo'] ?? false),
+                    child: _data['isVideo'] ?? false
+                        ? VideoView(
+                            url: _media,
+                            width: _videoWidth,
+                            height: _videoHeight,
+                          )
+                        : Image.network(
+                            _media,
+                            height: 96.0,
+                            fit: BoxFit.scaleDown,
+                          ),
                   )
                 : SizedBox(),
           ),

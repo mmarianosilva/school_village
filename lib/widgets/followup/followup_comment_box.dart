@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
-import 'package:school_village/usecase/upload_image_usecase.dart';
+import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
 
 class FollowupCommentBox extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
-import 'package:school_village/usecase/upload_image_usecase.dart';
+import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';

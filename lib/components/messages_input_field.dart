@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
-import 'package:video_player/video_player.dart';
+import 'package:school_village/util/video_helper.dart';
 
 typedef SendPressed(img, text, isVideo);
 
@@ -21,12 +20,10 @@ class InputField extends StatefulWidget {
 }
 
 class _InputFieldState extends State<InputField> {
-  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   final TextEditingController inputController = TextEditingController();
   final SendPressed sendPressed;
   File image;
   bool isVideoFile;
-  VideoPlayerController _controller;
   File thumbNail;
   bool _loading = false;
 
@@ -56,23 +53,14 @@ class _InputFieldState extends State<InputField> {
   }
 
   _transcodeVideo(File video) async {
-    String path = "${video.path}.mp4";
-    String thumbPath = "${video.path}_thumb.jpg";
     setState(() {
       _loading = true;
     });
 
-    _flutterFFmpeg
-        .execute("-ss 1 -i ${video.path} -vframes 1 $thumbPath")
-        .then((r) {
-      saveImage(File(path), true, File(thumbPath));
+    File thumbnail = await VideoHelper.buildThumbnail(video);
+    File processedVideo = await VideoHelper.processVideoForUpload(video);
 
-      _flutterFFmpeg.execute("-i ${video.path} -s hd480 $path").then((rc) {
-        setState(() {
-          _loading = false;
-        });
-      });
-    });
+    saveImage(processedVideo, true, thumbnail);
   }
 
   void saveImage(File file, bool isVideoFile, File thumb) async {
@@ -81,7 +69,6 @@ class _InputFieldState extends State<InputField> {
       image = file;
       thumbNail = thumb;
     });
-    _initVideoController();
   }
 
   _buildImagePreview() {
@@ -95,7 +82,8 @@ class _InputFieldState extends State<InputField> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Image.file(isVideoFile ? thumbNail : image, height: 120.0, fit: BoxFit.scaleDown),
+                Image.file(isVideoFile ? thumbNail : image,
+                    height: 120.0, fit: BoxFit.scaleDown),
                 SizedBox(width: 16.0),
                 GestureDetector(
                   onTap: () {
@@ -116,54 +104,6 @@ class _InputFieldState extends State<InputField> {
             : SizedBox()
       ],
     );
-  }
-
-  _initVideoController() {
-    _controller = VideoPlayerController.file(image);
-    _controller.initialize().then((_) {
-      setState(() {});
-    });
-  }
-
-  _buildVideoPreview() {
-    return Stack(
-      children: [
-        Container(
-          padding: EdgeInsets.all(4.0),
-          child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                    height: 120,
-                    child: _buildVideoView()),
-                SizedBox(width: 16.0),
-                GestureDetector(
-                  onTap: () {
-                    _removeImage();
-                  },
-                  child: Icon(Icons.remove_circle_outline, color: Colors.red),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  _buildVideoView() {
-    return Center(
-        child: _controller.value.initialized
-            ? GestureDetector(
-                onTap: () {
-                  print('onVideoTap');
-                },
-                child: AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                ))
-            : Container());
   }
 
   clearState() {
@@ -259,26 +199,25 @@ class _InputFieldState extends State<InputField> {
               color: SVColors.talkAroundAccent,
               child: Container(
                   child: TextField(
-                    controller: inputController,
-                    maxLines: null,
-                    style: TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                        hintStyle: TextStyle(color: Colors.grey.shade50),
-                        fillColor: Colors.transparent,
-                        filled: true,
-                        border: InputBorder.none,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            Icons.send,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            sendPressed(
-                                image, inputController.text, thumbNail);
-                          },
-                        ),
-                        hintText: "Type Message..."),
-                  )),
+                controller: inputController,
+                maxLines: null,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    hintStyle: TextStyle(color: Colors.grey.shade50),
+                    fillColor: Colors.transparent,
+                    filled: true,
+                    border: InputBorder.none,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        sendPressed(image, inputController.text, thumbNail);
+                      },
+                    ),
+                    hintText: "Type Message..."),
+              )),
             ),
           ),
         )
