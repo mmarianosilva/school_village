@@ -16,6 +16,8 @@ class _VideoAppState extends State<FullScreenVideoView> {
   Future<void> _initializeVideoPlayer;
   final String url;
   final String message;
+  final GlobalKey<ScaffoldState> _scaffold = GlobalKey<ScaffoldState>();
+  bool _warningDisplayed = false;
 
   _VideoAppState({this.url, this.message});
 
@@ -32,6 +34,7 @@ class _VideoAppState extends State<FullScreenVideoView> {
     return MaterialApp(
       title: this.message,
       home: Scaffold(
+        key: _scaffold,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
           child: Stack(
@@ -59,7 +62,18 @@ class _VideoAppState extends State<FullScreenVideoView> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
+            if (!_warningDisplayed) {
+              _scaffold.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Depending on the size of the video, it might take up to a minute to start.',
+                  ),
+                  duration: Duration(seconds: 3),
+                ),
+              );
+              _warningDisplayed = true;
+            }
             setState(() {
               if (_controller.value.isPlaying) {
                 _controller.pause();
@@ -69,8 +83,7 @@ class _VideoAppState extends State<FullScreenVideoView> {
             });
           },
           child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow
-          ),
+              _controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
         ),
       ),
     );
