@@ -13,8 +13,7 @@ class FollowupCommentBox extends StatefulWidget {
   FollowupCommentBox(this._firestorePath);
 
   @override
-  _FollowupCommentBoxState createState() =>
-      _FollowupCommentBoxState();
+  _FollowupCommentBoxState createState() => _FollowupCommentBoxState();
 }
 
 class _FollowupCommentBoxState extends State<FollowupCommentBox> {
@@ -22,6 +21,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
 
   File _selectedPhoto;
   DocumentSnapshot _userDoc;
+  bool _busy = false;
 
   @override
   void initState() {
@@ -42,65 +42,97 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white70,
+        color: Colors.white,
         border: Border.all(color: Colors.grey[500], width: 1.0),
       ),
       padding: const EdgeInsets.all(8.0),
-        child: Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            _userDoc != null ? Text('${_userDoc['firstName']} ${_userDoc['lastName']}') : Text('...'),
-            Spacer(),
-            Text('Date'),
-            Spacer(),
-            Text('Time'),
-          ],
-        ),
-        Container(
-          child: TextField(
-            controller: _inputController,
-            decoration: InputDecoration(
-              hintText: 'Add comment',
-            ),
-          ),
-        ),
-        _selectedPhoto != null
-            ? Container(
-                height: 96.0,
-                child: Image.file(
-                  _selectedPhoto,
-                  fit: BoxFit.scaleDown,
+      child: Stack(
+        children: <Widget>[
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  _userDoc != null
+                      ? Text('${_userDoc['firstName']} ${_userDoc['lastName']}')
+                      : Text('...'),
+                  Spacer(),
+                  Text('Date'),
+                  Spacer(),
+                  Text('Time'),
+                ],
+              ),
+              Container(
+                child: TextField(
+                  controller: _inputController,
+                  decoration: InputDecoration(
+                    hintText: 'Add comment',
+                  ),
                 ),
+              ),
+              _selectedPhoto != null
+                  ? Container(
+                      height: 96.0,
+                      child: Image.file(
+                        _selectedPhoto,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    )
+                  : SizedBox(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      'Clear',
+                      style: TextStyle(color: Colors.blueAccent),
+                    ),
+                    onPressed: _onClear,
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'Add',
+                      style: TextStyle(color: Colors.blueAccent),
+                    ),
+                    onPressed: _onAdd,
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.add_a_photo,
+                      color: Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      _onTakePhoto();
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.add_photo_alternate,
+                      color: Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      _onSelectPhoto();
+                    },
+                  )
+                ],
               )
-            : SizedBox(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            FlatButton(
-              child: Text('Clear', style: TextStyle(color: Colors.blueAccent),),
-              onPressed: _onClear,
+            ],
+          ),
+          _busy
+              ? Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white70,
+              ),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
-            FlatButton(
-              child: Text('Add', style: TextStyle(color: Colors.blueAccent),),
-              onPressed: _onAdd,
-            ),
-            IconButton(
-              icon: Icon(Icons.add_a_photo, color: Colors.blueAccent,),
-              onPressed: () {
-                _onTakePhoto();
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.add_photo_alternate, color: Colors.blueAccent,),
-              onPressed: () {
-                _onSelectPhoto();
-              },
-            )
-          ],
-        )
-      ],
-    ));
+          )
+              : SizedBox(),
+        ],
+      ),
+    );
   }
 
   Future<void> _onTakePhoto() async {
@@ -125,26 +157,39 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
 
   Future<void> _onAdd() async {
     assert(_userDoc != null);
-    final String body = _inputController.text;
-    final String path = '${widget._firestorePath}/followup';
-    String uploadUri;
-    if (_selectedPhoto != null) {
-      final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
-      uploadUri = await uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto);
+    if (_inputController.text.isEmpty && _selectedPhoto == null) {
+      return;
     }
-    await Firestore.instance.collection(path).add({
-      'createdById' : _userDoc.documentID,
-      'createdBy' : "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
-      'img' : uploadUri,
-      'timestamp' : FieldValue.serverTimestamp(),
-      'body' : body,
+    setState(() {
+      _busy = true;
     });
-    _onClear();
+    try {
+      final String body = _inputController.text;
+      final String path = '${widget._firestorePath}/followup';
+      String uploadUri;
+      if (_selectedPhoto != null) {
+        final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        uploadUri = await uploadFileUsecase.uploadFile(
+            '$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto);
+      }
+      await Firestore.instance.collection(path).add({
+        'createdById': _userDoc.documentID,
+        'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+        'img': uploadUri,
+        'timestamp': FieldValue.serverTimestamp(),
+        'body': body,
+      });
+    } on Exception catch (ex) {
+      debugPrint('${ex.toString()}');
+    } finally {
+      _onClear();
+    }
   }
 
   void _onClear() {
     _inputController.clear();
     setState(() {
+      _busy = false;
       _selectedPhoto = null;
     });
   }
