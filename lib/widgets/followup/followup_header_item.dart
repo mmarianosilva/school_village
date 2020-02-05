@@ -4,7 +4,7 @@ import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/navigation_helper.dart';
 
 const double _videoWidth = 480;
-const double _videoHeight = 270;
+const double _videoHeight = 96;
 
 class FollowupHeaderItem extends StatelessWidget {
   final Map<String, dynamic> _data;
