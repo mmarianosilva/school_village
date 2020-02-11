@@ -80,48 +80,44 @@ class _HotLineListState extends State<HotLineList> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  Followup('Anonymous Hotline Log', document.reference.path))),
+                              builder: (BuildContext context) => Followup(
+                                  'Anonymous Hotline Log',
+                                  document.reference.path))),
                       child: Container(
-                        child:
-                            Column(mainAxisSize: MainAxisSize.min, children: <
-                                Widget>[
-                          Container(
-                            padding: EdgeInsets.only(
-                                left: 8.0, right: 8.0, top: 8.0),
-                            alignment: Alignment.centerLeft,
-                            child: Text(document['body'] + ""),
-                          ),
-                          new Container(
-                            padding: EdgeInsets.only(
-                                left: 8.0, right: 8.0, top: 2.0, bottom: 2.0),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                                "${dateFormatting.messageDateFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}",
-                                style: TextStyle(
-                                    fontSize: 12.0,
-                                    fontStyle: FontStyle.italic)),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Flexible(
-                                flex: 1,
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                      left: 8.0, right: 8.0, bottom: 8.0),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(document['createdBy'] ?? '',
-                                      style: TextStyle(
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                              Flexible(
-                                flex: 1,
-                                child: Container(
-                                    padding: EdgeInsets.only(
-                                        left: 8.0, right: 8.0, bottom: 8.0),
-                                    alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text(document['createdBy'],
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                Spacer(),
+                                Text(
+                                    dateFormatting.dateFormatter.format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            document['createdAt'])),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                Spacer(),
+                                Text(
+                                    dateFormatting.timeFormatter.format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            document['createdAt'])),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(document['body']),
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Container(
                                     child: FutureBuilder(
                                       future: Firestore.instance
                                           .document(document['schoolId'] ?? '')
@@ -131,17 +127,48 @@ class _HotLineListState extends State<HotLineList> {
                                               schoolData) =>
                                           Text(
                                               schoolData.hasData
-                                                  ? schoolData.data['name'] ??
-                                                      ''
+                                                  ? schoolData.data['name'] ?? ''
                                                   : '',
                                               style: TextStyle(
                                                   fontSize: 12.0,
                                                   fontWeight: FontWeight.bold)),
-                                    )),
-                              ),
-                            ],
-                          ),
-                        ]),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    child: FutureBuilder(
+                                      future: Firestore.instance
+                                          .collection(
+                                              '${document.reference.path}/followup')
+                                          .getDocuments(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<QuerySnapshot> data) {
+                                        if (data.hasData) {
+                                          return Text(
+                                            'Follow-up ${data.data.documents.length}',
+                                            style:
+                                                TextStyle(color: Colors.blueAccent),
+                                          );
+                                        }
+                                        return Text('');
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                document['media'] != null
+                                    ? document['isVideo'] ?? false
+                                        ? Icon(
+                                            Icons.videocam,
+                                            color: Colors.blueAccent,
+                                          )
+                                        : Icon(Icons.photo_size_select_actual,
+                                            color: Colors.blueAccent)
+                                    : SizedBox(),
+                              ],
+                            ),
+                          ],
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(4.0),

@@ -245,7 +245,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View All'),
+              child: Text('View Log'),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -285,7 +285,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View All'),
+              child: Text('View Log'),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
