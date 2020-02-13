@@ -60,125 +60,168 @@ class _HotLineListState extends State<HotLineList> {
       ),
       body: !isLoaded
           ? Text("Loading...")
-          : StreamBuilder(
-              stream: Firestore.instance
-                  .collection("schools/$_schoolId/hotline")
-                  .orderBy("createdAt", descending: true)
-                  .snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (!snapshot.hasData) return const Text('Loading...');
-                final int messageCount = snapshot.data.documents.length;
-                print(messageCount);
-                return ListView.builder(
-                  itemCount: messageCount,
-                  itemBuilder: (_, int index) {
-                    final DocumentSnapshot document =
-                        snapshot.data.documents[index];
-                    debugPrint(document['body']);
+          : Stack(
+              children: <Widget>[
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("schools/$_schoolId/hotline")
+                        .orderBy("createdAt", descending: true)
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      if (!snapshot.hasData) return const Text('Loading...');
+                      final int messageCount = snapshot.data.documents.length;
+                      print(messageCount);
+                      return ListView.builder(
+                        itemCount: messageCount,
+                        itemBuilder: (_, int index) {
+                          final DocumentSnapshot document =
+                              snapshot.data.documents[index];
+                          debugPrint(document['body']);
 
-                    return GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) => Followup(
-                                  'Anonymous Hotline Log',
-                                  document.reference.path))),
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text(document['createdBy'],
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                Spacer(),
-                                Text(
-                                    dateFormatting.dateFormatter.format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            document['createdAt'])),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                Spacer(),
-                                Text(
-                                    dateFormatting.timeFormatter.format(
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            document['createdAt'])),
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(document['body']),
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container(
-                                    child: FutureBuilder(
-                                      future: Firestore.instance
-                                          .document(document['schoolId'] ?? '')
-                                          .get(),
-                                      initialData: document,
-                                      builder: (BuildContext context,
-                                              schoolData) =>
-                                          Text(
-                                              schoolData.hasData
-                                                  ? schoolData.data['name'] ?? ''
-                                                  : '',
-                                              style: TextStyle(
-                                                  fontSize: 12.0,
-                                                  fontWeight: FontWeight.bold)),
-                                    ),
-                                  ),
+                          return GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) => Followup(
+                                        'Anonymous Hotline Log',
+                                        document.reference.path))),
+                            child: Card(
+                              margin: EdgeInsets.all(4.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(4.0),
                                 ),
-                                Expanded(
-                                  child: Container(
-                                    child: FutureBuilder(
-                                      future: Firestore.instance
-                                          .collection(
-                                              '${document.reference.path}/followup')
-                                          .getDocuments(),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<QuerySnapshot> data) {
-                                        if (data.hasData) {
-                                          return Text(
-                                            'Follow-up ${data.data.documents.length}',
-                                            style:
-                                                TextStyle(color: Colors.blueAccent),
-                                          );
-                                        }
-                                        return Text('');
-                                      },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Text(document['createdBy'],
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        Spacer(),
+                                        Text(
+                                            dateFormatting.dateFormatter.format(
+                                                DateTime
+                                                    .fromMillisecondsSinceEpoch(
+                                                        document['createdAt'])),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        Spacer(),
+                                        Text(
+                                            dateFormatting.timeFormatter.format(
+                                                DateTime
+                                                    .fromMillisecondsSinceEpoch(
+                                                        document['createdAt'])),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ],
                                     ),
-                                  ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: Text(document['body']),
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            child: FutureBuilder(
+                                              future: Firestore.instance
+                                                  .document(
+                                                      document['schoolId'] ??
+                                                          '')
+                                                  .get(),
+                                              initialData: document,
+                                              builder: (BuildContext context,
+                                                      schoolData) =>
+                                                  Text(
+                                                      schoolData.hasData
+                                                          ? schoolData.data[
+                                                                  'name'] ??
+                                                              ''
+                                                          : '',
+                                                      style: TextStyle(
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: FutureBuilder(
+                                              future: Firestore.instance
+                                                  .collection(
+                                                      '${document.reference.path}/followup')
+                                                  .getDocuments(),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<QuerySnapshot>
+                                                      data) {
+                                                if (data.hasData) {
+                                                  return Text(
+                                                    'Follow-up ${data.data.documents.length}',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.blueAccent),
+                                                  );
+                                                }
+                                                return Text('');
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        document['media'] != null
+                                            ? document['isVideo'] ?? false
+                                                ? Icon(
+                                                    Icons.videocam,
+                                                    color: Colors.blueAccent,
+                                                    size: 24.0,
+                                                  )
+                                                : Icon(
+                                                    Icons
+                                                        .photo_size_select_actual,
+                                                    color: Colors.blueAccent,
+                                                    size: 24.0,
+                                                  )
+                                            : SizedBox(
+                                                width: 24.0,
+                                              ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                document['media'] != null
-                                    ? document['isVideo'] ?? false
-                                        ? Icon(
-                                            Icons.videocam,
-                                            color: Colors.blueAccent,
-                                          )
-                                        : Icon(Icons.photo_size_select_actual,
-                                            color: Colors.blueAccent)
-                                    : SizedBox(),
-                              ],
+                              ),
                             ),
+                          );
+                        },
+                      );
+                    }),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 96.0,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromARGB(0, 255, 255, 255),
+                            Color.fromARGB(255, 255, 255, 255)
                           ],
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        margin: EdgeInsets.all(8.0),
                       ),
-                    );
-                  },
-                );
-              }),
+                    ),
+                  ),
+                )
+              ],
+            ),
     );
   }
 }
