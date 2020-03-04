@@ -4,12 +4,11 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:school_village/util/date_formatter.dart';
-import 'package:school_village/util/pdf_handler.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
+import 'package:school_village/util/date_formatter.dart';
+import 'package:school_village/util/pdf_handler.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/model/school_alert.dart';
@@ -23,6 +22,7 @@ import 'package:school_village/widgets/talk_around/message_details/message_detai
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_home.dart';
 import 'package:school_village/widgets/incident_management/incident_message.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class IncidentManagement extends StatefulWidget {
   final GlobalKey<_IncidentManagementState> key;
@@ -429,7 +429,7 @@ class _IncidentManagementState extends State<IncidentManagement>
       builder: (context, child, model) {
         return Scaffold(
             appBar: BaseAppBar(
-                title: Text("Incident Dashboard",
+                title: Text(localize("Incident Dashboard"),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
                 leading: BackButton(color: Colors.grey.shade800),
@@ -531,7 +531,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                           horizontal: 8.0, vertical: 4.0),
                                       child: Row(
                                         children: <Widget>[
-                                          Text("911 Callback: ",
+                                          Text(localize("911 Callback: "),
                                               textAlign: TextAlign.start,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
@@ -573,7 +573,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                                       vertical: 0.0),
                                               child: Row(
                                                 children: <Widget>[
-                                                  Text("Reported by: ",
+                                                  Text(localize("Reported by: "),
                                                       textAlign:
                                                           TextAlign.start,
                                                       style: TextStyle(
@@ -695,12 +695,12 @@ class _IncidentManagementState extends State<IncidentManagement>
                               horizontal: 16.0, vertical: 4.0),
                           child: Row(
                             children: <Widget>[
-                              Text("SECURITY COMMUNICATIONS",
+                              Text(localize("SECURITY COMMUNICATIONS"),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.red)),
                               Spacer(),
-                              Text("Time",
+                              Text(localize("Time"),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.red))

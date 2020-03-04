@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class CloseIncidentManagementAlert extends StatelessWidget {
   final TextEditingController _incidentReportController = TextEditingController();
@@ -25,7 +26,7 @@ class CloseIncidentManagementAlert extends StatelessWidget {
                       child: Container(
                           padding: EdgeInsets.all(8.0),
                           child: Text(
-                              "This will terminate the Incident Management Phase",
+                              localize("This will terminate the Incident Management Phase", context),
                               maxLines: 2,
                               style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500))
                       )
@@ -34,18 +35,18 @@ class CloseIncidentManagementAlert extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
-                child: Text("This will declare the Incident Management phase of this event to be complete. The Management Dashboard will close and the tracking of Incident Management communications will terminate. Any final instructions to Responders should be broadcasted via Broadcast Messaging prior to terminating.", maxLines: null),
+                child: Text(localize("This will declare the Incident Management phase of this event to be complete. The Management Dashboard will close and the tracking of Incident Management communications will terminate. Any final instructions to Responders should be broadcasted via Broadcast Messaging prior to terminating.", context), maxLines: null),
               ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
-                child: Text("Do you wish to Terminate?", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(localize("Do you wish to Terminate?", context), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: TextField(
                   controller: _incidentReportController,
                   decoration: InputDecoration(
-                    hintText: "Describe the incident resolution to let others know why it's being closed"
+                    hintText: localize("Describe the incident resolution to let others know why it's being closed", context),
                   ),
                   maxLines: null,
                 ),
@@ -66,7 +67,7 @@ class CloseIncidentManagementAlert extends StatelessWidget {
                         padding: EdgeInsets.all(4.0),
                         width: 80.0,
                         child: Center(
-                            child: Text("No".toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18.0),)
+                            child: Text(localize("No", context).toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18.0),)
                         ),
                       )
                   ),
@@ -82,7 +83,7 @@ class CloseIncidentManagementAlert extends StatelessWidget {
                         padding: EdgeInsets.all(4.0),
                         width: 80.0,
                         child: Center(
-                            child: Text("Yes".toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18.0),)
+                            child: Text(localize("Yes", context).toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18.0),)
                         ),
                       )
                   )

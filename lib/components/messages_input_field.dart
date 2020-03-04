@@ -6,6 +6,7 @@ import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/video_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 typedef SendPressed(img, text, isVideo);
 
@@ -126,12 +127,12 @@ class _InputFieldState extends State<InputField> {
             padding: EdgeInsets.all(10.0),
             child: Column(children: [
               Text(
-                'Pick an Image',
+                localize('Pick an Image'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               FlatButton(
                 textColor: SVColors.talkAroundAccent,
-                child: Text('Use Camera'),
+                child: Text(localize('Use Camera')),
                 onPressed: () {
                   Navigator.pop(context);
                   _getImage(context, ImageSource.camera, false);
@@ -139,7 +140,7 @@ class _InputFieldState extends State<InputField> {
               ),
               FlatButton(
                 textColor: SVColors.talkAroundAccent,
-                child: Text('Use Gallery'),
+                child: Text(localize('Use Gallery')),
                 onPressed: () {
                   Navigator.pop(context);
                   _getImage(context, ImageSource.gallery, false);
@@ -149,12 +150,12 @@ class _InputFieldState extends State<InputField> {
                 height: 20.0,
               ),
               Text(
-                'Pick a Video',
+                localize('Pick a Video'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               FlatButton(
                 textColor: SVColors.talkAroundAccent,
-                child: Text('Use Camera'),
+                child: Text(localize('Use Camera')),
                 onPressed: () {
                   Navigator.pop(context);
                   _getImage(context, ImageSource.camera, true);
@@ -162,7 +163,7 @@ class _InputFieldState extends State<InputField> {
               ),
               FlatButton(
                 textColor: SVColors.talkAroundAccent,
-                child: Text('Use Gallery'),
+                child: Text(localize('Use Gallery')),
                 onPressed: () {
                   Navigator.pop(context);
                   _getImage(context, ImageSource.gallery, true);
@@ -216,7 +217,7 @@ class _InputFieldState extends State<InputField> {
                         sendPressed(image, inputController.text, thumbNail);
                       },
                     ),
-                    hintText: "Type Message..."),
+                    hintText: localize("Type Message...")),
               )),
             ),
           ),

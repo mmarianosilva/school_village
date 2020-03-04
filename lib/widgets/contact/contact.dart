@@ -1,36 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
-import 'dart:async';
+import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Contact extends StatefulWidget {
   @override
-  _ContactState createState() => new _ContactState();
+  _ContactState createState() => _ContactState();
 }
 
 class _ContactState extends State<Contact> {
 
-  final emailController = new TextEditingController();
-  final fNameController = new TextEditingController();
-  final lNameController = new TextEditingController();
-  final schoolController = new TextEditingController();
-  final phoneController = new TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final emailController = TextEditingController();
+  final fNameController = TextEditingController();
+  final lNameController = TextEditingController();
+  final schoolController = TextEditingController();
+  final phoneController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "School Village";
 
   onRequest() {
     _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content:
-        new Row(
+        SnackBar(content:
+        Row(
           children: <Widget>[
-            new CircularProgressIndicator(),
-            new Text("Requesting in")
+            CircularProgressIndicator(),
+            Text(localize("Requesting in"))
           ],
         ),
-          duration: new Duration(milliseconds: 30000),
+          duration: Duration(milliseconds: 30000),
         )
     );
 
@@ -57,78 +54,78 @@ class _ContactState extends State<Contact> {
   @override
   Widget build(BuildContext context) {
 
-    return new Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
-        appBar: new BaseAppBar(
-            title: new Text(title,
+        appBar: BaseAppBar(
+            title: Text(title,
                 textAlign: TextAlign.center,
-                style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+                style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
-            leading: new BackButton(color: Colors.grey.shade800)
+            leading: BackButton(color: Colors.grey.shade800)
         ),
-        body: new Center(
-          child: new Container(
-            padding: new EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
-            child: new Column(
+        body: Center(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+            child: Column(
               children: <Widget>[
                 const SizedBox(height: 8.0),
-//              new Image.asset('assets/images/logo.png'),
-                new Flexible(
-                    child: new TextField(
+//              Image.asset('assets/images/logo.png'),
+                Flexible(
+                    child: TextField(
                       controller: emailController,
-                      decoration: new InputDecoration(
-                          border: const UnderlineInputBorder(),
-                          hintText: 'Email'),
+                      decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          hintText: localize('Email')),
                     )
                 ),
                 const SizedBox(height: 12.0),
-                new Flexible(
-                    child: new TextField(
+                Flexible(
+                    child: TextField(
                       controller: fNameController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'First Name',
+                          hintText: localize('First Name'),
                           labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
                     )
                 ),
                 const SizedBox(height: 12.0),
-                new Flexible(
-                    child: new TextField(
+                Flexible(
+                    child: TextField(
                       controller: lNameController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'Last Name',
+                          hintText: localize('Last Name'),
                           labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
                     )
                 ),
                 const SizedBox(height: 12.0),
-                new Flexible(
-                    child: new TextField(
+                Flexible(
+                    child: TextField(
                       controller: phoneController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'Phone',
+                          hintText: localize('Phone'),
                           labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
                     )
                 ),
                 const SizedBox(height: 12.0),
-                new Flexible(
-                    child: new TextField(
+                Flexible(
+                    child: TextField(
                       controller: schoolController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'School District',
+                          hintText: localize('School District'),
                           labelStyle: Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark)),
                     )
                 ),
                 const SizedBox(height: 32.0),
-                new MaterialButton(
+                MaterialButton(
                     minWidth: 200.0,
                     color: Theme.of(context).accentColor,
                     onPressed: onRequest,
                     textColor: Colors.white,
-                    child: new Text("Request Access")
+                    child: Text(localize("Request Access"))
                 )
               ],
             ),

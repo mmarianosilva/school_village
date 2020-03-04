@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:school_village/util/colors.dart';
-import '../../util/user_helper.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class SelectGroups extends StatefulWidget {
   final GlobalKey<_SelectGroupsState> key = GlobalKey();
@@ -85,7 +86,7 @@ class _SelectGroupsState extends State<SelectGroups> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading ? Center(child: Text('Loading...')) : _getList();
+    return _isLoading ? Center(child: Text(localize('Loading...'))) : _getList();
   }
 
   _getList() {
@@ -138,7 +139,7 @@ class _SelectGroupsState extends State<SelectGroups> {
         Align(
           child: Container(
               padding: EdgeInsets.only(top: 3.0),
-              child: Text("Select group:",
+              child: Text(localize("Select group:"),
                   style: TextStyle(
                       color: Color.fromRGBO(50, 51, 57, 1.0),
                       letterSpacing: 1.2,
@@ -157,7 +158,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                       SizedBox(
                         height: checkBoxHeight / 2.5,
                       ),
-                      Text("Alert tone:")
+                      Text(localize("Alert tone:"))
                     ],
                   ),
                   SizedBox(
@@ -168,7 +169,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                       dense: true,
                       controlAffinity: ListTileControlAffinity.leading,
                       title: Text(
-                        "Amber",
+                        localize("Amber"),
                         style: TextStyle(color: Colors.red),
                       ),
                       activeColor: Colors.red,
@@ -190,7 +191,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                       dense: true,
                       controlAffinity: ListTileControlAffinity.leading,
                       title: Text(
-                        "2-Tone",
+                        localize("2-Tone"),
                       ),
                       value: !amberAlert,
                       onChanged: (value) {
@@ -211,7 +212,7 @@ class _SelectGroupsState extends State<SelectGroups> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text("Send to: "),
+              Text(localize("Send to: ")),
               DropdownButton(
                 items: _districtSchools(),
                 onChanged: (value) {

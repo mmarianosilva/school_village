@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart' ;
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/widgets/contact/contact_dialog.dart';
-import 'package:url_launcher/url_launcher.dart' ;
+import 'package:school_village/util/localizations/localization.dart';
 
 class MessageDetail extends StatelessWidget {
   final Map<String, dynamic> notification;
 
-  String _staticMapKey = "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI";
+  final String _staticMapKey = "AIzaSyAbuIElF_ufTQ_NRdSz3z-0Wm21H6GQDQI";
 
   MessageDetail({Key key, this.notification}) : super(key: key);
 
@@ -18,7 +18,7 @@ class MessageDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgets = new List();
+    List<Widget> widgets = List();
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -36,57 +36,57 @@ class MessageDetail extends StatelessWidget {
 
     if(notification["location"] != null) {
       widgets.add(
-          new GestureDetector(
+          GestureDetector(
             onTap: () {
               launch("https://www.google.com/maps/search/?api=1&map_action=map&basemap=satellite&query=${notification["location"]["latitude"]},${notification["location"]["longitude"]}");
             },
-            child: new Image.network(
+            child: Image.network(
                 "https://maps.googleapis.com/maps/api/staticmap?center=${notification["location"]["latitude"]},${notification["location"]["longitude"]}&zoom=18&markers=color:red%7Clabel:A%7C${notification["location"]["latitude"]},${notification["location"]["longitude"]}&size=${iwidth}x$iheight&maptype=hybrid&key=$_staticMapKey"),
           )
 
       );
     }
     widgets.add(
-        new Container(
-          padding: new EdgeInsets.all(20.0),
-          child: new Column(
+        Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               notification['createdBy'] != null ?
-              new Text("Broadcast message from ${notification['createdBy']}", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)) :
-              new Text("Message from ${notification['author']}", style: new TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-              new SizedBox(height: 8.0,),
-              new Text(notification["body"]),
-              new SizedBox(height: 8.0,),
+              Text("${localize('Broadcast message from', context)} ${notification['createdBy']}", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)) :
+              Text("${localize('Message from', context)} ${notification['author']}", style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8.0,),
+              Text(notification["body"]),
+              SizedBox(height: 8.0,),
               notification['createdBy'] != null ?
-              new Text("Created by ${notification['createdBy']}") :
-              new Text("Created by ${notification['author']}"),
-              new SizedBox(height: 8.0,),
+              Text("${localize('Created by', context)} ${notification['createdBy']}") :
+              Text("${localize('Created by', context)} ${notification['author']}"),
+              SizedBox(height: 8.0,),
               notification['createdAt'] != null ?
-              new Text("Created at ${dateFormatting.messageDateFormatter.format(new DateTime.fromMillisecondsSinceEpoch(notification['createdAt']))}") :
-              new Text("Created at ${dateFormatting.messageDateFormatter.format(notification['timestamp'].toDate())}"),
-              new SizedBox(height: 16.0,),
+              Text("${localize('Created at', context)} ${dateFormatting.messageDateFormatter.format(DateTime.fromMillisecondsSinceEpoch(notification['createdAt']))}") :
+              Text("${localize('Created at', context)} ${dateFormatting.messageDateFormatter.format(notification['timestamp'].toDate())}"),
+              SizedBox(height: 16.0,),
 //              (notification['reportedByPhone'] != null ? new GestureDetector(
 //                  onTap: () => _showCallOptions(context),
-//                  child: new Text("Contact", style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
+//                  child: new Text(localize("Contact", context), style: new TextStyle(fontSize: 18.0, color: Theme.of(context).accentColor))
 //              ) : new SizedBox()),
 
             ],
           ),
         )
     );
-    return new Scaffold(
+    return Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: new BaseAppBar(
-          title: new Text('Message',
+        appBar: BaseAppBar(
+          title: Text(localize('Message', context),
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          leading: new BackButton(color: Colors.grey.shade800),
+          leading: BackButton(color: Colors.grey.shade800),
         ),
-        body: new Column(
+        body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: widgets

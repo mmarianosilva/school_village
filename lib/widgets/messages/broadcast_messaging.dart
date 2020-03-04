@@ -13,6 +13,7 @@ import 'package:school_village/widgets/messages/broadcast_message.dart';
 import 'package:school_village/widgets/select_group/select_group.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/constants.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class BroadcastMessaging extends StatefulWidget {
   final bool editable;
@@ -161,7 +162,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   _getScreen() {
     if (messageList.length == 0) {
       return Center(
-        child: Text('No messages'),
+        child: Text(localize('No messages')),
       );
     }
     if (messageList.length > 0 && isLoaded) {
@@ -217,7 +218,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           });
     }
     return Center(
-      child: Text('Loading...'),
+      child: Text(localize('Loading...')),
     );
   }
 
@@ -226,7 +227,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error sending broadcast'),
+            title: Text(localize('Error sending broadcast')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: [Text(error)],
@@ -234,7 +235,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             ),
             actions: [
               FlatButton(
-                child: Text('Okay'),
+                child: Text(localize('Okay')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -246,12 +247,12 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   _sendMessage(File image, text, isVideo) {
     if (selectGroups.key.currentState.selectedGroups.length < 1) {
-      showErrorDialog("Please select group to send the broadcast message");
+      showErrorDialog(localize("Please select group to send the broadcast message"));
       return;
     }
 
     if (text.length < 8) {
-      showErrorDialog("Text length should be at least 8 characters");
+      showErrorDialog(localize("Text length should be at least 8 characters"));
       return;
     }
 
@@ -259,21 +260,21 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Are you sure you want to send this message?'),
+            title: Text(localize('Are you sure you want to send this message?')),
             content: SingleChildScrollView(
               child: ListBody(
-                children: [Text('This cannot be undone')],
+                children: [Text(localize('This cannot be undone'))],
               ),
             ),
             actions: [
               FlatButton(
-                child: Text('No'),
+                child: Text(localize('No')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text('Yes'),
+                child: Text(localize('Yes')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _sendBroadcasts(image, text, isVideo);
@@ -366,7 +367,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: BaseAppBar(
-          title: Text('Broadcast Messaging',
+          title: Text(localize('Broadcast Messaging'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,

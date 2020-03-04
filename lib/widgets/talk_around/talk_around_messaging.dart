@@ -12,6 +12,7 @@ import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_room_detail.dart';
 import 'package:school_village/widgets/talk_around/talk_around_search.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class TalkAroundMessaging extends StatefulWidget {
   final TalkAroundChannel channel;
@@ -64,17 +65,17 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
       }
       return "$name${members.last.name}";
     }
-    return "Loading...";
+    return localize("Loading...");
   }
 
   String _buildTitle() {
     if (!channel.direct) {
-      return "Talk-Around";
+      return localize("Talk-Around");
     }
     if (channel.members.length == 2) {
-      return "Talk-Around: Direct Message";
+      return localize("Talk-Around: Direct Message");
     }
-    return "Talk-Around: Group Message";
+    return localize("Talk-Around: Group Message");
 
   }
 
@@ -153,11 +154,11 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
         });
         showDialog(context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text('An error occurred'),
+          title: Text(localize('An error occurred')),
           content: Text('$ex'),
           actions: <Widget>[
             FlatButton(
-              child: Text('Ok'),
+              child: Text(localize('Ok')),
               onPressed: () => Navigator.pop(context),
             )
           ],
@@ -227,7 +228,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
             return Center(
                 child: Column(
                   children: <Widget>[
-                    Text("Loading..."),
+                    Text(localize("Loading...")),
                     CircularProgressIndicator()
                   ],
                 )
@@ -276,7 +277,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                                     child: TextField(
                                       controller: messageInputController,
                                       decoration: InputDecoration(
-                                          hintText: "Message ${_buildChannelName()}",
+                                          hintText: "${localize('Message')} ${_buildChannelName()}",
                                           hintStyle: TextStyle(color: Color.fromARGB(255, 187, 187, 187))
                                       ),
                                       maxLines: null,

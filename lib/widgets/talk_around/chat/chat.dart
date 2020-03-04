@@ -1,15 +1,17 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:location/location.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/constants.dart';
-import '../message/message.dart';
-import 'package:location/location.dart';
-import 'dart:io';
+import 'package:school_village/widgets/talk_around/message/message.dart';
 import 'package:mime/mime.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Chat extends StatefulWidget {
   final String conversation;
@@ -245,8 +247,8 @@ class _ChatState extends State<Chat> {
             );
           });
     }
-    return const Center(
-      child: const Text('No messages'),
+    return Center(
+      child: Text(localize('No messages')),
     );
   }
 

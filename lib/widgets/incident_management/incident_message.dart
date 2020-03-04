@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:school_village/model/talk_around_message.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/incident_management/on_map_interface.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class IncidentMessage extends StatelessWidget {
   final TalkAroundMessage message;
@@ -31,7 +31,7 @@ class IncidentMessage extends StatelessWidget {
                     builder: (context) {
                       if (message.latitude != null && message.longitude != null) {
                         return GestureDetector(
-                            child: Text("Map", style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
+                            child: Text(localize("Map", context), style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
                             onTap: () => onMapClicked.onMapClicked(message));
                       } else {
                         return SizedBox();
@@ -56,7 +56,7 @@ class IncidentMessage extends StatelessWidget {
               return Row(
                 children: <Widget>[
                   Flexible(
-                      child: Text("From:", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(localize("From:", context), style: TextStyle(fontWeight: FontWeight.bold)),
                       flex: 2,
                       fit: FlexFit.tight),
                   Flexible(
@@ -67,7 +67,7 @@ class IncidentMessage extends StatelessWidget {
                       flex: 7,
                       fit: FlexFit.tight),
                   Flexible(
-                      child: Text("To:", style: TextStyle(fontWeight: FontWeight.bold), maxLines: 1,),
+                      child: Text(localize("To:", context), style: TextStyle(fontWeight: FontWeight.bold), maxLines: 1,),
                       flex: 1,
                       fit: FlexFit.tight),
                   Flexible(
@@ -80,7 +80,7 @@ class IncidentMessage extends StatelessWidget {
               return Row(
                 children: <Widget>[
                   Flexible(
-                      child: Text("From: ", style: TextStyle(fontWeight: FontWeight.bold))),
+                      child: Text(localize("From: ", context), style: TextStyle(fontWeight: FontWeight.bold))),
                   Flexible(
                       child: GestureDetector(
                           onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
@@ -96,7 +96,7 @@ class IncidentMessage extends StatelessWidget {
           text: TextSpan(
               style: DefaultTextStyle.of(context).style,
               children: <TextSpan>[
-                TextSpan(text: "Message: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: localize("Message: ", context), style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: message.message)
               ]
           ),

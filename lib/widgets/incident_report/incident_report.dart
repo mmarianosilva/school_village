@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class IncidentReport extends StatefulWidget {
   @override
@@ -60,7 +61,7 @@ class IncidentState extends State<IncidentReport> {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: BaseAppBar(
-          title: Text('Incident Report Form',
+          title: Text(localize('Incident Report Form'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
@@ -68,7 +69,7 @@ class IncidentState extends State<IncidentReport> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: items.length == 0
-            ? Text('Loading...')
+            ? Text(localize('Loading...'))
             : Builder(
           builder: (context) => Stack(children: [
             buildSingleChildScrollView(context),
@@ -134,7 +135,7 @@ class IncidentState extends State<IncidentReport> {
             color: SVColors.incidentReport,
             child: Center(
                 child: Text(
-                  'Incident Type',
+                  localize('Incident Type'),
                   style: TextStyle(color: Colors.white, fontSize: 18.0),
                 )),
           ),
@@ -216,7 +217,7 @@ class IncidentState extends State<IncidentReport> {
                     }
                   },
                   color: SVColors.incidentReport,
-                  child: Text("REVIEW REPORT",
+                  child: Text(localize("REVIEW REPORT"),
                       style: TextStyle(color: Colors.white)))),
           SizedBox.fromSize(size: Size(0, 31))
         ]));
@@ -294,7 +295,7 @@ class IncidentState extends State<IncidentReport> {
                 margin: EdgeInsets.only(top: 10.0),
                 width: textWidth + 10.0,
                 child: Text(
-                  'Time/Date of Incident:',
+                  localize('Time/Date of Incident:'),
                   style: TextStyle(fontSize: fontSize),
                 )),
             SizedBox(width: padding),
@@ -303,7 +304,7 @@ class IncidentState extends State<IncidentReport> {
                   minWidth: double.infinity,
                   child: OutlineButton(
                       child: Text(date == null
-                          ? 'Select Time and Date'
+                          ? localize('Select Time and Date')
                           : dateFormatting.messageDateFormatter.format(date)),
                       onPressed: () {
                         _selectDate();
@@ -312,7 +313,7 @@ class IncidentState extends State<IncidentReport> {
             SizedBox(width: 10),
             MaterialButton(
               minWidth: 50.0,
-              child: Text('Now', style: TextStyle(color: Colors.white)),
+              child: Text(localize('Now'), style: TextStyle(color: Colors.white)),
               color: SVColors.incidentReport,
               onPressed: () {
                 setState(() {
@@ -327,7 +328,7 @@ class IncidentState extends State<IncidentReport> {
             Container(
                 margin: EdgeInsets.only(top: 10.0),
                 width: textWidth + 10.0,
-                child: Text('Location:', style: TextStyle(fontSize: fontSize))),
+                child: Text(localize('Location:'), style: TextStyle(fontSize: fontSize))),
             SizedBox(width: padding),
             Flexible(child: TextField(onChanged: (val) {
               setState(() {
@@ -341,7 +342,7 @@ class IncidentState extends State<IncidentReport> {
           height: padding,
         ),
         Text(
-          'Details:',
+          localize('Details:'),
           style: TextStyle(fontSize: fontSize),
         ),
         SizedBox(
@@ -500,7 +501,7 @@ class IncidentState extends State<IncidentReport> {
                     });
                   },
                   color: SVColors.incidentReport,
-                  child: Text("Positive Feedback",
+                  child: Text(localize("Positive Feedback"),
                       style: TextStyle(color: Colors.white))),
             ),
             SizedBox(
@@ -523,7 +524,7 @@ class IncidentState extends State<IncidentReport> {
                     other = val;
                   });
                 },
-                decoration: InputDecoration(hintText: 'Other'),
+                decoration: InputDecoration(hintText: localize('Other')),
               ),
             )
           ],

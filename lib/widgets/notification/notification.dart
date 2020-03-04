@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/date_formatter.dart' as dateFormatting;
+import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/followup/followup.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class NotificationDetail extends StatelessWidget {
   final SchoolAlert notification;
@@ -19,25 +20,25 @@ class NotificationDetail extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Contact Reporter'),
+            title: Text(localize('Contact Reporter', context)),
             content: Text(
                 "Do you want to contact ${notification.reportedByPhoneFormatted} ?"),
             actions: <Widget>[
               FlatButton(
-                child: Text('Cancel'),
+                child: Text(localize('Cancel', context)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text('SMS'),
+                child: Text(localize('SMS', context)),
                 onPressed: () {
                   Navigator.of(context).pop();
                   launch(Uri.encodeFull("sms:${notification.reportedByPhone}"));
                 },
               ),
               FlatButton(
-                child: Text('Phone'),
+                child: Text(localize('Phone', context)),
                 onPressed: () {
                   Navigator.of(context).pop();
                   launch(Uri.encodeFull("tel:${notification.reportedByPhone}"));
@@ -82,7 +83,7 @@ class NotificationDetail extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text(notification.title == null ? 'Details' : notification.title,
+          Text(notification.title == null ? localize('Details', context) : notification.title,
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
           SizedBox(
             height: 8.0,
@@ -91,12 +92,12 @@ class NotificationDetail extends StatelessWidget {
           SizedBox(
             height: 8.0,
           ),
-          Text("Reported by ${notification.createdBy}"),
+          Text("${localize('Reported by', context)} ${notification.createdBy}"),
           SizedBox(
             height: 8.0,
           ),
           Text(
-              "Reported at ${dateFormatting.messageDateFormatter.format(notification.timestamp)}"),
+              "${localize('Reported at', context)} ${dateFormatting.messageDateFormatter.format(notification.timestamp)}"),
           SizedBox(
             height: 16.0,
           ),
@@ -104,7 +105,7 @@ class NotificationDetail extends StatelessWidget {
                   notification.reportedByPhone.trim() != ''
               ? GestureDetector(
                   onTap: () => _showCallOptions(context),
-                  child: Text("Contact",
+                  child: Text(localize("Contact", context),
                       style: TextStyle(
                           fontSize: 18.0,
                           color: Theme.of(context).accentColor)))
@@ -118,7 +119,7 @@ class NotificationDetail extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Follow-up',
+              localize('Follow-up', context),
               style: TextStyle(color: Colors.blueAccent),
             ),
           )
@@ -128,7 +129,7 @@ class NotificationDetail extends StatelessWidget {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: BaseAppBar(
-          title: Text('Details',
+          title: Text(localize('Details', context),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,

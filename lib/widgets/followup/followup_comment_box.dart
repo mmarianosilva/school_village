@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class FollowupCommentBox extends StatefulWidget {
   final String _firestorePath;
@@ -57,16 +58,16 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                       ? Text('${_userDoc['firstName']} ${_userDoc['lastName']}')
                       : Text('...'),
                   Spacer(),
-                  Text('Date'),
+                  Text(localize('Date')),
                   Spacer(),
-                  Text('Time'),
+                  Text(localize('Time')),
                 ],
               ),
               Container(
                 child: TextField(
                   controller: _inputController,
                   decoration: InputDecoration(
-                    hintText: 'Add comment',
+                    hintText: localize('Add comment'),
                   ),
                 ),
               ),
@@ -84,14 +85,14 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                 children: <Widget>[
                   FlatButton(
                     child: Text(
-                      'Clear',
+                      localize('Clear'),
                       style: TextStyle(color: Colors.blueAccent),
                     ),
                     onPressed: _onClear,
                   ),
                   FlatButton(
                     child: Text(
-                      'Add',
+                      localize('Add'),
                       style: TextStyle(color: Colors.blueAccent),
                     ),
                     onPressed: _onAdd,

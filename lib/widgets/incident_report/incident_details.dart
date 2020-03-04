@@ -5,18 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:school_village/components/base_appbar.dart';
-import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/colors.dart';
-import 'package:intl/intl.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/navigation_helper.dart';
 import 'package:school_village/util/user_helper.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/followup/followup.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class IncidentDetails extends StatefulWidget {
   final DocumentSnapshot firestoreDocument;
@@ -143,7 +141,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: BaseAppBar(
-          title: Text('Incident Report',
+          title: Text(localize('Incident Report'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.white,
@@ -204,7 +202,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
                 color: SVColors.incidentReport,
                 margin: EdgeInsets.symmetric(vertical: 15),
               ),
-              Text('Details',
+              Text(localize('Details'),
                   style: TextStyle(
                       color: SVColors.incidentReportGray,
                       fontWeight: FontWeight.bold,
@@ -220,7 +218,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
               !demo
                   ? GestureDetector(
                       child: Text(
-                        'Contact',
+                        localize('Contact'),
                         style: TextStyle(color: SVColors.talkAroundBlue),
                       ),
                       onTap: () => showContactDialog(context, name, phone),
@@ -234,19 +232,19 @@ class IncidentDetailsState extends State<IncidentDetails> {
                             _sendReport();
                           },
                           color: SVColors.incidentReportRed,
-                          child: Text("SEND REPORT",
+                          child: Text(localize("SEND REPORT"),
                               style: TextStyle(color: Colors.white))))
                   : FlatButton(
                       onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) => Followup(
-                              'Incident Report',
+                              localize('Incident Report'),
                               widget.firestoreDocument.reference.path),
                         ),
                       ),
                       child: Text(
-                        'Follow-up',
+                        localize('Follow-up'),
                         style: TextStyle(color: Colors.blueAccent),
                       ),
                     ),

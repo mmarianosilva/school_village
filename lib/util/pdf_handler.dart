@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class PdfHandler {
   static const platform = const MethodChannel('schoolvillage.app/pdf_view');
@@ -62,18 +63,18 @@ class PdfHandler {
   }
 
   static void showLoading(BuildContext context) {
-    var alert = new AlertDialog(
-      title: new Text("Downloading Document"),
-      content: new Row(
+    var alert = AlertDialog(
+      title: Text(LocalizationHelper.of(context).localized("Downloading Document")),
+      content: Row(
         children: <Widget>[
-          new CircularProgressIndicator(),
-          new SizedBox(width: 12.0),
-          new Expanded(child: new Text("Please wait.."))
+          CircularProgressIndicator(),
+          SizedBox(width: 12.0),
+          Expanded(child: Text(LocalizationHelper.of(context).localized("Please wait..")))
         ],
       ),
       actions: <Widget>[
         FlatButton(
-          child: Text('Cancel'.toUpperCase()),
+          child: Text(LocalizationHelper.of(context).localized('Cancel').toUpperCase()),
           onPressed: () {
             _canceled = true;
             Navigator.pop(context);

@@ -11,6 +11,7 @@ import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Notifications extends StatefulWidget {
   @override
@@ -67,8 +68,8 @@ class _NotificationsState extends State<Notifications> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         FlatButton(
-                          child: const Text(
-                            'ID',
+                          child: Text(
+                            localize('ID'),
                             style: TextStyle(color: Colors.blueAccent),
                           ),
                           onPressed: () {
@@ -84,13 +85,13 @@ class _NotificationsState extends State<Notifications> {
                           },
                         ),
                         FlatButton(
-                          child: const Text('VIEW'),
+                          child: Text(localize('VIEW')),
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => NotificationDetail(
-                                    notification: alert, title: 'Notification'),
+                                    notification: alert, title: localize('Notification')),
                               ),
                             );
                           },
@@ -99,13 +100,13 @@ class _NotificationsState extends State<Notifications> {
                     );
                   } else {
                     return FlatButton(
-                      child: const Text('VIEW'),
+                      child: Text(localize('VIEW')),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => NotificationDetail(
-                                notification: alert, title: 'Notification'),
+                                notification: alert, title: localize('Notification')),
                           ),
                         );
                       },
@@ -130,7 +131,7 @@ class _NotificationsState extends State<Notifications> {
       return Scaffold(
           backgroundColor: Colors.grey.shade100,
           appBar: BaseAppBar(
-            title: Text('Alert Log',
+            title: Text(localize('Alert Log'),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
             backgroundColor: Colors.grey.shade200,
@@ -138,7 +139,7 @@ class _NotificationsState extends State<Notifications> {
             leading: BackButton(color: Colors.grey.shade800),
           ),
           body: !isLoaded
-              ? Text("Loading..")
+              ? Text(localize("Loading.."))
               : Stack(
                 children: <Widget>[
                   _buildList(),

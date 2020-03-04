@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../util/user_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../util/analytics_helper.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/services.dart';
+import 'package:school_village/util/analytics_helper.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class StudentLogin extends StatefulWidget {
 
@@ -20,7 +20,7 @@ class _StudentLoginState extends State<StudentLogin> {
   _StudentLoginState({this.role});
 
   final codeController = new TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "School Village";
   final String role;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -49,14 +49,14 @@ class _StudentLoginState extends State<StudentLogin> {
 
   login(email, code) async {
     _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content:
-        new Row(
+        SnackBar(content:
+        Row(
           children: <Widget>[
-            new CircularProgressIndicator(),
-            new Text("Logging in")
+            CircularProgressIndicator(),
+            Text(localize("Logging in"))
           ],
         ),
-          duration: new Duration(days: 1),
+          duration: Duration(days: 1),
         )
     );
 
@@ -70,18 +70,18 @@ class _StudentLoginState extends State<StudentLogin> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return new AlertDialog(
-              title: new Text('Error logging in'),
-              content: new SingleChildScrollView(
-                child: new ListBody(
+            return AlertDialog(
+              title: Text(localize('Error logging in')),
+              content: SingleChildScrollView(
+                child: ListBody(
                   children: <Widget>[
-                    new Text(error.message)
+                    Text(error.message)
                   ],
                 ),
               ),
               actions: <Widget>[
-                new FlatButton(
-                  child: new Text('Okay'),
+                FlatButton(
+                  child: Text(localize('Okay')),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -94,16 +94,16 @@ class _StudentLoginState extends State<StudentLogin> {
     });
   }
 
-  getEmail(code) async{
+  getEmail(code) async {
     _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content:
-        new Row(
+        SnackBar(content:
+        Row(
           children: <Widget>[
-            new CircularProgressIndicator(),
-            new Text("Logging in")
+            CircularProgressIndicator(),
+            Text(localize("Logging in"))
           ],
         ),
-          duration: new Duration(days: 1),
+          duration: Duration(days: 1),
         )
     );
     var url = "https://us-central1-schoolvillage-1.cloudfunctions.net/api/student/code/$code";
@@ -112,9 +112,7 @@ class _StudentLoginState extends State<StudentLogin> {
     return response.body;
   }
 
-  onRequest() async{
-
-
+  onRequest() async {
     var code = codeController.text.trim() ;
     var email = await getEmail(code);
     if(email == null || email == "") {
@@ -122,17 +120,17 @@ class _StudentLoginState extends State<StudentLogin> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return new AlertDialog(
-              title: new Text('Error logging in'),
-              content: new SingleChildScrollView(
-                child: new ListBody(
+            return AlertDialog(
+              title: Text(localize('Error logging in')),
+              content: SingleChildScrollView(
+                child: ListBody(
                   children: <Widget>[
                   ],
                 ),
               ),
               actions: <Widget>[
-                new FlatButton(
-                  child: new Text('Okay'),
+                FlatButton(
+                  child: Text(localize('Okay')),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -156,40 +154,39 @@ class _StudentLoginState extends State<StudentLogin> {
     UserHelper.setAnonymousRole(role);
     print(role + "Role");
 
-    return new Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
-
-            title: new Text(title, textAlign: TextAlign.center, style: new TextStyle(color: Colors.black)),
+        appBar: AppBar(
+            title: Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
-            leading: new BackButton(color: Colors.grey.shade800)
+            leading: BackButton(color: Colors.grey.shade800)
         ),
-        body: new Center(
-          child: new Container(
-            padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-            child: new Column(
+        body: Center(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+            child: Column(
               children: <Widget>[
                 const SizedBox(height: 18.0),
 //              new Image.asset('assets/images/logo.png'),
-                new Flexible(
-                    child: new TextField(
+                Flexible(
+                    child: TextField(
                       autofocus: true,
                       controller: codeController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'School Code'),
+                          hintText: localize('School Code')),
                     )
                 ),
                 const SizedBox(height: 32.0),
-                new MaterialButton(
+                MaterialButton(
                     minWidth: 200.0,
                     color: Theme.of(context).accentColor,
                     onPressed: () {
                       onRequest();
                     },
                     textColor: Colors.white,
-                    child: new Text("Login")
+                    child: Text(localize("Login"))
                 )
               ],
             ),

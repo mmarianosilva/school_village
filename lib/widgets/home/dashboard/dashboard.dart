@@ -1,6 +1,11 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:location/location.dart';
 import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
@@ -8,20 +13,15 @@ import 'package:school_village/widgets/home/dashboard/header_buttons.dart';
 import 'package:school_village/widgets/incident_management/incident_management.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
 import 'package:school_village/widgets/incident_report/incident_report.dart';
-import '../../../util/pdf_handler.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../util/user_helper.dart';
-import '../../alert/alert.dart';
-import '../../hotline/hotline.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../util/file_helper.dart';
-import 'dart:io';
-import '../../notifications/notifications.dart';
-import 'package:scoped_model/scoped_model.dart';
-import '../../../model/main_model.dart';
-import 'package:location/location.dart';
-import '../../../util/constants.dart';
-import '../../holine_list/hotline_list.dart';
+import 'package:school_village/util/pdf_handler.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/file_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/alert/alert.dart';
+import 'package:school_village/widgets/hotline/hotline.dart';
+import 'package:school_village/widgets/notifications/notifications.dart';
+import 'package:school_village/model/main_model.dart';
+import 'package:school_village/widgets/holine_list/hotline_list.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -506,7 +506,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
         if (!isLoaded || !hasSchool) {
           return Material(
-              child: Text("Please Select A School from Settings Tab"));
+              child: Text(localize("Please Select A School from Settings Tab")));
         }
 
         return FutureBuilder(

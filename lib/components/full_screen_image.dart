@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:school_village/components/icon_button.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class ImageViewScreen extends StatelessWidget {
   final String imageAddress;
@@ -13,7 +14,7 @@ class ImageViewScreen extends StatelessWidget {
         body: Stack(children: [
       PhotoView(
         imageProvider: NetworkImage(imageAddress),
-        loadingChild: Text("Loading", style: TextStyle(color: Colors.white)),
+        loadingChild: Text(localize("Loading", context), style: TextStyle(color: Colors.white)),
         initialScale:  PhotoViewComputedScale.covered * 6.0,
         minScale: PhotoViewComputedScale.contained,
       ),

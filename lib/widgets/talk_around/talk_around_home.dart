@@ -12,6 +12,7 @@ import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_room_item.dart';
 import 'package:school_village/widgets/talk_around/talk_around_search.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class TalkAroundHome extends StatefulWidget {
   @override
@@ -142,7 +143,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BaseAppBar(
-        title: Text("Talk Around"),
+        title: Text(localize("Talk Around")),
         backgroundColor: Color.fromARGB(255, 134, 165, 177),
       ),
       body: Builder(
@@ -188,7 +189,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                          "Channels".toUpperCase(),
+                          localize("Channels").toUpperCase(),
                           style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
                           textAlign: TextAlign.start
                       ),
@@ -206,7 +207,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                          "Direct Messages".toUpperCase(),
+                          localize("Direct Messages").toUpperCase(),
                           style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
                           textAlign: TextAlign.start
                       ),

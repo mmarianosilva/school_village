@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/widgets/followup/followup.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class HotLineList extends StatefulWidget {
   @override
@@ -52,14 +53,14 @@ class _HotLineListState extends State<HotLineList> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: Text('Anonymous Hotline Log',
+        title: Text(localize('Anonymous Hotline Log'),
             textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
         leading: BackButton(color: Colors.grey.shade800),
       ),
       body: !isLoaded
-          ? Text("Loading...")
+          ? Text(localize("Loading..."))
           : Stack(
               children: <Widget>[
                 StreamBuilder(
@@ -69,7 +70,7 @@ class _HotLineListState extends State<HotLineList> {
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
-                      if (!snapshot.hasData) return const Text('Loading...');
+                      if (!snapshot.hasData) return Text(localize('Loading...'));
                       final int messageCount = snapshot.data.documents.length;
                       print(messageCount);
                       return ListView.builder(
@@ -84,7 +85,7 @@ class _HotLineListState extends State<HotLineList> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (BuildContext context) => Followup(
-                                        'Anonymous Hotline Log',
+                                        localize('Anonymous Hotline Log'),
                                         document.reference.path))),
                             child: Card(
                               margin: EdgeInsets.all(4.0),

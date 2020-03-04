@@ -1,21 +1,23 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:sentry/sentry.dart';
 import 'package:school_village/util/token_helper.dart';
 import 'package:school_village/util/user_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'widgets/splash/splash.dart';
-import 'widgets/home/home.dart';
-import 'widgets/login/login.dart';
-import 'package:firebase_analytics/observer.dart';
-import 'util/analytics_helper.dart';
-import 'util/constants.dart';
-import 'package:sentry/sentry.dart';
+import 'package:school_village/widgets/splash/splash.dart';
+import 'package:school_village/widgets/home/home.dart';
+import 'package:school_village/widgets/login/login.dart';
+import 'package:school_village/util/analytics_helper.dart';
+import 'package:school_village/util/constants.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'dart:async';
-import 'model/main_model.dart';
+import 'package:school_village/model/main_model.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 final SentryClient _sentry = new SentryClient(dsn: Constants.sentry_dsn);
 
@@ -39,12 +41,12 @@ Future<Null> main() async {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: Column(
               children: <Widget>[
-                Text(
-                    'An unexpected error has occurred. Please login again to resolve the issue.'),
-                Text('We apologize for the inconvenience.'),
+                Text(LocalizationHelper.of(context).localized(
+                    'An unexpected error has occurred. Please login again to resolve the issue.')),
+                Text(LocalizationHelper.of(context).localized('We apologize for the inconvenience.')),
                 FlatButton(
                   color: Colors.blueAccent,
-                  child: Text('Logout'.toUpperCase(), style: TextStyle(color: Colors.white),),
+                  child: Text(LocalizationHelper.of(context).localized('Logout').toUpperCase(), style: TextStyle(color: Colors.white),),
                   onPressed: () async {
                     final String token = (await SharedPreferences.getInstance()).getString("fcmToken");
                     final FirebaseUser user = (await UserHelper.getUser());
@@ -93,6 +95,7 @@ Future<Null> main() async {
                 analytics: AnalyticsHelper.getAnalytics()),
             homePageRouteObserver
           ],
+          localizationsDelegates: [LocalizationDelegate()],
         ),
       ));
     });

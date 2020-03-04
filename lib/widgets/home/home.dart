@@ -2,7 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/widgets/incident_report/incident_list.dart';
@@ -12,18 +17,14 @@ import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_home.dart';
 import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
-import './dashboard/dashboard.dart';
-import '../settings/settings.dart';
-import '../holine_list/hotline_list.dart';
-import '../../util/user_helper.dart';
-import '../schoollist/school_list.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../util/token_helper.dart';
-import '../../model/main_model.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/services.dart' show MethodChannel, rootBundle;
+import 'package:school_village/widgets/home/dashboard/dashboard.dart';
+import 'package:school_village/widgets/settings/settings.dart';
+import 'package:school_village/widgets/holine_list/hotline_list.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/schoollist/school_list.dart';
+import 'package:school_village/util/token_helper.dart';
+import 'package:school_village/model/main_model.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -245,7 +246,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View Log'),
+              child: Text(localize('View Log')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -258,7 +259,7 @@ class _HomeState extends State<Home> {
               },
             ),
             FlatButton(
-              child: Text('Close'),
+              child: Text(localize('Close')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -285,7 +286,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View Log'),
+              child: Text(localize('View Log')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -298,7 +299,7 @@ class _HomeState extends State<Home> {
               },
             ),
             FlatButton(
-              child: Text('Close'),
+              child: Text(localize('Close')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -325,7 +326,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View Details'),
+              child: Text(localize('View Details')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -338,7 +339,7 @@ class _HomeState extends State<Home> {
               },
             ),
             FlatButton(
-              child: Text('Close'),
+              child: Text(localize('Close')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -365,14 +366,14 @@ class _HomeState extends State<Home> {
                 ),
                 actions: <Widget>[
                   FlatButton(
-                    child: Text('Open'),
+                    child: Text(localize('Open')),
                     onPressed: () {
                       stopSound();
                       _openTalkAroundChannel(message);
                     },
                   ),
                   FlatButton(
-                    child: Text('Close'),
+                    child: Text(localize('Close')),
                     onPressed: () {
                       stopSound();
                       Navigator.of(context).pop();
@@ -402,7 +403,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('View Details'),
+              child: Text(localize('View Details')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();
@@ -416,7 +417,7 @@ class _HomeState extends State<Home> {
               },
             ),
             FlatButton(
-              child: Text('Close Alert'),
+              child: Text(localize('Close Alert')),
               onPressed: () {
                 stopSound();
                 Navigator.of(context).pop();

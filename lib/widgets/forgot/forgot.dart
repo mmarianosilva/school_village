@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Forgot extends StatefulWidget {
   @override
-  _ForgotState createState() => new _ForgotState();
+  _ForgotState createState() => _ForgotState();
 }
 
 class _ForgotState extends State<Forgot> {
 
-  final emailController = new TextEditingController();
-  final fNameController = new TextEditingController();
-  final lNameController = new TextEditingController();
-  final schoolController = new TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final emailController = TextEditingController();
+  final fNameController = TextEditingController();
+  final lNameController = TextEditingController();
+  final schoolController = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "School Village";
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   onRequest() async{
     _scaffoldKey.currentState.showSnackBar(
-        new SnackBar(content:
-        new Row(
+        SnackBar(content:
+        Row(
           children: <Widget>[
-            new CircularProgressIndicator(),
-            new Text("Requesting password change")
+            CircularProgressIndicator(),
+            Text(localize("Requesting password change"))
           ],
         ),
-          duration: new Duration(milliseconds: 1000),
+          duration: Duration(milliseconds: 1000),
         )
     );
 
@@ -47,38 +46,38 @@ class _ForgotState extends State<Forgot> {
   @override
   Widget build(BuildContext context) {
 
-    return new Scaffold(
+    return Scaffold(
         key: _scaffoldKey,
-        appBar: new BaseAppBar(
-          title: new Text(title,
+        appBar: BaseAppBar(
+          title: Text(title,
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          leading: new BackButton(color: Colors.grey.shade800)
+          leading: BackButton(color: Colors.grey.shade800)
         ),
-        body: new Center(
-          child: new Container(
-            padding: new EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
-            child: new Column(
+        body: Center(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+            child: Column(
               children: <Widget>[
-                const SizedBox(height: 18.0),
-//              new Image.asset('assets/images/logo.png'),
-                new Flexible(
-                    child: new TextField(
+                SizedBox(height: 18.0),
+//              Image.asset('assets/images/logo.png'),
+                Flexible(
+                    child: TextField(
                       controller: emailController,
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           border: const UnderlineInputBorder(),
-                          hintText: 'Email'),
+                          hintText: localize('Email')),
                     )
                 ),
                 const SizedBox(height: 32.0),
-                new MaterialButton(
+                MaterialButton(
                     minWidth: 200.0,
                     color: Theme.of(context).accentColor,
                     onPressed: onRequest,
                     textColor: Colors.white,
-                    child: new Text("Reset Password")
+                    child: Text(localize("Reset Password"))
                 )
               ],
             ),

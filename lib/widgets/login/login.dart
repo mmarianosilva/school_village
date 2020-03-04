@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
-import '../contact/contact.dart';
-import '../forgot/forgot.dart';
-import '../../util/analytics_helper.dart';
-import '../student_login/student_login.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/contact/contact.dart';
+import 'package:school_village/widgets/forgot/forgot.dart';
+import 'package:school_village/util/analytics_helper.dart';
+import 'package:school_village/widgets/student_login/student_login.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error logging in'),
+            title: Text(localize('Error logging in')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: [Text(error)],
@@ -58,7 +58,7 @@ class _LoginState extends State<Login> {
             ),
             actions: [
               FlatButton(
-                child: Text('Okay'),
+                child: Text(localize('Okay')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -71,19 +71,19 @@ class _LoginState extends State<Login> {
   onLogin() async {
     if (!emailExp.hasMatch(emailController.text.trim())) {
       FocusScope.of(context).requestFocus(emailFocusNode);
-      showErrorDialog('Please enter valid email');
+      showErrorDialog(localize('Please enter valid email'));
       return;
     }
 
     if(passwordController.text.trim().length < 6){
       FocusScope.of(context).requestFocus(passwordFocusNode);
-      showErrorDialog('Password my be at least 6 characters');
+      showErrorDialog(localize('Password my be at least 6 characters'));
       return;
     }
 
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Row(
-        children: <Widget>[CircularProgressIndicator(), Text("Logging in")],
+        children: <Widget>[CircularProgressIndicator(), Text(localize("Logging in"))],
       ),
       duration: Duration(days: 1),
     ));
@@ -159,7 +159,7 @@ class _LoginState extends State<Login> {
                           focusNode: passwordFocusNode,
                           decoration: InputDecoration(
                               border: const UnderlineInputBorder(),
-                              hintText: 'Password',
+                              hintText: localize('Password'),
                               labelStyle:
                               Theme.of(context).textTheme.caption.copyWith(color: Theme.of(context).primaryColorDark),
                               icon: Icon(Icons.lock)),
@@ -170,7 +170,7 @@ class _LoginState extends State<Login> {
                         color: Theme.of(context).accentColor,
                         onPressed: onLogin,
                         textColor: Colors.white,
-                        child: Text("LOGIN")),
+                        child: Text(localize("LOGIN"))),
                     const SizedBox(height: 18.0),
                     MaterialButton(
                         minWidth: 200.0,
@@ -178,7 +178,7 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           studentLogin("student");
                         },
-                        child: Text("STUDENT LOGIN")),
+                        child: Text(localize("STUDENT LOGIN"))),
                     const SizedBox(height: 18.0),
                     MaterialButton(
                         minWidth: 200.0,
@@ -186,11 +186,11 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           studentLogin("family");
                         },
-                        child: Text("FAMILY LOGIN")),
+                        child: Text(localize("FAMILY LOGIN"))),
                     const SizedBox(height: 18.0),
-                    FlatButton(onPressed: onForgot, child: Text("Forgot Password?")),
+                    FlatButton(onPressed: onForgot, child: Text(localize("Forgot Password?"))),
                     const SizedBox(height: 18.0),
-                    FlatButton(onPressed: createAccount, child: Text("Create Account")),
+                    FlatButton(onPressed: createAccount, child: Text(localize("Create Account"))),
                   ],
                 ),
               ),

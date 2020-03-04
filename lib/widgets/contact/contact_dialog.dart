@@ -1,30 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:school_village/util/localizations/localization.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void showContactDialog(BuildContext context, String name, String phone) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return new AlertDialog(
-          title: new Text('Contact'),
-          content: new Text("Do you want to contact $name?"),
+        return AlertDialog(
+          title: Text(LocalizationHelper.of(context).localized('Contact')),
+          content: Text("${LocalizationHelper.of(context).localized('Do you want to contact')} $name?"),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text('Cancel'),
+            FlatButton(
+              child: Text(LocalizationHelper.of(context).localized('Cancel')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            new FlatButton(
-              child: new Text('SMS'),
+            FlatButton(
+              child: Text(LocalizationHelper.of(context).localized('SMS')),
               onPressed: () {
                 Navigator.of(context).pop();
                 launch(Uri.encodeFull("sms:$phone"));
               },
             ),
-            new FlatButton(
-              child: new Text('Phone'),
+            FlatButton(
+              child: Text(LocalizationHelper.of(context).localized('Phone')),
               onPressed: () {
                 Navigator.of(context).pop();
                 launch(Uri.encodeFull("tel:$phone"));

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:school_village/components/base_appbar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../schoollist/school_list.dart';
-import '../../util/user_helper.dart';
-import '../../model/main_model.dart';
-import '../../util/token_helper.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:package_info/package_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/widgets/schoollist/school_list.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/model/main_model.dart';
+import 'package:school_village/util/token_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -50,14 +51,14 @@ class _SettingsState extends State<Settings> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Logging out'),
+          title: Text(localize('Logging out')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Row(
                   children: <Widget>[
                     CircularProgressIndicator(),
-                    Text("Logging out")
+                    Text(localize("Logging out"))
                   ],
                 )
               ],
@@ -100,7 +101,7 @@ class _SettingsState extends State<Settings> {
           return Scaffold(
             backgroundColor: Colors.grey.shade100,
             appBar: BaseAppBar(
-              title: Text('Settings',
+              title: Text(localize('Settings'),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
               backgroundColor: Colors.grey.shade200,
@@ -129,7 +130,7 @@ class _SettingsState extends State<Settings> {
                   children: <Widget>[
                     FlatButton.icon(
                       icon: Icon(Icons.school, size: 32.0),
-                      label: Text('Change School',
+                      label: Text(localize('Change School'),
                           style: TextStyle(
                               fontSize: 18.0, fontWeight: FontWeight.bold)),
                       onPressed: () {
@@ -146,7 +147,7 @@ class _SettingsState extends State<Settings> {
                   children: <Widget>[
                     FlatButton.icon(
                       icon: Icon(Icons.exit_to_app, size: 32.0),
-                      label: Text('Logout',
+                      label: Text(localize('Logout'),
                           style: TextStyle(
                               fontSize: 18.0, fontWeight: FontWeight.bold)),
                       onPressed: () {

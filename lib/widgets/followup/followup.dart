@@ -7,6 +7,7 @@ import 'package:school_village/widgets/followup/followup_comment_box.dart';
 import 'package:school_village/widgets/followup/followup_header_item.dart';
 import 'package:school_village/widgets/followup/followup_incident_report_header.dart';
 import 'package:school_village/widgets/followup/followup_list_item.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Followup extends StatefulWidget {
   final String _title;
@@ -101,7 +102,7 @@ class _FollowupState extends State<Followup> {
               style: TextStyle(color: Colors.black),
             ),
             Text(
-              'Follow-up Reporting',
+              localize('Follow-up Reporting'),
               style: TextStyle(color: Colors.blueAccent),
             ),
           ],
@@ -135,7 +136,7 @@ class _FollowupState extends State<Followup> {
                               snapshot.data.documents.isEmpty) {
                             return Container(
                               margin: const EdgeInsets.all(16.0),
-                              child: Text('No followup reports found'),
+                              child: Text(localize('No followup reports found')),
                             );
                           }
                           return Expanded(

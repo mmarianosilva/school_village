@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Broadcast extends StatefulWidget {
   final Map<String, bool> groups;
@@ -63,23 +64,23 @@ class _BroadcastState extends State<Broadcast> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Are you sure you want to send this message?'),
+            title: Text(localize('Are you sure you want to send this message?')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text('This cannot be undone')
+                  Text(localize('This cannot be undone'))
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('No'),
+                child: Text(localize('No')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text('Yes'),
+                child: Text(localize('Yes')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _saveBroadcast(alertBody, context);
@@ -112,17 +113,17 @@ class _BroadcastState extends State<Broadcast> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Sent'),
+            title: Text(localize('Sent')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text('Your message has been sent')
+                  Text(localize('Your message has been sent'))
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('Okay'),
+                child: Text(localize('Okay')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
@@ -143,7 +144,7 @@ class _BroadcastState extends State<Broadcast> {
 
     List<Widget> widgets = List();
 
-    widgets.add(Text("Message to broadcast:",
+    widgets.add(Text(localize("Message to broadcast:"),
       style: TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.bold
@@ -162,7 +163,7 @@ class _BroadcastState extends State<Broadcast> {
       },
       decoration: InputDecoration(
           border: const OutlineInputBorder(),
-          hintText: 'Message'),
+          hintText: localize('Message')),
     ));
     widgets.add(SizedBox(height: 12.0));
     widgets.add(Text("$numCharacters characters (minimum 10)",
@@ -176,7 +177,7 @@ class _BroadcastState extends State<Broadcast> {
       alignment: Alignment.centerRight,
       child: MaterialButton(
         color: Theme.of(context).accentColor,
-        child: Text("Send"),
+        child: Text(localize("Send")),
         onPressed: numCharacters >= 10 ?() {_sendMessage(context);} : null,
       ),
     ));
@@ -185,7 +186,7 @@ class _BroadcastState extends State<Broadcast> {
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
         appBar: BaseAppBar(
-          title: Text('Broadcast',
+          title: Text(localize('Broadcast'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,

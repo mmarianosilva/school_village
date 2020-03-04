@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
-import '../../model/school_ref.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class SchoolList extends StatefulWidget {
   @override
@@ -31,7 +30,7 @@ class _SchoolListState extends State<SchoolList> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: BaseAppBar(
-        title: Text("Select School",
+        title: Text(localize("Select School"),
             style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
         leading: BackButton(color: Colors.grey.shade800),
         backgroundColor: Colors.grey.shade200,
@@ -41,9 +40,9 @@ class _SchoolListState extends State<SchoolList> {
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
-                return Text('Loading...');
+                return Text(localize('Loading...'));
               case ConnectionState.waiting:
-                return Text('Loading...');
+                return Text(localize('Loading...'));
               default:
                 if (snapshot.hasError)
                   return Text('Error: ${snapshot.error}');
@@ -61,11 +60,11 @@ class _SchoolListState extends State<SchoolList> {
                             AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
                           switch (snapshot.connectionState) {
                             case ConnectionState.none:
-                              return Text('Loading...');
+                              return Text(localize('Loading...'));
                             case ConnectionState.waiting:
-                              return Text('Loading...');
+                              return Text(localize('Loading...'));
                             case ConnectionState.active:
-                              return Text('Loading...');
+                              return Text(localize('Loading...'));
                             default:
                               if (snapshot.hasError)
                                 return Text('Error: ${snapshot.error}');

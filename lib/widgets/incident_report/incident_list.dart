@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/date_formatter.dart' as dateFormatting;
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/incident_report/incident_details.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 final dateTimeFormatter = dateFormatting.messageDateFormatter;
 
@@ -102,7 +103,7 @@ class IncidentListState extends State<IncidentList> {
               subtitle: Text(
                   "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}"),
               trailing: FlatButton(
-                child: Text('VIEW'),
+                child: Text(localize('VIEW')),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -143,14 +144,14 @@ class IncidentListState extends State<IncidentList> {
       return Scaffold(
           backgroundColor: Colors.grey.shade100,
           appBar: BaseAppBar(
-            title: Text('Incident Report Log',
+            title: Text(localize('Incident Report Log'),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
             leading: BackButton(color: Colors.grey.shade800),
           ),
-          body: !isLoaded ? Text("Loading..") : _buildList());
+          body: !isLoaded ? Text(localize("Loading..")) : _buildList());
     });
   }
 

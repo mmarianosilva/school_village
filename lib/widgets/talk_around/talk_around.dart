@@ -5,8 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
-import '../../util/user_helper.dart';
-import 'chat/chat.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/talk_around/chat/chat.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class TalkAround extends StatefulWidget {
   final TalkAroundChannel conversation;
@@ -84,7 +85,7 @@ class _TalkAroundState extends State<TalkAround>
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('New Message:',
+                Text(localize('New Message:'),
                     style: TextStyle(
                         inherit: false,
                         fontSize: 13.0,
@@ -110,22 +111,22 @@ class _TalkAroundState extends State<TalkAround>
         appBar: BaseAppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          title: new Text('Talk Around',
+          title: Text(localize('Talk Around'),
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
-          leading: new BackButton(color: Colors.grey.shade800),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+          leading: BackButton(color: Colors.grey.shade800),
         ),
-        body: new Center(child: new Text("Loading")),
+        body: Center(child: Text(localize("Loading"))),
       );
     }
     return Scaffold(
       appBar: BaseAppBar(
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
-          title: new Text(conversation.direct ? conversation.groupConversationName(UserHelper.getDisplayName(_userSnapshot)) : '${conversation.name}',
+          title: Text(conversation.direct ? conversation.groupConversationName(UserHelper.getDisplayName(_userSnapshot)) : '${conversation.name}',
               textAlign: TextAlign.center,
-              style: new TextStyle(color: Colors.black, letterSpacing: 1.29)),
-          leading: new BackButton(color: Colors.grey.shade800),
+              style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+          leading: BackButton(color: Colors.grey.shade800),
       ),
       body: Chat(
         conversation: "${_schoolId}/messages/${conversation.id}",

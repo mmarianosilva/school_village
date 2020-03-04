@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
-import '../../util/user_helper.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Alert extends StatefulWidget {
   @override
@@ -66,7 +67,7 @@ class _AlertState extends State<Alert> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Send Alert'),
+            title: Text(localize('Send Alert')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -74,20 +75,20 @@ class _AlertState extends State<Alert> {
                     controller: customAlertController,
                     decoration: InputDecoration(
                         border: const UnderlineInputBorder(),
-                        hintText: 'What is the emergency?'),
+                        hintText: localize('What is the emergency?')),
                   )
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('Cancel'),
+                child: Text(localize('Cancel')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text('Send'),
+                child: Text(localize('Send')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _sendAlert("other", "Alert!", "${customAlertController.text} at $_schoolName");
@@ -108,18 +109,18 @@ class _AlertState extends State<Alert> {
           barrierDismissible: false,
           builder: (_) {
             return AlertDialog(
-              title: Text('Are you sure you want to send this alert?'),
+              title: Text(localize('Are you sure you want to send this alert?')),
               content: SingleChildScrollView(
                 child: ListBody(
                   children: <Widget>[
-                    Text('This cannot be undone')
+                    Text(localize('This cannot be undone'))
                   ],
                 ),
               ),
               actions: <Widget>[
                 FlatButton(
                   color: Colors.red,
-                  child: Text('911 + Campus', style: TextStyle(color: Colors.white)),
+                  child: Text(localize('911 + Campus'), style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     Navigator.of(context).pop();
                     showDialog(
@@ -127,25 +128,25 @@ class _AlertState extends State<Alert> {
                         barrierDismissible: false,
                         builder: (_) {
                           return AlertDialog(
-                            title: Text('Are you sure you want to send a message to 911?'),
+                            title: Text(localize('Are you sure you want to send a message to 911?')),
                             content: SingleChildScrollView(
                               child: ListBody(
                                 children: <Widget>[
-                                  Text('This cannot be undone')
+                                  Text(localize('This cannot be undone'))
                                 ],
                               ),
                             ),
                             actions: <Widget>[
                               FlatButton(
                                   color: Colors.black45,
-                                  child: Text('Yes', style: TextStyle(color: Colors.white)),
+                                  child: Text(localize('Yes'), style: TextStyle(color: Colors.white)),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                                "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only."),
+                                                localize("Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
                                           )
                                       );
                                     } else {
@@ -156,7 +157,7 @@ class _AlertState extends State<Alert> {
                               ),
                               FlatButton(
                                   color: Colors.black45,
-                                  child: Text('No', style: TextStyle(color: Colors.white)),
+                                  child: Text(localize('No'), style: TextStyle(color: Colors.white)),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   }
@@ -169,7 +170,7 @@ class _AlertState extends State<Alert> {
                 ),
                 FlatButton(
                   color: Colors.red,
-                  child: Text('Only Campus', style: TextStyle(color: Colors.white)),
+                  child: Text(localize('Only Campus'), style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     Navigator.of(context).pop();
                     _saveAlert(alertTitle, alertBody, alertType, context);
@@ -177,7 +178,7 @@ class _AlertState extends State<Alert> {
                 ),
                 FlatButton(
                   color: Colors.black45,
-                  child: Text('Cancel', style: TextStyle(color: Colors.white)),
+                  child: Text(localize('Cancel'), style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -192,18 +193,18 @@ class _AlertState extends State<Alert> {
         barrierDismissible: false,
         builder: (_) {
           return AlertDialog(
-            title: Text('Are you sure you want to send this alert?'),
+            title: Text(localize('Are you sure you want to send this alert?')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text('This cannot be undone')
+                  Text(localize('This cannot be undone'))
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
                 color: Colors.black45,
-                child: Text('YES', style: TextStyle(color: Colors.white)),
+                child: Text(localize('YES'), style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _saveAlert(alertTitle, alertBody, alertType, context);
@@ -211,7 +212,7 @@ class _AlertState extends State<Alert> {
               ),
               FlatButton(
                 color: Colors.black45,
-                child: Text('NO', style: TextStyle(color: Colors.white)),
+                child: Text(localize('NO'), style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -250,7 +251,7 @@ class _AlertState extends State<Alert> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Alert Sent'),
+            title: Text(localize('Alert Sent')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
@@ -260,7 +261,7 @@ class _AlertState extends State<Alert> {
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('Okay'),
+                child: Text(localize('Okay')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -285,7 +286,7 @@ class _AlertState extends State<Alert> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: BaseAppBar(
-          title: Text('Alert',
+          title: Text(localize('Alert'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
           backgroundColor: Colors.grey.shade200,
@@ -321,7 +322,7 @@ class _AlertState extends State<Alert> {
                   SizedBox(height: 32.0),
                   Container(
                       padding: EdgeInsets.all(12.0),
-                      child: Text("TAP AN ICON BELOW TO SEND AN ALERT",
+                      child: Text(localize("TAP AN ICON BELOW TO SEND AN ALERT"),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: Colors.red,

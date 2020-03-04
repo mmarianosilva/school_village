@@ -8,8 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/video_helper.dart';
-import 'package:sentry/sentry.dart';
-import '../../util/user_helper.dart';
+import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class Hotline extends StatefulWidget {
   @override
@@ -234,15 +234,15 @@ class _HotlineState extends State<Hotline> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Sent'),
+            title: Text(localize('Sent')),
             content: SingleChildScrollView(
               child: ListBody(
-                children: <Widget>[Text('Your message has been sent')],
+                children: <Widget>[Text(localize('Your message has been sent'))],
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text('Okay'),
+                child: Text(localize('Okay')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
@@ -415,7 +415,7 @@ class _HotlineState extends State<Hotline> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text("English", style: TextStyle(color: Colors.white)),
+                Text(localize("English"), style: TextStyle(color: Colors.white)),
                 Switch(
                     value: !isEnglish,
                     activeColor: Colors.grey.shade300,
@@ -426,7 +426,7 @@ class _HotlineState extends State<Hotline> {
                         isEnglish = !value;
                       });
                     }),
-                Text("Español", style: TextStyle(color: Colors.white))
+                Text(localize("Español"), style: TextStyle(color: Colors.white))
               ],
             ),
             _buildText(),

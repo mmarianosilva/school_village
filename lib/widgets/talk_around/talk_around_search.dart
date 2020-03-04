@@ -10,6 +10,7 @@ import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_room_item.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class TalkAroundSearch extends StatefulWidget {
   final bool _createMode;
@@ -216,7 +217,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
                 ),
               ),
               MaterialButton(
-                  child: Text("Cancel", style: TextStyle(color: Colors.white)),
+                  child: Text(localize("Cancel"), style: TextStyle(color: Colors.white)),
                   onPressed: () => Navigator.pop(context)
               )
             ],
