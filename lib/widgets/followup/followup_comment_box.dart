@@ -6,6 +6,7 @@ import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/video_helper.dart';
 
 class FollowupCommentBox extends StatefulWidget {
   final String _firestorePath;
@@ -23,6 +24,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
   File _selectedPhoto;
   DocumentSnapshot _userDoc;
   bool _busy = false;
+  bool _isVideo = false;
 
   @override
   void initState() {
@@ -114,6 +116,15 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                     onPressed: () {
                       _onSelectPhoto();
                     },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.video_call,
+                      color: Colors.blueAccent
+                    ),
+                    onPressed: () {
+                      _onSelectVideo();
+                    },
                   )
                 ],
               )
@@ -146,7 +157,27 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
   Future<void> _onSelectPhoto() async {
     File photo = await widget._imagePickerUsecase.selectImage();
     if (photo != null) {
+      _isVideo = false;
       _changePreviewPhoto(photo);
+    }
+  }
+
+  Future<void> _onSelectVideo() async {
+    File video = await widget._imagePickerUsecase.selectVideo();
+    if (video != null) {
+      setState(() {
+        _busy = true;
+      });
+      try {
+        await VideoHelper.buildThumbnail(video);
+        await VideoHelper.processVideoForUpload(video);
+        _isVideo = true;
+        _changePreviewPhoto(File(VideoHelper.thumbnailPath(video)));
+      } finally {
+        setState(() {
+          _busy = false;
+        });
+      }
     }
   }
 
@@ -169,9 +200,15 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
       final String path = '${widget._firestorePath}/followup';
       String uploadUri;
       if (_selectedPhoto != null) {
-        final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
-        uploadUri = await uploadFileUsecase.uploadFile(
-            '$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto);
+          final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        if (_isVideo) {
+          uploadUri = await uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', File(VideoHelper.convertedVideoPath(_selectedPhoto)));
+        } else {
+          uploadUri = await uploadFileUsecase.uploadFile(
+              '$path/${DateTime
+                  .now()
+                  .millisecondsSinceEpoch}', _selectedPhoto);
+        }
       }
       await Firestore.instance.collection(path).add({
         'createdById': _userDoc.documentID,
