@@ -28,7 +28,6 @@ class IncidentListState extends State<IncidentList> {
   String _schoolId = '';
   String _schoolName = '';
   String name = '';
-  DocumentReference _school;
   DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
   List<DocumentSnapshot> reports = [];
@@ -38,7 +37,8 @@ class IncidentListState extends State<IncidentList> {
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
-    _school = Firestore.instance.document(_schoolId);
+    _schoolSnapshot = await Firestore.instance.document(_schoolId).get();
+    _schoolName = _schoolSnapshot['name'];
     _handleMessageCollection();
     await UserHelper.loadIncidentTypes();
     setState(() {
@@ -144,9 +144,16 @@ class IncidentListState extends State<IncidentList> {
       return Scaffold(
           backgroundColor: Colors.grey.shade100,
           appBar: BaseAppBar(
-            title: Text(localize('Incident Report Log'),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+            title: Column(
+              children: <Widget>[
+                Text(localize('Incident Report Log'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+                Text(_schoolName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.blueAccent, fontSize: 16.0)),
+              ],
+            ),
             backgroundColor: Colors.grey.shade200,
             elevation: 0.0,
             leading: BackButton(color: Colors.grey.shade800),
