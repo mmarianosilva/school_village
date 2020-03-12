@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:school_village/model/school_ref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'user_helper.dart';
 import 'dart:io';
 import 'package:device_info/device_info.dart';

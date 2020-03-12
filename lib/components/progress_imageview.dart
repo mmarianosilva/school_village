@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:school_village/components/video_view.dart';
 import 'dart:typed_data';
 
-import 'package:video_player/video_player.dart';
-
 typedef void ProgressImageTapCallBack(String imgUrl);
 
 class ProgressImage extends StatefulWidget {

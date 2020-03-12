@@ -75,12 +75,12 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
               ),
               _selectedPhoto != null
                   ? Container(
-                      height: 96.0,
-                      child: Image.file(
-                        _selectedPhoto,
-                        fit: BoxFit.scaleDown,
-                      ),
-                    )
+                height: 96.0,
+                child: Image.file(
+                  _selectedPhoto,
+                  fit: BoxFit.scaleDown,
+                ),
+              )
                   : SizedBox(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -119,8 +119,8 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                   ),
                   IconButton(
                     icon: Icon(
-                      Icons.video_call,
-                      color: Colors.blueAccent
+                        Icons.video_call,
+                        color: Colors.blueAccent
                     ),
                     onPressed: () {
                       _onSelectVideo();
@@ -172,7 +172,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
         await VideoHelper.buildThumbnail(video);
         await VideoHelper.processVideoForUpload(video);
         _isVideo = true;
-        _changePreviewPhoto(File(VideoHelper.thumbnailPath(video)));
+        _changePreviewPhoto(File(await VideoHelper.thumbnailPath(video)));
       } finally {
         setState(() {
           _busy = false;
@@ -200,9 +200,9 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
       final String path = '${widget._firestorePath}/followup';
       String uploadUri;
       if (_selectedPhoto != null) {
-          final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
         if (_isVideo) {
-          uploadUri = await uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', File(VideoHelper.convertedVideoPath(_selectedPhoto)));
+          uploadUri = await uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', VideoHelper.videoForThumbnail(_selectedPhoto));
         } else {
           uploadUri = await uploadFileUsecase.uploadFile(
               '$path/${DateTime
@@ -210,12 +210,15 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                   .millisecondsSinceEpoch}', _selectedPhoto);
         }
       }
-      await Firestore.instance.collection(path).add({
-        'createdById': _userDoc.documentID,
-        'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
-        'img': uploadUri,
-        'timestamp': FieldValue.serverTimestamp(),
-        'body': body,
+      await Firestore.instance.runTransaction((transaction) async {
+        await Firestore.instance.collection(path).add({
+          'createdById': _userDoc.documentID,
+          'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+          'img': uploadUri,
+          'timestamp': FieldValue.serverTimestamp(),
+          'body': body,
+          'isVideo': _isVideo,
+        });
       });
     } on Exception catch (ex) {
       debugPrint('${ex.toString()}');

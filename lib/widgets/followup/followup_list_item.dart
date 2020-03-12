@@ -32,12 +32,14 @@ class FollowupListItem extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                dateFormatter.format(_data['timestamp'].toDate()),
+                _data['timestamp'] != null ?
+                dateFormatter.format(_data['timestamp'].toDate()) : '',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Spacer(),
               Text(
-                timeFormatter.format(_data['timestamp'].toDate()),
+                _data['timestamp'] != null ?
+                timeFormatter.format(_data['timestamp'].toDate()) : '',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

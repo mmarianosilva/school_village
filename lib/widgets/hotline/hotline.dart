@@ -210,7 +210,7 @@ class _HotlineState extends State<Hotline> {
         isLoaded = false;
       });
       final File uploadFile = _isVideo
-          ? File(VideoHelper.convertedVideoPath(_selectedMedia))
+          ? File(await VideoHelper.convertedVideoPath(_selectedMedia))
           : _selectedMedia;
       final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
       firebaseStoragePath = await uploadFileUsecase.uploadFile(
@@ -253,7 +253,7 @@ class _HotlineState extends State<Hotline> {
         });
   }
 
-  _buildPreviewBox() {
+  _buildPreviewBox() async {
     if (_selectedMedia == null) {
       return SizedBox();
     }
@@ -264,7 +264,7 @@ class _HotlineState extends State<Hotline> {
           Expanded(
             child: Image.file(
               _isVideo
-                  ? File(VideoHelper.thumbnailPath(_selectedMedia))
+                  ? File(await VideoHelper.thumbnailPath(_selectedMedia))
                   : _selectedMedia,
               fit: BoxFit.scaleDown,
             ),
