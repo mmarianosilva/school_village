@@ -485,16 +485,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
-        if (ref != null && ref != '') {
-          model
-              .getAlertGroups(
-              this.ref.split("/").length > 1 ? this.ref.split("/")[1] : '')
-              .then((alerts) {
-            print("User");
-            print(alerts);
-          });
+        if (model.user == null) {
+          return Center(child: CircularProgressIndicator());
         }
-
         if (!isLoaded) {
           _getSchoolId();
         } else {
@@ -507,7 +500,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         if (!isLoaded || !hasSchool) {
           return Material(
               child: Text(localize("Please Select A School from Settings Tab")));
-        }
+      }
 
         return FutureBuilder(
             future: Firestore.instance.document(ref).get(),

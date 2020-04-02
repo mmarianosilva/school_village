@@ -7,6 +7,7 @@ import 'dart:async';
 mixin UserModel on Model {
 
   DocumentSnapshot _user;
+  DocumentSnapshot get user => _user;
   String _token = '';
 
   Future<DocumentSnapshot> getUser() async {

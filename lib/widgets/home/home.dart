@@ -67,15 +67,26 @@ class _HomeState extends State<Home> {
 
   Future<SchoolAlert> _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
-    return await alerts.orderBy("createdAt", descending: true).getDocuments().then((result) {
+    CollectionReference alerts =
+        Firestore.instance.collection("${schoolId}/notifications");
+    return await alerts
+        .orderBy("createdAt", descending: true)
+        .getDocuments()
+        .then((result) {
       if (result.documents.isEmpty) {
         return null;
       }
-      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.fromMillisecondsSinceEpoch(0);
-      result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
-      final latestAlert = result.documents.isNotEmpty ? SchoolAlert.fromMap(result.documents.last) : null;
+      final DocumentSnapshot lastResolved = result.documents
+          .firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
+      final Timestamp lastResolvedTimestamp = lastResolved != null
+          ? lastResolved["endedAt"]
+          : Timestamp.fromMillisecondsSinceEpoch(0);
+      result.documents.removeWhere((doc) =>
+          doc["endedAt"] != null ||
+          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+      final latestAlert = result.documents.isNotEmpty
+          ? SchoolAlert.fromMap(result.documents.last)
+          : null;
       return latestAlert;
     });
   }
@@ -142,7 +153,8 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _onNotification(Map<String, dynamic> data, [bool appInForeground = false]) async {
+  _onNotification(Map<String, dynamic> data,
+      [bool appInForeground = false]) async {
     Map<String, dynamic> message;
 
     if (data["data"] != null) {
@@ -173,9 +185,11 @@ class _HomeState extends State<Home> {
       playMessageAlert();
       return _shoIncidentReportDialog(message);
     } else if (message["type"] == "alert") {
-      String path = "schools/${message["schoolId"]}/notifications/${message["notificationId"]}";
+      String path =
+          "schools/${message["schoolId"]}/notifications/${message["notificationId"]}";
       DocumentSnapshot alert = await Firestore.instance.document(path).get();
-      if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] > 7200000) {
+      if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] >
+          7200000) {
         return true;
       }
       SchoolAlert latestAlert = await _checkIfAlertIsInProgress();
@@ -198,37 +212,39 @@ class _HomeState extends State<Home> {
     final String escapedSchoolId = incomingMessageData["schoolId"];
     debugPrint(escapedSchoolId);
     debugPrint(incomingMessageData["conversationId"]);
-    return Firestore
-        .instance
+    return Firestore.instance
         .document(
-        "schools/$escapedSchoolId/messages/${incomingMessageData["conversationId"]}")
+            "schools/$escapedSchoolId/messages/${incomingMessageData["conversationId"]}")
         .get()
         .then((data) async {
       debugPrint('Retrieved channelInformation information');
       debugPrint(data.data.toString());
       TalkAroundChannel channel;
       if (data["direct"] ?? false) {
-        Stream<TalkAroundUser> membersStream = Stream.fromIterable(
-            data["members"]).asyncMap((userId) async {
+        Stream<TalkAroundUser> membersStream =
+            Stream.fromIterable(data["members"]).asyncMap((userId) async {
           final DocumentSnapshot snapshot = await userId.get();
-          return TalkAroundUser.fromMapAndGroup(snapshot,
+          return TalkAroundUser.fromMapAndGroup(
+              snapshot,
               snapshot.data["associatedSchools"][escapedSchoolId] != null
-                  ? snapshot
-                  .data["associatedSchools"][escapedSchoolId]["role"]
+                  ? snapshot.data["associatedSchools"][escapedSchoolId]["role"]
                   : "");
         });
         final List<TalkAroundUser> members = await membersStream.toList();
-        channel = TalkAroundChannel.fromMapAndUsers(
-            data, members);
+        channel = TalkAroundChannel.fromMapAndUsers(data, members);
       } else {
         channel = TalkAroundChannel.fromMapAndUsers(data, null);
       }
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => TalkAroundHome()),
-              (route) => route.settings.name == '/home');
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context) => TalkAroundMessaging(channel: channel,)));
+          (route) => route.settings.name == '/home');
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TalkAroundMessaging(
+                    channel: channel,
+                  )));
     });
   }
 
@@ -312,7 +328,10 @@ class _HomeState extends State<Home> {
   }
 
   _showBroadcastDialog(Map<String, dynamic> message) async {
-    final DocumentSnapshot messageSnapshot = await Firestore.instance.document("schools/${message['schoolId']}/broadcasts/${message['broadcastId']}").get();
+    final DocumentSnapshot messageSnapshot = await Firestore.instance
+        .document(
+            "schools/${message['schoolId']}/broadcasts/${message['broadcastId']}")
+        .get();
     return showDialog<Null>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -333,7 +352,9 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MessageDetail(notification: messageSnapshot.data,),
+                    builder: (context) => MessageDetail(
+                      notification: messageSnapshot.data,
+                    ),
                   ),
                 );
               },
@@ -358,31 +379,30 @@ class _HomeState extends State<Home> {
           barrierDismissible: true,
           builder: (BuildContext context) {
             return AlertDialog(
-                title: Text(message['title'] ?? ""),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[Text(message['body']) ?? ''],
-                  ),
+              title: Text(message['title'] ?? ""),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[Text(message['body']) ?? ''],
                 ),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text(localize('Open')),
-                    onPressed: () {
-                      stopSound();
-                      _openTalkAroundChannel(message);
-                    },
-                  ),
-                  FlatButton(
-                    child: Text(localize('Close')),
-                    onPressed: () {
-                      stopSound();
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(localize('Open')),
+                  onPressed: () {
+                    stopSound();
+                    _openTalkAroundChannel(message);
+                  },
+                ),
+                FlatButton(
+                  child: Text(localize('Close')),
+                  onPressed: () {
+                    stopSound();
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
             );
-          }
-      );
+          });
     }
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
@@ -410,8 +430,8 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        NotificationDetail(notification: SchoolAlert.fromMap(notification)),
+                    builder: (context) => NotificationDetail(
+                        notification: SchoolAlert.fromMap(notification)),
                   ),
                 );
               },
@@ -481,15 +501,15 @@ class _HomeState extends State<Home> {
       }
       print("Redirecting to Schools");
 
-      setState(() {
-        isLoaded = true;
-      });
       if (!_navigatedToSchoolList) {
         _navigatedToSchoolList = true;
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SchoolList()),
         );
+        setState(() {
+          isLoaded = true;
+        });
       }
       return;
     }
@@ -519,6 +539,11 @@ class _HomeState extends State<Home> {
           model.refreshUserIfNull();
           print("Updating school");
           updateSchool();
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         } else {
           checkNewSchool();
         }
