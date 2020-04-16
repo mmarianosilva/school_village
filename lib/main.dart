@@ -19,7 +19,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
-final SentryClient _sentry = new SentryClient(dsn: Constants.sentry_dsn);
+final SentryClient _sentry = SentryClient(dsn: Constants.sentry_dsn);
 
 _configureFirestoreOfflinePersistence() {
   Firestore.instance.settings(persistenceEnabled: false);
@@ -76,22 +76,22 @@ Future<Null> main() async {
   runZoned<Future<Null>>(() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
         .then((_) {
-      runApp(new ScopedModel<MainModel>(
+      runApp(ScopedModel<MainModel>(
         model: model,
-        child: new MaterialApp(
+        child: MaterialApp(
           home: Splash(),
-          theme: new ThemeData(
+          theme: ThemeData(
               primaryColor: Colors.grey.shade900,
               accentColor: Colors.blue,
               brightness: Brightness.light,
               primaryColorDark: Colors.white10,
               primaryColorLight: Colors.white),
           routes: <String, WidgetBuilder>{
-            '/home': (BuildContext context) => new Home(),
-            '/login': (BuildContext context) => new Login(),
+            '/home': (BuildContext context) => Home(),
+            '/login': (BuildContext context) => Login(),
           },
           navigatorObservers: [
-            new FirebaseAnalyticsObserver(
+            FirebaseAnalyticsObserver(
                 analytics: AnalyticsHelper.getAnalytics()),
             homePageRouteObserver
           ],

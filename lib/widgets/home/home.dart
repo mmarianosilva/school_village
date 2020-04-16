@@ -43,7 +43,7 @@ List<Choice> choices = <Choice>[
   Choice(title: 'Settings', icon: Icons.settings)
 ];
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   static const platform = const MethodChannel('schoolvillage.app/audio');
 
   int index = 0;
@@ -134,12 +134,15 @@ class _HomeState extends State<Home> {
     TokenHelper.saveToken();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
+        debugPrint('on Message : ${message.toString()}');
         return _onNotification(message, true);
       },
       onLaunch: (Map<String, dynamic> message) {
+        debugPrint('onLaunch : ${message.toString()}');
         return _onNotification(message);
       },
       onResume: (Map<String, dynamic> message) {
+        debugPrint('onResume : ${message.toString()}');
         return _onNotification(message);
       },
     );
@@ -151,6 +154,14 @@ class _HomeState extends State<Home> {
       });
       print(token);
     });
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      stopSound();
+    }
   }
 
   _onNotification(Map<String, dynamic> data,
@@ -585,5 +596,11 @@ class _HomeState extends State<Home> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }
