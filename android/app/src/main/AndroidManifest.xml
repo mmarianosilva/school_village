@@ -17,7 +17,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-            android:name="io.flutter.app.FlutterApplication"
+            android:name=".SchoolVillageApplication"
             android:allowBackup="false"
             android:icon="@mipmap/ic_launcher"
             tools:replace="allowBackup,label"
@@ -25,7 +25,7 @@
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="my_channel_01"/>
+                android:value="default_channel" />
 
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
