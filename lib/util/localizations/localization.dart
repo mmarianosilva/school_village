@@ -14,9 +14,9 @@ class LocalizationHelper {
 
   String localized(String key) {
     if (this._locale.languageCode == 'es') {
-      return es_strings[key];
+      return es_strings[key] ?? key;
     } else {
-      return en_strings[key];
+      return en_strings[key] ?? key;
     }
   }
 }
