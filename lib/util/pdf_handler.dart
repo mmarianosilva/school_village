@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/user_helper.dart';
 
 class PdfHandler {
   static const platform = const MethodChannel('schoolvillage.app/pdf_view');
-  static FirebaseStorage storage = new FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage();
   static bool _canceled;
 
   static showPdfFile(BuildContext context, String url, String name, {List<Map<String, dynamic>> connectedFiles}) async {
@@ -35,7 +37,7 @@ class PdfHandler {
   }
 
   static Future<String> preparePdfFromUrl(BuildContext context, String url, String name, {String parent}) async {
-    final FirebaseStorage storage = new FirebaseStorage();
+    final FirebaseStorage storage = FirebaseStorage();
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path;
     if (!name.endsWith(".pdf")) {
@@ -48,7 +50,7 @@ class PdfHandler {
     }
     print(path);
 
-    final File tempFile = new File(path);
+    final File tempFile = File(path);
 
     if (!tempFile.existsSync()) {
       final StorageReference ref = storage.ref().child(url);
@@ -87,5 +89,38 @@ class PdfHandler {
 
   static void hideLoading(BuildContext context) {
     Navigator.pop(context);
+  }
+
+  static Future<void> showLinkedPdf(BuildContext context, String documentId) async {
+    showLoading(context);
+    String localPdfPath = '';
+    try {
+      String schoolId = await UserHelper.getSelectedSchoolID();
+      DocumentSnapshot pdfDocument = await Firestore.instance.document(
+          "$schoolId/linked-pdfs/$documentId").get();
+      if (pdfDocument != null) {
+        final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument["name"]}';
+        final StorageReference pdfDirectory = FirebaseStorage.instance.ref()
+            .child(storagePath);
+        final Directory systemTempDir = await getApplicationDocumentsDirectory();
+        final String rootPath = '${systemTempDir.path}/${pdfDocument["name"]}';
+        final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
+        await items["items"].forEach((dynamic key, dynamic item) async {
+          StorageReference pdfFile = pdfDirectory.child(key);
+          StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
+              File('$rootPath/$key'));
+          await pdfDownloadTask.future;
+        });
+        localPdfPath = '$rootPath/${pdfDocument["root"].split('/').last}';
+      }
+    }
+    finally {
+      hideLoading(context);
+      if (localPdfPath.isNotEmpty) {
+        final Config config = Config();
+        config.multiTabEnabled = true;
+        PdftronFlutter.openDocument(localPdfPath, config: config);
+      }
+    }
   }
 }

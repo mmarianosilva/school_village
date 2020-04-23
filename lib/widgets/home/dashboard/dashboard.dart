@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:flutter/material.dart';
@@ -65,19 +67,30 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    CollectionReference alerts = Firestore.instance.collection("${schoolId}/notifications");
-    _alertSubscription = alerts.orderBy("createdAt", descending: true).snapshots().listen((result) {
+    CollectionReference alerts =
+        Firestore.instance.collection("${schoolId}/notifications");
+    _alertSubscription = alerts
+        .orderBy("createdAt", descending: true)
+        .snapshots()
+        .listen((result) {
       if (result.documents.isEmpty) {
         this.setState(() {
           this.alertInProgress = null;
         });
         return;
       }
-      final DocumentSnapshot lastResolved = result.documents.firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null ? lastResolved["endedAt"] : Timestamp.fromMillisecondsSinceEpoch(0);
-      result.documents.removeWhere((doc) => doc["endedAt"] != null || doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
-      final latestAlert = result.documents.isNotEmpty ? result.documents.last : null;
-      SchoolAlert alert = latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+      final DocumentSnapshot lastResolved = result.documents
+          .firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
+      final Timestamp lastResolvedTimestamp = lastResolved != null
+          ? lastResolved["endedAt"]
+          : Timestamp.fromMillisecondsSinceEpoch(0);
+      result.documents.removeWhere((doc) =>
+          doc["endedAt"] != null ||
+          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+      final latestAlert =
+          result.documents.isNotEmpty ? result.documents.last : null;
+      SchoolAlert alert =
+          latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
       if (this.alertInProgress != alert) {
         this.setState(() {
           this.alertInProgress = alert;
@@ -89,6 +102,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _showPDF(context, url, name, {List<Map<String, dynamic>> connectedFiles}) {
     print(url);
     PdfHandler.showPdfFile(context, url, name, connectedFiles: connectedFiles);
+  }
+
+  Future<void> _showLinkedPDF(BuildContext context, String documentId) async {
+    PdfHandler.showLinkedPdf(context, documentId);
   }
 
   _launchURL(url) async {
@@ -188,8 +205,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   openIncidentManagement() {
     Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => IncidentManagement(alert: alertInProgress, role: role))
-    );
+        MaterialPageRoute(
+            builder: (context) =>
+                IncidentManagement(alert: alertInProgress, role: role)));
   }
 
   _buildSettingsOption() {
@@ -212,10 +230,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Support",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Support",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
@@ -253,10 +272,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                     SizedBox(width: 12.0),
                     Expanded(
                         child: Text(
-                          "Alert Log",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                        )),
+                      "Alert Log",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          color: SVColors.dashboardItemFontColor),
+                    )),
                     Icon(Icons.chevron_right, color: Colors.grey)
                   ],
                 ),
@@ -281,12 +302,27 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (snapshot.data.data["documents"][index - 5]["type"] == "pdf") {
-          final List<Map<String, dynamic>> connectedFiles = snapshot.data.data["documents"][index - 5]["connectedFiles"] != null ? snapshot.data.data["documents"][index - 5]["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList() : null;
-          _showPDF(context,
-            snapshot.data.data["documents"][index - 5]["location"], snapshot.data.data["documents"][index - 5]["title"], connectedFiles: connectedFiles);
+          final List<Map<String, dynamic>> connectedFiles =
+              snapshot.data.data["documents"][index - 5]["connectedFiles"] !=
+                      null
+                  ? snapshot.data.data["documents"][index - 5]["connectedFiles"]
+                      .map<Map<String, dynamic>>(
+                          (untyped) => Map<String, dynamic>.from(untyped))
+                      .toList()
+                  : null;
+          _showPDF(
+              context,
+              snapshot.data.data["documents"][index - 5]["location"],
+              snapshot.data.data["documents"][index - 5]["title"],
+              connectedFiles: connectedFiles);
+        } else if (snapshot.data.data["documents"][index - 5]["type"] ==
+            "linked-pdf") {
+          _showLinkedPDF(
+            context,
+            snapshot.data.data["documents"][index - 5]["location"],
+          );
         } else {
-          _launchURL(
-              snapshot.data.data["documents"][index - 5]["location"]);
+          _launchURL(snapshot.data.data["documents"][index - 5]["location"]);
         }
       },
       child: Column(
@@ -300,24 +336,32 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data.data["documents"][index - 5]["icon"],
+                          url: snapshot.data.data["documents"][index - 5]
+                              ["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
                         if (snapshot.data == null) {
-                          return Image.asset('assets/images/logo.png', width: 48.0,);
+                          return Image.asset(
+                            'assets/images/logo.png',
+                            width: 48.0,
+                          );
                         }
-                        return Image.file(snapshot.data, width: 48.0,);
+                        return Image.file(
+                          snapshot.data,
+                          width: 48.0,
+                        );
                       }),
                 ),
               ),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    snapshot.data.data["documents"][index - 5]["title"],
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                snapshot.data.data["documents"][index - 5]["title"],
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
@@ -337,7 +381,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentReport() {
-    if (role == 'school_student' || role == 'school_family' || role == 'pd-fire-ems') {
+    if (role == 'school_student' ||
+        role == 'school_family' ||
+        role == 'pd-fire-ems') {
       return SizedBox();
     }
 
@@ -364,10 +410,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Incident Report Form",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Incident Report Form",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
@@ -383,7 +430,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentList() {
-    if (role == 'school_student' || role == 'school_family' || role == 'pd-fire-ems') {
+    if (role == 'school_student' ||
+        role == 'school_family' ||
+        role == 'pd-fire-ems') {
       return SizedBox();
     }
 
@@ -410,10 +459,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Incident Report Log",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Incident Report Log",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
@@ -429,7 +479,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'school_admin' && role != 'school_security' && role != 'district') {
+    if (role != 'school_admin' &&
+        role != 'school_security' &&
+        role != 'district') {
       return SizedBox();
     }
     return GestureDetector(
@@ -452,10 +504,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Anonymous Hotline Log",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Anonymous Hotline Log",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
@@ -472,11 +525,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     if (role == 'school_student' || role == 'school_family') {
-      return SizedBox(height: 48.0,);
+      return SizedBox(
+        height: 48.0,
+      );
     }
     return GestureDetector(
       child:
-      Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
+          Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
       onTap: sendAlert,
     );
   }
@@ -499,16 +554,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
         if (!isLoaded || !hasSchool) {
           return Material(
-              child: Text(localize("Please Select A School from Settings Tab")));
-      }
+              child:
+                  Text(localize("Please Select A School from Settings Tab")));
+        }
 
         return FutureBuilder(
             future: Firestore.instance.document(ref).get(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
-                int documentCount = snapshot.data.data["documents"] != null ?
-                snapshot.data.data["documents"].length : 0;
+                int documentCount = snapshot.data.data["documents"] != null
+                    ? snapshot.data.data["documents"].length
+                    : 0;
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
@@ -525,8 +582,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   default:
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
-                    }
-                    else
+                    } else
                       return ListView.builder(
                           padding: EdgeInsets.all(8.0),
                           itemBuilder: (BuildContext context, int index) {
