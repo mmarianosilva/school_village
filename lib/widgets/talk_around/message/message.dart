@@ -22,6 +22,7 @@ class ChatMessage extends StatelessWidget {
     this.location,
     this.message,
     this.imageUrl,
+    this.isVideo = false,
     this.unread = false});
 
   final String text;
@@ -34,6 +35,7 @@ class ChatMessage extends StatelessWidget {
   final DocumentSnapshot message;
   final String imageUrl;
   final bool unread;
+  final bool isVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +133,9 @@ class ChatMessage extends StatelessWidget {
     return ProgressImage(
       height: 160.0,
       firebasePath: imageUrl,
+      isVideo: isVideo,
       onTap: (imgUrl) {
-        NavigationHelper.openMedia(context, imgUrl);
+        NavigationHelper.openMedia(context, imgUrl, isVideo: isVideo);
       },
     );
   }

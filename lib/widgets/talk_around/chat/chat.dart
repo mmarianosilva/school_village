@@ -243,6 +243,7 @@ class _ChatState extends State<Chat> {
               self: document['authorId'] == user.documentID,
               location: widget.showLocation ? document['location'] : null,
               imageUrl: document['image'],
+              isVideo: document['isVideo'],
               message: document,
             );
           });

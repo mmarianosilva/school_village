@@ -89,7 +89,7 @@ class _ProgressImageState extends State<ProgressImage> {
           ));
     }
 
-    if (this.isVideo != null && this.isVideo) {
+    if (this.isVideo ?? false) {
       return GestureDetector(
           child: VideoView(url: url, height: height, width: width),
           onTap: () {

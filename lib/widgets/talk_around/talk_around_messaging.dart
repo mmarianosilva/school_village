@@ -7,6 +7,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/util/video_helper.dart';
 import 'package:school_village/widgets/talk_around/chat/chat.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_room_detail.dart';
@@ -23,11 +24,13 @@ class TalkAroundMessaging extends StatefulWidget {
   _TalkAroundMessagingState createState() => _TalkAroundMessagingState(channel);
 }
 
-class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerProviderStateMixin {
+class _TalkAroundMessagingState extends State<TalkAroundMessaging>
+    with TickerProviderStateMixin {
   final TalkAroundChannel channel;
   DocumentSnapshot _userSnapshot;
   String _schoolId;
   bool isLoading = true;
+  bool isVideo = false;
   bool sending = false;
   File selectedImage;
   final TextEditingController messageInputController = TextEditingController();
@@ -54,13 +57,15 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     }
     if (_userSnapshot != null) {
       final String userId = _userSnapshot.documentID;
-      final List<TalkAroundUser> members = channel.members.where((user) => user.id.documentID != userId).toList();
+      final List<TalkAroundUser> members = channel.members
+          .where((user) => user.id.documentID != userId)
+          .toList();
       members.sort((user1, user2) => user1.name.compareTo(user2.name));
       if (members.length == 1) {
         return members.first.name;
       }
       String name = "";
-      for(int i = 0; i < members.length - 1; i++) {
+      for (int i = 0; i < members.length - 1; i++) {
         name += "${members[i].name}, ";
       }
       return "$name${members.last.name}";
@@ -76,7 +81,6 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
       return localize("Talk-Around: Direct Message");
     }
     return localize("Talk-Around: Group Message");
-
   }
 
   List<Widget> _buildChannelFooterOptions() {
@@ -90,6 +94,9 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
           child: Icon(Icons.photo_size_select_actual, color: Colors.black54),
           onTap: _onSelectPhoto,
         ),
+        GestureDetector(
+            child: Icon(Icons.video_call, color: Colors.black54),
+            onTap: _onSelectVideo),
         GestureDetector(
           child: Icon(Icons.add_circle_outline, color: Colors.black54),
           onTap: _onAddTapped,
@@ -105,17 +112,25 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
         child: Icon(Icons.photo_size_select_actual, color: Colors.black54),
         onTap: _onSelectPhoto,
       ),
+      GestureDetector(
+          child: Icon(Icons.video_call, color: Colors.black54),
+          onTap: _onSelectVideo),
     ];
   }
 
   void _onAddTapped() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundSearch(false, channel)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TalkAroundSearch(false, channel)));
   }
 
   void _onChannelNameTapped() {
     if (channel.members != null) {
-      Navigator.push(context, MaterialPageRoute(
-          builder: (context) => TalkAroundRoomDetail(channel)));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TalkAroundRoomDetail(channel)));
     }
   }
 
@@ -135,6 +150,29 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     });
   }
 
+  void _onSelectVideo() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    final File video = await selectImageUsecase.selectVideo();
+    if (video != null) {
+      setState(() {
+        sending = true;
+      });
+      try {
+        await VideoHelper.buildThumbnail(video);
+        await VideoHelper.processVideoForUpload(video);
+        File thumbnail = File(await VideoHelper.thumbnailPath(video));
+        setState(() {
+          selectedImage = thumbnail;
+          isVideo = selectedImage != null;
+        });
+      } finally {
+        setState(() {
+          sending = false;
+        });
+      }
+    }
+  }
+
   void _onSend() async {
     if (messageInputController.text.isEmpty && selectedImage == null) {
       return;
@@ -142,47 +180,60 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     setState(() {
       sending = true;
     });
-    String imageUri;
+    String uploadUri;
     if (selectedImage != null) {
       try {
-        final String storagePath = '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${selectedImage.path.substring(selectedImage.parent.path.length + 1)}';
-        await uploadFileUsecase.uploadFile(storagePath, selectedImage);
-        imageUri = storagePath;
+        final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        if (isVideo) {
+          final String path =
+              '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+          await uploadFileUsecase.uploadFile(
+              path, VideoHelper.videoForThumbnail(selectedImage));
+          uploadUri = path;
+        } else {
+          final String path =
+              '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${DateTime.now().millisecondsSinceEpoch}.${selectedImage.path.split('.').last}';
+          await uploadFileUsecase.uploadFile(path, selectedImage);
+          uploadUri = path;
+        }
+
       } on Exception catch (ex) {
         setState(() {
           sending = false;
         });
-        showDialog(context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: Text(localize('An error occurred')),
-          content: Text('$ex'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(localize('Ok')),
-              onPressed: () => Navigator.pop(context),
-            )
-          ],
-        ));
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  title: Text(localize('An error occurred')),
+                  content: Text('$ex'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text(localize('Ok')),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                ));
         return;
       }
     }
     final Map<String, dynamic> messageData = {
-      "image" : imageUri,
-      "author" : UserHelper.getDisplayName(_userSnapshot),
-      "authorId" : _userSnapshot.documentID,
-      "location" : await UserHelper.getLocation(),
-      "timestamp" : FieldValue.serverTimestamp(),
-      "body" : messageInputController.text,
-      "phone" : _userSnapshot.data["phone"]
+      "image": uploadUri,
+      "isVideo": isVideo,
+      "author": UserHelper.getDisplayName(_userSnapshot),
+      "authorId": _userSnapshot.documentID,
+      "location": await UserHelper.getLocation(),
+      "timestamp": FieldValue.serverTimestamp(),
+      "body": messageInputController.text,
+      "phone": _userSnapshot.data["phone"]
     };
     try {
       Firestore.instance.runTransaction((transaction) async {
-        CollectionReference messages = Firestore.instance.collection(
-            "$_schoolId/messages/${channel.id}/messages");
+        CollectionReference messages = Firestore.instance
+            .collection("$_schoolId/messages/${channel.id}/messages");
         await transaction.set(messages.document(), messageData);
-        Firestore.instance.document("$_schoolId/messages/${channel.id}").setData({
-          "timestamp" : FieldValue.serverTimestamp()
-        }, merge: true);
+        Firestore.instance
+            .document("$_schoolId/messages/${channel.id}")
+            .setData({"timestamp": FieldValue.serverTimestamp()}, merge: true);
       });
       messageInputController.clear();
     } on Exception catch (ex) {
@@ -190,6 +241,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
     }
     setState(() {
       selectedImage = null;
+      isVideo = false;
       sending = false;
     });
   }
@@ -210,29 +262,25 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(_buildTitle(), style: TextStyle(fontSize: 16, color: Colors.black)),
+                  Text(_buildTitle(),
+                      style: TextStyle(fontSize: 16, color: Colors.black)),
                   GestureDetector(
-                    child: Text(
-                        _buildChannelName(),
-                        style: TextStyle(fontSize: 16, color: Colors.blue)
-                    ),
+                    child: Text(_buildChannelName(),
+                        style: TextStyle(fontSize: 16, color: Colors.blue)),
                     onTap: _onChannelNameTapped,
                   )
                 ],
               ),
-            )
-        ),
-        body:
-        Builder(builder: (context) {
+            )),
+        body: Builder(builder: (context) {
           if (isLoading) {
             return Center(
                 child: Column(
-                  children: <Widget>[
-                    Text(localize("Loading...")),
-                    CircularProgressIndicator()
-                  ],
-                )
-            );
+              children: <Widget>[
+                Text(localize("Loading...")),
+                CircularProgressIndicator()
+              ],
+            ));
           } else {
             return Stack(
               children: <Widget>[
@@ -250,45 +298,49 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 16.0),
                         child: Column(
                           children: <Widget>[
-                            selectedImage != null ?
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Image.file(selectedImage, height: 120.0, fit: BoxFit.scaleDown,)
-                                  ],
-                                ) :
-                                SizedBox(),
+                            selectedImage != null
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Image.file(
+                                        selectedImage,
+                                        height: 120.0,
+                                        fit: BoxFit.scaleDown,
+                                      )
+                                    ],
+                                  )
+                                : SizedBox(),
                             Container(
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
                                   color: Colors.black,
                                   border: Border.all(
-                                      color: Colors.white,
-                                      width: 1.0
-                                  )
-                              ),
+                                      color: Colors.white, width: 1.0)),
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
                                     child: TextField(
                                       controller: messageInputController,
                                       decoration: InputDecoration(
-                                          hintText: "${localize('Message')} ${_buildChannelName()}",
-                                          hintStyle: TextStyle(color: Color.fromARGB(255, 187, 187, 187))
-                                      ),
+                                          hintText:
+                                              "${localize('Message')} ${_buildChannelName()}",
+                                          hintStyle: TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 187, 187, 187))),
                                       maxLines: null,
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   GestureDetector(
                                     child: Icon(
-                                        Icons.send,
-                                        color: Color.fromARGB(255, 187, 187, 187),
-                                        size: 32.0,
+                                      Icons.send,
+                                      color: Color.fromARGB(255, 187, 187, 187),
+                                      size: 32.0,
                                     ),
                                     onTap: _onSend,
                                   )
@@ -298,9 +350,9 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                             Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: _buildChannelFooterOptions()
-                              ),
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: _buildChannelFooterOptions()),
                             )
                           ],
                         ),
@@ -308,18 +360,17 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging> with TickerPr
                     ],
                   ),
                 ),
-                sending ?
-                    Container(
-                      color: Color.fromARGB(112, 0, 0, 0),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ) :
-                SizedBox(),
+                sending
+                    ? Container(
+                        color: Color.fromARGB(112, 0, 0, 0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : SizedBox(),
               ],
             );
           }
-        })
-    );
+        }));
   }
 }
