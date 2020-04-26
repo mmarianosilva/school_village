@@ -19,9 +19,10 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		B5987F23245628350021FF38 /* message.wav in Resources */ = {isa = PBXBuildFile; fileRef = B5987F21245628350021FF38 /* message.wav */; };
+		B5987F24245628350021FF38 /* alarm.wav in Resources */ = {isa = PBXBuildFile; fileRef = B5987F22245628350021FF38 /* alarm.wav */; };
 		C4A00F31F163D63E08AC58C3 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD8271983FA15132EA669B9 /* Pods_Runner.framework */; };
 		FA1B0E4021247BE5004E20A3 /* school_villageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA1B0E3F21247BE5004E20A3 /* school_villageTests.swift */; };
-		FAE1F41222BBCE7E00824B66 /* alarm.wav in Resources */ = {isa = PBXBuildFile; fileRef = FAE1F41122BBCE7E00824B66 /* alarm.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,8 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5987F21245628350021FF38 /* message.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = message.wav; sourceTree = "<group>"; };
+		B5987F22245628350021FF38 /* alarm.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = alarm.wav; sourceTree = "<group>"; };
 		C46865034235B30E5221014E /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		FA1B0E3D21247BE5004E20A3 /* school_villageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = school_villageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1B0E3F21247BE5004E20A3 /* school_villageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = school_villageTests.swift; sourceTree = "<group>"; };
@@ -140,6 +143,8 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				B5987F22245628350021FF38 /* alarm.wav */,
+				B5987F21245628350021FF38 /* message.wav */,
 				79004DC620B233D200812907 /* Runner.entitlements */,
 				7950E23820A52A0400D23A8C /* GoogleService-Info.plist */,
 				796F006A209AA78800F36689 /* WebViewController.swift */,
@@ -287,9 +292,10 @@
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				7950E23920A52A0500D23A8C /* GoogleService-Info.plist in Resources */,
-				FAE1F41222BBCE7E00824B66 /* alarm.wav in Resources */,
+				B5987F24245628350021FF38 /* alarm.wav in Resources */,
 				9740EEB51CF90195004384FC /* Generated.xcconfig in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
+				B5987F23245628350021FF38 /* message.wav in Resources */,
 				9740EEB41CF90195004384FC /* Debug.xcconfig in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
