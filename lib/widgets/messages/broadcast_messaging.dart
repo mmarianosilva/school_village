@@ -4,7 +4,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mime/mime.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
@@ -318,8 +317,8 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       path =
       '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(image.path).split("/").length > 1
-          ? lookupMimeType(image.path).split("/")[1]
+      type = image.path.split(".").last != null
+          ? image.path.split(".").last
           : type;
 
       path = path + "." + type;

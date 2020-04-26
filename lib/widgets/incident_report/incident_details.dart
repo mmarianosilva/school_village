@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/components/progress_imageview.dart';
@@ -264,8 +263,8 @@ class IncidentDetailsState extends State<IncidentDetails> {
     if (imageFile != null) {
       path = 'Schools/$schoolId/incident_reports/${document.documentID}';
       String type = 'jpeg';
-      type = lookupMimeType(imageFile.path).split("/").length > 1
-          ? lookupMimeType(imageFile.path).split("/")[1]
+      type = imageFile.path.split(".").last != null
+          ? imageFile.path.split(".").last
           : type;
       path = path + "." + type;
       print(path);

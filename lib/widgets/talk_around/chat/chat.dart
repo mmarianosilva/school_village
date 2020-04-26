@@ -10,7 +10,6 @@ import 'package:school_village/components/messages_input_field.dart';
 import 'package:school_village/model/message_holder.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/widgets/talk_around/message/message.dart';
-import 'package:mime/mime.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
 class Chat extends StatefulWidget {
@@ -89,8 +88,8 @@ class _ChatState extends State<Chat> {
         path =
         '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
         String type = 'jpeg';
-        type = lookupMimeType(image.path).split("/").length > 1
-            ? lookupMimeType(image.path).split("/")[1]
+        type = image.path.split(".").last != null
+            ? image.path.split(".").last
             : type;
         path = path + "." + type;
 
