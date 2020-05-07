@@ -201,25 +201,40 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
       String uploadUri;
       if (_selectedPhoto != null) {
         final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        final bool isVideoShallow = _isVideo;
+        final Function(String) onCompleteTask = (String url) {
+          Firestore.instance.runTransaction((transaction) async {
+            await Firestore.instance.collection(path).add({
+              'createdById': _userDoc.documentID,
+              'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+              'img': url,
+              'timestamp': FieldValue.serverTimestamp(),
+              'body': body,
+              'isVideo': isVideoShallow,
+            });
+          });
+        };
+        _inputController.clear();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text("Your file is being uploaded in the background. This can take a long time."),
+        ));
         if (_isVideo) {
-          uploadUri = await uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', VideoHelper.videoForThumbnail(_selectedPhoto));
+          uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', VideoHelper.videoForThumbnail(_selectedPhoto), onComplete: onCompleteTask);
         } else {
-          uploadUri = await uploadFileUsecase.uploadFile(
-              '$path/${DateTime
-                  .now()
-                  .millisecondsSinceEpoch}', _selectedPhoto);
+          uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto, onComplete: onCompleteTask);
         }
-      }
-      await Firestore.instance.runTransaction((transaction) async {
-        await Firestore.instance.collection(path).add({
-          'createdById': _userDoc.documentID,
-          'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
-          'img': uploadUri,
-          'timestamp': FieldValue.serverTimestamp(),
-          'body': body,
-          'isVideo': _isVideo,
+      } else {
+        await Firestore.instance.runTransaction((transaction) async {
+          await Firestore.instance.collection(path).add({
+            'createdById': _userDoc.documentID,
+            'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+            'img': uploadUri,
+            'timestamp': FieldValue.serverTimestamp(),
+            'body': body,
+            'isVideo': _isVideo,
+          });
         });
-      });
+      }
     } on Exception catch (ex) {
       debugPrint('${ex.toString()}');
     } finally {

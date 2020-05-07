@@ -17,8 +17,9 @@ import 'package:school_village/util/localizations/localization.dart';
 
 class TalkAroundMessaging extends StatefulWidget {
   final TalkAroundChannel channel;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  const TalkAroundMessaging({Key key, this.channel}) : super(key: key);
+  TalkAroundMessaging({Key key, this.channel}) : super(key: key);
 
   @override
   _TalkAroundMessagingState createState() => _TalkAroundMessagingState(channel);
@@ -184,19 +185,50 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     if (selectedImage != null) {
       try {
         final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
+        final bool isVideoShallow = isVideo;
+        final Map<String, double> currentLocation = await UserHelper.getLocation();
+        final String input = messageInputController.text;
+        messageInputController.clear();
+        final Function(String) onCompleteTask = (String url) {
+          final Map<String, dynamic> messageData = {
+            "image": uploadUri,
+            "isVideo": isVideoShallow,
+            "author": UserHelper.getDisplayName(_userSnapshot),
+            "authorId": _userSnapshot.documentID,
+            "location": currentLocation,
+            "timestamp": FieldValue.serverTimestamp(),
+            "body": input,
+            "phone": _userSnapshot.data["phone"]
+          };
+          try {
+            Firestore.instance.runTransaction((transaction) async {
+              CollectionReference messages = Firestore.instance
+                  .collection("$_schoolId/messages/${channel.id}/messages");
+              await transaction.set(messages.document(), messageData);
+              Firestore.instance
+                  .document("$_schoolId/messages/${channel.id}")
+                  .setData(
+                  {"timestamp": FieldValue.serverTimestamp()}, merge: true);
+            });
+          } on Exception catch (ex) {
+            print("$ex");
+          }
+        };
         if (isVideo) {
           final String path =
               '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${DateTime.now().millisecondsSinceEpoch}.mp4';
-          await uploadFileUsecase.uploadFile(
-              path, VideoHelper.videoForThumbnail(selectedImage));
+          uploadFileUsecase.uploadFile(
+              path, VideoHelper.videoForThumbnail(selectedImage), onComplete: onCompleteTask);
           uploadUri = path;
         } else {
           final String path =
               '${_schoolId[0].toUpperCase()}${_schoolId.substring(1)}/messages/${channel.id}/${DateTime.now().millisecondsSinceEpoch}.${selectedImage.path.split('.').last}';
-          await uploadFileUsecase.uploadFile(path, selectedImage);
+          uploadFileUsecase.uploadFile(path, selectedImage, onComplete: onCompleteTask);
           uploadUri = path;
         }
-
+        widget._scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text('Your file is being uploaded in the background. This can take a long time'),
+        ));
       } on Exception catch (ex) {
         setState(() {
           sending = false;
@@ -215,29 +247,29 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
                 ));
         return;
       }
-    }
-    final Map<String, dynamic> messageData = {
-      "image": uploadUri,
-      "isVideo": isVideo,
-      "author": UserHelper.getDisplayName(_userSnapshot),
-      "authorId": _userSnapshot.documentID,
-      "location": await UserHelper.getLocation(),
-      "timestamp": FieldValue.serverTimestamp(),
-      "body": messageInputController.text,
-      "phone": _userSnapshot.data["phone"]
-    };
-    try {
-      Firestore.instance.runTransaction((transaction) async {
-        CollectionReference messages = Firestore.instance
-            .collection("$_schoolId/messages/${channel.id}/messages");
-        await transaction.set(messages.document(), messageData);
-        Firestore.instance
-            .document("$_schoolId/messages/${channel.id}")
-            .setData({"timestamp": FieldValue.serverTimestamp()}, merge: true);
-      });
-      messageInputController.clear();
-    } on Exception catch (ex) {
-      print("$ex");
+    } else {
+      final Map<String, dynamic> messageData = {
+        "author": UserHelper.getDisplayName(_userSnapshot),
+        "authorId": _userSnapshot.documentID,
+        "location": await UserHelper.getLocation(),
+        "timestamp": FieldValue.serverTimestamp(),
+        "body": messageInputController.text,
+        "phone": _userSnapshot.data["phone"]
+      };
+      try {
+        Firestore.instance.runTransaction((transaction) async {
+          CollectionReference messages = Firestore.instance
+              .collection("$_schoolId/messages/${channel.id}/messages");
+          await transaction.set(messages.document(), messageData);
+          Firestore.instance
+              .document("$_schoolId/messages/${channel.id}")
+              .setData(
+              {"timestamp": FieldValue.serverTimestamp()}, merge: true);
+        });
+        messageInputController.clear();
+      } on Exception catch (ex) {
+        print("$ex");
+      }
     }
     setState(() {
       selectedImage = null;
@@ -255,6 +287,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: widget._scaffoldKey,
         appBar: BaseAppBar(
             iconTheme: IconThemeData(color: Colors.black),
             backgroundColor: Color.fromARGB(255, 241, 241, 245),

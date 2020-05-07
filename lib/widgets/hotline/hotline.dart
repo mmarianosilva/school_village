@@ -12,6 +12,8 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
 class Hotline extends StatefulWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   _HotlineState createState() => _HotlineState();
 }
@@ -205,6 +207,9 @@ class _HotlineState extends State<Hotline> {
     final DocumentReference document = collection.document();
 
     String firebaseStoragePath;
+    final String role = await UserHelper.getSelectedSchoolRole();
+    final String schoolId = await UserHelper.getSelectedSchoolID();
+
     if (_selectedMedia != null) {
       setState(() {
         isLoaded = false;
@@ -213,28 +218,43 @@ class _HotlineState extends State<Hotline> {
           ? File(await VideoHelper.convertedVideoPath(_selectedMedia))
           : _selectedMedia;
       final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
-      firebaseStoragePath = await uploadFileUsecase.uploadFile(
+      uploadFileUsecase.uploadFile(
           '$hotlinePath/${DateTime
               .now()
               .millisecondsSinceEpoch
               .toString()}/${uploadFile.path.substring(
               uploadFile.parent.path.length + 1)}',
-          uploadFile);
+          uploadFile,
+      onComplete: (String url) {
+            document.setData({
+              'body': message,
+              'createdAt': DateTime
+                  .now()
+                  .millisecondsSinceEpoch,
+              'createdBy': role,
+              'schoolId': schoolId,
+              'isVideo': _isVideo,
+              'media': firebaseStoragePath,
+            });
+      });
+      widget._scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Your file is being uploaded in the background. This can take a long time'),
+      ));
       setState(() {
         isLoaded = true;
       });
+    } else {
+      document.setData({
+        'body': message,
+        'createdAt': DateTime
+            .now()
+            .millisecondsSinceEpoch,
+        'createdBy': await UserHelper.getSelectedSchoolRole(),
+        'schoolId': await UserHelper.getSelectedSchoolID(),
+      });
     }
 
-    document.setData({
-      'body': message,
-      'createdAt': DateTime
-          .now()
-          .millisecondsSinceEpoch,
-      'createdBy': await UserHelper.getSelectedSchoolRole(),
-      'schoolId': await UserHelper.getSelectedSchoolID(),
-      'isVideo': _isVideo,
-      'media': firebaseStoragePath,
-    });
+
 
     showDialog(
         context: context,
@@ -458,6 +478,7 @@ class _HotlineState extends State<Hotline> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: widget._scaffoldKey,
         backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
           title: Text(isEnglish ? englishTitle : spanishTitle,

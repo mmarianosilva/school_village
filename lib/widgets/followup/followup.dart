@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/followup/followup_comment_box.dart';
@@ -75,12 +76,18 @@ class _FollowupState extends State<Followup> {
           snapshot.data['flattenedWitnesses'] = 'Missing data';
         }
         // Flatten image URL
-        if (snapshot.data['image'] != null) {
-          String url = await FirebaseStorage.instance
-              .ref()
-              .child(snapshot.data['image'])
-              .getDownloadURL();
-          snapshot.data['flattenedImageUrl'] = url;
+        if (snapshot.data['image'] != null && snapshot.data['image'].isNotEmpty) {
+          try {
+            String url = await FirebaseStorage.instance
+                .ref()
+                .child(snapshot.data['image'])
+                .getDownloadURL();
+            snapshot.data['flattenedImageUrl'] = url;
+          } on PlatformException catch (ex) {
+            if (ex.code == 'FIRStorageErrorDomain') {
+              debugPrint('Unable to retrieve photo from storage');
+            }
+          }
         }
       }
       setState(() {
