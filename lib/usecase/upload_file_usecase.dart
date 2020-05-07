@@ -1,19 +1,25 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class UploadFileUsecase {
   FirebaseStorage _storage = FirebaseStorage();
 
-  Future<String> uploadFile(String path, File file) async {
+  static void _handleUpload(StorageUploadTask task, {Function(String) onComplete}) async {
+    final StorageTaskSnapshot result = await task.onComplete;
+    if (result.error == null && onComplete != null) {
+      final String url = await result.ref.getDownloadURL();
+      onComplete(url);
+    } else {
+      debugPrint('_handleUpload error');
+      debugPrint('${result.error}');
+    }
+  }
+
+  void uploadFile(String path, File file, {Function(String) onComplete}) {
     final StorageReference storagePath = _storage.ref().child('${path[0]}${path.substring(1)}');
     final StorageUploadTask uploadTask = storagePath.putFile(file);
-    final StorageTaskSnapshot result = await uploadTask.onComplete;
-    if (result.error == null) {
-      final String url = await result.ref.getDownloadURL();
-      return url;
-    }
-    return Future.error(PlatformException(code: '${result.error}'));
+    _handleUpload(uploadTask, onComplete: onComplete);
   }
 }
