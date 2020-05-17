@@ -160,7 +160,7 @@ class _FollowupState extends State<Followup> {
                                         ? FollowupHeaderItem(_originalData)
                                         : FollowupIncidentReportHeader(
                                             _originalData)
-                                    : CircularProgressIndicator();
+                                    : Center(child: CircularProgressIndicator());
                               }
                               final DocumentSnapshot item =
                                   snapshot.data.documents[index - 1];
