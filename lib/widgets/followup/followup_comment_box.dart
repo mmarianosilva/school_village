@@ -48,57 +48,45 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
         color: Colors.white,
         border: Border.all(color: Colors.grey[500], width: 1.0),
       ),
-      padding: const EdgeInsets.all(8.0),
+//      padding: const EdgeInsets.all(8.0),
       child: Stack(
         children: <Widget>[
           Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Row(
+              Stack(
                 children: <Widget>[
-                  _userDoc != null
-                      ? Text('${_userDoc['firstName']} ${_userDoc['lastName']}')
-                      : Text('...'),
-                  Spacer(),
-                  Text(localize('Date')),
-                  Spacer(),
-                  Text(localize('Time')),
-                ],
-              ),
-              Container(
-                child: TextField(
-                  controller: _inputController,
-                  decoration: InputDecoration(
-                    hintText: localize('Add comment'),
+                  Container(
+                    padding: const EdgeInsets.only(left: 8.0, top: 16.0, right: 8.0,),
+                    child: TextField(
+                      controller: _inputController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintText: localize('Add comment'),
+                      ),
+                    ),
                   ),
-                ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: _onClear,
+                    ),
+                  ),
+                ],
               ),
               _selectedPhoto != null
                   ? Container(
-                height: 96.0,
-                child: Image.file(
-                  _selectedPhoto,
-                  fit: BoxFit.scaleDown,
-                ),
-              )
+                      height: 96.0,
+                      child: Image.file(
+                        _selectedPhoto,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    )
                   : SizedBox(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      localize('Clear'),
-                      style: TextStyle(color: Colors.blueAccent),
-                    ),
-                    onPressed: _onClear,
-                  ),
-                  FlatButton(
-                    child: Text(
-                      localize('Add'),
-                      style: TextStyle(color: Colors.blueAccent),
-                    ),
-                    onPressed: _onAdd,
-                  ),
                   IconButton(
                     icon: Icon(
                       Icons.add_a_photo,
@@ -118,29 +106,33 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(
-                        Icons.video_call,
-                        color: Colors.blueAccent
-                    ),
+                    icon: Icon(Icons.video_call, color: Colors.blueAccent),
                     onPressed: () {
                       _onSelectVideo();
                     },
-                  )
+                  ),
+                  FlatButton(
+                    child: Text(
+                      localize('Post'),
+                      style: TextStyle(color: Colors.blueAccent),
+                    ),
+                    onPressed: _onAdd,
+                  ),
                 ],
               )
             ],
           ),
           _busy
               ? Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white70,
-              ),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          )
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white70,
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                )
               : SizedBox(),
         ],
       ),
@@ -216,12 +208,18 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
         };
         _inputController.clear();
         Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text("Your file is being uploaded in the background. This can take a long time."),
+          content: Text(
+              "Your file is being uploaded in the background. This can take a long time."),
         ));
         if (_isVideo) {
-          uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', VideoHelper.videoForThumbnail(_selectedPhoto), onComplete: onCompleteTask);
+          uploadFileUsecase.uploadFile(
+              '$path/${DateTime.now().millisecondsSinceEpoch}',
+              VideoHelper.videoForThumbnail(_selectedPhoto),
+              onComplete: onCompleteTask);
         } else {
-          uploadFileUsecase.uploadFile('$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto, onComplete: onCompleteTask);
+          uploadFileUsecase.uploadFile(
+              '$path/${DateTime.now().millisecondsSinceEpoch}', _selectedPhoto,
+              onComplete: onCompleteTask);
         }
       } else {
         await Firestore.instance.runTransaction((transaction) async {
