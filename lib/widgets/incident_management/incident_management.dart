@@ -255,7 +255,9 @@ class _IncidentManagementState extends State<IncidentManagement>
     if (schoolId != null) {
       DocumentSnapshot schoolDocument =
           await Firestore.instance.document(schoolId).get();
-      _mapData = _getMapData(schoolDocument);
+      if (schoolDocument["documents"] != null) {
+        _mapData = _getMapData(schoolDocument);
+      }
       _schoolAddress = schoolDocument.data['address'];
     }
     Firestore.instance.document('users/${user.uid}').get().then((user) {
