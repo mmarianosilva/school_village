@@ -15,63 +15,66 @@ class FollowupListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white70,
-        border: Border.all(color: Colors.grey[500], width: 1.0),
-      ),
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text(
-                _data['createdBy'],
-                style: TextStyle(color: Colors.blueAccent),
-              ),
-              Spacer(),
-              Text(
-                _data['timestamp'] != null ?
-                dateFormatter.format(_data['timestamp'].toDate()) : '',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Spacer(),
-              Text(
-                _data['timestamp'] != null ?
-                timeFormatter.format(_data['timestamp'].toDate()) : '',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              _data['body'],
-              maxLines: null,
+    return Card(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: Colors.white70,
+          border: Border.all(color: Colors.grey[500], width: 1.0),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text(
+                  _data['createdBy'],
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
+                Spacer(),
+                Text(
+                  _data['timestamp'] != null ?
+                  dateFormatter.format(_data['timestamp'].toDate()) : '',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                Text(
+                  _data['timestamp'] != null ?
+                  timeFormatter.format(_data['timestamp'].toDate()) : '',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
-            child: _media != null
-                ? GestureDetector(
-                    onTap: () => NavigationHelper.openMedia(context, _media,
-                        isVideo: _data['isVideo'] ?? false),
-                    child: _data['isVideo'] ?? false
-                        ? VideoView(
-                            url: _media,
-                            width: _videoWidth,
-                            height: _videoHeight,
-                          )
-                        : Image.network(
-                            _media,
-                            height: 96.0,
-                            fit: BoxFit.scaleDown,
-                          ),
-                  )
-                : SizedBox(),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                _data['body'],
+                maxLines: null,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
+              child: _media != null
+                  ? GestureDetector(
+                      onTap: () => NavigationHelper.openMedia(context, _media,
+                          isVideo: _data['isVideo'] ?? false),
+                      child: _data['isVideo'] ?? false
+                          ? VideoView(
+                              url: _media,
+                              width: _videoWidth,
+                              height: _videoHeight,
+                            )
+                          : Image.network(
+                              _media,
+                              height: 96.0,
+                              fit: BoxFit.scaleDown,
+                            ),
+                    )
+                  : SizedBox(),
+            ),
+          ],
+        ),
       ),
     );
   }

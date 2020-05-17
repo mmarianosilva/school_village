@@ -76,7 +76,8 @@ class _FollowupState extends State<Followup> {
           snapshot.data['flattenedWitnesses'] = 'Missing data';
         }
         // Flatten image URL
-        if (snapshot.data['image'] != null && snapshot.data['image'].isNotEmpty) {
+        if (snapshot.data['image'] != null &&
+            snapshot.data['image'].isNotEmpty) {
           try {
             String url = await FirebaseStorage.instance
                 .ref()
@@ -122,55 +123,63 @@ class _FollowupState extends State<Followup> {
             Expanded(
               child: Container(
                 color: Colors.grey[100],
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    _originalData != null
-                        ? widget._title.toLowerCase() != 'incident report'
-                            ? FollowupHeaderItem(_originalData)
-                            : FollowupIncidentReportHeader(_originalData)
-                        : CircularProgressIndicator(),
-                    StreamBuilder<QuerySnapshot>(
-                      stream: Firestore.instance
-                          .collection('${widget._firestorePath}/followup')
-                          .orderBy('timestamp')
-                          .snapshots(),
-                      initialData: null,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.connectionState != ConnectionState.none) {
-                          if (!snapshot.hasData ||
-                              snapshot.data.documents.isEmpty) {
-                            return Container(
-                              margin: const EdgeInsets.all(16.0),
-                              child: Text(localize('No followup reports found')),
-                            );
-                          }
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: ListView.builder(
-                                  itemCount: snapshot.data.documents.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final DocumentSnapshot item =
-                                        snapshot.data.documents[index];
-                                    return FollowupListItem(item.data);
-                                  }),
-                            ),
-                          );
-                        }
-                        if (snapshot.hasError) {
-                          return Text(snapshot.error.toString());
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                  ],
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: Firestore.instance
+                      .collection('${widget._firestorePath}/followup')
+                      .orderBy('timestamp')
+                      .snapshots(),
+                  initialData: null,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState != ConnectionState.none) {
+                      if (!snapshot.hasData ||
+                          snapshot.data.documents.isEmpty) {
+                        return Column(
+                          children: <Widget>[
+                            _originalData != null
+                                ? widget._title.toLowerCase() !=
+                                        'incident report'
+                                    ? FollowupHeaderItem(_originalData)
+                                    : FollowupIncidentReportHeader(
+                                        _originalData)
+                                : Center(child: CircularProgressIndicator()),
+                            Text(localize('No followup reports found')),
+                          ],
+                        );
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                            itemCount: snapshot.data.documents.length + 1,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (index == 0) {
+                                return _originalData != null
+                                    ? widget._title.toLowerCase() !=
+                                            'incident report'
+                                        ? FollowupHeaderItem(_originalData)
+                                        : FollowupIncidentReportHeader(
+                                            _originalData)
+                                    : CircularProgressIndicator();
+                              }
+                              final DocumentSnapshot item =
+                                  snapshot.data.documents[index - 1];
+                              return FollowupListItem(item.data);
+                            }),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    }
+                    return CircularProgressIndicator();
+                  },
                 ),
               ),
             ),
-            FollowupCommentBox(this.widget._firestorePath),
+            SafeArea(child: Container(
+              color: Colors.grey[100],
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                child: FollowupCommentBox(this.widget._firestorePath))),
           ],
         ),
       ),

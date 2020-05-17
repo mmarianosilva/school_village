@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/navigation_helper.dart';
+import 'package:school_village/util/localizations/localization.dart';
 
 class FollowupIncidentReportHeader extends StatelessWidget {
   final Map<String, dynamic> _data;
@@ -39,16 +40,30 @@ class FollowupIncidentReportHeader extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              'Incident: ${_data['flattenedIncidents']}',
-              maxLines: null,
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(color: Colors.black),
+                children: [
+                  TextSpan(
+                      text: localize('Incident: ', context),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '${_data['flattenedIncidents']}'),
+                ],
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              'Location: ${_data['location']}',
-              maxLines: null,
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(color: Colors.black),
+                children: [
+                  TextSpan(
+                      text: localize('Location: ', context),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '${_data['location']}'),
+                ],
+              ),
             ),
           ),
           Padding(
@@ -57,17 +72,29 @@ class FollowupIncidentReportHeader extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: Container(
-                    child: Text(
-                      'Subject: ${_data['flattenedSubjects']}',
-                      maxLines: null,
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                              text: localize('Subject: ', context),
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          TextSpan(text: '${_data['flattenedSubjects']}'),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                    child: Text(
-                      'Witness: ${_data['flattenedWitnesses']}',
-                      maxLines: null,
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(color: Colors.black),
+                      children: [
+                        TextSpan(
+                            text: localize('Witness: ', context),
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: '${_data['flattenedWitnesses']}'),
+                      ],
                     ),
                   ),
                 ),
@@ -76,9 +103,16 @@ class FollowupIncidentReportHeader extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              'Details: ${_data['details']}',
-              maxLines: null,
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(color: Colors.black),
+                children: [
+                  TextSpan(
+                      text: localize('Details: ', context),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '${_data['details']}'),
+                ],
+              ),
             ),
           ),
           Padding(
