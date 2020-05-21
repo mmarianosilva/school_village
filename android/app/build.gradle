@@ -30,7 +30,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     lintOptions {
         disable 'InvalidPackage'
@@ -46,6 +46,17 @@ android {
         multiDexEnabled true
     }
 
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension "default"
+            applicationIdSuffix = ".dev"
+        }
+        prod {
+            dimension "default"
+        }
+    }
+
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
@@ -54,6 +65,7 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     buildTypes {
         release {
             signingConfig signingConfigs.release

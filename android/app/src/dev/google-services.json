@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1094421769111:android:d5144530f59a9d92",
+        "mobilesdk_app_id": "1:1094421769111:android:7fa603ae93bc46bad9b2d2",
         "android_client_info": {
-          "package_name": "com.oandmtech.schoolvillage"
+          "package_name": "com.oandmtech.schoolvillage.dev"
         }
       },
       "oauth_client": [
