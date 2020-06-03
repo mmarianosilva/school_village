@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:flutter/material.dart';
@@ -132,25 +130,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       }
       isLoaded = true;
     });
-  }
-
-  _updateSchool() async {
-    if (!hasSchool) {
-      var schoolId = await UserHelper.getSelectedSchoolID();
-      var userIsOwner = await UserHelper.getIsOwner();
-      var userRole = await UserHelper.getSelectedSchoolRole();
-      if (userIsOwner == null) {
-        userIsOwner = false;
-      }
-      setState(() {
-        if (schoolId != null && schoolId != '') {
-          ref = schoolId;
-          isOwner = userIsOwner;
-          role = userRole;
-          hasSchool = true;
-        }
-      });
-    }
   }
 
   checkNewSchool() async {
