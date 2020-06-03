@@ -19,16 +19,17 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
-final SentryClient _sentry = SentryClient(dsn: Constants.sentry_dsn);
-
 _configureFirestoreOfflinePersistence() {
   Firestore.instance.settings(persistenceEnabled: false);
 }
 
-final RouteObserver<PageRoute> homePageRouteObserver = RouteObserver<PageRoute>();
+final RouteObserver<PageRoute> homePageRouteObserver =
+RouteObserver<PageRoute>();
+
 final model = MainModel();
 
-Future<Null> main() async {
+Future<Null> internalMain(String sentryDsn) async {
+  final SentryClient _sentry = SentryClient(dsn: sentryDsn);
   WidgetsFlutterBinding.ensureInitialized();
   PdftronFlutter.initialize(Constants.pdftronLicenseKey);
   _configureFirestoreOfflinePersistence();
@@ -38,17 +39,25 @@ Future<Null> main() async {
         builder: (context) => Scaffold(
           appBar: null,
           body: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
             child: Column(
               children: <Widget>[
                 Text(LocalizationHelper.of(context).localized(
                     'An unexpected error has occurred. Please login again to resolve the issue.')),
-                Text(LocalizationHelper.of(context).localized('We apologize for the inconvenience.')),
+                Text(LocalizationHelper.of(context)
+                    .localized('We apologize for the inconvenience.')),
                 FlatButton(
                   color: Colors.blueAccent,
-                  child: Text(LocalizationHelper.of(context).localized('Logout').toUpperCase(), style: TextStyle(color: Colors.white),),
+                  child: Text(
+                    LocalizationHelper.of(context)
+                        .localized('Logout')
+                        .toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
                   onPressed: () async {
-                    final String token = (await SharedPreferences.getInstance()).getString("fcmToken");
+                    final String token = (await SharedPreferences.getInstance())
+                        .getString("fcmToken");
                     final FirebaseUser user = (await UserHelper.getUser());
                     await TokenHelper.deleteToken(token, user.uid);
                     await UserHelper.logout(token);
@@ -66,14 +75,7 @@ Future<Null> main() async {
       return ErrorWidget(error.exception);
     }
   };
-  FlutterError.onError = (FlutterErrorDetails details) async {
-    if (isInDebugMode) {
-      FlutterError.dumpErrorToConsole(details);
-    } else {
-      Zone.current.handleUncaughtError(details.exception, details.stack);
-    }
-  };
-  runZoned<Future<Null>>(() async {
+  runZonedGuarded<Future<Null>>(() async {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
         .then((_) {
       runApp(ScopedModel<MainModel>(
@@ -99,8 +101,8 @@ Future<Null> main() async {
         ),
       ));
     });
-  }, onError: (error, stackTrace) async {
-    await _reportError(error, stackTrace);
+  }, (error, stackTrace) async {
+    await _reportError(_sentry, error, stackTrace);
   });
 }
 
@@ -110,7 +112,7 @@ bool get isInDebugMode {
   return inDebugMode;
 }
 
-Future<Null> _reportError(dynamic error, dynamic stackTrace) async {
+Future<Null> _reportError(SentryClient _sentry, dynamic error, dynamic stackTrace) async {
   print('Caught error: $error');
   if (isInDebugMode) {
     print(stackTrace);
