@@ -4,9 +4,6 @@ import io.flutter.app.FlutterActivity
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
 import android.os.Bundle
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -20,8 +17,6 @@ class MainActivity : FlutterActivity() {
     protected override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GeneratedPluginRegistrant.registerWith(this)
-        AppCenter.start(getApplication(), "c5b4ce38-f8e5-458b-8f10-8328d37d76a3",
-                Analytics::class.java, Crashes::class.java)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Amber alert channel
             val CHANNEL_ID = "sv_alert"

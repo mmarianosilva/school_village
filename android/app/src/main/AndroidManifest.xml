@@ -17,11 +17,11 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-            android:name=".SchoolVillageApplication"
+            android:name="com.oandmtech.schoolvillage.SchoolVillageApplication"
             android:allowBackup="false"
             android:icon="@mipmap/ic_launcher"
             tools:replace="allowBackup,label"
-            android:label="SchoolVillage">
+            android:label="@string/app_name">
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -32,7 +32,7 @@
                 android:value="AIzaSyBVRFQqX_6Xp01lE2vO2Uozw0TNX9OiUOg" />
 
         <activity
-                android:name=".MainActivity"
+                android:name="com.oandmtech.schoolvillage.MainActivity"
                 android:launchMode="singleTop"
                 android:theme="@style/LaunchTheme"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
@@ -55,7 +55,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".PdfViewerActivity"
+                android:name="com.oandmtech.schoolvillage.PdfViewerActivity"
                 android:launchMode="singleTop"
                 android:theme="@style/LaunchTheme"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
