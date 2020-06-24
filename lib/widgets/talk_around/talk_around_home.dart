@@ -185,7 +185,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                     flex: 1
                 ),
                 Spacer(flex: 1),
-                Flexible(
+                _channels != null && _channels.isNotEmpty ? Flexible(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
@@ -194,15 +194,15 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                           textAlign: TextAlign.start
                       ),
                     )
-                ),
-                Flexible(
+                ) : const SizedBox(),
+                _channels != null && _channels.isNotEmpty ? Flexible(
                     child: ListView.builder(
                       itemBuilder: _buildChannelItem,
-                      itemCount: _channels != null ? _channels.length : 0,
+                      itemCount: _channels.length,
                     ),
                     flex: 6,
                     fit: FlexFit.loose
-                ),
+                ) : const SizedBox(),
                 Flexible(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
