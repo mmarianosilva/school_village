@@ -27,7 +27,7 @@ class UserHelper {
         email: email.trim().toLowerCase(), password: password);
   }
 
-  static getUser() async {
+  static Future<FirebaseUser> getUser() async {
     FirebaseUser user = await _auth.currentUser();
     if (user == null) {
       if (_prefs == null) {
@@ -41,8 +41,9 @@ class UserHelper {
           password.isEmpty) {
         return null;
       }
-      return await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+      return _auth.currentUser();
     }
     AnalyticsHelper.setUserId(user.uid);
     return user;
