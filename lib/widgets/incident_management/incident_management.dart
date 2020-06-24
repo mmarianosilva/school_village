@@ -74,10 +74,12 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   void _onSchoolMap() {
     PdfHandler.showPdfFile(context, _mapData["location"], _mapData["title"],
-        connectedFiles: _mapData["connectedFiles"] != null ? _mapData["connectedFiles"]
-            .map<Map<String, dynamic>>(
-                (untyped) => Map<String, dynamic>.from(untyped))
-            .toList() : null);
+        connectedFiles: _mapData["connectedFiles"] != null
+            ? _mapData["connectedFiles"]
+                .map<Map<String, dynamic>>(
+                    (untyped) => Map<String, dynamic>.from(untyped))
+                .toList()
+            : null);
   }
 
   void _onSop() async {
@@ -398,10 +400,6 @@ class _IncidentManagementState extends State<IncidentManagement>
         onMapClicked: this);
   }
 
-  bool _isDifferentReporter() {
-    return false;
-  }
-
   @override
   void onMapClicked(TalkAroundMessage message) {
     final messageMap = {
@@ -417,6 +415,20 @@ class _IncidentManagementState extends State<IncidentManagement>
         context,
         MaterialPageRoute(
             builder: (context) => MessageDetail(notification: messageMap)));
+  }
+
+  List<Widget> _buildStopAlertItems() {
+    if (role == 'school_security' || role == 'school_admin') {
+      return [
+        Spacer(),
+        Container(
+            child: GestureDetector(
+                child: Image.asset("assets/images/stop_sign.png", height: 64),
+                onTap: _showStopAlert),
+            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0)),
+      ];
+    }
+    return [];
   }
 
   @override
@@ -680,15 +692,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                                   height: 64),
                                               onTap: _onSop),
                                           padding: EdgeInsets.all(4)),
-                                      Spacer(),
-                                      Container(
-                                          child: GestureDetector(
-                                              child: Image.asset(
-                                                  "assets/images/stop_sign.png",
-                                                  height: 64),
-                                              onTap: _showStopAlert),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 4.0, horizontal: 8.0)),
+                                      ..._buildStopAlertItems(),
                                     ]),
                               ),
                             ),
