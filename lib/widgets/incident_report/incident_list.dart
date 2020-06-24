@@ -28,6 +28,7 @@ class IncidentListState extends State<IncidentList> {
   String _schoolId = '';
   String _schoolName = '';
   String name = '';
+  String _role = '';
   DocumentSnapshot _schoolSnapshot;
   bool isLoaded = false;
   List<DocumentSnapshot> reports = [];
@@ -36,9 +37,11 @@ class IncidentListState extends State<IncidentList> {
   IncidentListState({this.id});
 
   getUserDetails(MainModel model) async {
+    id = (await UserHelper.getUser()).uid;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolSnapshot = await Firestore.instance.document(_schoolId).get();
     _schoolName = _schoolSnapshot['name'];
+    _role = await UserHelper.getSelectedSchoolRole();
     _handleMessageCollection();
     await UserHelper.loadIncidentTypes();
     setState(() {
@@ -46,18 +49,27 @@ class IncidentListState extends State<IncidentList> {
     });
   }
 
-  _handleMessageCollection() {
-    _incidentListSubscription = Firestore.instance
-        .collection("$_schoolId/incident_reports")
-        .orderBy("createdAt")
-        .snapshots()
-        .listen((data) {
-          List<DocumentSnapshot> updatedList = data.documents;
-          updatedList.sort((a, b) => b['createdAt'].compareTo(a['createdAt']));
-          setState(() {
-            reports = updatedList;
-          });
-    });
+  _handleMessageCollection() async {
+    if (_role != 'school_staff') {
+      _incidentListSubscription = Firestore.instance
+          .collection("$_schoolId/incident_reports")
+          .orderBy("createdAt", descending: true)
+          .snapshots()
+          .listen((data) {
+        setState(() {
+          reports = data.documents;
+        });
+      });
+    } else {
+      final List<DocumentSnapshot> documents = (await Firestore.instance
+          .collection("$_schoolId/incident_reports")
+          .where("createdById", isEqualTo: id)
+          .orderBy("createdAt", descending: true)
+          .getDocuments()).documents;
+      setState(() {
+        reports = documents;
+      });
+    }
   }
 
 
