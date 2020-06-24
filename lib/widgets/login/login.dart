@@ -144,7 +144,9 @@ class _LoginState extends State<Login> {
                     Container(
                         width: MediaQuery.of(context).size.width - 40.0,
                         child: TextField(
+                          autocorrect: false,
                           controller: emailController,
+                          enableSuggestions: false,
                           keyboardType: TextInputType.emailAddress,
                           focusNode: emailFocusNode,
                           decoration:
@@ -154,6 +156,8 @@ class _LoginState extends State<Login> {
                     Container(
                         width: MediaQuery.of(context).size.width - 40.0,
                         child: TextField(
+                          autocorrect: false,
+                          enableSuggestions: false,
                           controller: passwordController,
                           obscureText: true,
                           focusNode: passwordFocusNode,
