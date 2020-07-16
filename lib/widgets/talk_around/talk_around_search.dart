@@ -176,6 +176,10 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           List.of([TalkAroundUser(doc.reference, UserHelper.getDisplayName(doc), doc.data["associatedSchools"][escapedSchoolId] != null ? TalkAroundUser.mapGroup(doc.data["associatedSchools"][escapedSchoolId]["role"]) : "")])
       );
     }).toList();
+    userList.removeWhere((channel) =>
+    !(channel.members.length != 1 ||
+        channel.members.first.name != username)
+    );
 
     final List<TalkAroundChannel> fullList = [...userList, ...retrievedChannels];
     fullList.sort((channel1, channel2) => channel1.groupConversationName(username).compareTo(channel2.groupConversationName(username)));

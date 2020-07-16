@@ -17,7 +17,7 @@ class UserHelper {
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
 
-  static signIn({email: String, password: String}) async {
+  static Future<AuthResult> signIn({email: String, password: String}) async {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }

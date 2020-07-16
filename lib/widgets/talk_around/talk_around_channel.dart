@@ -34,7 +34,9 @@ class TalkAroundChannel {
       output += "${names[i]}, ";
       i++;
     }
-    output += names[names.length - 1];
+    if (names.isNotEmpty) {
+      output += names[names.length - 1];
+    }
     return output;
   }
 }
