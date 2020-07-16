@@ -56,11 +56,14 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       channel["direct"] = true;
       channel["name"] = "";
       channel["members"] = members;
-      final DocumentReference channelDoc = Firestore.instance.collection("$_schoolId/messages").document();
+      final Map<String, dynamic> channelDoc =
       await Firestore.instance.runTransaction((transaction) async {
-        return transaction.set(channelDoc, channel).then((_) => channel);
+        final DocumentReference documentReference = await Firestore.instance.collection("$_schoolId/messages").add(channel);
+        return {
+          "id": documentReference.documentID,
+        };
       });
-      DocumentSnapshot firebaseModel = await channelDoc.get();
+      final DocumentSnapshot firebaseModel = await Firestore.instance.document("$_schoolId/messages/${channelDoc["id"]}").get();
       final String escapedSchoolId = _schoolId.substring("schools/".length);
       Stream<TalkAroundUser> participants = Stream.fromIterable(members).asyncMap((id) async {
         final DocumentSnapshot user = await id.get();
