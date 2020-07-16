@@ -542,9 +542,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
-                int documentCount = snapshot.data.data["documents"] != null
-                    ? snapshot.data.data["documents"].length
-                    : 0;
+                final List<DocumentSnapshot> documents =
+                    snapshot.data.data["documents"] != null
+                        ? snapshot.data.data["documents"].where(
+                            (snapshot) =>
+                                snapshot["accessRoles"] == null || snapshot["accessRoles"].contains(role)).toList().cast<DocumentSnapshot>()
+                        : null;
+                final int documentCount = documents != null ? documents.length : 0;
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
@@ -578,7 +582,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                               return _buildIncidentList();
                             }
                             if (index == 4) {
-                              return SizedBox();
+                              return const SizedBox();
                             }
                             if (index == documentCount + 5) {
                               return _buildMessagesOption(model);
