@@ -16,7 +16,8 @@ class TalkAroundSearch extends StatefulWidget {
   final bool _createMode;
   final TalkAroundChannel _channel;
 
-  const TalkAroundSearch(this._createMode, this._channel, {Key key}) : super(key: key);
+  const TalkAroundSearch(this._createMode, this._channel, {Key key})
+      : super(key: key);
 
   @override
   _TalkAroundSearchState createState() => _TalkAroundSearchState();
@@ -57,42 +58,56 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       channel["name"] = "";
       channel["members"] = members;
       final Map<String, dynamic> channelDoc =
-      await Firestore.instance.runTransaction((transaction) async {
-        final DocumentReference documentReference = await Firestore.instance.collection("$_schoolId/messages").add(channel);
+          await Firestore.instance.runTransaction((transaction) async {
+        final DocumentReference documentReference = await Firestore.instance
+            .collection("$_schoolId/messages")
+            .add(channel);
         return {
           "id": documentReference.documentID,
         };
       });
-      final DocumentSnapshot firebaseModel = await Firestore.instance.document("$_schoolId/messages/${channelDoc["id"]}").get();
+      final DocumentSnapshot firebaseModel = await Firestore.instance
+          .document("$_schoolId/messages/${channelDoc["id"]}")
+          .get();
       final String escapedSchoolId = _schoolId.substring("schools/".length);
-      Stream<TalkAroundUser> participants = Stream.fromIterable(members).asyncMap((id) async {
+      Stream<TalkAroundUser> participants =
+          Stream.fromIterable(members).asyncMap((id) async {
         final DocumentSnapshot user = await id.get();
-        TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data["associatedSchools"][escapedSchoolId] != null ? user.data["associatedSchools"][escapedSchoolId]["role"] : "");
+        TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
+            user,
+            user.data["associatedSchools"][escapedSchoolId] != null
+                ? user.data["associatedSchools"][escapedSchoolId]["role"]
+                : "");
         return member;
       });
       List<TalkAroundUser> users = await participants.toList();
       selectedChannel = TalkAroundChannel.fromMapAndUsers(firebaseModel, users);
     }
     if (widget._createMode) {
-      Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => TalkAroundMessaging(channel: selectedChannel)));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  TalkAroundMessaging(channel: selectedChannel)));
     } else {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => TalkAroundMessaging(channel: selectedChannel)),
+          MaterialPageRoute(
+              builder: (context) =>
+                  TalkAroundMessaging(channel: selectedChannel)),
           (route) => route.settings.name == '/talk-around');
     }
   }
 
-  void _setupTextInputController() {
-
-  }
+  void _setupTextInputController() {}
 
   void _onSearchTextInput(String input) {
     final List<TalkAroundChannel> filter = _chats.where((channel) {
       input = input.toLowerCase();
       return channel.name.toLowerCase().contains(input) ||
-          (channel.members.where((member) => member.name.toLowerCase().contains(input)).isNotEmpty); // For group messages
+          (channel.members
+              .where((member) => member.name.toLowerCase().contains(input))
+              .isNotEmpty); // For group messages
     }).toList();
     setState(() {
       _filteredList = filter;
@@ -115,37 +130,40 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   void _getChatrooms() async {
     final escapedSchoolId = _schoolId.substring("schools/".length);
     final username = UserHelper.getDisplayName(_userSnapshot);
-    final QuerySnapshot users = await Firestore
-        .instance
+    final QuerySnapshot users = await Firestore.instance
         .collection("users")
         .where("associatedSchools.$escapedSchoolId.allowed", isEqualTo: true)
         .getDocuments();
-    users.documents.removeWhere((doc) => doc.documentID == _userSnapshot.documentID);
+
+    final List<DocumentSnapshot> modifiableUserList = [...users.documents];
+    modifiableUserList
+        .removeWhere((doc) => doc.documentID == _userSnapshot.documentID);
 
     if (!widget._createMode) {
-      users.documents.removeWhere((doc) =>
-      widget._channel.members.firstWhere((member) =>
-      member.id == doc.reference,
-          orElse: () => null)
-          != null);
+      modifiableUserList.removeWhere((doc) =>
+          widget._channel.members.firstWhere(
+              (member) => member.id == doc.reference,
+              orElse: () => null) !=
+          null);
     }
 
     final List<TalkAroundChannel> retrievedChannels = List<TalkAroundChannel>();
 
     if (widget._createMode) {
-      final QuerySnapshot channels = await Firestore
-          .instance
+      final QuerySnapshot channels = await Firestore.instance
           .collection("$_schoolId/messages")
           .where("members", arrayContains: _userSnapshot.reference)
           .getDocuments();
-      List<Future<TalkAroundChannel>> processedChannels = channels.documents
-          .map((channel) async {
-        Stream<TalkAroundUser> members = Stream.fromIterable(
-            channel.data["members"]).asyncMap((id) async {
+      List<Future<TalkAroundChannel>> processedChannels =
+          channels.documents.map((channel) async {
+        Stream<TalkAroundUser> members =
+            Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
           final DocumentSnapshot user = await id.get();
-          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user,
-              user.data["associatedSchools"][escapedSchoolId] != null ? user
-                  .data["associatedSchools"][escapedSchoolId]["role"] : "");
+          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
+              user,
+              user.data["associatedSchools"][escapedSchoolId] != null
+                  ? user.data["associatedSchools"][escapedSchoolId]["role"]
+                  : "");
           return member;
         });
         List<TalkAroundUser> users = await members.toList();
@@ -153,39 +171,53 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       }).toList();
       retrievedChannels.addAll(await Future.wait(processedChannels));
       retrievedChannels.removeWhere((channel) =>
-        !(channel.members.length != 1 ||
-          channel.members.first.name != username)
-      );
+          !(channel.members.length != 1 ||
+              channel.members.first.name != username));
 
-      users.documents.removeWhere((doc) =>
-      retrievedChannels.firstWhere((item) =>
-      item.members.firstWhere((member) =>
-      member.id.documentID == doc.documentID,
-          orElse: () => null) != null,
-          orElse: () => null)
-          != null);
+
+
+      modifiableUserList.removeWhere((doc) =>
+          retrievedChannels.firstWhere(
+              (item) =>
+                  item.members.firstWhere(
+                      (member) => member.id.documentID == doc.documentID,
+                      orElse: () => null) !=
+                  null,
+              orElse: () => null) !=
+          null);
     }
-    
-    
-    final List<String> talkAroundPermissions = PermissionMatrix.getTalkAroundPermissions(_role);
-    users.documents.removeWhere((userSnapshot) => userSnapshot["associatedSchools"][escapedSchoolId] == null || !talkAroundPermissions.contains(userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
 
-    final List<TalkAroundChannel> userList = users.documents.map((doc) {
+    final List<String> talkAroundPermissions =
+        PermissionMatrix.getTalkAroundPermissions(_role);
+    modifiableUserList.removeWhere((userSnapshot) =>
+        userSnapshot["associatedSchools"][escapedSchoolId] == null ||
+        !talkAroundPermissions.contains(
+            userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
+
+    final List<TalkAroundChannel> userList = modifiableUserList.map((doc) {
       return TalkAroundChannel(
           "",
           "",
           true,
           null,
-          List.of([TalkAroundUser(doc.reference, UserHelper.getDisplayName(doc), doc.data["associatedSchools"][escapedSchoolId] != null ? TalkAroundUser.mapGroup(doc.data["associatedSchools"][escapedSchoolId]["role"]) : "")])
-      );
+          List.of([
+            TalkAroundUser(
+                doc.reference,
+                UserHelper.getDisplayName(doc),
+                doc.data["associatedSchools"][escapedSchoolId] != null
+                    ? TalkAroundUser.mapGroup(
+                        doc.data["associatedSchools"][escapedSchoolId]["role"])
+                    : "")
+          ]));
     }).toList();
-    userList.removeWhere((channel) =>
-    !(channel.members.length != 1 ||
-        channel.members.first.name != username)
-    );
 
-    final List<TalkAroundChannel> fullList = [...userList, ...retrievedChannels];
-    fullList.sort((channel1, channel2) => channel1.groupConversationName(username).compareTo(channel2.groupConversationName(username)));
+    final List<TalkAroundChannel> fullList = [
+      ...userList,
+      ...retrievedChannels
+    ];
+    fullList.sort((channel1, channel2) => channel1
+        .groupConversationName(username)
+        .compareTo(channel2.groupConversationName(username)));
     setState(() {
       _chats = fullList;
       _filteredList = _chats;
@@ -224,9 +256,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
                 ),
               ),
               MaterialButton(
-                  child: Text(localize("Cancel"), style: TextStyle(color: Colors.white)),
-                  onPressed: () => Navigator.pop(context)
-              )
+                  child: Text(localize("Cancel"),
+                      style: TextStyle(color: Colors.white)),
+                  onPressed: () => Navigator.pop(context))
             ],
           ),
         ),
