@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:school_village/util/file_helper.dart';
 import '../../util/user_helper.dart';
 import '../../util/analytics_helper.dart';
 
@@ -17,6 +18,7 @@ class Splash extends StatelessWidget {
       print("Bad Password");
     }
     if(currentUser != null) {
+      FileHelper.downloadRequiredDocuments();
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/home', (Route<dynamic> route) => false);
     } else {

@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/util/user_helper.dart';
 
@@ -22,10 +22,10 @@ class PdfHandler {
       root = name;
     }
     showLoading(context);
-    final String pdfFilePath = await preparePdfFromUrl(context, url, name, parent: root);
+    final String pdfFilePath = await preparePdfFromUrl(url, name, parent: root);
     if (connectedFiles != null && connectedFiles.isNotEmpty) {
       final Iterable<Future> transfer = connectedFiles.map((file) =>
-          preparePdfFromUrl(context, file["url"], file["name"], parent: root));
+          preparePdfFromUrl(file["url"], file["name"], parent: root));
       await Future.wait(transfer);
     }
     if (!_canceled) {
@@ -36,7 +36,7 @@ class PdfHandler {
     }
   }
 
-  static Future<String> preparePdfFromUrl(BuildContext context, String url, String name, {String parent}) async {
+  static Future<String> preparePdfFromUrl(String url, String name, {String parent}) async {
     final FirebaseStorage storage = FirebaseStorage();
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path;
@@ -95,24 +95,7 @@ class PdfHandler {
     showLoading(context);
     String localPdfPath = '';
     try {
-      String schoolId = await UserHelper.getSelectedSchoolID();
-      DocumentSnapshot pdfDocument = await Firestore.instance.document(
-          "$schoolId/linked-pdfs/$documentId").get();
-      if (pdfDocument != null) {
-        final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument["name"]}';
-        final StorageReference pdfDirectory = FirebaseStorage.instance.ref()
-            .child(storagePath);
-        final Directory systemTempDir = await getApplicationDocumentsDirectory();
-        final String rootPath = '${systemTempDir.path}/${pdfDocument["name"]}';
-        final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
-        await items["items"].forEach((dynamic key, dynamic item) async {
-          StorageReference pdfFile = pdfDirectory.child(key);
-          StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
-              File('$rootPath/$key'));
-          await pdfDownloadTask.future;
-        });
-        localPdfPath = '$rootPath/${pdfDocument["root"].split('/').last}';
-      }
+      localPdfPath = await downloadLinkedPdf(documentId);
     }
     finally {
       hideLoading(context);
@@ -122,5 +105,27 @@ class PdfHandler {
         PdftronFlutter.openDocument(localPdfPath, config: config);
       }
     }
+  }
+
+  static Future<String> downloadLinkedPdf(String documentId) async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    DocumentSnapshot pdfDocument = await Firestore.instance.document(
+        "$schoolId/linked-pdfs/$documentId").get();
+    if (pdfDocument != null) {
+      final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument["name"]}';
+      final StorageReference pdfDirectory = FirebaseStorage.instance.ref()
+          .child(storagePath);
+      final Directory systemTempDir = await getApplicationDocumentsDirectory();
+      final String rootPath = '${systemTempDir.path}/${pdfDocument["name"]}';
+      final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
+      await items["items"].forEach((dynamic key, dynamic item) async {
+        StorageReference pdfFile = pdfDirectory.child(key);
+        StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
+            File('$rootPath/$key'));
+        await pdfDownloadTask.future;
+      });
+      return '$rootPath/${pdfDocument["root"].split('/').last}';
+    }
+    return null;
   }
 }

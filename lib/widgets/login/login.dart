@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/file_helper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/contact/contact.dart';
 import 'package:school_village/widgets/forgot/forgot.dart';
@@ -15,7 +15,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -38,6 +37,7 @@ class _LoginState extends State<Login> {
 
   proceed() async {
     await checkIfOnlyOneSchool();
+    FileHelper.downloadRequiredDocuments();
     AnalyticsHelper.logLogin();
     Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
   }
@@ -88,9 +88,10 @@ class _LoginState extends State<Login> {
       duration: Duration(days: 1),
     ));
 
-    UserHelper.signIn(email: emailController.text.trim().toLowerCase(), password: passwordController.text).then((user) {
-      print(user);
-      proceed();
+    UserHelper.signIn(email: emailController.text.trim().toLowerCase(), password: passwordController.text).then((auth) {
+      if (auth.user != null) {
+        proceed();
+      }
     }).catchError((error) {
       _scaffoldKey.currentState.hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
       showErrorDialog(error.message);
