@@ -70,23 +70,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     _alertSubscription = alerts
         .orderBy("createdAt", descending: true)
         .snapshots()
-        .listen((result) {
+        .listen((result) async {
+          final DocumentSnapshot latestResolved = (await alerts.orderBy("endedAt", descending: true).limit(1).getDocuments()).documents.first;
       if (result.documents.isEmpty) {
         this.setState(() {
           this.alertInProgress = null;
         });
         return;
       }
-      final DocumentSnapshot lastResolved = result.documents
-          .firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null
-          ? lastResolved["endedAt"]
+      final Timestamp lastResolvedTimestamp = latestResolved != null
+          ? latestResolved["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
-      result.documents.removeWhere((doc) =>
-          doc["endedAt"] != null ||
-          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert =
-          result.documents.isNotEmpty ? result.documents.last : null;
+          result.documents.lastWhere((DocumentSnapshot snapshot) => snapshot["createdAt"] > lastResolvedTimestamp.millisecondsSinceEpoch, orElse: () => null);
       SchoolAlert alert =
           latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
       if (this.alertInProgress != alert) {
