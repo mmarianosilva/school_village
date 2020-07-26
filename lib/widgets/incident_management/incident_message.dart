@@ -79,9 +79,8 @@ class IncidentMessage extends StatelessWidget {
             } else {
               return Row(
                 children: <Widget>[
-                  Flexible(
-                      child: Text(localize("From: ", context), style: TextStyle(fontWeight: FontWeight.bold))),
-                  Flexible(
+                  Text(localize("From: ", context), style: TextStyle(fontWeight: FontWeight.bold)),
+                  Expanded(
                       child: GestureDetector(
                           onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
                           child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)))

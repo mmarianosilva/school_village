@@ -230,7 +230,7 @@ class _AlertState extends State<Alert> {
   }
 
 
-  _saveAlert(alertTitle, alertBody, alertType, context) async{
+  _saveAlert(alertTitle, alertBody, alertType, context) async {
     CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.document();
 

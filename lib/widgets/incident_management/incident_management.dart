@@ -457,199 +457,166 @@ class _IncidentManagementState extends State<IncidentManagement>
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Container(
-                      color: Color.fromARGB(140, 229, 229, 234),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 4.0),
-                        child: Row(children: [
-                          Text("${alert.title}",
-                              style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold)),
-                          Expanded(
-                              child: Text(
-                                  "${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}",
-                                  textAlign: TextAlign.end))
-                        ]),
-                      ),
-                    ),
                     Flexible(
-                      child: GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(
-                            target: LatLng(alert.location.latitude,
-                                alert.location.longitude),
-                            zoom: 16.4),
-                        mapType: MapType.satellite,
-                        myLocationButtonEnabled: false,
-                        indoorViewEnabled: true,
-                        markers: markers,
-                      ),
-                      flex: 10,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            color: Color.fromARGB(140, 229, 229, 234),
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: <Widget>[
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: Text(
-                                    "${alert.body}",
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.bold),
-                                    maxLines: 1,
-                                  ),
+                      child: Stack(
+                        children: <Widget>[
+                          GoogleMap(
+                            onMapCreated: _onMapCreated,
+                            initialCameraPosition: CameraPosition(
+                                target: LatLng(alert.location.latitude,
+                                    alert.location.longitude),
+                                zoom: 16.4),
+                            mapType: MapType.satellite,
+                            myLocationButtonEnabled: false,
+                            indoorViewEnabled: true,
+                            markers: markers,
+                          ),
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              color: Color.fromARGB(140, 229, 229, 234),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 4.0),
+                                child: Row(
+                                  children: [
+                                    Text("${alert.title}",
+                                        style: TextStyle(
+                                            fontSize: 18.0,
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold)),
+                                    Expanded(
+                                        child: Text(
+                                            "${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}",
+                                            textAlign: TextAlign.end))
+                                  ],
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                    vertical: 4.0,
-                                  ),
-                                  child: Container(
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      flex: 12,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      color: Color.fromARGB(140, 229, 229, 234),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: <Widget>[
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              "${alert.body}",
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 14.0, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      launch(
+                                          "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
+                                    },
                                     child: Text(
                                       "${_schoolAddress}",
-                                      textAlign: TextAlign.center,
+                                      textAlign: TextAlign.start,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        color: Colors.lightBlueAccent,
                                         fontSize: 14.0,
                                       ),
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        child: Text(
-                                          'LOCATION:',
-                                          style: TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 11, 48, 224),
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          launch(
-                                              "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
-                                        },
-                                      ),
-                                      GestureDetector(
-                                        child: Icon(
-                                          Icons.location_on,
-                                          color: Colors.red,
-                                        ),
-                                        onTap: () {
-                                          launch(
-                                              "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
-                                        },
-                                      ),
-                                      const Spacer(),
-                                      _mapData != null
-                                          ? GestureDetector(
-                                              child: Icon(Icons.map),
-                                              onTap: _onSchoolMap,
-                                            )
-                                          : const SizedBox(),
-                                      _mapData != null
-                                          ? GestureDetector(
-                                              child: Text(
-                                                'CAMPUS MAP',
-                                                style: TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 11, 48, 224),
-                                                ),
-                                              ),
-                                              onTap: _onSchoolMap,
-                                            )
-                                          : const SizedBox(),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 4.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(localize("911 Callback: "),
-                                          textAlign: TextAlign.start,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14.0)),
-                                      Text(alert.createdBy,
-                                          textAlign: TextAlign.start,
-                                          style: TextStyle(fontSize: 14.0)),
-                                      GestureDetector(
-                                        onTap: () => showContactDialog(
-                                            context,
-                                            alert.createdBy,
-                                            alert.reportedByPhone),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0, vertical: 0.0),
-                                          child: Text(
-                                            alert.reportedByPhoneFormatted,
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                              fontSize: 14.0,
-                                              color: Color.fromARGB(
-                                                  255, 11, 48, 224),
-                                            ),
-                                          ),
+                                _mapData != null
+                                    ? GestureDetector(
+                                        onTap: _onSchoolMap,
+                                        child: const Icon(
+                                          Icons.map,
+                                          color: Colors.black,
                                         ),
                                       )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 0.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(localize("Reported by: "),
-                                          textAlign: TextAlign.start,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14.0)),
-                                      Text(alert.createdBy,
-                                          style: TextStyle(fontSize: 14.0)),
-                                      GestureDetector(
-                                          onTap: () => showContactDialog(
-                                              context,
-                                              alert.createdBy,
-                                              alert.reportedByPhone),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 4.0, vertical: 0.0),
-                                            child: Text(
-                                                alert.reportedByPhoneFormatted,
-                                                style: TextStyle(
-                                                    fontSize: 14.0,
-                                                    color: Color.fromARGB(
-                                                        255, 11, 48, 224))),
-                                          ))
-                                    ],
-                                  ),
-                                ),
+                                    : const SizedBox(),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(localize("911 Callback: "),
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12.0)),
+                                Text(alert.createdBy,
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(fontSize: 12.0)),
+                                GestureDetector(
+                                  onTap: () => showContactDialog(context,
+                                      alert.createdBy, alert.reportedByPhone),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0),
+                                    child: Text(
+                                      alert.reportedByPhoneFormatted,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        color: Color.fromARGB(255, 11, 48, 224),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 0.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  localize("Reported by: "),
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.0),
+                                ),
+                                Text(alert.createdBy,
+                                    style: TextStyle(fontSize: 12.0)),
+                                GestureDetector(
+                                    onTap: () => showContactDialog(context,
+                                        alert.createdBy, alert.reportedByPhone),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 4.0, vertical: 0.0),
+                                      child: Text(
+                                          alert.reportedByPhoneFormatted,
+                                          style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: Color.fromARGB(
+                                                  255, 11, 48, 224))),
+                                    ))
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Builder(builder: (context) {
                       if (widget.resolved) {
