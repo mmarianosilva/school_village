@@ -50,7 +50,19 @@ class IncidentListState extends State<IncidentList> {
   }
 
   _handleMessageCollection() async {
-    if (_role != 'school_staff') {
+    if (_role == 'school_security') {
+      String escapedSchoolId = _schoolId.substring("schools/".length);
+      final List<DocumentSnapshot> securityUsers = (await Firestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "school_security").getDocuments()).documents;
+      _incidentListSubscription = Firestore.instance
+          .collection("$_schoolId/incident_reports")
+          .where("createdById", whereIn: securityUsers.map((security) => security.documentID).toList())
+          .snapshots()
+          .listen((data) {
+            setState(() {
+              reports = data.documents;
+            });
+      });
+    } else if (_role != 'school_staff') {
       _incidentListSubscription = Firestore.instance
           .collection("$_schoolId/incident_reports")
           .orderBy("createdAt", descending: true)
