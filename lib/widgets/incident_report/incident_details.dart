@@ -181,74 +181,75 @@ class IncidentDetailsState extends State<IncidentDetails> {
       }
     }
     return SingleChildScrollView(
-        child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildKeyValueText('Incident', incident),
-              SizedBox.fromSize(size: Size(0, 10.0)),
-              _buildKeyValueText('Subject', subject),
-              SizedBox.fromSize(size: Size(0, 10.0)),
-              _buildKeyValueText('Witness', witness),
-              SizedBox.fromSize(size: Size(0, 10.0)),
-              _buildKeyValueText('Date', dateFormatter.format(date)),
-              SizedBox.fromSize(size: Size(0, 10.0)),
-              _buildKeyValueText('Time', timeFormatter.format(date)),
-              SizedBox.fromSize(size: Size(0, 10.0)),
-              _buildKeyValueText('Location', location),
-              Container(
-                height: 1,
-                color: SVColors.incidentReport,
-                margin: EdgeInsets.symmetric(vertical: 15),
-              ),
-              Text(localize('Details'),
-                  style: TextStyle(
-                      color: SVColors.incidentReportGray,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                child: Text(
-                  details,
-                ),
-              ),
-              _buildImagePreview(),
-              _buildKeyValueText('Reported by', name),
-              !demo
-                  ? GestureDetector(
-                      child: Text(
-                        localize('Contact'),
-                        style: TextStyle(color: SVColors.talkAroundBlue),
-                      ),
-                      onTap: () => showContactDialog(context, name, phone),
-                    )
-                  : SizedBox(),
-              SizedBox.fromSize(size: Size(0, 26.0)),
-              demo
-                  ? Center(
-                      child: RaisedButton(
-                          onPressed: () {
-                            _sendReport();
-                          },
-                          color: SVColors.incidentReportRed,
-                          child: Text(localize("SEND REPORT"),
-                              style: TextStyle(color: Colors.white))))
-                  : FlatButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => Followup(
-                              localize('Incident Report'),
-                              widget.firestoreDocument.reference.path),
-                        ),
-                      ),
-                      child: Text(
-                        localize('Follow-up'),
-                        style: TextStyle(color: Colors.blueAccent),
-                      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _buildKeyValueText('Incident', incident),
+          SizedBox.fromSize(size: Size(0, 10.0)),
+          _buildKeyValueText('Subject', subject),
+          SizedBox.fromSize(size: Size(0, 10.0)),
+          _buildKeyValueText('Witness', witness),
+          SizedBox.fromSize(size: Size(0, 10.0)),
+          _buildKeyValueText('Date', dateFormatter.format(date)),
+          SizedBox.fromSize(size: Size(0, 10.0)),
+          _buildKeyValueText('Time', timeFormatter.format(date)),
+          SizedBox.fromSize(size: Size(0, 10.0)),
+          _buildKeyValueText('Location', location),
+          Container(
+            height: 1,
+            color: SVColors.incidentReport,
+            margin: EdgeInsets.symmetric(vertical: 15),
+          ),
+          Text(localize('Details'),
+              style: TextStyle(
+                  color: SVColors.incidentReportGray,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16)),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            child: Text(
+              details,
+            ),
+          ),
+          _buildImagePreview(),
+          _buildKeyValueText('Reported by', name),
+          !demo
+              ? GestureDetector(
+                  child: Text(
+                    localize('Contact'),
+                    style: TextStyle(color: SVColors.talkAroundBlue),
+                  ),
+                  onTap: () => showContactDialog(context, name, phone),
+                )
+              : SizedBox(),
+          SizedBox.fromSize(size: Size(0, 26.0)),
+          demo
+              ? Center(
+                  child: RaisedButton(
+                      onPressed: () {
+                        _sendReport();
+                      },
+                      color: SVColors.incidentReportRed,
+                      child: Text(localize("SEND REPORT"),
+                          style: TextStyle(color: Colors.white))))
+              : FlatButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => Followup(
+                          localize('Incident Report'),
+                          widget.firestoreDocument.reference.path),
                     ),
-              SizedBox.fromSize(size: Size(0, 15.0)),
-            ]),),);
+                  ),
+                  child: Text(
+                    localize('Follow-up'),
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
+                ),
+          SizedBox.fromSize(size: Size(0, 15.0)),
+        ]),
+      ),
+    );
   }
 
   _sendReport() async {
@@ -285,6 +286,24 @@ class IncidentDetailsState extends State<IncidentDetails> {
       'image': path,
       'other': other
     });
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Success'),
+        content: Container(
+          constraints: BoxConstraints(maxHeight: 128.0),
+          child: Center(
+            child: Text('Incident report has been sent successfully'),
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Center(child: Text('Ok'.toUpperCase())),
+          ),
+        ],
+      ),
+    );
     Navigator.pop(context);
     Navigator.pop(context);
   }
@@ -301,8 +320,6 @@ class IncidentDetailsState extends State<IncidentDetails> {
     });
     return downloadUrl;
   }
-
-
 
   _buildImagePreview() {
     if (imageFile == null && (imgUrl == null || imgUrl.isEmpty)) {
