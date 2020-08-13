@@ -56,6 +56,7 @@ class IncidentListState extends State<IncidentList> {
       _incidentListSubscription = Firestore.instance
           .collection("$_schoolId/incident_reports")
           .where("createdById", whereIn: securityUsers.map((security) => security.documentID).toList())
+          .orderBy("createdAt", descending: true)
           .snapshots()
           .listen((data) {
             setState(() {

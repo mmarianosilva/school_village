@@ -6,6 +6,8 @@ import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/util/constants.dart';
+import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:school_village/components/base_appbar.dart';
@@ -25,6 +27,7 @@ import 'package:school_village/widgets/schoollist/school_list.dart';
 import 'package:school_village/util/token_helper.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -43,7 +46,7 @@ List<Choice> choices = <Choice>[
   Choice(title: 'Settings', icon: Icons.settings)
 ];
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScopeObserver {
   static const platform = const MethodChannel('schoolvillage.app/audio');
 
   int index = 0;
@@ -57,12 +60,17 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   String _messageAlertAssetFile;
 
   Future playAlarm() async {
+    final role = await UserHelper.getSelectedSchoolRole();
+    if ((role == 'school_security' || role == 'school_admin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
+      return playMessageAlert();
+    }
     if (!Platform.isIOS) {
       await copyLocalAssets();
       await audioPlugin.play(_localAssetFile, isLocal: true);
     } else {
       platform.invokeMethod('playBackgroundAudio');
     }
+    (await SharedPreferences.getInstance()).setInt(Constants.lastAmberAlertTimestampKey, DateTime.now().millisecondsSinceEpoch);
   }
 
   Future<SchoolAlert> _checkIfAlertIsInProgress() async {
@@ -89,6 +97,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           : null;
       return latestAlert;
     });
+  }
+
+  @override
+  void onDidPopScope() {
+    checkNewSchool();
   }
 
   stopSound() {
@@ -592,7 +605,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               ),
             ],
           ),
-          body: Dashboard(),
+          body: Dashboard(this),
         );
       },
     );

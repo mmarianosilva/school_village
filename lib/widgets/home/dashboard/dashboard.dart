@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:flutter/material.dart';
@@ -24,6 +25,10 @@ import 'package:school_village/model/main_model.dart';
 import 'package:school_village/widgets/holine_list/hotline_list.dart';
 
 class Dashboard extends StatefulWidget {
+  const Dashboard(this.listener);
+
+  final DashboardScopeObserver listener;
+
   @override
   _DashboardState createState() => _DashboardState();
 }
@@ -60,6 +65,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   void didPopNext() {
+    if (widget.listener != null) {
+      widget.listener.onDidPopScope();
+    }
     _checkIfAlertIsInProgress();
   }
 

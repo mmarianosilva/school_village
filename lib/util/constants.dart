@@ -8,4 +8,5 @@ class Constants {
   static const hotLineBlue = const Color(0xFF0B92B4);
   static const messagesHorizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0);
   static const pdftronLicenseKey = '';
+  static const lastAmberAlertTimestampKey = 'lastAmberAlertTimestamp';
 }
