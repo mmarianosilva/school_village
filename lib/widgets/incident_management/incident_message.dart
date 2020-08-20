@@ -10,7 +10,13 @@ class IncidentMessage extends StatelessWidget {
   final String targetGroup;
   final OnMapInterface onMapClicked;
 
-  IncidentMessage({Key key, this.message, this.timestamp, this.targetGroup, this.onMapClicked}) : super(key: key);
+  IncidentMessage(
+      {Key key,
+      this.message,
+      this.timestamp,
+      this.targetGroup,
+      this.onMapClicked})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,31 +27,34 @@ class IncidentMessage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
           child: Row(
             children: <Widget>[
-              Flexible(
-                  child: Text("${message.origin}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red), maxLines: 1, overflow: TextOverflow.ellipsis,),
-                  flex: 2,
-                  fit: FlexFit.tight
+              Expanded(
+                child: Text(
+                  "${message.origin}",
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Flexible(
-                  child: Builder(
-                    builder: (context) {
-                      if (message.latitude != null && message.longitude != null) {
-                        return GestureDetector(
-                            child: Text(localize("Map", context), style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), textAlign: TextAlign.end),
-                            onTap: () => onMapClicked.onMapClicked(message));
-                      } else {
-                        return SizedBox();
-                      }
-                    },
-                  ),
-                  flex: 1,
-                  fit: FlexFit.tight
+              Builder(
+                builder: (context) {
+                  if (message.latitude != null && message.longitude != null) {
+                    return GestureDetector(
+                        child: Text(localize("Map", context),
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 11, 48, 224)),
+                            textAlign: TextAlign.end),
+                        onTap: () => onMapClicked.onMapClicked(message));
+                  } else {
+                    return SizedBox();
+                  }
+                },
               ),
-              Flexible(
-                  child: Text(timestamp, textAlign: TextAlign.end, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                  flex: 2,
-                  fit: FlexFit.tight
-              )
+              const SizedBox(width: 16.0),
+              Text(timestamp,
+                  textAlign: TextAlign.end,
+                  style:
+                      TextStyle(fontWeight: FontWeight.bold, color: Colors.red))
             ],
           ),
         ),
@@ -55,37 +64,57 @@ class IncidentMessage extends StatelessWidget {
             if (targetGroup.isNotEmpty) {
               return Row(
                 children: <Widget>[
-                  Flexible(
-                      child: Text(localize("From:", context), style: TextStyle(fontWeight: FontWeight.bold)),
-                      flex: 2,
-                      fit: FlexFit.tight),
-                  Flexible(
-                      child: GestureDetector(
-                          onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
-                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)), maxLines: 1, overflow: TextOverflow.ellipsis,)
-                      ),
-                      flex: 7,
-                      fit: FlexFit.tight),
-                  Flexible(
-                      child: Text(localize("To:", context), style: TextStyle(fontWeight: FontWeight.bold), maxLines: 1,),
-                      flex: 1,
-                      fit: FlexFit.tight),
-                  Flexible(
-                      child: Text(targetGroup, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                      flex: 7,
-                      fit: FlexFit.tight)
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      children: <Widget>[
+                        Text(localize("From:", context),
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        GestureDetector(
+                            onTap: () => showContactDialog(context,
+                                message.author, message.reportedByPhone),
+                            child: Text(
+                              message.author,
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 11, 48, 224)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          localize("To:", context),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                        ),
+                        Expanded(
+                            child: Text(
+                          targetGroup,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                      ],
+                    ),
+                  ),
                 ],
               );
             } else {
               return Row(
                 children: <Widget>[
-                  Text(localize("From: ", context), style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(localize("From: ", context),
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   Expanded(
                       child: GestureDetector(
-                          onTap: () => showContactDialog(context, message.author, message.reportedByPhone),
-                          child: Text(message.author, style: TextStyle(color: Color.fromARGB(255, 11, 48, 224)))
-                      )
-                  )
+                          onTap: () => showContactDialog(
+                              context, message.author, message.reportedByPhone),
+                          child: Text(message.author,
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 11, 48, 224)))))
                 ],
               );
             }
@@ -95,10 +124,11 @@ class IncidentMessage extends StatelessWidget {
           text: TextSpan(
               style: DefaultTextStyle.of(context).style,
               children: <TextSpan>[
-                TextSpan(text: localize("Message: ", context), style: TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(
+                    text: localize("Message: ", context),
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 TextSpan(text: message.message)
-              ]
-          ),
+              ]),
           textAlign: TextAlign.justify,
         ),
         Divider(color: Colors.red)

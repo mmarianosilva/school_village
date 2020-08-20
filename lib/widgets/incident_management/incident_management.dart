@@ -474,7 +474,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                           Align(
                             alignment: Alignment.topCenter,
                             child: Container(
-                              color: Color.fromARGB(140, 229, 229, 234),
+                              color: Color.fromARGB(190, 229, 229, 234),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 4.0),
@@ -532,7 +532,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                       "${_schoolAddress}",
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                        color: Colors.lightBlueAccent,
+                                        color: Color.fromARGB(255, 11, 48, 224),
                                         fontSize: 14.0,
                                       ),
                                     ),
@@ -611,7 +611,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                               fontSize: 12.0,
                                               color: Color.fromARGB(
                                                   255, 11, 48, 224))),
-                                    ))
+                                    ),)
                               ],
                             ),
                           ),
@@ -626,9 +626,8 @@ class _IncidentManagementState extends State<IncidentManagement>
                             child: Container(
                               color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                                 child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
@@ -663,7 +662,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                     ]),
                               ),
                             ),
-                            flex: 4);
+                            flex: 3);
                       }
                     }),
                     Padding(
