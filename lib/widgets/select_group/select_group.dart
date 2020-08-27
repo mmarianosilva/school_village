@@ -61,7 +61,7 @@ class _SelectGroupsState extends State<SelectGroups> {
   List<DropdownMenuItem> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All Schools");
-    _schools.addAll(schoolSnapshots.map((item) => item["name"]));
+    _schools.addAll(schoolSnapshots.map((item) => item.data()["name"]));
     return _schools.map((value) => DropdownMenuItem(
       value: value,
       child: Text(value),
@@ -71,7 +71,7 @@ class _SelectGroupsState extends State<SelectGroups> {
   Future<List<DocumentSnapshot>> _fetchSchoolSnapshots(List<Map<String, dynamic>> schoolRef) async {
     List<DocumentSnapshot> list = List<DocumentSnapshot>(schoolRef.length);
     for (int i = 0; i < schoolRef.length; i++) {
-      list[i] = await Firestore.instance.document(schoolRef[i]["ref"]).get();
+      list[i] = await FirebaseFirestore.instance.doc(schoolRef[i]["ref"]).get();
     }
     return list;
   }
@@ -216,9 +216,9 @@ class _SelectGroupsState extends State<SelectGroups> {
               DropdownButton(
                 items: _districtSchools(),
                 onChanged: (value) {
-                  if (schoolSnapshots.where((item) => item["name"] == value).isNotEmpty) {
+                  if (schoolSnapshots.where((item) => item.data()["name"] == value).isNotEmpty) {
                     setState(() {
-                      selectedSchool = schoolSnapshots.firstWhere((item) => item["name"] == value);
+                      selectedSchool = schoolSnapshots.firstWhere((item) => item.data()["name"] == value);
                     });
                   } else {
                     setState(() {
@@ -226,7 +226,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                     });
                   }
                 },
-                value: selectedSchool != null ? selectedSchool["name"] : "All Schools",
+                value: selectedSchool != null ? selectedSchool.data()["name"] : "All Schools",
               )
             ],
           ),

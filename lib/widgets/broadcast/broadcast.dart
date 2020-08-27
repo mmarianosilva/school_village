@@ -38,14 +38,14 @@ class _BroadcastState extends State<Broadcast> {
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolName = await UserHelper.getSchoolName();
-    _user = Firestore.instance.document('users/${user.uid}');
+    _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
-      _userId = user.documentID;
+      _userId = user.id;
       setState(() {
         name =
-        "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
-        phone = _userSnapshot.data['phone'];
+        "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
+        phone = _userSnapshot.data()['phone'];
         isLoaded = true;
       });
       print(name);
@@ -94,11 +94,11 @@ class _BroadcastState extends State<Broadcast> {
 
   _saveBroadcast(alertBody, context) async{
     print('$_schoolId/broadcasts');
-    CollectionReference collection  = Firestore.instance.collection('$_schoolId/broadcasts');
-    final DocumentReference document = collection.document();
+    CollectionReference collection  = FirebaseFirestore.instance.collection('$_schoolId/broadcasts');
+    final DocumentReference document = collection.doc();
     final Map<String, double> location = await UserHelper.getLocation();
 
-    document.setData(<String, dynamic>{
+    document.set(<String, dynamic>{
       'body': alertBody,
       'groups' : groups,
       'createdById': _userId,

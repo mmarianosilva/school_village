@@ -31,7 +31,7 @@ class _ChatState extends State<Chat> {
   final String conversation;
   final DocumentSnapshot user;
   final bool showInput;
-  final Firestore firestore = Firestore.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   Location _location = Location();
   List<MessageHolder> messageList = List();
   ScrollController _scrollController;
@@ -78,15 +78,15 @@ class _ChatState extends State<Chat> {
       return;
     }
     CollectionReference collection =
-    Firestore.instance.collection('$conversation/messages');
-    Firestore.instance.runTransaction((transaction) async {
-      final DocumentReference document = collection.document();
+    FirebaseFirestore.instance.collection('$conversation/messages');
+    FirebaseFirestore.instance.runTransaction((transaction) async {
+      final DocumentReference document = collection.doc();
       var path = '';
       var thumbPath = '';
       if (image != null) {
         _showLoading();
         path =
-        '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}';
+        '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.id}';
         String type = 'jpeg';
         type = image.path.split(".").last != null
             ? image.path.split(".").last
@@ -94,7 +94,7 @@ class _ChatState extends State<Chat> {
         path = path + "." + type;
 
         thumbPath =
-            '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.documentID}' +
+            '${conversation[0].toUpperCase()}${conversation.substring(1)}/${document.id}' +
                 '.jpeg';
 
         print(path);
@@ -104,8 +104,8 @@ class _ChatState extends State<Chat> {
       }
       await transaction.set(document, <String, dynamic>{
         'body': text,
-        'authorId': user.documentID,
-        'author': "${user.data['firstName']} ${user.data['lastName']}",
+        'authorId': user.id,
+        'author': "${user.data()['firstName']} ${user.data()['lastName']}",
         'timestamp': FieldValue.serverTimestamp(),
         'location': widget.showLocation ? await _getLocation() : null,
         'image': image == null ? null : path
@@ -139,29 +139,24 @@ class _ChatState extends State<Chat> {
 
   _getLocation() async {
     Map<String, double> location = new Map();
-    String error;
     try {
       LocationData locationData = await _location.getLocation();
       location['accuracy'] = locationData.accuracy;
       location['altitude'] = locationData.altitude;
       location['latitude'] = locationData.latitude;
       location['longitude'] = locationData.longitude;
-      error = null;
     } catch (e) {
       location = null;
     }
     return location;
   }
-
-  static const horizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0);
-
   _convertDateToKey(Timestamp createdAt) {
     return createdAt.millisecondsSinceEpoch ~/ Constants.oneDay;
   }
 
   _handleMessageMapInsert(DocumentSnapshot shot) {
-    print(shot.data['timestamp']);
-    var day = _convertDateToKey(shot['timestamp']);
+    print(shot.data()['timestamp']);
+    var day = _convertDateToKey(shot.data()['timestamp']);
 
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
@@ -194,7 +189,7 @@ class _ChatState extends State<Chat> {
         .orderBy("timestamp")
         .snapshots()
         .listen((data) {
-      _handleDocumentChanges(data.documentChanges);
+      _handleDocumentChanges(data.docChanges);
     });
   }
 
@@ -235,14 +230,14 @@ class _ChatState extends State<Chat> {
 
             final DocumentSnapshot document = messageList[index].message;
             return ChatMessage(
-              text: document['body'],
-              name: "${document['author']}",
-              phone: "${document['phone']}",
-              timestamp: document['timestamp'],
-              self: document['authorId'] == user.documentID,
-              location: widget.showLocation ? document['location'] : null,
-              imageUrl: document['image'],
-              isVideo: document['isVideo'],
+              text: document.data()['body'],
+              name: "${document.data()['author']}",
+              phone: "${document.data()['phone']}",
+              timestamp: document.data()['timestamp'],
+              self: document.data()['authorId'] == user.id,
+              location: widget.showLocation ? document.data()['location'] : null,
+              imageUrl: document.data()['image'],
+              isVideo: document.data()['isVideo'],
               message: document,
             );
           });

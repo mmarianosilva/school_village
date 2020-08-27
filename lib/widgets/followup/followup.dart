@@ -26,8 +26,8 @@ class _FollowupState extends State<Followup> {
   @override
   void initState() {
     super.initState();
-    Firestore.instance
-        .document(widget._firestorePath)
+    FirebaseFirestore.instance
+        .doc(widget._firestorePath)
         .get()
         .then((snapshot) async {
       if (widget._title.toLowerCase() == 'incident report') {
@@ -38,7 +38,7 @@ class _FollowupState extends State<Followup> {
         final Map<String, String> negativeIncidents =
             UserHelper.negativeIncidents;
         String flattenedIncidents = '';
-        for (String incident in snapshot.data['incidents']) {
+        for (String incident in snapshot.data()['incidents']) {
           if (positiveIncidents.containsKey(incident)) {
             flattenedIncidents =
                 '$flattenedIncidents${positiveIncidents[incident]}, ';
@@ -48,42 +48,42 @@ class _FollowupState extends State<Followup> {
           }
         }
         if (flattenedIncidents.length > 2) {
-          snapshot.data['flattenedIncidents'] =
+          snapshot.data()['flattenedIncidents'] =
               flattenedIncidents.substring(0, flattenedIncidents.length - 2);
         } else {
-          snapshot.data['flattenedIncidents'] = 'Missing data';
+          snapshot.data()['flattenedIncidents'] = 'Missing data';
         }
         // Flatten subjects
         String flattenedSubjects = '';
-        for (String subject in snapshot.data['subjects']) {
+        for (String subject in snapshot.data()['subjects']) {
           flattenedSubjects = '$flattenedSubjects$subject, ';
         }
         if (flattenedSubjects.length > 2) {
-          snapshot.data['flattenedSubjects'] =
+          snapshot.data()['flattenedSubjects'] =
               flattenedSubjects.substring(0, flattenedSubjects.length - 2);
         } else {
-          snapshot.data['flattenedSubjects'] = 'Missing data';
+          snapshot.data()['flattenedSubjects'] = 'Missing data';
         }
         // Flatten witnesses
         String flattenedWitnesses = '';
-        for (String witness in snapshot.data['witnesses']) {
+        for (String witness in snapshot.data()['witnesses']) {
           flattenedWitnesses = '$flattenedWitnesses$witness, ';
         }
         if (flattenedWitnesses.length > 2) {
-          snapshot.data['flattenedWitnesses'] =
+          snapshot.data()['flattenedWitnesses'] =
               flattenedWitnesses.substring(0, flattenedWitnesses.length - 2);
         } else {
-          snapshot.data['flattenedWitnesses'] = 'Missing data';
+          snapshot.data()['flattenedWitnesses'] = 'Missing data';
         }
         // Flatten image URL
-        if (snapshot.data['image'] != null &&
-            snapshot.data['image'].isNotEmpty) {
+        if (snapshot.data()['image'] != null &&
+            snapshot.data()['image'].isNotEmpty) {
           try {
             String url = await FirebaseStorage.instance
                 .ref()
-                .child(snapshot.data['image'])
+                .child(snapshot.data()['image'])
                 .getDownloadURL();
-            snapshot.data['flattenedImageUrl'] = url;
+            snapshot.data()['flattenedImageUrl'] = url;
           } on PlatformException catch (ex) {
             if (ex.code == 'FIRStorageErrorDomain') {
               debugPrint('Unable to retrieve photo from storage');
@@ -92,7 +92,7 @@ class _FollowupState extends State<Followup> {
         }
       }
       setState(() {
-        _originalData = snapshot.data;
+        _originalData = snapshot.data();
       });
     });
   }
@@ -124,7 +124,7 @@ class _FollowupState extends State<Followup> {
               child: Container(
                 color: Colors.grey[100],
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: Firestore.instance
+                  stream: FirebaseFirestore.instance
                       .collection('${widget._firestorePath}/followup')
                       .orderBy('timestamp')
                       .snapshots(),
@@ -133,7 +133,7 @@ class _FollowupState extends State<Followup> {
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.connectionState != ConnectionState.none) {
                       if (!snapshot.hasData ||
-                          snapshot.data.documents.isEmpty) {
+                          snapshot.data.docs.isEmpty) {
                         return Column(
                           children: <Widget>[
                             _originalData != null
@@ -151,7 +151,7 @@ class _FollowupState extends State<Followup> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: ListView.builder(
                           shrinkWrap: true,
-                            itemCount: snapshot.data.documents.length + 1,
+                            itemCount: snapshot.data.docs.length + 1,
                             itemBuilder: (BuildContext context, int index) {
                               if (index == 0) {
                                 return _originalData != null
@@ -163,8 +163,8 @@ class _FollowupState extends State<Followup> {
                                     : Center(child: CircularProgressIndicator());
                               }
                               final DocumentSnapshot item =
-                                  snapshot.data.documents[index - 1];
-                              return FollowupListItem(item.data);
+                                  snapshot.data.docs[index - 1];
+                              return FollowupListItem(item.data());
                             }),
                       );
                     }

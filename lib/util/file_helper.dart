@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
@@ -12,7 +11,7 @@ import 'package:school_village/util/pdf_handler.dart';
 import 'package:school_village/util/user_helper.dart';
 
 class FileHelper {
-  static final Firestore firestore = Firestore.instance;
+  static final FirebaseFirestore firestore = FirebaseFirestore.instance;
   static final FirebaseStorage storage = new FirebaseStorage();
 
   static Future<File> getFileFromStorage(
@@ -37,8 +36,8 @@ class FileHelper {
   static Future<void> downloadRequiredDocuments() async {
     final String schoolId = await UserHelper.getSelectedSchoolID();
     final String role = await UserHelper.getSelectedSchoolRole();
-    final DocumentSnapshot school = await firestore.document(schoolId).get();
-    final List<Map<String, dynamic>> documents = (school["documents"]
+    final DocumentSnapshot school = await firestore.doc(schoolId).get();
+    final List<Map<String, dynamic>> documents = (school.get("documents")
             .cast<Map<String, dynamic>>())
         .where((Map<String, dynamic> item) =>
             item["accessRoles"] == null || item["accessRoles"].contains(role))

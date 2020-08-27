@@ -98,13 +98,13 @@ class IncidentDetailsState extends State<IncidentDetails> {
   getDetails() async {
     FirebaseUser _user = await UserHelper.getUser();
     DocumentReference _userRef =
-        Firestore.instance.document("users/${_user.uid}");
+        FirebaseFirestore.instance.doc("users/${_user.uid}");
     var schoolId = await UserHelper.getSelectedSchoolID();
     _userRef.get().then((user) {
-      userId = user.documentID;
+      userId = user.id;
       setState(() {
         if (demo) {
-          name = "${user.data['firstName']} ${user.data['lastName']}";
+          name = "${user.data()['firstName']} ${user.data()['lastName']}";
           this.loading = false;
         }
         this.schoolId = schoolId;
@@ -112,9 +112,9 @@ class IncidentDetailsState extends State<IncidentDetails> {
     });
     if (!demo) {
       final DocumentSnapshot snapshot =
-          await Firestore.instance.document("users/$reportedById").get();
+          await FirebaseFirestore.instance.doc("users/$reportedById").get();
       setState(() {
-        this.phone = snapshot["phone"];
+        this.phone = snapshot.data()["phone"];
         this.loading = false;
       });
     }
@@ -257,12 +257,12 @@ class IncidentDetailsState extends State<IncidentDetails> {
       loading = true;
     });
     CollectionReference collection =
-        Firestore.instance.collection('$schoolId/incident_reports');
-    final DocumentReference document = collection.document();
+        FirebaseFirestore.instance.collection('$schoolId/incident_reports');
+    final DocumentReference document = collection.doc();
     var path = '';
 
     if (imageFile != null) {
-      path = 'Schools/$schoolId/incident_reports/${document.documentID}';
+      path = 'Schools/$schoolId/incident_reports/${document.id}';
       String type = 'jpeg';
       type = imageFile.path.split(".").last != null
           ? imageFile.path.split(".").last
@@ -272,7 +272,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       await uploadFile(path, imageFile);
     }
 
-    await document.setData(<String, dynamic>{
+    await document.set(<String, dynamic>{
       'positiveIncidents': posItems,
       'incidents': items,
       'createdBy': name,

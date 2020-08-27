@@ -43,7 +43,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   void _getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
-    Firestore.instance.document('users/${user.uid}').get().then((user) {
+    FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
@@ -57,9 +57,9 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
       return "#${channel.name}";
     }
     if (_userSnapshot != null) {
-      final String userId = _userSnapshot.documentID;
+      final String userId = _userSnapshot.id;
       final List<TalkAroundUser> members = channel.members
-          .where((user) => user.id.documentID != userId)
+          .where((user) => user.id.id != userId)
           .toList();
       members.sort((user1, user2) => user1.name.compareTo(user2.name));
       if (members.length == 1) {
@@ -194,21 +194,21 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "image": uploadUri,
             "isVideo": isVideoShallow,
             "author": UserHelper.getDisplayName(_userSnapshot),
-            "authorId": _userSnapshot.documentID,
+            "authorId": _userSnapshot.id,
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot.data["phone"]
+            "phone": _userSnapshot.data()["phone"]
           };
           try {
-            Firestore.instance.runTransaction((transaction) async {
-              CollectionReference messages = Firestore.instance
+            FirebaseFirestore.instance.runTransaction((transaction) async {
+              CollectionReference messages = FirebaseFirestore.instance
                   .collection("$_schoolId/messages/${channel.id}/messages");
-              await transaction.set(messages.document(), messageData);
-              Firestore.instance
-                  .document("$_schoolId/messages/${channel.id}")
-                  .setData(
-                  {"timestamp": FieldValue.serverTimestamp()}, merge: true);
+              await transaction.set(messages.doc(), messageData);
+              FirebaseFirestore.instance
+                  .doc("$_schoolId/messages/${channel.id}")
+                  .set(
+                  {"timestamp": FieldValue.serverTimestamp()}, SetOptions(merge: true));
             });
           } on Exception catch (ex) {
             print("$ex");
@@ -250,21 +250,21 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     } else {
       final Map<String, dynamic> messageData = {
         "author": UserHelper.getDisplayName(_userSnapshot),
-        "authorId": _userSnapshot.documentID,
+        "authorId": _userSnapshot.id,
         "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot.data["phone"]
+        "phone": _userSnapshot.data()["phone"]
       };
       try {
-        Firestore.instance.runTransaction((transaction) async {
-          CollectionReference messages = Firestore.instance
+        FirebaseFirestore.instance.runTransaction((transaction) async {
+          CollectionReference messages = FirebaseFirestore.instance
               .collection("$_schoolId/messages/${channel.id}/messages");
-          await transaction.set(messages.document(), messageData);
-          Firestore.instance
-              .document("$_schoolId/messages/${channel.id}")
-              .setData(
-              {"timestamp": FieldValue.serverTimestamp()}, merge: true);
+          await transaction.set(messages.doc(), messageData);
+          FirebaseFirestore.instance
+              .doc("$_schoolId/messages/${channel.id}")
+              .set(
+              {"timestamp": FieldValue.serverTimestamp()}, SetOptions(merge: true));
         });
         messageInputController.clear();
       } on Exception catch (ex) {

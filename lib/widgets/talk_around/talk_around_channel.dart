@@ -12,10 +12,10 @@ class TalkAroundChannel {
 
   factory TalkAroundChannel.fromMapAndUsers(DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
     return TalkAroundChannel(
-        firebaseModel.documentID,
-        firebaseModel.data["name"],
-        firebaseModel.data["direct"] ?? false,
-        firebaseModel.data["timestamp"] ?? Timestamp.now(),
+        firebaseModel.id,
+        firebaseModel.data()["name"],
+        firebaseModel.data()["direct"] ?? false,
+        firebaseModel.data()["timestamp"] ?? Timestamp.now(),
         members);
   }
 

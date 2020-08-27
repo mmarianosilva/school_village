@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';

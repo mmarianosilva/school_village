@@ -203,8 +203,8 @@ class _HotlineState extends State<Hotline> {
 
   _saveMessage(message) async {
     final String hotlinePath = '$_schoolId/hotline';
-    CollectionReference collection = Firestore.instance.collection(hotlinePath);
-    final DocumentReference document = collection.document();
+    CollectionReference collection = FirebaseFirestore.instance.collection(hotlinePath);
+    final DocumentReference document = collection.doc();
 
     String firebaseStoragePath;
     final String role = await UserHelper.getSelectedSchoolRole();
@@ -226,7 +226,7 @@ class _HotlineState extends State<Hotline> {
               uploadFile.parent.path.length + 1)}',
           uploadFile,
       onComplete: (String url) {
-            document.setData({
+            document.set({
               'body': message,
               'createdAt': DateTime
                   .now()
@@ -244,7 +244,7 @@ class _HotlineState extends State<Hotline> {
         isLoaded = true;
       });
     } else {
-      document.setData({
+      document.set({
         'body': message,
         'createdAt': DateTime
             .now()

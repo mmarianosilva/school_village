@@ -30,15 +30,15 @@ class _NotificationsState extends State<Notifications> {
 
   getUserDetails(MainModel model) async {
     _schoolId = await UserHelper.getSelectedSchoolID();
-    _school = Firestore.instance.document(_schoolId);
+    _school = FirebaseFirestore.instance.doc(_schoolId);
     _role = await UserHelper.getSelectedSchoolRole();
     List<SchoolAlert> notifications = [];
-    Query ref = Firestore.instance
+    Query ref = FirebaseFirestore.instance
         .collection("/$_schoolId/notifications")
         .orderBy('createdAt', descending: true)
         .limit(25);
-    ref.getDocuments().then((querySnapshot) {
-      notifications.addAll(querySnapshot.documents
+    ref.get().then((querySnapshot) {
+      notifications.addAll(querySnapshot.docs
           .map((document) => SchoolAlert.fromMap(document)));
       setState(() {
         isLoaded = true;

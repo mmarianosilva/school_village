@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
-
-//import 'package:photo_view/photo_view_scale_boundary.dart';
-import 'package:school_village/components/full_screen_image.dart';
-import 'package:school_village/components/full_screen_video.dart';
 import 'package:school_village/components/progress_imageview.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/date_formatter.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/user_helper.dart';
@@ -12,8 +11,6 @@ class SchoolList extends StatefulWidget {
 
 class _SchoolListState extends State<SchoolList> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  bool _isLoading = true;
   BuildContext _context;
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
@@ -52,8 +49,8 @@ class _SchoolListState extends State<SchoolList> {
 //                    itemExtent: 20.0,
                     itemBuilder: (BuildContext context, int index) {
                       return FutureBuilder(
-                        future: Firestore.instance
-                            .document(snapshot.data[index]['ref'])
+                        future: FirebaseFirestore.instance
+                            .doc(snapshot.data[index]['ref'])
                             .get(),
                         // a Future<String> or null
                         builder: (BuildContext context,
@@ -69,11 +66,6 @@ class _SchoolListState extends State<SchoolList> {
                               if (snapshot.hasError)
                                 return Text('Error: ${snapshot.error}');
                               else {
-                                var isOwner = false;
-                                if(snapshot.data[index]['role'] == 'SiteAdmin' || snapshot.data[index]['role'] == 'Owner') {
-                                  isOwner = true;
-                                }
-
                                 return Container(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -88,13 +80,13 @@ class _SchoolListState extends State<SchoolList> {
                                         child: FlatButton(
                                             child: Text(schoolSnapshot.data == null
                                                 ? ''
-                                                : schoolSnapshot.data["name"]),
+                                                : schoolSnapshot.data.data()["name"]),
                                             onPressed: () {
                                               selectSchool(
                                                   schoolName:
-                                                  schoolSnapshot.data["name"],
-                                                  schoolId: snapshot.data[index]['ref'],
-                                                  role: snapshot.data[index]['role']);
+                                                  schoolSnapshot.data.data()["name"],
+                                                  schoolId: snapshot.data.data()[index]['ref'],
+                                                  role: snapshot.data.data()[index]['role']);
                                             }),
                                       ),
                                     ],

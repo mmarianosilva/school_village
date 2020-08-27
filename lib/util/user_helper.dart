@@ -66,18 +66,18 @@ class UserHelper {
     }
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
-    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
-    Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
-    setIsOwner(userSnapshot['owner'] != null && userSnapshot['owner'] == true
+    Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
+    setIsOwner(userSnapshot.data()['owner'] != null && userSnapshot.data()['owner'] == true
         ? true
         : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot['associatedSchools'][keys.elementAt(i)]["role"]
+        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]["role"]
       });
     }
     return schools;
@@ -87,10 +87,10 @@ class UserHelper {
     if (positiveIncidents == null && negativeIncidents == null) {
       String selectedSchool = await getSelectedSchoolID();
 
-      DocumentReference schoolRef = Firestore.instance.document(selectedSchool);
+      DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
       DocumentSnapshot schoolSnapshot = await schoolRef.get();
 
-      var items = schoolSnapshot["incidents"];
+      var items = schoolSnapshot.data()["incidents"];
 
       negativeIncidents = (Map<String, String>.from(items["negative"]));
       positiveIncidents =  (Map<String, String>.from(items["positive"]));
@@ -100,10 +100,10 @@ class UserHelper {
   static getSchoolAllGroups() async {
     final String selectedSchool = await getSelectedSchoolID();
     print(selectedSchool);
-    DocumentReference schoolRef = Firestore.instance.document(selectedSchool);
+    DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
     DocumentSnapshot schoolSnapshot = await schoolRef.get();
     List<dynamic> groups = [];
-    Iterable<dynamic> keys = schoolSnapshot['groups'].keys;
+    Iterable<dynamic> keys = schoolSnapshot.data()['groups'].keys;
     for (int i = 0; i < keys.length; i++) {
       groups.add({
         "name": keys.elementAt(i).toString().trim(),
@@ -183,7 +183,7 @@ class UserHelper {
     }
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
-    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
     subscribeToAllTopics(userSnapshot);
   }
@@ -253,10 +253,10 @@ class UserHelper {
   }
 
   static String getDisplayName([DocumentSnapshot snapshot]) {
-    return "${snapshot.data["firstName"]} ${snapshot.data["lastName"]} ${snapshot.data["room"] != null && snapshot.data["room"].isNotEmpty ? ' (${snapshot.data["room"]})' : ''}";
+    return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
   static String getRoomNumber([DocumentSnapshot snapshot]) {
-    return snapshot.data["room"];
+    return snapshot.data()["room"];
   }
 }

@@ -39,7 +39,7 @@ class _TalkAroundState extends State<TalkAround>
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
-    _user = Firestore.instance.document('users/${user.uid}');
+    _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     _user.get().then((user) {
       setState(() {
         _userSnapshot = user;

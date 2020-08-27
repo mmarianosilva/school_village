@@ -18,7 +18,7 @@ mixin UserModel on Model {
       }
       print("User ID");
       print(user.uid);
-      DocumentReference userRef = Firestore.instance.document('users/${user.uid}');
+      DocumentReference userRef = FirebaseFirestore.instance.doc('users/${user.uid}');
       userRef.get().then((user) {
         _user = user;
         notifyListeners();
@@ -30,8 +30,8 @@ mixin UserModel on Model {
   getAlertGroups(schoolId) async {
     DocumentSnapshot user = await getUser();
     print(user);
-    if(user != null && user.data['associatedSchools'].containsKey(schoolId) && user.data['associatedSchools'][schoolId].containsKey('alerts')) {
-      return user.data['associatedSchools'][schoolId]['alerts'].keys.where((k) => user.data['associatedSchools'][schoolId]['alerts'][k] == true);
+    if(user != null && user.get('associatedSchools').containsKey(schoolId) && user.get('associatedSchools')[schoolId].containsKey('alerts')) {
+      return user.get('associatedSchools')[schoolId]['alerts'].keys.where((k) => user.get('associatedSchools')[schoolId]['alerts'][k] == true);
     } else {
       return [];
     }
@@ -42,7 +42,7 @@ mixin UserModel on Model {
       FirebaseUser user = await UserHelper.getUser();
       print("User ID");
       print(user.uid);
-      DocumentReference userRef = Firestore.instance.document('users/${user.uid}');
+      DocumentReference userRef = FirebaseFirestore.instance.doc('users/${user.uid}');
       userRef.get().then((user) {
         _user = user;
         notifyListeners();

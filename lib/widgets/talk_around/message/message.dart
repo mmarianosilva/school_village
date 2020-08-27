@@ -1,15 +1,11 @@
-import 'package:photo_view/photo_view.dart';
 import 'package:flutter/material.dart';
-import 'package:school_village/components/full_screen_image.dart';
 import 'package:school_village/components/progress_imageview.dart';
-import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/navigation_helper.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
-import 'package:school_village/widgets/talk_around/message_details/message_details.dart';
+import 'package:school_village/widgets/talk_around/message_details/message_details.dart' as msg;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../notification/notification.dart';
 
 class ChatMessage extends StatelessWidget {
   ChatMessage({
@@ -120,7 +116,7 @@ class ChatMessage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MessageDetail(notification: message.data),
+        builder: (context) => msg.MessageDetail(notification: message.data()),
       ),
     );
   }

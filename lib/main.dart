@@ -20,7 +20,7 @@ import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
 _configureFirestoreOfflinePersistence() {
-  Firestore.instance.settings(persistenceEnabled: false);
+  FirebaseFirestore.instance.settings = Settings(persistenceEnabled: false);
 }
 
 final RouteObserver<PageRoute> homePageRouteObserver =

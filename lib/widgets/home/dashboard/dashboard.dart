@@ -74,23 +74,23 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts =
-        Firestore.instance.collection("${schoolId}/notifications");
+        FirebaseFirestore.instance.collection("${schoolId}/notifications");
     _alertSubscription = alerts
         .orderBy("createdAt", descending: true)
         .snapshots()
         .listen((result) async {
-          final DocumentSnapshot latestResolved = (await alerts.orderBy("endedAt", descending: true).limit(1).getDocuments()).documents.first;
-      if (result.documents.isEmpty) {
+          final DocumentSnapshot latestResolved = (await alerts.orderBy("endedAt", descending: true).limit(1).get()).docs.first;
+      if (result.docs.isEmpty) {
         this.setState(() {
           this.alertInProgress = null;
         });
         return;
       }
       final Timestamp lastResolvedTimestamp = latestResolved != null
-          ? latestResolved["endedAt"]
+          ? latestResolved.data()["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
       final latestAlert =
-          result.documents.lastWhere((DocumentSnapshot snapshot) => snapshot["createdAt"] > lastResolvedTimestamp.millisecondsSinceEpoch, orElse: () => null);
+          result.docs.lastWhere((DocumentSnapshot snapshot) => snapshot.data()["createdAt"] > lastResolvedTimestamp.millisecondsSinceEpoch, orElse: () => null);
       SchoolAlert alert =
           latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
       if (this.alertInProgress != alert) {
@@ -280,32 +280,32 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return SizedBox();
   }
 
-  _buildDocumentOption(snapshot, index) {
+  _buildDocumentOption(DocumentSnapshot snapshot, index) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot.data.data["documents"][index - 5]["type"] == "pdf") {
+        if (snapshot.data()["documents"][index - 5]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data.data["documents"][index - 5]["connectedFiles"] !=
+              snapshot.data()["documents"][index - 5]["connectedFiles"] !=
                       null
-                  ? snapshot.data.data["documents"][index - 5]["connectedFiles"]
+                  ? snapshot.data()["documents"][index - 5]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
           _showPDF(
               context,
-              snapshot.data.data["documents"][index - 5]["location"],
-              snapshot.data.data["documents"][index - 5]["title"],
+              snapshot.data()["documents"][index - 5]["location"],
+              snapshot.data()["documents"][index - 5]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot.data.data["documents"][index - 5]["type"] ==
+        } else if (snapshot.data()["documents"][index - 5]["type"] ==
             "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot.data.data["documents"][index - 5]["location"],
+            snapshot.data()["documents"][index - 5]["location"],
           );
         } else {
-          _launchURL(snapshot.data.data["documents"][index - 5]["location"]);
+          _launchURL(snapshot.data()["documents"][index - 5]["location"]);
         }
       },
       child: Column(
@@ -319,7 +319,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data.data["documents"][index - 5]
+                          url: snapshot.data()["documents"][index - 5]
                               ["icon"],
                           context: context),
                       builder:
@@ -340,7 +340,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data.data["documents"][index - 5]["title"],
+                snapshot.data()["documents"][index - 5]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -542,13 +542,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         }
 
         return FutureBuilder(
-            future: Firestore.instance.document(ref).get(),
+            future: FirebaseFirestore.instance.doc(ref).get(),
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
-                    snapshot.data.data["documents"] != null
-                        ? snapshot.data.data["documents"].where(
+                    snapshot.data.data()["documents"] != null
+                        ? snapshot.data.data()["documents"].where(
                             (snapshot) =>
                                 snapshot["accessRoles"] == null || snapshot["accessRoles"].contains(role)).toList().cast<DocumentSnapshot>()
                         : null;
@@ -600,7 +600,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 8) {
                               return _buildSettingsOption();
                             }
-                            return _buildDocumentOption(snapshot, index);
+                            return _buildDocumentOption(snapshot.data, index);
                           },
                           itemCount: documentCount + 9);
                 }

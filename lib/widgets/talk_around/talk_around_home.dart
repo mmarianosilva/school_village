@@ -25,7 +25,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   DocumentSnapshot _userSnapshot;
   String _schoolId;
   String _schoolRole;
-  final Firestore _firestore = Firestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchBarController = TextEditingController();
   StreamSubscription<QuerySnapshot> _messageListSubscription;
   StreamSubscription<QuerySnapshot> _channelListSubscription;
@@ -35,7 +35,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     FirebaseUser user = await UserHelper.getUser();
     final schoolId = await UserHelper.getSelectedSchoolID();
     final schoolRole = await UserHelper.getSelectedSchoolRole();
-    Firestore.instance.document('users/${user.uid}').get().then((user) {
+    FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
@@ -51,7 +51,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .where("roles", arrayContains: _schoolRole)
         .snapshots()
         .listen((snapshot) async {
-      List<DocumentSnapshot> documentList = snapshot.documents;
+      List<DocumentSnapshot> documentList = snapshot.docs;
       Iterable<DocumentSnapshot> channels = documentList;
       List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
         return TalkAroundChannel.fromMapAndUsers(channel, null);
@@ -70,12 +70,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .snapshots()
         .listen((snapshot) async {
       final String escapedSchoolId = _schoolId.substring("schools/".length);
-      List<DocumentSnapshot> documentList = snapshot.documents;
+      List<DocumentSnapshot> documentList = snapshot.docs;
       Iterable<DocumentSnapshot> groupMessages = documentList;
       List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
-        Stream<TalkAroundUser> members = Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
+        Stream<TalkAroundUser> members = Stream.fromIterable(channel.data()["members"]).asyncMap((id) async {
           final DocumentSnapshot user = await id.get();
-          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data["associatedSchools"][escapedSchoolId] != null ? user.data["associatedSchools"][escapedSchoolId]["role"] : "");
+          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data()["associatedSchools"][escapedSchoolId] != null ? user.data()["associatedSchools"][escapedSchoolId]["role"] : "");
           return member;
         });
         List<TalkAroundUser> users = await members.toList();

@@ -20,7 +20,7 @@ import 'package:school_village/widgets/talk_around/talk_around_home.dart';
 import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_user.dart';
 import 'package:school_village/widgets/home/dashboard/dashboard.dart';
-import 'package:school_village/widgets/settings/settings.dart';
+import 'package:school_village/widgets/settings/settings.dart' as settings;
 import 'package:school_village/widgets/holine_list/hotline_list.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/schoollist/school_list.dart';
@@ -76,24 +76,24 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   Future<SchoolAlert> _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts =
-        Firestore.instance.collection("${schoolId}/notifications");
+        FirebaseFirestore.instance.collection("${schoolId}/notifications");
     return await alerts
         .orderBy("createdAt", descending: true)
-        .getDocuments()
+        .get()
         .then((result) {
-      if (result.documents.isEmpty) {
+      if (result.docs.isEmpty) {
         return null;
       }
-      final DocumentSnapshot lastResolved = result.documents
-          .firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
+      final DocumentSnapshot lastResolved = result.docs
+          .firstWhere((doc) => doc.data()["endedAt"] != null, orElse: () => null);
       final Timestamp lastResolvedTimestamp = lastResolved != null
-          ? lastResolved["endedAt"]
+          ? lastResolved.data()["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
-      result.documents.removeWhere((doc) =>
-          doc["endedAt"] != null ||
-          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
-      final latestAlert = result.documents.isNotEmpty
-          ? SchoolAlert.fromMap(result.documents.last)
+      result.docs.removeWhere((doc) =>
+          doc.data()["endedAt"] != null ||
+          doc.data()["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+      final latestAlert = result.docs.isNotEmpty
+          ? SchoolAlert.fromMap(result.docs.last)
           : null;
       return latestAlert;
     });
@@ -211,8 +211,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     } else if (message["type"] == "alert") {
       String path =
           "schools/${message["schoolId"]}/notifications/${message["notificationId"]}";
-      DocumentSnapshot alert = await Firestore.instance.document(path).get();
-      if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] >
+      DocumentSnapshot alert = await FirebaseFirestore.instance.doc(path).get();
+      if (Timestamp.now().millisecondsSinceEpoch - alert.data()["createdAt"] >
           7200000) {
         return true;
       }
@@ -236,22 +236,22 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     final String escapedSchoolId = incomingMessageData["schoolId"];
     debugPrint(escapedSchoolId);
     debugPrint(incomingMessageData["conversationId"]);
-    return Firestore.instance
-        .document(
+    return FirebaseFirestore.instance
+        .doc(
             "schools/$escapedSchoolId/messages/${incomingMessageData["conversationId"]}")
         .get()
         .then((data) async {
       debugPrint('Retrieved channelInformation information');
       debugPrint(data.data.toString());
       TalkAroundChannel channel;
-      if (data["direct"] ?? false) {
+      if (data.data()["direct"] ?? false) {
         Stream<TalkAroundUser> membersStream =
-            Stream.fromIterable(data["members"]).asyncMap((userId) async {
+            Stream.fromIterable(data.data()["members"]).asyncMap((userId) async {
           final DocumentSnapshot snapshot = await userId.get();
           return TalkAroundUser.fromMapAndGroup(
               snapshot,
-              snapshot.data["associatedSchools"][escapedSchoolId] != null
-                  ? snapshot.data["associatedSchools"][escapedSchoolId]["role"]
+              snapshot.data()["associatedSchools"][escapedSchoolId] != null
+                  ? snapshot.data()["associatedSchools"][escapedSchoolId]["role"]
                   : "");
         });
         final List<TalkAroundUser> members = await membersStream.toList();
@@ -352,8 +352,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   }
 
   _showBroadcastDialog(Map<String, dynamic> message) async {
-    final DocumentSnapshot messageSnapshot = await Firestore.instance
-        .document(
+    final DocumentSnapshot messageSnapshot = await FirebaseFirestore.instance
+        .doc(
             "schools/${message['schoolId']}/broadcasts/${message['broadcastId']}")
         .get();
     return showDialog<Null>(
@@ -377,7 +377,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
                   context,
                   MaterialPageRoute(
                     builder: (context) => MessageDetail(
-                      notification: messageSnapshot.data,
+                      notification: messageSnapshot.data(),
                     ),
                   ),
                 );
@@ -431,8 +431,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     var notificationId = message['notificationId'];
     var schoolId = message['schoolId'];
     DocumentSnapshot notification;
-    notification = await Firestore.instance
-        .document("/schools/$schoolId/notifications/$notificationId")
+    notification = await FirebaseFirestore.instance
+        .doc("/schools/$schoolId/notifications/$notificationId")
         .get();
     return showDialog<Null>(
       context: context,
@@ -476,7 +476,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   openSettings() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Settings()),
+      MaterialPageRoute(builder: (context) => settings.Settings()),
     );
   }
 
@@ -484,14 +484,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     var schools = await UserHelper.getSchools();
     if (schools.length == 1) {
       print("Only 1 School");
-      var school = await Firestore.instance.document(schools[0]['ref']).get();
-      print(school.data["name"]);
+      var school = await FirebaseFirestore.instance.doc(schools[0]['ref']).get();
+      print(school.data()["name"]);
       await UserHelper.setSelectedSchool(
           schoolId: schools[0]['ref'],
-          schoolName: school.data["name"],
+          schoolName: school.data()["name"],
           schoolRole: schools[0]['role']);
       setState(() {
-        title = school.data["name"];
+        title = school.data()["name"];
         isLoaded = true;
         _schoolId = schools[0]['ref'];
       });

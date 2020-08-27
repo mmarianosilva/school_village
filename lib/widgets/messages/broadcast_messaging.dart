@@ -53,22 +53,22 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     _user = await UserHelper.getUser();
     role = await UserHelper.getSelectedSchoolRole();
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
-    _userRef = Firestore.instance.document("users/${_user.uid}");
+    _userRef = FirebaseFirestore.instance.doc("users/${_user.uid}");
     _userRef.get().then((user) {
-      var keys = user.data["associatedSchools"][schoolId]["groups"].keys;
+      var keys = user.data()["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user.data["associatedSchools"][schoolId]["groups"]
+        if (user.data()["associatedSchools"][schoolId]["groups"]
         [keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
       }
       setState(() {
-        _userId = user.documentID;
-        name = "${user.data['firstName']} ${user.data['lastName']}";
+        _userId = user.id;
+        name = "${user.data()['firstName']} ${user.data()['lastName']}";
         _schoolId = schoolId;
-        phone = '${user.data['phone']}';
+        phone = '${user.data()['phone']}';
         _groups = groups;
         isLoaded = true;
         _handleMessageCollection();
@@ -141,12 +141,12 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleMessageCollection() {
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("schools/$_schoolId/broadcasts")
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-      _handleDocumentChanges(data.documentChanges);
+      _handleDocumentChanges(data.docChanges);
     });
   }
 
@@ -201,18 +201,18 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             final DocumentSnapshot document = messageList[index].message;
             final groups = List<String>();
 
-            for (var value in (document['groups'].keys)) {
+            for (var value in (document.data()['groups'].keys)) {
               groups.add(value);
             }
 
             return BroadcastMessage(
-              text: document['body'],
-              name: "${document['createdBy']}",
-              timestamp: document['createdAt'] is Timestamp ? document['createdAt'] : Timestamp.fromMillisecondsSinceEpoch(document['createdAt']),
+              text: document.data()['body'],
+              name: "${document.data()['createdBy']}",
+              timestamp: document.data()['createdAt'] is Timestamp ? document.data()['createdAt'] : Timestamp.fromMillisecondsSinceEpoch(document.data()['createdAt']),
               groups: groups,
-              imageUrl: document['image'],
+              imageUrl: document.data()['image'],
               message: document,
-              isVideo: document['isVideo'] ?? false,
+              isVideo: document.data()['isVideo'] ?? false,
             );
           });
     }
@@ -289,10 +289,10 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       DocumentSnapshot selectedSchool = selectGroups.key.currentState.selectedSchool;
       if (selectedSchool == null) {
         selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
-          _saveBroadcast(image, alertBody, isVideo, schoolDocument.documentID);
+          _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
         });
       } else {
-        _saveBroadcast(image, alertBody, isVideo, selectedSchool.documentID);
+        _saveBroadcast(image, alertBody, isVideo, selectedSchool.id);
       }
     } else {
       _saveBroadcast(image, alertBody, isVideo);
@@ -308,14 +308,14 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       schoolId = _schoolId;
     }
     final broadcastPath = 'schools/$schoolId/broadcasts';
-    CollectionReference collection = Firestore.instance.collection(broadcastPath);
-    final DocumentReference document = collection.document();
+    CollectionReference collection = FirebaseFirestore.instance.collection(broadcastPath);
+    final DocumentReference document = collection.doc();
 
     var path = '';
     if (image != null) {
       _showLoading();
       path =
-      '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.documentID}';
+      '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.id}';
       String type = 'jpeg';
       type = image.path.split(".").last != null
           ? image.path.split(".").last
@@ -329,7 +329,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
     print('saveBroadcast is vidoe ' + isVideo.toString());
 
-    document.setData(<String, dynamic>{
+    document.set(<String, dynamic>{
       'body': alertBody,
       'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,

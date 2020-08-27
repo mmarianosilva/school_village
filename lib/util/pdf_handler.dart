@@ -109,14 +109,14 @@ class PdfHandler {
 
   static Future<String> downloadLinkedPdf(String documentId) async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    DocumentSnapshot pdfDocument = await Firestore.instance.document(
+    DocumentSnapshot pdfDocument = await FirebaseFirestore.instance.doc(
         "$schoolId/linked-pdfs/$documentId").get();
     if (pdfDocument != null) {
-      final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument["name"]}';
+      final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument.data()["name"]}';
       final StorageReference pdfDirectory = FirebaseStorage.instance.ref()
           .child(storagePath);
       final Directory systemTempDir = await getApplicationDocumentsDirectory();
-      final String rootPath = '${systemTempDir.path}/${pdfDocument["name"]}';
+      final String rootPath = '${systemTempDir.path}/${pdfDocument.data()["name"]}';
       final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
       await items["items"].forEach((dynamic key, dynamic item) async {
         StorageReference pdfFile = pdfDirectory.child(key);
@@ -124,7 +124,7 @@ class PdfHandler {
             File('$rootPath/$key'));
         await pdfDownloadTask.future;
       });
-      return '$rootPath/${pdfDocument["root"].split('/').last}';
+      return '$rootPath/${pdfDocument.data()["root"].split('/').last}';
     }
     return null;
   }

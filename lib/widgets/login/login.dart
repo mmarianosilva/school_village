@@ -26,10 +26,10 @@ class _LoginState extends State<Login> {
     var schools = await UserHelper.getSchools();
     if (schools.length == 1) {
       print("Only 1 School");
-      var school = await Firestore.instance.document(schools[0]['ref']).get();
-      print(school.data["name"]);
+      var school = await FirebaseFirestore.instance.doc(schools[0]['ref']).get();
+      print(school.data()["name"]);
       await UserHelper.setSelectedSchool(
-          schoolId: schools[0]['ref'], schoolName: school.data["name"], schoolRole: schools[0]['role']);
+          schoolId: schools[0]['ref'], schoolName: school.data()["name"], schoolRole: schools[0]['role']);
       return true;
     }
     return false;

@@ -44,18 +44,18 @@ class _AlertState extends State<Alert> {
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolName = await UserHelper.getSchoolName();
-    Firestore.instance.document(_schoolId).get().then((school) {
-      _isTrainingMode = school['isTraining'];
+    FirebaseFirestore.instance.doc(_schoolId).get().then((school) {
+      _isTrainingMode = school.data()['isTraining'];
     });
     _role = await UserHelper.getSelectedSchoolRole();
-    _user = Firestore.instance.document('users/${user.uid}');
+    _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     _user.get().then((user) {
       _userSnapshot = user;
-      _userId = user.documentID;
+      _userId = user.id;
       setState(() {
         name =
-        "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}";
-        phone = "${_userSnapshot.data['phone']}";
+        "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
+        phone = "${_userSnapshot.data()['phone']}";
         isLoaded = true;
       });
       print(name);
@@ -231,11 +231,11 @@ class _AlertState extends State<Alert> {
 
 
   _saveAlert(alertTitle, alertBody, alertType, context) async {
-    CollectionReference collection  = Firestore.instance.collection('$_schoolId/notifications');
-    final DocumentReference document = collection.document();
+    CollectionReference collection  = FirebaseFirestore.instance.collection('$_schoolId/notifications');
+    final DocumentReference document = collection.doc();
 
     final String room = UserHelper.getRoomNumber(_userSnapshot);
-    document.setData(<String, dynamic>{
+    document.set(<String, dynamic>{
       'title': alertTitle,
       'body': alertBody,
       'type': alertType,

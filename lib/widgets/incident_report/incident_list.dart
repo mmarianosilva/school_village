@@ -39,8 +39,8 @@ class IncidentListState extends State<IncidentList> {
   getUserDetails(MainModel model) async {
     id = (await UserHelper.getUser()).uid;
     _schoolId = await UserHelper.getSelectedSchoolID();
-    _schoolSnapshot = await Firestore.instance.document(_schoolId).get();
-    _schoolName = _schoolSnapshot['name'];
+    _schoolSnapshot = await FirebaseFirestore.instance.doc(_schoolId).get();
+    _schoolName = _schoolSnapshot.data()['name'];
     _role = await UserHelper.getSelectedSchoolRole();
     _handleMessageCollection();
     await UserHelper.loadIncidentTypes();
@@ -52,33 +52,33 @@ class IncidentListState extends State<IncidentList> {
   _handleMessageCollection() async {
     if (_role == 'school_security') {
       String escapedSchoolId = _schoolId.substring("schools/".length);
-      final List<DocumentSnapshot> securityUsers = (await Firestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "school_security").getDocuments()).documents;
-      _incidentListSubscription = Firestore.instance
+      final List<DocumentSnapshot> securityUsers = (await FirebaseFirestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "school_security").get()).docs;
+      _incidentListSubscription = FirebaseFirestore.instance
           .collection("$_schoolId/incident_reports")
-          .where("createdById", whereIn: securityUsers.map((security) => security.documentID).toList())
+          .where("createdById", whereIn: securityUsers.map((security) => security.id).toList())
           .orderBy("createdAt", descending: true)
           .snapshots()
           .listen((data) {
             setState(() {
-              reports = data.documents;
+              reports = data.docs;
             });
       });
     } else if (_role != 'school_staff') {
-      _incidentListSubscription = Firestore.instance
+      _incidentListSubscription = FirebaseFirestore.instance
           .collection("$_schoolId/incident_reports")
           .orderBy("createdAt", descending: true)
           .snapshots()
           .listen((data) {
         setState(() {
-          reports = data.documents;
+          reports = data.docs;
         });
       });
     } else {
-      final List<DocumentSnapshot> documents = (await Firestore.instance
+      final List<DocumentSnapshot> documents = (await FirebaseFirestore.instance
           .collection("$_schoolId/incident_reports")
           .where("createdById", isEqualTo: id)
           .orderBy("createdAt", descending: true)
-          .getDocuments()).documents;
+          .get()).docs;
       setState(() {
         reports = documents;
       });
@@ -93,12 +93,12 @@ class IncidentListState extends State<IncidentList> {
       itemCount: reports.length,
       itemBuilder: (_, int index) {
         final DocumentSnapshot document = reports[index];
-        List<String> subjectNames = List<String>.from(document['subjects']);
-        List<String> witnessNames = List<String>.from(document['witnesses']);
+        List<String> subjectNames = List<String>.from(document.data()['subjects']);
+        List<String> witnessNames = List<String>.from(document.data()['witnesses']);
 
-        List<String> items = List<String>.from(document['incidents']);
+        List<String> items = List<String>.from(document.data()['incidents']);
         List<String> posItems =
-        List<String>.from(document['positiveIncidents']);
+        List<String>.from(document.data()['positiveIncidents']);
 
         var report = '';
 
@@ -110,7 +110,7 @@ class IncidentListState extends State<IncidentList> {
           report += '${UserHelper.positiveIncidents[value] ?? 'Unknown incident'}' + ', ';
         });
 
-        var other = document['other'];
+        var other = document.data()['other'];
         if (other == null || other.isEmpty) {
           report = report.substring(0, report.length - 2);
         } else {
@@ -126,7 +126,7 @@ class IncidentListState extends State<IncidentList> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}"),
+                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document.data()['createdAt']))}"),
               trailing: FlatButton(
                 child: Text(localize('VIEW')),
                 onPressed: () {
@@ -136,18 +136,18 @@ class IncidentListState extends State<IncidentList> {
                       builder: (context) => IncidentDetails(
                           firestoreDocument: document,
                           demo: false,
-                          details: document['details'],
+                          details: document.data()['details'],
                           date: DateTime.fromMillisecondsSinceEpoch(
-                              document['date']),
-                          name: document['createdBy'],
-                          reportedById: document['createdById'],
-                          location: document['location'],
+                              document.data()['date']),
+                          name: document.data()['createdBy'],
+                          reportedById: document.data()['createdById'],
+                          location: document.data()['location'],
                           witnessNames: witnessNames,
                           subjectNames: subjectNames,
                           items: items,
                           posItems: posItems,
-                          imgUrl: document['image'],
-                          other: document['other'],),
+                          imgUrl: document.data()['image'],
+                          other: document.data()['other'],),
                     ),
                   );
                 },

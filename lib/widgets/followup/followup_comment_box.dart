@@ -34,7 +34,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
 
   Future<void> _init() async {
     final _user = await UserHelper.getUser();
-    Firestore.instance.document("users/${_user.uid}").get().then((snapshot) {
+    FirebaseFirestore.instance.doc("users/${_user.uid}").get().then((snapshot) {
       setState(() {
         _userDoc = snapshot;
       });
@@ -195,10 +195,10 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
         final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
         final bool isVideoShallow = _isVideo;
         final Function(String) onCompleteTask = (String url) {
-          Firestore.instance.runTransaction((transaction) async {
-            await Firestore.instance.collection(path).add({
-              'createdById': _userDoc.documentID,
-              'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+          FirebaseFirestore.instance.runTransaction((transaction) async {
+            await FirebaseFirestore.instance.collection(path).add({
+              'createdById': _userDoc.id,
+              'createdBy': "${_userDoc.data()["firstName"]} ${_userDoc.data()["lastName"]}",
               'img': url,
               'timestamp': FieldValue.serverTimestamp(),
               'body': body,
@@ -222,10 +222,10 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
               onComplete: onCompleteTask);
         }
       } else {
-        await Firestore.instance.runTransaction((transaction) async {
-          await Firestore.instance.collection(path).add({
-            'createdById': _userDoc.documentID,
-            'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          await FirebaseFirestore.instance.collection(path).add({
+            'createdById': _userDoc.id,
+            'createdBy': "${_userDoc.data()["firstName"]} ${_userDoc.data()["lastName"]}",
             'img': uploadUri,
             'timestamp': FieldValue.serverTimestamp(),
             'body': body,

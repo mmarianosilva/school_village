@@ -16,10 +16,10 @@ class TokenHelper {
     FirebaseUser user = await UserHelper.getUser();
     String userPath = "/users/${user.uid}";
     print('User path /users/${user.uid}');
-    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-    if (userSnapshot['devices'] != null &&
-        userSnapshot['devices'].keys.contains(token)) {
+    if (userSnapshot.data()['devices'] != null &&
+        userSnapshot.data()['devices'].keys.contains(token)) {
       print("Not adding Token to user");
       (await SharedPreferences.getInstance()).setString("fcmToken", token);
       return;
@@ -31,10 +31,10 @@ class TokenHelper {
     print("token = $token");
     print("Deleting token");
     String userPath = "/users/$userId";
-    DocumentReference userRef = Firestore.instance.document(userPath);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
 
     DocumentSnapshot userSnapshot = await userRef.get();
-    Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot.data['devices']);
+    Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot.data()['devices']);
 
     print(devices);
 
@@ -42,9 +42,9 @@ class TokenHelper {
     
       devices[token] = FieldValue.delete();
 
-      await Firestore.instance
-          .document("/users/$userId")
-          .setData(<String, dynamic>{'devices': devices}, merge: true);
+      await FirebaseFirestore.instance
+          .doc("/users/$userId")
+          .set(<String, dynamic>{'devices': devices}, SetOptions(merge: true));
       print(devices);
       print("Deleted token");
     }
@@ -55,9 +55,9 @@ class TokenHelper {
     String deviceInfo = await getDeviceInfo();
     Map<String, String> device = {token: deviceInfo};
 
-    await Firestore.instance
-        .document("/users/$userId")
-        .setData(<String, dynamic>{'devices': device}, merge: true);
+    await FirebaseFirestore.instance
+        .doc("/users/$userId")
+        .set(<String, dynamic>{'devices': device}, SetOptions(merge: true));
     (await SharedPreferences.getInstance()).setString("fcmToken", token);
   }
 

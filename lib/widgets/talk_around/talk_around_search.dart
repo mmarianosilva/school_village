@@ -58,16 +58,16 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       channel["name"] = "";
       channel["members"] = members;
       final Map<String, dynamic> channelDoc =
-          await Firestore.instance.runTransaction((transaction) async {
-        final DocumentReference documentReference = await Firestore.instance
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final DocumentReference documentReference = await FirebaseFirestore.instance
             .collection("$_schoolId/messages")
             .add(channel);
         return {
-          "id": documentReference.documentID,
+          "id": documentReference.id,
         };
       });
-      final DocumentSnapshot firebaseModel = await Firestore.instance
-          .document("$_schoolId/messages/${channelDoc["id"]}")
+      final DocumentSnapshot firebaseModel = await FirebaseFirestore.instance
+          .doc("$_schoolId/messages/${channelDoc["id"]}")
           .get();
       final String escapedSchoolId = _schoolId.substring("schools/".length);
       Stream<TalkAroundUser> participants =
@@ -75,8 +75,8 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
         final DocumentSnapshot user = await id.get();
         TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
             user,
-            user.data["associatedSchools"][escapedSchoolId] != null
-                ? user.data["associatedSchools"][escapedSchoolId]["role"]
+            user.data()["associatedSchools"][escapedSchoolId] != null
+                ? user.data()["associatedSchools"][escapedSchoolId]["role"]
                 : "");
         return member;
       });
@@ -118,7 +118,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     FirebaseUser user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     _role = await UserHelper.getSelectedSchoolRole();
-    Firestore.instance.document('users/${user.uid}').get().then((user) {
+    FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
@@ -130,14 +130,14 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   void _getChatrooms() async {
     final escapedSchoolId = _schoolId.substring("schools/".length);
     final username = UserHelper.getDisplayName(_userSnapshot);
-    final QuerySnapshot users = await Firestore.instance
+    final QuerySnapshot users = await FirebaseFirestore.instance
         .collection("users")
         .where("associatedSchools.$escapedSchoolId.allowed", isEqualTo: true)
-        .getDocuments();
+        .get();
 
-    final List<DocumentSnapshot> modifiableUserList = [...users.documents];
+    final List<DocumentSnapshot> modifiableUserList = [...users.docs];
     modifiableUserList
-        .removeWhere((doc) => doc.documentID == _userSnapshot.documentID);
+        .removeWhere((doc) => doc.id == _userSnapshot.id);
 
     if (!widget._createMode) {
       modifiableUserList.removeWhere((doc) =>
@@ -150,19 +150,19 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     final List<TalkAroundChannel> retrievedChannels = List<TalkAroundChannel>();
 
     if (widget._createMode) {
-      final QuerySnapshot channels = await Firestore.instance
+      final QuerySnapshot channels = await FirebaseFirestore.instance
           .collection("$_schoolId/messages")
           .where("members", arrayContains: _userSnapshot.reference)
-          .getDocuments();
+          .get();
       List<Future<TalkAroundChannel>> processedChannels =
-          channels.documents.map((channel) async {
+          channels.docs.map((channel) async {
         Stream<TalkAroundUser> members =
-            Stream.fromIterable(channel.data["members"]).asyncMap((id) async {
+            Stream.fromIterable(channel.data()["members"]).asyncMap((id) async {
           final DocumentSnapshot user = await id.get();
           TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
               user,
-              user.data["associatedSchools"][escapedSchoolId] != null
-                  ? user.data["associatedSchools"][escapedSchoolId]["role"]
+              user.data()["associatedSchools"][escapedSchoolId] != null
+                  ? user.data()["associatedSchools"][escapedSchoolId]["role"]
                   : "");
           return member;
         });
@@ -180,7 +180,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
           retrievedChannels.firstWhere(
               (item) =>
                   item.members.firstWhere(
-                      (member) => member.id.documentID == doc.documentID,
+                      (member) => member.id.id == doc.id,
                       orElse: () => null) !=
                   null,
               orElse: () => null) !=
@@ -190,9 +190,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     final List<String> talkAroundPermissions =
         PermissionMatrix.getTalkAroundPermissions(_role);
     modifiableUserList.removeWhere((userSnapshot) =>
-        userSnapshot["associatedSchools"][escapedSchoolId] == null ||
+        userSnapshot.data()["associatedSchools"][escapedSchoolId] == null ||
         !talkAroundPermissions.contains(
-            userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
+            userSnapshot.data()["associatedSchools"][escapedSchoolId]["role"]));
 
     final List<TalkAroundChannel> userList = modifiableUserList.map((doc) {
       return TalkAroundChannel(
@@ -204,9 +204,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
             TalkAroundUser(
                 doc.reference,
                 UserHelper.getDisplayName(doc),
-                doc.data["associatedSchools"][escapedSchoolId] != null
+                doc.data()["associatedSchools"][escapedSchoolId] != null
                     ? TalkAroundUser.mapGroup(
-                        doc.data["associatedSchools"][escapedSchoolId]["role"])
+                        doc.data()["associatedSchools"][escapedSchoolId]["role"])
                     : "")
           ]));
     }).toList();

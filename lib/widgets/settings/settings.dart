@@ -38,7 +38,7 @@ class _SettingsState extends State<Settings> {
       _version = version;
       _userSnapshot = userSnapshot;
       name = _userSnapshot != null ?
-      "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}" :
+      "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}" :
       "An error ocurred while loading user data";
       isLoaded = true;
       _userId = user != null ? user.uid : "";

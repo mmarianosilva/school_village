@@ -84,13 +84,13 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   void _onSop() async {
     DocumentSnapshot schoolData =
-        await Firestore.instance.document(_schoolId).get();
-    if (schoolData["sop"][alert.type] != null) {
-      PdfHandler.showPdfFile(context, schoolData["sop"][alert.type]["location"],
-          schoolData["sop"][alert.type]["title"]);
+        await FirebaseFirestore.instance.doc(_schoolId).get();
+    if (schoolData.data()["sop"][alert.type] != null) {
+      PdfHandler.showPdfFile(context, schoolData.data()["sop"][alert.type]["location"],
+          schoolData.data()["sop"][alert.type]["title"]);
     } else {
-      PdfHandler.showPdfFile(context, schoolData["sop"]["other"]["location"],
-          schoolData["sop"]["other"]["title"]);
+      PdfHandler.showPdfFile(context, schoolData.data()["sop"]["other"]["location"],
+          schoolData.data()["sop"]["other"]["title"]);
     }
   }
 
@@ -101,14 +101,15 @@ class _IncidentManagementState extends State<IncidentManagement>
           ? "Incident closed without resolution message"
           : closureComment;
       final String author = UserHelper.getDisplayName(_userSnapshot);
-      Firestore.instance.runTransaction((transaction) {
+      FirebaseFirestore.instance.runTransaction((transaction) {
         DocumentReference alertRef =
-            Firestore.instance.document("$_schoolId/notifications/${alert.id}");
-        return transaction.update(alertRef, {
+            FirebaseFirestore.instance.doc("$_schoolId/notifications/${alert.id}");
+        transaction.update(alertRef, {
           "endedAt": FieldValue.serverTimestamp(),
           "resolution": finalMessage,
           "resolvedBy": author,
         });
+        return Future.value(true);
       }).then((_) {
         Navigator.pop(context);
       });
@@ -149,27 +150,27 @@ class _IncidentManagementState extends State<IncidentManagement>
     if (snapshot.isEmpty) {
       return;
     }
-    if (snapshot.first.document.reference.parent().path ==
-        Firestore.instance.collection('$_schoolId/notifications').path) {
+    if (snapshot.first.doc.reference.parent.path ==
+        FirebaseFirestore.instance.collection('$_schoolId/notifications').path) {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
-            data.document["title"],
-            data.document.documentID,
+            data.doc.data()["title"],
+            data.doc.id,
             "",
-            data.document["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
-            data.document["createdBy"],
-            data.document["createdById"],
-            data.document["reportedByPhone"],
-            data.document["location"]["latitude"],
-            data.document["location"]["longitude"]);
+            data.doc.data()["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
+            data.doc.data()["createdBy"],
+            data.doc.data()["createdById"],
+            data.doc.data()["reportedByPhone"],
+            data.doc.data()["location"]["latitude"],
+            data.doc.data()["location"]["longitude"]);
       }).toList();
       _fullList.addAll(newList);
-    } else if (snapshot.first.document.reference.parent().path ==
-        Firestore.instance.collection('$_schoolId/broadcasts').path) {
+    } else if (snapshot.first.doc.reference.parent.path ==
+        FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
         Map<String, bool> targetGroups =
-            Map<String, bool>.from(item.document.data['groups']);
+            Map<String, bool>.from(item.doc.data()['groups']);
         for (String key in targetGroups.keys) {
           if (this._broadcastGroupData.containsKey(key) &&
               this._broadcastGroupData[key] &&
@@ -182,7 +183,7 @@ class _IncidentManagementState extends State<IncidentManagement>
       List<TalkAroundMessage> newList = snapshot.map((data) {
         String channel = "";
         Map<String, bool> broadcastGroup =
-            Map<String, bool>.from(data.document["groups"]);
+            Map<String, bool>.from(data.doc.data()["groups"]);
         for (String key in broadcastGroup.keys) {
           if (broadcastGroup[key]) {
             channel += "$key, ";
@@ -191,13 +192,13 @@ class _IncidentManagementState extends State<IncidentManagement>
         channel = channel.substring(0, channel.length - 2);
         return TalkAroundMessage(
             "Broadcast Message",
-            data.document.documentID,
+            data.doc.id,
             channel,
-            data.document["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.document["createdAt"]),
-            data.document["createdBy"],
-            data.document["createdById"],
-            data.document["reportedByPhone"],
+            data.doc.data()["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
+            data.doc.data()["createdBy"],
+            data.doc.data()["createdById"],
+            data.doc.data()["reportedByPhone"],
             null,
             null);
       }).toList();
@@ -206,22 +207,22 @@ class _IncidentManagementState extends State<IncidentManagement>
       List<TalkAroundMessage> newList =
           await Future.wait(snapshot.map((data) async {
         final DocumentSnapshot channelSnapshot =
-            await data.document.reference.parent().parent().get();
+            await data.doc.reference.parent.parent.get();
         final TalkAroundChannel channel =
             TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
         return TalkAroundMessage(
             "Channel Message",
-            data.document.documentID,
+            data.doc.id,
             channel.groupConversationName(
-                "${_userSnapshot.data['firstName']} ${_userSnapshot.data['lastName']}"),
-            data.document["body"],
+                "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"),
+            data.doc.data()["body"],
             DateTime.fromMicrosecondsSinceEpoch(
-                data.document["timestamp"].microsecondsSinceEpoch),
-            data.document["author"],
-            data.document["authorId"],
-            data.document["reportedByPhone"],
-            data.document["location"]["latitude"],
-            data.document["location"]["longitude"]);
+                data.doc.data()["timestamp"].microsecondsSinceEpoch),
+            data.doc.data()["author"],
+            data.doc.data()["authorId"],
+            data.doc.data()["reportedByPhone"],
+            data.doc.data()["location"]["latitude"],
+            data.doc.data()["location"]["longitude"]);
       }).toList());
       _fullList.addAll(newList);
     }
@@ -256,18 +257,18 @@ class _IncidentManagementState extends State<IncidentManagement>
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
       DocumentSnapshot schoolDocument =
-          await Firestore.instance.document(schoolId).get();
-      if (schoolDocument["documents"] != null) {
+          await FirebaseFirestore.instance.doc(schoolId).get();
+      if (schoolDocument.data()["documents"] != null) {
         _mapData = _getMapData(schoolDocument);
       }
-      _schoolAddress = schoolDocument.data['address'];
+      _schoolAddress = schoolDocument.data()['address'];
     }
-    Firestore.instance.document('users/${user.uid}').get().then((user) {
+    FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
         _schoolId = schoolId;
         _broadcastGroupData = Map<String, bool>.from(
-            user.data['associatedSchools']
+            user.data()['associatedSchools']
                 [schoolId.substring(schoolId.indexOf('/') + 1)]['groups']);
         _isLoading = false;
       });
@@ -276,7 +277,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
-    final List<Map<String, dynamic>> documents = snapshot["documents"]
+    final List<Map<String, dynamic>> documents = snapshot.data()["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
@@ -302,19 +303,19 @@ class _IncidentManagementState extends State<IncidentManagement>
         _messages = _fullList;
       });
     } else {
-      _alertSubscription = Firestore.instance
-          .document("$_schoolId/notifications/${alert.id}")
+      _alertSubscription = FirebaseFirestore.instance
+          .doc("$_schoolId/notifications/${alert.id}")
           .snapshots()
           .listen((snapshot) {
-        if (snapshot.data["endedAt"] != null) {
+        if (snapshot.data()["endedAt"] != null) {
           _fullList.add(TalkAroundMessage(
               "Incident Record Closed",
               "alert-resolved-identifier",
               "",
-              "${snapshot.data["resolution"] != null ? snapshot.data["resolution"] : "This incident has been resolved and closed."}",
+              "${snapshot.data()["resolution"] != null ? snapshot.data()["resolution"] : "This incident has been resolved and closed."}",
               DateTime.fromMillisecondsSinceEpoch(
-                  snapshot.data["endedAt"].millisecondsSinceEpoch),
-              snapshot.data["resolvedBy"] ?? "SCHOOL VILLAGE SYSTEM",
+                  snapshot.data()["endedAt"].millisecondsSinceEpoch),
+              snapshot.data()["resolvedBy"] ?? "SCHOOL VILLAGE SYSTEM",
               "",
               null,
               null,
@@ -326,12 +327,12 @@ class _IncidentManagementState extends State<IncidentManagement>
         }
       });
     }
-    Query userMessageChannels = Firestore.instance
+    Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
         .where("roles", arrayContains: role);
-    QuerySnapshot messageChannels = await userMessageChannels.getDocuments();
+    QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
-    messageChannels.documents.forEach((channelDocument) {
+    messageChannels.docs.forEach((channelDocument) {
       if (alert.resolved) {
         messageStreamGroup.add(channelDocument.reference
             .collection("messages")
@@ -353,7 +354,7 @@ class _IncidentManagementState extends State<IncidentManagement>
     });
     if (alert.resolved) {
       // Broadcast messages
-      messageStreamGroup.add(Firestore.instance
+      messageStreamGroup.add(FirebaseFirestore.instance
           .collection('$_schoolId/broadcasts')
           .where("createdAt",
               isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
@@ -361,7 +362,7 @@ class _IncidentManagementState extends State<IncidentManagement>
               isLessThanOrEqualTo: alert.timestampEnded.millisecondsSinceEpoch)
           .snapshots());
       // Alerts
-      messageStreamGroup.add(Firestore.instance
+      messageStreamGroup.add(FirebaseFirestore.instance
           .collection('$_schoolId/notifications')
           .where("createdAt",
               isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
@@ -370,22 +371,22 @@ class _IncidentManagementState extends State<IncidentManagement>
           .snapshots());
     } else {
       // Broadcast messages
-      messageStreamGroup.add(Firestore.instance
+      messageStreamGroup.add(FirebaseFirestore.instance
           .collection('$_schoolId/broadcasts')
           .where("createdAt",
               isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
           .snapshots());
       // Alerts
-      messageStreamGroup.add(Firestore.instance
+      messageStreamGroup.add(FirebaseFirestore.instance
           .collection('$_schoolId/notifications')
           .where("createdAt",
               isGreaterThanOrEqualTo: alert.timestamp.millisecondsSinceEpoch)
           .snapshots());
     }
     _messageStream = messageStreamGroup.stream.listen((data) {
-      data.documentChanges
+      data.docChanges
           .removeWhere((item) => item.type != DocumentChangeType.added);
-      onMessagesChanged(data.documentChanges);
+      onMessagesChanged(data.docChanges);
     });
   }
 
