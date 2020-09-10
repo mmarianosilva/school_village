@@ -117,13 +117,13 @@ class PdfHandler {
           .child(storagePath);
       final Directory systemTempDir = await getApplicationDocumentsDirectory();
       final String rootPath = '${systemTempDir.path}/${pdfDocument.data()["name"]}';
-      final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
-      await items["items"].forEach((dynamic key, dynamic item) async {
-        StorageReference pdfFile = pdfDirectory.child(key);
-        StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
-            File('$rootPath/$key'));
-        await pdfDownloadTask.future;
-      });
+      // final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
+      // await items["items"].forEach((dynamic key, dynamic item) async {
+      //   StorageReference pdfFile = pdfDirectory.child(key);
+      //   StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
+      //       File('$rootPath/$key'));
+      //   await pdfDownloadTask.future;
+      // });
       return '$rootPath/${pdfDocument.data()["root"].split('/').last}';
     }
     return null;

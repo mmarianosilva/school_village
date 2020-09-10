@@ -17,83 +17,102 @@ class TalkAroundRoomItem extends StatelessWidget {
         onTap: this.onTap,
         child: Row(
           children: <Widget>[
-            Flexible(
-                child: Builder(builder: (context) {
-                  if (!item.direct) {
-                    return Text(
-                        "#",
-                        style: TextStyle(color: Colors.white, fontSize: 16.0),
-                        textAlign: TextAlign.center
-                    );
-                  }
-                  if (item.members.length > 2) {
-                    return Container(
-                      color: Colors.transparent,
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.all(const Radius.circular(4.0))
-                        ),
-                        child: Text(
-                            "${item.members.length - 1}",
-                            style: TextStyle(color: Color.fromARGB(255, 10, 104, 127), fontSize: 16.0),
-                            textAlign: TextAlign.center),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Builder(builder: (context) {
+                if (item.isClass ?? false) {
+                  return Text(
+                    "▫",
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                      textAlign: TextAlign.center,
+                  );
+                }
+                if (!item.direct) {
+                  return Text(
+                      "#",
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                      textAlign: TextAlign.center
+                  );
+                }
+                if (item.members.length > 2) {
+                  return Container(
+                    color: Colors.transparent,
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.all(const Radius.circular(4.0))
                       ),
-                    );
-                  } else {
-                    return Text(
-                        "•",
-                        style: TextStyle(color: Colors.white, fontSize: 16.0),
-                        textAlign: TextAlign.center
-                    );
-                  }
-                }),
-                flex: 1,
-                fit: FlexFit.tight
+                      child: Text(
+                          "${item.members.length - 1}",
+                          style: TextStyle(color: Color.fromARGB(255, 10, 104, 127), fontSize: 16.0),
+                          textAlign: TextAlign.center),
+                    ),
+                  );
+                } else {
+                  return Container(
+                    width: 16.0,
+                    height: 16.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(4.0),
+                    margin: const EdgeInsets.only(right: 4.0),
+                  );
+                }
+              }),
             ),
-            Flexible(
+            Expanded(
                 child: Text(
                     item.groupConversationName(username),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: TextStyle(color: Colors.white, fontSize: 16.0)
                 ),
-                flex: 8,
-                fit: FlexFit.tight
             ),
-            Flexible(
-              child: Builder(builder: (context) {
-                if (!item.direct) {
-                  return SizedBox();
-                }
-                if (item.timestamp != null) {
-                  return Text(
+            Builder(builder: (context) {
+              if (item.isClass ?? false) {
+                return Container(
+                  constraints: BoxConstraints(maxWidth: 96.0),
+                  child: Text(
+                      item.admin.name,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 12.0),
+                      textAlign: TextAlign.end),
+                );
+              }
+              if (!item.direct) {
+                return SizedBox();
+              }
+              if (item.timestamp != null) {
+                return Container(
+                  constraints: BoxConstraints(maxWidth: 80.0),
+                  child: Text(
                       messageDateFormatter.format(item.timestamp.toDate()),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 12.0),
-                      textAlign: TextAlign.end);
-                }
-                else if (item.members.length > 2) {
-                  return Text(
-                      "Group",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
-                      textAlign: TextAlign.end);
-                } else {
-                  return Text(
-                      item.members[0].name != username ? item.members[0].group : item.members[1].group,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
-                      textAlign: TextAlign.end);
-                }
-              }),
-              flex: 3,
-              fit: FlexFit.tight,
-            )
+                      textAlign: TextAlign.end),
+                );
+              }
+              else if (item.members.length > 2) {
+                return Text(
+                    "Group",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
+                    textAlign: TextAlign.end);
+              } else {
+                return Text(
+                    item.members[0].name != username ? item.members[0].group : item.members[1].group,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
+                    textAlign: TextAlign.end);
+              }
+            })
           ],
         ),
       ),

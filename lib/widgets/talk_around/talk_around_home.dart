@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/search/search_bar.dart';
+import 'package:school_village/widgets/talk_around/class/talk_around_create_class.dart';
 import 'package:school_village/widgets/talk_around/talk_around_channel.dart';
 import 'package:school_village/widgets/talk_around/talk_around_messaging.dart';
 import 'package:school_village/widgets/talk_around/talk_around_room_item.dart';
@@ -21,6 +22,7 @@ class TalkAroundHome extends StatefulWidget {
 
 class _TalkAroundHomeState extends State<TalkAroundHome> {
   List<TalkAroundChannel> _channels = List<TalkAroundChannel>();
+  List<TalkAroundChannel> _groupMessages = List<TalkAroundChannel>();
   List<TalkAroundChannel> _directMessages = List<TalkAroundChannel>();
   DocumentSnapshot _userSnapshot;
   String _schoolId;
@@ -53,10 +55,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       Iterable<DocumentSnapshot> channels = documentList;
-      List<Future<TalkAroundChannel>> processedChannels = channels.map((channel) async {
+      List<Future<TalkAroundChannel>> processedChannels =
+          channels.map((channel) async {
         return TalkAroundChannel.fromMapAndUsers(channel, null);
       }).toList();
-      List<TalkAroundChannel> retrievedChannels = await Future.wait(processedChannels);
+      List<TalkAroundChannel> retrievedChannels =
+          await Future.wait(processedChannels);
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -66,55 +70,77 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     });
     _messageListSubscription = _firestore
         .collection("$_schoolId/messages")
-        .where("members", arrayContains: _userSnapshot.reference)
+        .where("members", arrayContainsAny: [_userSnapshot.reference])
         .snapshots()
         .listen((snapshot) async {
-      final String escapedSchoolId = _schoolId.substring("schools/".length);
-      List<DocumentSnapshot> documentList = snapshot.docs;
-      Iterable<DocumentSnapshot> groupMessages = documentList;
-      List<Future<TalkAroundChannel>> processedGroupMessages = groupMessages.map((channel) async {
-        Stream<TalkAroundUser> members = Stream.fromIterable(channel.data()["members"]).asyncMap((id) async {
-          final DocumentSnapshot user = await id.get();
-          TalkAroundUser member = TalkAroundUser.fromMapAndGroup(user, user.data()["associatedSchools"][escapedSchoolId] != null ? user.data()["associatedSchools"][escapedSchoolId]["role"] : "");
-          return member;
+          final String escapedSchoolId = _schoolId.substring("schools/".length);
+          List<DocumentSnapshot> documentList = snapshot.docs;
+          Iterable<DocumentSnapshot> groupMessages = documentList;
+          List<Future<TalkAroundChannel>> processedGroupMessages =
+              groupMessages.map((channel) async {
+            Stream<TalkAroundUser> members =
+                Stream.fromIterable(channel.data()["members"])
+                    .asyncMap((id) async {
+              final DocumentSnapshot user = await id.get();
+              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
+                  user,
+                  user.data()["associatedSchools"][escapedSchoolId] != null
+                      ? user.data()["associatedSchools"][escapedSchoolId]
+                          ["role"]
+                      : "");
+              return member;
+            });
+            List<TalkAroundUser> users = await members.toList();
+            return TalkAroundChannel.fromMapAndUsers(channel, users);
+          }).toList();
+          List<TalkAroundChannel> retrievedGroupMessages =
+              await Future.wait(processedGroupMessages);
+          if (retrievedGroupMessages.isNotEmpty) {
+            retrievedGroupMessages.sort((group1, group2) =>
+                group2.timestamp.compareTo(group1.timestamp));
+          }
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _directMessages = retrievedGroupMessages
+                  .where((channel) => !channel.isClass)
+                  .toList();
+              _groupMessages = retrievedGroupMessages
+                  .where((channel) => channel.isClass)
+                  .toList()
+                    ..sort((item1, item2) => item1.name.compareTo(item2.name));
+            });
+          }
         });
-        List<TalkAroundUser> users = await members.toList();
-        return TalkAroundChannel.fromMapAndUsers(channel, users);
-      }).toList();
-      List<TalkAroundChannel> retrievedGroupMessages = await Future.wait(processedGroupMessages);
-      if (retrievedGroupMessages.isNotEmpty) {
-        retrievedGroupMessages.sort((group1, group2) =>
-            group2.timestamp.compareTo(group1.timestamp));
-      }
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _directMessages = retrievedGroupMessages;
-        });
-      }
-    });
   }
 
-  Widget _buildChannelItem(BuildContext context, int index) {
+  Widget _buildChannelItem(int index) {
     TalkAroundChannel item = _channels[index];
     return TalkAroundRoomItem(
-        item: item,
-        username: "",
-        onTap: () => _handleOnTap(item)
-    );
+        item: item, username: "", onTap: () => _handleOnTap(item));
   }
 
-  Widget _buildDirectMessageItem(BuildContext context, int index) {
+  Widget _buildDirectMessageItem(int index) {
     TalkAroundChannel item = _directMessages[index];
     return TalkAroundRoomItem(
         item: item,
         username: UserHelper.getDisplayName(_userSnapshot),
-        onTap: () => _handleOnTap(item)
-    );
+        onTap: () => _handleOnTap(item));
+  }
+
+  Widget _buildGroupMessageItem(int index) {
+    TalkAroundChannel item = _groupMessages[index];
+    return TalkAroundRoomItem(
+        item: item,
+        username: UserHelper.getDisplayName(_userSnapshot),
+        onTap: () => _handleOnTap(item));
   }
 
   void _handleOnTap(TalkAroundChannel item) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundMessaging(channel: item)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TalkAroundMessaging(channel: item)));
   }
 
   @override
@@ -146,6 +172,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         title: Text(localize("Talk Around")),
         backgroundColor: Color.fromARGB(255, 134, 165, 177),
       ),
+      backgroundColor: Color.fromARGB(255, 7, 133, 164),
       body: Builder(
         builder: (BuildContext context) {
           if (_isLoading) {
@@ -162,63 +189,119 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             color: Color.fromARGB(255, 7, 133, 164),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                      color: Color.fromARGB(255, 10, 104, 127),
-                      child: Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.asset("assets/images/sv_icon_menu.png"),
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  color: Color.fromARGB(255, 10, 104, 127),
+                  child: Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset("assets/images/sv_icon_menu.png"),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: SearchBar(
+                            controller: _searchBarController,
+                            onTap: () => {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          TalkAroundSearch(true, null)))
+                            },
                           ),
-                          Expanded(
-                            child: SearchBar(
-                              controller: _searchBarController,
-                              onTap: () => { Navigator.push(context, MaterialPageRoute(builder: (context) => TalkAroundSearch(true, null))) },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8.0),
+                            _channels?.isNotEmpty ?? false
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(
+                                        localize("Channels").toUpperCase(),
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 199, 199, 204)),
+                                        textAlign: TextAlign.start),
+                                  )
+                                : const SizedBox(),
+                            ...List.generate(
+                              _channels != null ? _channels.length : 0,
+                              _buildChannelItem,
                             ),
-                          )
-                        ],
+                            _groupMessages?.isNotEmpty ?? false
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(
+                                        localize("Class | Group").toUpperCase(),
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 199, 199, 204)),
+                                        textAlign: TextAlign.start),
+                                  )
+                                : const SizedBox(),
+                            ...List.generate(
+                                _groupMessages != null
+                                    ? _groupMessages.length
+                                    : 0,
+                                _buildGroupMessageItem),
+                            _directMessages?.isNotEmpty ?? false
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(
+                                        localize("Direct Messages").toUpperCase(),
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 199, 199, 204)),
+                                        textAlign: TextAlign.start),
+                                  )
+                                : const SizedBox(),
+                            ...List.generate(
+                              _directMessages != null
+                                  ? _directMessages.length
+                                  : 0,
+                              _buildDirectMessageItem,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    flex: 1
-                ),
-                Spacer(flex: 1),
-                _channels != null && _channels.isNotEmpty ? Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                          localize("Channels").toUpperCase(),
-                          style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
-                          textAlign: TextAlign.start
-                      ),
-                    )
-                ) : const SizedBox(),
-                _channels != null && _channels.isNotEmpty ? Flexible(
-                    child: ListView.builder(
-                      itemBuilder: _buildChannelItem,
-                      itemCount: _channels.length,
-                    ),
-                    flex: 6,
-                    fit: FlexFit.loose
-                ) : const SizedBox(),
-                Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                          localize("Direct Messages").toUpperCase(),
-                          style: TextStyle(color: Color.fromARGB(255, 199, 199, 204)),
-                          textAlign: TextAlign.start
-                      ),
-                    )
-                ),
-                Flexible(
-                    child: ListView.builder(
-                      itemBuilder: _buildDirectMessageItem,
-                      itemCount: _directMessages != null ? _directMessages.length : 0,
-                    ),
-                    flex: 6
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: MaterialButton(
+                            color: Color(0xff007aff),
+                            elevation: 4.0,
+                            onPressed: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) => TalkAroundCreateClass())),
+                            child: Padding(
+                              padding: EdgeInsets.zero,
+                              child: Text(
+                                localize('Create Group'),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 )
               ],
             ),

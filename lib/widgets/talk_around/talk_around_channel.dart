@@ -7,22 +7,42 @@ class TalkAroundChannel {
   final bool direct;
   final Timestamp timestamp;
   final List<TalkAroundUser> members;
+  final TalkAroundUser admin;
+  final bool isClass;
 
-  TalkAroundChannel(this.id, this.name, this.direct, this.timestamp, this.members);
+  TalkAroundChannel(
+    this.id,
+    this.name,
+    this.direct,
+    this.timestamp,
+    this.members, {
+    this.admin,
+    this.isClass = false,
+  });
 
-  factory TalkAroundChannel.fromMapAndUsers(DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
+  factory TalkAroundChannel.fromMapAndUsers(
+      DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
     return TalkAroundChannel(
         firebaseModel.id,
         firebaseModel.data()["name"],
         firebaseModel.data()["direct"] ?? false,
         firebaseModel.data()["timestamp"] ?? Timestamp.now(),
-        members);
+        members,
+        admin: firebaseModel.data()["admin"] != null
+            ? TalkAroundUser(
+                FirebaseFirestore.instance
+                    .doc("users/${firebaseModel.data()["admin"]}"),
+                firebaseModel.data()["adminName"],
+                firebaseModel.data()["adminRole"],
+              )
+            : null,
+        isClass: firebaseModel.data()["class"] ?? false);
   }
 
   bool get showLocation => !direct && name.contains("Security");
 
   String groupConversationName(String username) {
-    if (!direct) {
+    if (!direct || isClass) {
       return name;
     }
     List<String> names = members.map((item) => item.name).toList();

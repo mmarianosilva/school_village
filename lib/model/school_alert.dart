@@ -22,18 +22,18 @@ class SchoolAlert {
   SchoolAlert.fromMap(DocumentSnapshot firebaseModel) : this(
     firebaseModel.id,
     firebaseModel.reference.path,
-    firebaseModel.get("title"),
-    firebaseModel.get("body"),
-    DateTime.fromMillisecondsSinceEpoch(firebaseModel.get("createdAt")),
-    firebaseModel.get("endedAt") != null ? DateTime.fromMicrosecondsSinceEpoch(firebaseModel.get("endedAt").microsecondsSinceEpoch) : null,
-    firebaseModel.get("createdBy"),
-    firebaseModel.get("createdById"),
-    LocationData.fromMap(Map<String, double>.from(firebaseModel.get("location"))),
-    firebaseModel.get("type"),
-    firebaseModel.get("reportedByPhone"),
-    firebaseModel.get("resolution"),
-    resolved: firebaseModel.get("endedAt") != null,
-    resolvedBy: firebaseModel.get("resolvedBy"));
+    firebaseModel.data()["title"],
+    firebaseModel.data()["body"],
+    DateTime.fromMillisecondsSinceEpoch(firebaseModel.data()["createdAt"]),
+    firebaseModel.data()["endedAt"] != null ? DateTime.fromMicrosecondsSinceEpoch(firebaseModel.data()["endedAt"].microsecondsSinceEpoch) : null,
+    firebaseModel.data()["createdBy"],
+    firebaseModel.data()["createdById"],
+    LocationData.fromMap(Map<String, double>.from(firebaseModel.data()["location"])),
+    firebaseModel.data()["type"],
+    firebaseModel.data()["reportedByPhone"],
+    firebaseModel.data()["resolution"],
+    resolved: firebaseModel.data()["endedAt"] != null,
+    resolvedBy: firebaseModel.data()["resolvedBy"]);
 
   String get reportedByPhoneFormatted => reportedByPhone.length > 6 ? "${reportedByPhone.substring(0, 3)}-${reportedByPhone.substring(3, 6)}-${reportedByPhone.substring(6)}" : reportedByPhone;
 }
