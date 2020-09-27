@@ -69,7 +69,7 @@ class IncidentDetails extends StatefulWidget {
 }
 
 class IncidentDetailsState extends State<IncidentDetails> {
-  static FirebaseStorage storage = FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage.instance;
 
   final List<String> items;
   final List<String> posItems;
@@ -309,11 +309,11 @@ class IncidentDetailsState extends State<IncidentDetails> {
   }
 
   uploadFile(String path, File file) async {
-    final StorageReference ref = storage.ref().child(path);
-    final StorageUploadTask uploadTask = ref.putFile(file);
+    final Reference ref = storage.ref().child(path);
+    final UploadTask uploadTask = ref.putFile(file);
 
     String downloadUrl;
-    await uploadTask.onComplete.then((val) {
+    await uploadTask.then((val) {
       val.ref.getDownloadURL().then((v) {
         downloadUrl = v;
       });

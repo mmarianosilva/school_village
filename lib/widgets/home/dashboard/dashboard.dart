@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
+import 'package:school_village/widgets/roll_call/roll_call_log.dart';
+import 'package:school_village/widgets/search/search_dropdown_field.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:flutter/material.dart';
@@ -43,6 +45,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   SchoolAlert alertInProgress = null;
   StreamSubscription<QuerySnapshot> _alertSubscription;
 
+  // Roll call
+  bool rollCallAll = false;
+
   @override
   void initState() {
     super.initState();
@@ -79,18 +84,22 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         .orderBy("createdAt", descending: true)
         .snapshots()
         .listen((result) async {
-          final DocumentSnapshot latestResolved = (await alerts.orderBy("endedAt", descending: true).limit(1).get()).docs.first;
       if (result.docs.isEmpty) {
         this.setState(() {
           this.alertInProgress = null;
         });
         return;
       }
+      final List<QueryDocumentSnapshot> lastAlert = (await alerts.orderBy("endedAt", descending: true).limit(1).get()).docs;
+      final DocumentSnapshot latestResolved = lastAlert.isNotEmpty ? lastAlert.first : null;
       final Timestamp lastResolvedTimestamp = latestResolved != null
           ? latestResolved.data()["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
-      final latestAlert =
-          result.docs.lastWhere((DocumentSnapshot snapshot) => snapshot.data()["createdAt"] > lastResolvedTimestamp.millisecondsSinceEpoch, orElse: () => null);
+      final latestAlert = result.docs.lastWhere(
+          (DocumentSnapshot snapshot) =>
+              snapshot.data()["createdAt"] >
+              lastResolvedTimestamp.millisecondsSinceEpoch,
+          orElse: () => null);
       SchoolAlert alert =
           latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
       if (this.alertInProgress != alert) {
@@ -204,7 +213,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             children: <Widget>[
               Container(
                 width: 56.0,
-                height: 56.0,
                 child: Center(
                   child: Icon(Icons.info_outline,
                       size: 48.0, color: Color.fromRGBO(23, 58, 163, 1)),
@@ -247,7 +255,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                   children: <Widget>[
                     Container(
                       width: 56.0,
-                      height: 56.0,
                       child: Center(
                         child: Image.asset('assets/images/alert.png'),
                       ),
@@ -286,16 +293,14 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       onTap: () {
         if (snapshot.data()["documents"][index - 5]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data()["documents"][index - 5]["connectedFiles"] !=
-                      null
-                  ? snapshot.data()["documents"][index - 5]["connectedFiles"]
+              snapshot.data()["documents"][index - 5]["connectedFiles"] != null
+                  ? snapshot
+                      .data()["documents"][index - 5]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(
-              context,
-              snapshot.data()["documents"][index - 5]["location"],
+          _showPDF(context, snapshot.data()["documents"][index - 5]["location"],
               snapshot.data()["documents"][index - 5]["title"],
               connectedFiles: connectedFiles);
         } else if (snapshot.data()["documents"][index - 5]["type"] ==
@@ -315,12 +320,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             children: <Widget>[
               Container(
                 width: 56.0,
-                height: 56.0,
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data()["documents"][index - 5]
-                              ["icon"],
+                          url: snapshot.data()["documents"][index - 5]["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -385,7 +388,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             children: <Widget>[
               Container(
                 width: 56.0,
-                height: 56.0,
                 child: Center(
                   child: Image.asset('assets/images/feature_image.png'),
                 ),
@@ -434,7 +436,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             children: <Widget>[
               Container(
                 width: 56.0,
-                height: 56.0,
                 child: Center(
                   child: Image.asset('assets/images/incident_report_log.png'),
                 ),
@@ -478,7 +479,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             children: <Widget>[
               Container(
                 width: 56.0,
-                height: 56.0,
                 child: Center(
                   child: Icon(Icons.record_voice_over,
                       size: 48.0, color: Colors.black),
@@ -519,6 +519,319 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     );
   }
 
+  Future<bool> _displayRollCallDialog() async {
+    return showDialog<bool>(
+      builder: (context) => AlertDialog(
+        title: Text(
+          localize('Start a Roll Call?'),
+          style: TextStyle(
+              color: Color(0xff111010),
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.48),
+          textAlign: TextAlign.center,
+        ),
+        titlePadding: EdgeInsets.only(top: 8.0),
+        contentPadding: EdgeInsets.zero,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            if (role == 'school_admin' || role == 'district') ...[
+              Text(
+                localize('Schoolwide roll call').toUpperCase(),
+                style: TextStyle(
+                  color: Color(0xff810317),
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  height: 24.0 / 18.0,
+                  letterSpacing: 0.64,
+                ),
+              ),
+              Text(
+                localize('Select the Recipient'),
+                style: TextStyle(
+                  color: Color(0xff111010),
+                  fontSize: 20.0,
+                  letterSpacing: -0.48,
+                ),
+              ),
+              Row(
+                children: [
+                  Radio(
+                    activeColor: Color(0xff810317),
+                    onChanged: (value) {
+                      setState(() {
+                        rollCallAll = !value;
+                      });
+                    },
+                    groupValue: rollCallAll,
+                    value: !rollCallAll,
+                  ),
+                  Text(
+                    localize('Staff').toUpperCase(),
+                    style: TextStyle(
+                      color: Color(0xff881037),
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.16,
+                    ),
+                  ),
+                  const Spacer(),
+                  Radio(
+                    activeColor: Color(0xff810317),
+                    onChanged: (value) {
+                      setState(() {
+                        rollCallAll = value;
+                      });
+                    },
+                    groupValue: rollCallAll,
+                    value: rollCallAll,
+                  ),
+                  Text(
+                    localize('All').toUpperCase(),
+                    style: TextStyle(
+                      color: Color(0xff881037),
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.16,
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: MaterialButton(
+                      child: Container(
+                        height: 60.0,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: Color(0xff48484a),
+                        ),
+                        child: Center(
+                          child: Text(
+                            localize('Cancel').toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17.0,
+                              height: 22.0 / 17.0,
+                              letterSpacing: -0.41,
+                            ),
+                          ),
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(false),
+                    ),
+                  ),
+                  Expanded(
+                    child: MaterialButton(
+                      child: Container(
+                        height: 60.0,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: Color(0xff48484a),
+                        ),
+                        child: Center(
+                          child: Text(
+                            localize('Send').toUpperCase(),
+                            style: TextStyle(
+                              color: Color(0xff14c3ef),
+                              fontSize: 17.0,
+                              height: 22.0 / 17.0,
+                              letterSpacing: -0.41,
+                            ),
+                          ),
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(true),
+                    ),
+                  ),
+                ],
+              ),
+            ] else
+              const SizedBox(),
+            const SizedBox(height: 16.0),
+            Expanded(
+              child: Container(
+                color: Color(0xffe5e5ea),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      localize('GROUP or CLASS ROLL CALL'),
+                      style: TextStyle(
+                        color: Color(0xff810317),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.46,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    SearchDropdownField(),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          activeColor: Colors.black,
+                          groupValue: true,
+                          onChanged: (value) {},
+                          value: true,
+                        ),
+                        Expanded(
+                          child: Text(
+                            localize('Self-Reported Roll Call'),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          activeColor: Colors.black,
+                          groupValue: true,
+                          onChanged: (value) {},
+                          value: false,
+                        ),
+                        Expanded(
+                          child: Text(
+                            localize('Manual Roll Call'),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: MaterialButton(
+                            child: Container(
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Color(0xff48484a),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  localize('Cancel').toUpperCase(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17.0,
+                                    height: 22.0 / 17.0,
+                                    letterSpacing: -0.41,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                        ),
+                        Expanded(
+                          child: MaterialButton(
+                            child: Container(
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Color(0xff48484a),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  localize('Send').toUpperCase(),
+                                  style: TextStyle(
+                                    color: Color(0xff14c3ef),
+                                    fontSize: 17.0,
+                                    height: 22.0 / 17.0,
+                                    letterSpacing: -0.41,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            MaterialButton(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Color(0xff48484a),
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0, vertical: 16.0),
+                child: Text(
+                  localize('Roll call log').toUpperCase(),
+                  style: TextStyle(
+                    color: Color(0xff14c3ef),
+                    fontSize: 17.0,
+                    height: 22.0 / 17.0,
+                    letterSpacing: -0.41,
+                  ),
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(height: 16.0),
+          ],
+        ),
+      ),
+      context: context,
+    );
+  }
+
+  _buildRollCallRequest() {
+    if (role == 'school_student' || role == 'school_family') {
+      return const SizedBox();
+    }
+    return GestureDetector(
+      onTap: () async {
+        if ((await _displayRollCallDialog()) ?? false) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => RollCallLog()),
+          );
+        }
+        ;
+      },
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
+            children: <Widget>[
+              Container(
+                width: 56.0,
+                child: Center(
+                  child: Image.asset('assets/images/roll_call_button.png',
+                      fit: BoxFit.contain),
+                ),
+              ),
+              SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  localize('Roll Call Request'),
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: Colors.grey)
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -548,11 +861,16 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
                     snapshot.data.data()["documents"] != null
-                        ? snapshot.data.data()["documents"].where(
-                            (snapshot) =>
-                                snapshot["accessRoles"] == null || snapshot["accessRoles"].contains(role)).toList().cast<DocumentSnapshot>()
+                        ? snapshot.data
+                            .data()["documents"]
+                            .where((snapshot) =>
+                                snapshot["accessRoles"] == null ||
+                                snapshot["accessRoles"].contains(role))
+                            .toList()
+                            .cast<DocumentSnapshot>()
                         : null;
-                final int documentCount = documents != null ? documents.length : 0;
+                final int documentCount =
+                    documents != null ? documents.length : 0;
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
@@ -586,7 +904,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                               return _buildIncidentList();
                             }
                             if (index == 4) {
-                              return const SizedBox();
+                              return _buildRollCallRequest();
                             }
                             if (index == documentCount + 5) {
                               return _buildMessagesOption(model);

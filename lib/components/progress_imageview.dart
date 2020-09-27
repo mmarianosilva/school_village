@@ -49,7 +49,7 @@ class _ProgressImageState extends State<ProgressImage> {
       this.onTap,
       this.isVideo});
 
-  static FirebaseStorage storage = FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage.instance;
 
   @override
   void initState() {

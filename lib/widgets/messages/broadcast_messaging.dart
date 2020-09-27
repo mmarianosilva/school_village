@@ -29,7 +29,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     this.selectGroups = SelectGroups((value) => amberAlert = value);
   }
 
-  static FirebaseStorage storage = FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage.instance;
   FirebaseUser _user;
   String _userId;
   String name = '';
@@ -344,17 +344,16 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   uploadFile(String path, File file) async {
-    final StorageReference ref = storage.ref().child(path);
-    final StorageUploadTask uploadTask = ref.putFile(file);
+    final Reference ref = storage.ref().child(path);
+    final UploadTask uploadTask = ref.putFile(file);
 
     String downloadUrl;
-    await uploadTask.onComplete.then((val) {
+    await uploadTask.then((val) {
       val.ref.getDownloadURL().then((v) {
         downloadUrl = v; //Val here is Already String
       });
     });
 
-//    final Uri downloadUrl = (await uploadTask.onComplete).downloadUrl;
     return downloadUrl;
   }
 

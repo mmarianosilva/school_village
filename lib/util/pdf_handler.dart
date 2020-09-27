@@ -12,7 +12,7 @@ import 'package:school_village/util/user_helper.dart';
 
 class PdfHandler {
   static const platform = const MethodChannel('schoolvillage.app/pdf_view');
-  static FirebaseStorage storage = FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage.instance;
   static bool _canceled;
 
   static showPdfFile(BuildContext context, String url, String name, {List<Map<String, dynamic>> connectedFiles}) async {
@@ -37,7 +37,6 @@ class PdfHandler {
   }
 
   static Future<String> preparePdfFromUrl(String url, String name, {String parent}) async {
-    final FirebaseStorage storage = FirebaseStorage();
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path;
     if (!name.endsWith(".pdf")) {
@@ -53,11 +52,11 @@ class PdfHandler {
     final File tempFile = File(path);
 
     if (!tempFile.existsSync()) {
-      final StorageReference ref = storage.ref().child(url);
+      final Reference ref = storage.ref().child(url);
       await tempFile.create(recursive: true);
       assert(await tempFile.readAsString() == "");
-      final StorageFileDownloadTask task = ref.writeToFile(tempFile);
-      final int byteCount = (await task.future).totalByteCount;
+      final DownloadTask task = ref.writeToFile(tempFile);
+      final int byteCount = (await task).totalBytes;
       print(byteCount);
       print("Done Downloading");
     }
@@ -113,17 +112,17 @@ class PdfHandler {
         "$schoolId/linked-pdfs/$documentId").get();
     if (pdfDocument != null) {
       final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument.data()["name"]}';
-      final StorageReference pdfDirectory = FirebaseStorage.instance.ref()
+      final Reference pdfDirectory = FirebaseStorage.instance.ref()
           .child(storagePath);
       final Directory systemTempDir = await getApplicationDocumentsDirectory();
       final String rootPath = '${systemTempDir.path}/${pdfDocument.data()["name"]}';
-      // final Map<String, dynamic> items = Map<String, dynamic>.from(await pdfDirectory.listAll());
-      // await items["items"].forEach((dynamic key, dynamic item) async {
-      //   StorageReference pdfFile = pdfDirectory.child(key);
-      //   StorageFileDownloadTask pdfDownloadTask = pdfFile.writeToFile(
-      //       File('$rootPath/$key'));
-      //   await pdfDownloadTask.future;
-      // });
+      final ListResult list = await pdfDirectory.listAll();
+      await list.items.forEach((fileRef) async {
+        final String path = '$rootPath/${fileRef.name}';
+        final File destination = await File(path).create(recursive: true);
+        DownloadTask pdfDownloadTask = fileRef.writeToFile(destination);
+        await pdfDownloadTask;
+      });
       return '$rootPath/${pdfDocument.data()["root"].split('/').last}';
     }
     return null;

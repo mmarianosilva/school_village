@@ -27,7 +27,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  static FirebaseStorage storage = FirebaseStorage();
+  static FirebaseStorage storage = FirebaseStorage.instance;
   final String conversation;
   final DocumentSnapshot user;
   final bool showInput;
@@ -120,12 +120,11 @@ class _ChatState extends State<Chat> {
   }
 
   uploadFile(String path, File file) async {
-    final StorageReference ref = storage.ref().child(path);
-    final StorageUploadTask uploadTask = ref.putFile(file);
-//    final Uri downloadUrl = (await uploadTask.future).downloadUrl;
+    final Reference ref = storage.ref().child(path);
+    final UploadTask uploadTask = ref.putFile(file);
 
     String downloadUrl;
-    await uploadTask.onComplete.then((val) {
+    await uploadTask.then((val) {
       val.ref.getDownloadURL().then((v) {
         downloadUrl = v; //Val here is Already String
       });

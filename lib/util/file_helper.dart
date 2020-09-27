@@ -12,7 +12,7 @@ import 'package:school_village/util/user_helper.dart';
 
 class FileHelper {
   static final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static final FirebaseStorage storage = new FirebaseStorage();
+  static final FirebaseStorage storage = FirebaseStorage.instance;
 
   static Future<File> getFileFromStorage(
       {url: String, context: BuildContext}) async {
@@ -22,11 +22,11 @@ class FileHelper {
     String path = "${systemTempDir.path}/$digest";
     final File file = new File(path);
     if (!file.existsSync()) {
-      final StorageReference ref = storage.ref().child(url);
+      final Reference ref = storage.ref().child(url);
       await file.create();
       assert(await file.readAsString() == "");
-      final StorageFileDownloadTask task = ref.writeToFile(file);
-      final int byteCount = (await task.future).totalByteCount;
+      final DownloadTask task = ref.writeToFile(file);
+      final int byteCount = (await task).totalBytes;
       print(byteCount);
       print("Done Downloading");
     }
@@ -36,6 +36,9 @@ class FileHelper {
   static Future<void> downloadRequiredDocuments() async {
     final String schoolId = await UserHelper.getSelectedSchoolID();
     final String role = await UserHelper.getSelectedSchoolRole();
+    if (schoolId == null || role == null) {
+      return;
+    }
     final DocumentSnapshot school = await firestore.doc(schoolId).get();
     final List<Map<String, dynamic>> documents = (school.data()["documents"]
             .cast<Map<String, dynamic>>())
@@ -60,13 +63,13 @@ class FileHelper {
           .toList()
           : null;
       if (connectedFiles != null) {
-        final String root = document["name"];
-        await PdfHandler.preparePdfFromUrl(document["location"], document["name"], parent: root);
+        final String root = document["name"] ?? document["title"];
+        await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"], parent: root);
         final Iterable<Future> transfer = connectedFiles.map((file) =>
-            PdfHandler.preparePdfFromUrl(file["url"], file["name"], parent: root));
+            PdfHandler.preparePdfFromUrl(file["url"], file["name"] ?? file["title"], parent: root));
         await Future.wait(transfer);
       } else {
-        await PdfHandler.preparePdfFromUrl(document["location"], document["name"]);
+        await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"]);
       }
     } else if (document["type"] == "linked-pdf") {
       await PdfHandler.downloadLinkedPdf(document["location"]);
