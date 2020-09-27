@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
-import 'package:school_village/widgets/roll_call/roll_call_log.dart';
-import 'package:school_village/widgets/search/search_dropdown_field.dart';
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:location/location.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
+// import 'package:school_village/widgets/roll_call/roll_call_log.dart';
+import 'package:school_village/widgets/search/search_dropdown_field.dart';
 import 'package:school_village/main.dart';
 import 'package:school_village/model/school_alert.dart';
 import 'package:school_village/util/colors.dart';
@@ -291,26 +291,26 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot.data()["documents"][index - 5]["type"] == "pdf") {
+        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data()["documents"][index - 5]["connectedFiles"] != null
+              snapshot.data()["documents"][index - 4]["connectedFiles"] != null
                   ? snapshot
-                      .data()["documents"][index - 5]["connectedFiles"]
+                      .data()["documents"][index - 4]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(context, snapshot.data()["documents"][index - 5]["location"],
-              snapshot.data()["documents"][index - 5]["title"],
+          _showPDF(context, snapshot.data()["documents"][index - 4]["location"],
+              snapshot.data()["documents"][index - 4]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot.data()["documents"][index - 5]["type"] ==
+        } else if (snapshot.data()["documents"][index - 4]["type"] ==
             "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot.data()["documents"][index - 5]["location"],
+            snapshot.data()["documents"][index - 4]["location"],
           );
         } else {
-          _launchURL(snapshot.data()["documents"][index - 5]["location"]);
+          _launchURL(snapshot.data()["documents"][index - 4]["location"]);
         }
       },
       child: Column(
@@ -323,7 +323,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data()["documents"][index - 5]["icon"],
+                          url: snapshot.data()["documents"][index - 4]["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -343,7 +343,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data()["documents"][index - 5]["title"],
+                snapshot.data()["documents"][index - 4]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -791,11 +791,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return GestureDetector(
       onTap: () async {
         if ((await _displayRollCallDialog()) ?? false) {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => RollCallLog()),
-          );
+          // Navigator.of(context).push(
+          //   MaterialPageRoute(builder: (context) => RollCallLog()),
+          // );
         }
-        ;
       },
       child: Column(
         children: <Widget>[
@@ -903,24 +902,24 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == 3) {
                               return _buildIncidentList();
                             }
-                            if (index == 4) {
-                              return _buildRollCallRequest();
-                            }
-                            if (index == documentCount + 5) {
+                            // if (index == 4) {
+                            //   return _buildRollCallRequest();
+                            // }
+                            if (index == documentCount + 4) {
                               return _buildMessagesOption(model);
                             }
-                            if (index == documentCount + 6) {
+                            if (index == documentCount + 5) {
                               return _buildNotificationsOption(model);
                             }
-                            if (index == documentCount + 7) {
+                            if (index == documentCount + 6) {
                               return _buildHotlineMessages();
                             }
-                            if (index == documentCount + 8) {
+                            if (index == documentCount + 7) {
                               return _buildSettingsOption();
                             }
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 9);
+                          itemCount: documentCount + 8);
                 }
               }
               return Center(
