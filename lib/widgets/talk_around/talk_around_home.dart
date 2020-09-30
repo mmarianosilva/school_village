@@ -202,9 +202,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: SearchBar(
-                            controller: _searchBarController,
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: GestureDetector(
                             onTap: () => {
                               Navigator.push(
                                   context,
@@ -212,6 +212,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                       builder: (context) =>
                                           TalkAroundSearch(true, null)))
                             },
+                            child: AbsorbPointer(
+                              absorbing: true,
+                              child: SearchBar(
+                                controller: _searchBarController,
+                              ),
+                            ),
                           ),
                         ),
                       )
@@ -264,7 +270,8 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
                                     child: Text(
-                                        localize("Direct Messages").toUpperCase(),
+                                        localize("Direct Messages")
+                                            .toUpperCase(),
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 199, 199, 204)),
@@ -289,7 +296,8 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                             elevation: 4.0,
                             onPressed: () => Navigator.of(context).push(
                                 MaterialPageRoute(
-                                    builder: (context) => TalkAroundCreateClass())),
+                                    builder: (context) =>
+                                        TalkAroundCreateClass())),
                             child: Padding(
                               padding: EdgeInsets.zero,
                               child: Text(

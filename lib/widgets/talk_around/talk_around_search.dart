@@ -182,7 +182,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
                   item.members.firstWhere(
                       (member) => member.id.id == doc.id,
                       orElse: () => null) !=
-                  null,
+                  null && (item.direct ?? false),
               orElse: () => null) !=
           null);
     }
@@ -240,49 +240,55 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BaseAppBar(
-        backgroundColor: Color.fromARGB(255, 10, 104, 127),
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          color: Color.fromARGB(255, 10, 104, 127),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: SearchBar(
-                  controller: _searchBarController,
-                  onTextInput: _onSearchTextInput,
-                  focusNode: _searchBarFocusNode,
+    return WillPopScope(
+      onWillPop: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: BaseAppBar(
+          backgroundColor: Color.fromARGB(255, 10, 104, 127),
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            color: Color.fromARGB(255, 10, 104, 127),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: SearchBar(
+                    controller: _searchBarController,
+                    onTextInput: _onSearchTextInput,
+                    focusNode: _searchBarFocusNode,
+                  ),
                 ),
-              ),
-              MaterialButton(
-                  child: Text(localize("Cancel"),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () => Navigator.pop(context))
-            ],
+                MaterialButton(
+                    child: Text(localize("Cancel"),
+                        style: TextStyle(color: Colors.white)),
+                    onPressed: () => Navigator.pop(context))
+              ],
+            ),
           ),
         ),
-      ),
-      body: Builder(
-        builder: (BuildContext context) {
-          if (_isLoading) {
+        body: Builder(
+          builder: (BuildContext context) {
+            if (_isLoading) {
+              return Container(
+                color: Color.fromARGB(255, 7, 133, 164),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              );
+            }
             return Container(
               color: Color.fromARGB(255, 7, 133, 164),
-              child: Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                ),
+              child: ListView.builder(
+                itemBuilder: _buildListItem,
+                itemCount: _filteredList != null ? _filteredList.length : 0,
               ),
             );
-          }
-          return Container(
-            color: Color.fromARGB(255, 7, 133, 164),
-            child: ListView.builder(
-              itemBuilder: _buildListItem,
-              itemCount: _filteredList != null ? _filteredList.length : 0,
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
