@@ -68,6 +68,21 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
     });
   }
 
+  Future<bool> _checkIfUnique(Map<String, dynamic> data) async {
+    final query = await FirebaseFirestore.instance
+        .collection("$_schoolId/messages")
+        .where("name", isEqualTo: data["name"])
+        .get();
+    if (query.docs.isEmpty) {
+      return true;
+    }
+    final doc = query.docs.first;
+    if (widget.group != null) {
+      return widget.group.id == doc.id;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,6 +242,23 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
                           .toList(),
                       'name': _groupController.text,
                     };
+                    if (!(await _checkIfUnique(payload))) {
+                      await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text(localize("Error")),
+                                content: Text(localize(
+                                    "There is already a group with this name. Please choose a different one.")),
+                                actions: [
+                                  FlatButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: Text(localize("Ok").toUpperCase()),
+                                  ),
+                                ],
+                              ));
+                      return;
+                    }
                     if (widget.group != null) {
                       final docRef = firestore
                           .doc("$_schoolId/messages/${widget.group.id}");
@@ -270,17 +302,19 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
               ],
             ),
           ),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    itemBuilder: _buildListItem,
-                    itemCount: _members.length,
-                    shrinkWrap: true,
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: ListView.builder(
+                      itemBuilder: _buildListItem,
+                      itemCount: _members.length,
+                      shrinkWrap: true,
+                    ),
                   ),
-          )
+                )
         ],
       ),
     );
