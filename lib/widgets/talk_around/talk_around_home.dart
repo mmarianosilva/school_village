@@ -68,50 +68,98 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         });
       }
     });
-    _messageListSubscription = _firestore
-        .collection("$_schoolId/messages")
-        .where("members", arrayContainsAny: [_userSnapshot.reference])
-        .snapshots()
-        .listen((snapshot) async {
-          final String escapedSchoolId = _schoolId.substring("schools/".length);
-          List<DocumentSnapshot> documentList = snapshot.docs;
-          Iterable<DocumentSnapshot> groupMessages = documentList;
-          List<Future<TalkAroundChannel>> processedGroupMessages =
-              groupMessages.map((channel) async {
-            Stream<TalkAroundUser> members =
-                Stream.fromIterable(channel.data()["members"])
-                    .asyncMap((id) async {
-              final DocumentSnapshot user = await id.get();
-              TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
-                  user,
-                  user.data()["associatedSchools"][escapedSchoolId] != null
-                      ? user.data()["associatedSchools"][escapedSchoolId]
-                          ["role"]
-                      : "");
-              return member;
-            });
-            List<TalkAroundUser> users = await members.toList();
-            return TalkAroundChannel.fromMapAndUsers(channel, users);
-          }).toList();
-          List<TalkAroundChannel> retrievedGroupMessages =
-              await Future.wait(processedGroupMessages);
-          if (retrievedGroupMessages.isNotEmpty) {
-            retrievedGroupMessages.sort((group1, group2) =>
-                group2.timestamp.compareTo(group1.timestamp));
-          }
-          if (mounted) {
-            setState(() {
-              _isLoading = false;
-              _directMessages = retrievedGroupMessages
-                  .where((channel) => !channel.isClass)
-                  .toList();
-              _groupMessages = retrievedGroupMessages
-                  .where((channel) => channel.isClass)
-                  .toList()
-                    ..sort((item1, item2) => item1.name.compareTo(item2.name));
-            });
-          }
-        });
+    if (_schoolRole != "school_admin" && _schoolRole != "district") {
+      _messageListSubscription = _firestore
+          .collection("$_schoolId/messages")
+          .where("members", arrayContainsAny: [_userSnapshot.reference])
+          .snapshots()
+          .listen((snapshot) async {
+        final String escapedSchoolId = _schoolId.substring("schools/".length);
+        List<DocumentSnapshot> documentList = snapshot.docs;
+        Iterable<DocumentSnapshot> groupMessages = documentList;
+        List<Future<TalkAroundChannel>> processedGroupMessages =
+        groupMessages.map((channel) async {
+          Stream<TalkAroundUser> members =
+          Stream.fromIterable(channel.data()["members"])
+              .asyncMap((id) async {
+            final DocumentSnapshot user = await id.get();
+            TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
+                user,
+                user.data()["associatedSchools"][escapedSchoolId] != null
+                    ? user.data()["associatedSchools"][escapedSchoolId]
+                ["role"]
+                    : "");
+            return member;
+          });
+          List<TalkAroundUser> users = await members.toList();
+          return TalkAroundChannel.fromMapAndUsers(channel, users);
+        }).toList();
+        List<TalkAroundChannel> retrievedGroupMessages =
+        await Future.wait(processedGroupMessages);
+        if (retrievedGroupMessages.isNotEmpty) {
+          retrievedGroupMessages.sort((group1, group2) =>
+              group2.timestamp.compareTo(group1.timestamp));
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _directMessages = retrievedGroupMessages
+                .where((channel) => !channel.isClass)
+                .toList();
+            _groupMessages = retrievedGroupMessages
+                .where((channel) => channel.isClass)
+                .toList()
+              ..sort((item1, item2) => item1.name.compareTo(item2.name));
+          });
+        }
+      });
+    } else {
+      _messageListSubscription = _firestore
+          .collection("$_schoolId/messages")
+          .snapshots()
+          .listen((snapshot) async {
+        final String escapedSchoolId = _schoolId.substring("schools/".length);
+        List<DocumentSnapshot> documentList = snapshot.docs;
+        Iterable<DocumentSnapshot> groupMessages = documentList.toList()..removeWhere((chatroom) => !(chatroom.data()["class"] ?? false) && !(chatroom.data()["members"] != null && chatroom.data()["members"].contains(_userSnapshot.reference)));
+        List<Future<TalkAroundChannel>> processedGroupMessages =
+        groupMessages.map((channel) async {
+          Stream<TalkAroundUser> members =
+          Stream.fromIterable(channel.data()["members"])
+              .asyncMap((id) async {
+            final DocumentSnapshot user = await id.get();
+            TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
+                user,
+                user.data()["associatedSchools"][escapedSchoolId] != null
+                    ? user.data()["associatedSchools"][escapedSchoolId]
+                ["role"]
+                    : "");
+            return member;
+          });
+          List<TalkAroundUser> users = await members.toList();
+          return TalkAroundChannel.fromMapAndUsers(channel, users);
+        }).toList();
+        List<TalkAroundChannel> retrievedGroupMessages =
+        await Future.wait(processedGroupMessages);
+        if (retrievedGroupMessages.isNotEmpty) {
+          retrievedGroupMessages.sort((group1, group2) =>
+              group2.timestamp.compareTo(group1.timestamp));
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _directMessages = retrievedGroupMessages
+                .where((channel) => !channel.isClass)
+                .toList();
+            _groupMessages = retrievedGroupMessages
+                .where((channel) => channel.isClass)
+                .toList()
+              ..sort((item1, item2) => item1.name.compareTo(item2.name));
+          });
+        }
+      });
+    }
   }
 
   Widget _buildChannelItem(int index) {

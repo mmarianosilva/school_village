@@ -310,9 +310,10 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             ),
           ),
           actions: (widget.channel.isClass ?? false) &&
-                  widget.channel.admin.id ==
+              ((_userSnapshot != null && (_userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "school_admin" || _userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "district")) ||
+              (widget.channel.admin.id ==
                       FirebaseFirestore.instance
-                          .doc("users/${_userSnapshot?.id ?? "a"}")
+                          .doc("users/${_userSnapshot?.id ?? "a"}")))
               ? [
                   FlatButton(
                     onPressed: () =>
