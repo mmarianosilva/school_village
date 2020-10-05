@@ -221,8 +221,8 @@ class _IncidentManagementState extends State<IncidentManagement>
             data.doc.data()["author"],
             data.doc.data()["authorId"],
             data.doc.data()["reportedByPhone"],
-            data.doc.data()["location"]["latitude"],
-            data.doc.data()["location"]["longitude"]);
+            data.doc.data()["location"] != null ? data.doc.data()["location"]["latitude"] : null,
+            data.doc.data()["location"] != null ? data.doc.data()["location"]["longitude"] : null,);
       }).toList());
       _fullList.addAll(newList);
     }
@@ -329,7 +329,7 @@ class _IncidentManagementState extends State<IncidentManagement>
     }
     Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
-        .where("roles", arrayContains: role);
+        .where("roles", arrayContainsAny: [role, "school_security", "school_admin"]);
     QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.docs.forEach((channelDocument) {
