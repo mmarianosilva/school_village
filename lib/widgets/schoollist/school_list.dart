@@ -85,8 +85,8 @@ class _SchoolListState extends State<SchoolList> {
                                               selectSchool(
                                                   schoolName:
                                                   schoolSnapshot.data.data()["name"],
-                                                  schoolId: snapshot.data.data()[index]['ref'],
-                                                  role: snapshot.data.data()[index]['role']);
+                                                  schoolId: snapshot.data[index]['ref'],
+                                                  role: snapshot.data[index]['role']);
                                             }),
                                       ),
                                     ],
