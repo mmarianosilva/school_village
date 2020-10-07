@@ -72,7 +72,30 @@ class FileHelper {
         await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"]);
       }
     } else if (document["type"] == "linked-pdf") {
-      await PdfHandler.downloadLinkedPdf(document["location"]);
+      await PdfHandler.downloadLinkedPdf(document["location"], null);
     }
+  }
+
+  static Stream<TaskSnapshot> downloadStorageDocument(Map<String, dynamic> document) {
+    if (document["type"] == "pdf") {
+      final List<Map<String, dynamic>> connectedFiles =
+      document["connectedFiles"] !=
+          null
+          ? document["connectedFiles"]
+          .map<Map<String, dynamic>>(
+              (untyped) => Map<String, dynamic>.from(untyped))
+          .toList()
+          : null;
+      if (connectedFiles != null) {
+        final String root = document["name"] ?? document["title"];
+
+      } else {
+        final filename = (document["name"] ?? document["title"]).endsWith(".pdf") ? document["name"] ?? document["title"] : "${document["name"] ?? document["title"]}.pdf";
+        return FirebaseStorage.instance.ref(document["location"]).writeToFile(filename).snapshotEvents;
+      }
+    } else if (document["type"] == "linked-pdf") {
+
+    }
+    return Stream.empty();
   }
 }

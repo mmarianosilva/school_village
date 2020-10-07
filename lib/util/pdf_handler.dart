@@ -15,7 +15,8 @@ class PdfHandler {
   static FirebaseStorage storage = FirebaseStorage.instance;
   static bool _canceled;
 
-  static showPdfFile(BuildContext context, String url, String name, {List<Map<String, dynamic>> connectedFiles}) async {
+  static showPdfFile(BuildContext context, String url, String name,
+      {List<Map<String, dynamic>> connectedFiles}) async {
     String root;
     _canceled = false;
     if (connectedFiles != null) {
@@ -24,8 +25,8 @@ class PdfHandler {
     showLoading(context);
     final String pdfFilePath = await preparePdfFromUrl(url, name, parent: root);
     if (connectedFiles != null && connectedFiles.isNotEmpty) {
-      final Iterable<Future> transfer = connectedFiles.map((file) =>
-          preparePdfFromUrl(file["url"], file["name"], parent: root));
+      final Iterable<Future> transfer = connectedFiles.map(
+          (file) => preparePdfFromUrl(file["url"], file["name"], parent: root));
       await Future.wait(transfer);
     }
     if (!_canceled) {
@@ -36,7 +37,8 @@ class PdfHandler {
     }
   }
 
-  static Future<String> preparePdfFromUrl(String url, String name, {String parent}) async {
+  static Future<String> preparePdfFromUrl(String url, String name,
+      {String parent}) async {
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path;
     if (!name.endsWith(".pdf")) {
@@ -63,19 +65,35 @@ class PdfHandler {
     return path;
   }
 
-  static void showLoading(BuildContext context) {
+  static void showLoading(BuildContext context, {Stream<int> downloadStream}) {
     var alert = AlertDialog(
-      title: Text(LocalizationHelper.of(context).localized("Downloading Document")),
+      title: Text(
+          LocalizationHelper.of(context).localized("Downloading Document")),
       content: Row(
         children: <Widget>[
           CircularProgressIndicator(),
           SizedBox(width: 12.0),
-          Expanded(child: Text(LocalizationHelper.of(context).localized("Please wait..")))
+          Expanded(
+              child: downloadStream != null
+                  ? StreamBuilder<int>(
+                      stream: downloadStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text("${snapshot.data}% completed");
+                        } else if (snapshot.hasError) {
+                          return const Text(
+                              "An error has been encountered. Please try again.");
+                        }
+                        return const SizedBox.shrink();
+                      })
+                  : Text(LocalizationHelper.of(context)
+                      .localized("Please wait..")))
         ],
       ),
       actions: <Widget>[
         FlatButton(
-          child: Text(LocalizationHelper.of(context).localized('Cancel').toUpperCase()),
+          child: Text(
+              LocalizationHelper.of(context).localized('Cancel').toUpperCase()),
           onPressed: () {
             _canceled = true;
             Navigator.pop(context);
@@ -83,20 +101,28 @@ class PdfHandler {
         )
       ],
     );
-    showDialog(context: context, barrierDismissible: false, builder: (context) => alert,);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => alert,
+    );
   }
 
   static void hideLoading(BuildContext context) {
     Navigator.pop(context);
   }
 
-  static Future<void> showLinkedPdf(BuildContext context, String documentId) async {
-    showLoading(context);
+  static Future<void> showLinkedPdf(
+    BuildContext context,
+    String documentId,
+  ) async {
+    final downloadStream = StreamController<int>();
+    showLoading(context, downloadStream: downloadStream.stream);
     String localPdfPath = '';
     try {
-      localPdfPath = await downloadLinkedPdf(documentId);
-    }
-    finally {
+      localPdfPath = await downloadLinkedPdf(documentId, downloadStream);
+    } finally {
+      downloadStream.close();
       hideLoading(context);
       if (localPdfPath.isNotEmpty) {
         final Config config = Config();
@@ -106,22 +132,35 @@ class PdfHandler {
     }
   }
 
-  static Future<String> downloadLinkedPdf(String documentId) async {
+  static Future<String> downloadLinkedPdf(
+      String documentId, StreamController<int> dialogStream) async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    DocumentSnapshot pdfDocument = await FirebaseFirestore.instance.doc(
-        "$schoolId/linked-pdfs/$documentId").get();
+    DocumentSnapshot pdfDocument = await FirebaseFirestore.instance
+        .doc("$schoolId/linked-pdfs/$documentId")
+        .get();
     if (pdfDocument != null) {
-      final String storagePath = '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument.data()["name"]}';
-      final Reference pdfDirectory = FirebaseStorage.instance.ref()
-          .child(storagePath);
+      final String storagePath =
+          '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument.data()["name"]}';
+      final Reference pdfDirectory =
+          FirebaseStorage.instance.ref().child(storagePath);
       final Directory systemTempDir = await getApplicationDocumentsDirectory();
-      final String rootPath = '${systemTempDir.path}/${pdfDocument.data()["name"]}';
+      final String rootPath =
+          '${systemTempDir.path}/${pdfDocument.data()["name"]}';
       final ListResult list = await pdfDirectory.listAll();
       await list.items.forEach((fileRef) async {
         final String path = '$rootPath/${fileRef.name}';
         final File destination = await File(path).create(recursive: true);
-        DownloadTask pdfDownloadTask = fileRef.writeToFile(destination);
+        final pdfDownloadTask = fileRef.writeToFile(destination);
+        final taskSubscription = pdfDownloadTask.snapshotEvents.listen((event) {
+          if (event.state == TaskState.running) {
+            final progress = (event.bytesTransferred / event.totalBytes * 100).toInt();
+            if (dialogStream != null) {
+              dialogStream.add(progress);
+            }
+          }
+        });
         await pdfDownloadTask;
+        taskSubscription.cancel();
       });
       return '$rootPath/${pdfDocument.data()["root"].split('/').last}';
     }
