@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '11.0'
+# platform :ios, '9.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -9,28 +9,6 @@ project 'Runner', {
   'Profile' => :release,
   'Release' => :release,
 }
-
-def parse_KV_file(file, separator='=')
-  file_abs_path = File.expand_path(file)
-  if !File.exists? file_abs_path
-    return [];
-  end
-  pods_ary = []
-  skip_line_start_symbols = ["#", "/"]
-  File.foreach(file_abs_path) { |line|
-      next if skip_line_start_symbols.any? { |symbol| line =~ /^\s*#{symbol}/ }
-      plugin = line.split(pattern=separator)
-      if plugin.length == 2
-        podname = plugin[0].strip()
-        path = plugin[1].strip()
-        podpath = File.expand_path("#{path}", file_abs_path)
-        pods_ary.push({:name => podname, :path => podpath});
-      else
-        puts "Invalid plugin specification: #{line}"
-      end
-  }
-  return pods_ary
-end
 
 def flutter_root
   generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
@@ -54,24 +32,10 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  # plugin_pods = parse_KV_file('../.flutter-plugins')
-  # plugin_pods.map { |p|
-  #   symlink = File.join('Pods', '.symlinks', 'plugins', p[:name])
-  #   File.symlink(p[:path], symlink)
-  #   if p[:name] == 'flutter_ffmpeg'
-  #     pod p[:name]+'/https-gpl-lts', :path => File.join(symlink, 'ios')
-  #   else
-  #     pod p[:name], :path => File.join(symlink, 'ios')
-  #   end
-  # }
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-    target.build_configurations.each do |config|
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-    end
   end
 end
