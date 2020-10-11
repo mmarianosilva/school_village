@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.oandmtech.schoolvillage"
+        applicationId "com.oandmtech.marinavillage"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
@@ -46,13 +46,20 @@ android {
         multiDexEnabled true
     }
 
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+    }
+
     flavorDimensions "default"
     productFlavors {
         dev {
             dimension "default"
-            resValue "string", "app_name", "School Village Dev"
+            resValue "string", "app_name", "Marina Village Dev"
             versionNameSuffix "-dev"
-            applicationId "com.oandmtech.schoolvillage.dev"
+//            applicationId "com.oandmtech.schoolvillage.dev"
         }
         prod {
             dimension "default"

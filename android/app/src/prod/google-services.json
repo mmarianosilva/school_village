@@ -1,50 +1,35 @@
 {
   "project_info": {
-    "project_number": "801521806783",
-    "firebase_url": "https://schoolvillage-1.firebaseio.com",
-    "project_id": "schoolvillage-1",
-    "storage_bucket": "schoolvillage-1.appspot.com"
+    "project_number": "1083635958124",
+    "firebase_url": "https://marinavillage-1.firebaseio.com",
+    "project_id": "marinavillage-1",
+    "storage_bucket": "marinavillage-1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:801521806783:android:d5144530f59a9d92",
+        "mobilesdk_app_id": "1:1083635958124:android:82fcddbe0fd9a320427349",
         "android_client_info": {
-          "package_name": "com.oandmtech.schoolvillage"
+          "package_name": "com.oandmtech.marinavillage"
         }
       },
       "oauth_client": [
         {
-          "client_id": "801521806783-divjebmq1tqb9v0ekb7q5j963bggi92c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.oandmtech.schoolvillage",
-            "certificate_hash": "39109bef7a9a11ed71d13d9a97da044d6bbc8981"
-          }
-        },
-        {
-          "client_id": "801521806783-8kr3k3mu4ap05g97sg5h0eart3hj53pv.apps.googleusercontent.com",
+          "client_id": "1083635958124-4ot7u7p8vn5u9bsftea1tnr1m1o9tsnd.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBVRFQqX_6Xp01lE2vO2Uozw0TNX9OiUOg"
+          "current_key": "AIzaSyBcJoxBV_IrwUy1snRjjSEGsm0a7NWx7YA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "801521806783-8kr3k3mu4ap05g97sg5h0eart3hj53pv.apps.googleusercontent.com",
+              "client_id": "1083635958124-4ot7u7p8vn5u9bsftea1tnr1m1o9tsnd.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "801521806783-fl8d6ufv7j4kauuku268idhtptbefs3j.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.oandmtech.SchoolVillage"
-              }
             }
           ]
         }

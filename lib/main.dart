@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:sentry/sentry.dart';
@@ -28,7 +27,6 @@ Future<Null> internalMain(String sentryDsn) async {
   final SentryClient _sentry = SentryClient(dsn: sentryDsn);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  PdftronFlutter.initialize(Constants.pdftronLicenseKey);
   ErrorWidget.builder = (FlutterErrorDetails error) {
     if (FirebaseAuth.instance.currentUser() != null) {
       return Builder(
