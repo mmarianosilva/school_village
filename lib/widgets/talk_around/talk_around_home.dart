@@ -244,7 +244,10 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                   color: Color.fromARGB(255, 10, 104, 127),
                   child: Row(
                     children: <Widget>[
-                      Padding(
+                      Container(
+                        constraints: const BoxConstraints(
+                          maxWidth: 64.0,
+                        ),
                         padding: const EdgeInsets.all(8.0),
                         child: Image.asset("assets/images/sv_icon_menu.png"),
                       ),

@@ -13,7 +13,6 @@ import 'package:school_village/widgets/splash/splash.dart';
 import 'package:school_village/widgets/home/home.dart';
 import 'package:school_village/widgets/login/login.dart';
 import 'package:school_village/util/analytics_helper.dart';
-import 'package:school_village/util/constants.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
