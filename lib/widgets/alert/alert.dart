@@ -10,17 +10,6 @@ class Alert extends StatefulWidget {
   _AlertState createState() => _AlertState();
 }
 
-class Choice {
-  const Choice({this.title, this.icon});
-
-  final String title;
-  final IconData icon;
-}
-
-const List<Choice> choices = const <Choice>[
-  const Choice(title: 'Test Notifications', icon: Icons.notifications)
-];
-
 class _AlertState extends State<Alert> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String _schoolId = '';
@@ -272,10 +261,6 @@ class _AlertState extends State<Alert> {
     );
   }
 
-  _select(Choice choice) {
-    _saveAlert("Test Notification", "Test Notification for $_schoolName", "test", context);
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -292,26 +277,6 @@ class _AlertState extends State<Alert> {
           backgroundColor: Colors.grey.shade200,
           elevation: 0.0,
           leading: BackButton(color: Colors.grey.shade800),
-          actions: <Widget>[
-            PopupMenuButton<Choice>(
-              onSelected: _select,
-              icon: Icon(Icons.more_vert, color: Colors.grey.shade800),
-              itemBuilder: (BuildContext context) {
-                return choices.map((Choice choice) {
-                  return PopupMenuItem<Choice>(
-                    value: choice,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(choice.icon, color: Colors.grey.shade800),
-                        SizedBox(width: 8.0),
-                        Text(choice.title)
-                      ],
-                    ),
-                  );
-                }).toList();
-              },
-            ),
-          ]
       ),
       body: Builder(
           builder: (BuildContext context) {
@@ -349,10 +314,8 @@ class _AlertState extends State<Alert> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Expanded(
-                                flex: 1,
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
-
                                   child: GestureDetector(
                                       onTap: () {_sendAlert("armed", "Armed Assailant Alert!", "An Armed Assailant has been reported at $_schoolName");},
                                       child: Column(children: [
@@ -361,7 +324,6 @@ class _AlertState extends State<Alert> {
                                       ])),
                                 )),
                             Expanded(
-                                flex: 1,
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -372,7 +334,6 @@ class _AlertState extends State<Alert> {
                                       ])),
                                 )),
                             Expanded(
-                                flex: 1,
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -388,7 +349,41 @@ class _AlertState extends State<Alert> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Expanded(
-                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("auto", "Auto Accident/Injury", "A car accident has been reported at $_schoolName");},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_auto_accident_injury.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                )),
+                            Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("explosion", "Explosion Alert!", "An explosion has been reported at $_schoolName");},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_explosion.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                )),
+                            Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                      onTap: () {_sendAlert("boat", "Boat Accident/Injury", "A boat accident has been reported at $_schoolName");},
+                                      child: Column(children: [
+                                        Image.asset('assets/images/alert_boat_accident_injury.png',
+                                            width: 72.0, height: 109.8),
+                                      ])),
+                                ))
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Expanded(
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -399,7 +394,6 @@ class _AlertState extends State<Alert> {
                                       ])),
                                 )),
                             Expanded(
-                                flex: 1,
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -410,7 +404,6 @@ class _AlertState extends State<Alert> {
                                       ])),
                                 )),
                             Expanded(
-                                flex: 1,
                                 child: Container(
                                   margin: EdgeInsets.all(8.0),
                                   child: GestureDetector(
@@ -421,7 +414,7 @@ class _AlertState extends State<Alert> {
                                       ])),
                                 ))
                           ],
-                        )
+                        ),
                       ],
                     ),
                   )

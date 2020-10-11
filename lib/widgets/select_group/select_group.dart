@@ -17,9 +17,6 @@ class SelectGroups extends StatefulWidget {
 
 List<String> allowedGroups() {
   return [
-    "family",
-    "students",
-    "staff"
   ];
 }
 
@@ -135,18 +132,8 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     return Container(
       color: SVColors.colorFromHex('#e5e5ea'),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Column(children: [
-        Align(
-          child: Container(
-              padding: EdgeInsets.only(top: 3.0),
-              child: Text(localize("Select group:"),
-                  style: TextStyle(
-                      color: Color.fromRGBO(50, 51, 57, 1.0),
-                      letterSpacing: 1.2,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold))),
-        ),
-        SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: checkboxes)),
         Align(
             child: Container(
               child: Row(
@@ -232,7 +219,6 @@ class _SelectGroupsState extends State<SelectGroups> {
           ),
         ): SizedBox(),
       ]),
-      height: schoolSnapshots == null ? (checkBoxHeight * 2) + 25.0 : (checkBoxHeight * 2) + 65.0,
     );
   }
 }

@@ -8,8 +8,6 @@ import '../../util/analytics_helper.dart';
 
 class Splash extends StatelessWidget {
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   goToNextPage(BuildContext context) async {
     FirebaseUser currentUser;
     try {
@@ -36,18 +34,12 @@ class Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     AnalyticsHelper.logAppOpen();
     startTimeout(context);
-    return new Material(
+    return Material(
       color: Theme.of(context).primaryColorLight,
-      child: new Center(
-        child: new Container(
-          padding: const EdgeInsets.all(40.0),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Image.asset('assets/images/splash_text.png'),
-              new Image.asset('assets/images/logo.png', width: 44.0)
-            ],
-          ),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 64.0),
+          child: Image.asset('assets/images/splash_text.png'),
         )
       ),
     );

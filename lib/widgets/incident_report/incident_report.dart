@@ -140,7 +140,6 @@ class IncidentState extends State<IncidentReport> {
                 )),
           ),
           Container(child: _buildCheckBoxes()),
-          _buildLastRow(),
           Container(
             height: 2,
             color: SVColors.incidentReport,
@@ -484,68 +483,39 @@ class IncidentState extends State<IncidentReport> {
     return Column(children: widgets);
   }
 
-  _buildLastRow() {
-    return Container(
-        height: 55,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 26,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 2 - 20,
-              child: RaisedButton(
-                  onPressed: () {
-                    setState(() {
-                      positiveFeedbackVisible = !positiveFeedbackVisible;
-                    });
-                  },
-                  color: SVColors.incidentReport,
-                  child: Text(localize("Positive Feedback"),
-                      style: TextStyle(color: Colors.white))),
-            ),
-            SizedBox(
-              width: 6,
-            ),
-            Checkbox(
-              value: otherEnabled,
-              onChanged: (val) {
-                setState(() {
-                  otherEnabled = val;
-                });
-              },
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 2 - 80,
-              child: TextField(
-                onChanged: (val) {
-                  setState(() {
-                    otherEnabled = val.isNotEmpty;
-                    other = val;
-                  });
-                },
-                decoration: InputDecoration(hintText: localize('Other')),
-              ),
-            )
-          ],
-        ));
-  }
-
   _buildCheckBoxes() {
     List<Widget> widgets = [];
-    items.forEach((key, value) {
-      widgets.add(_buildCheckBox(key, items, UserHelper.negativeIncidents));
+    final sortedIncidentTypes = items.keys.toList();
+    sortedIncidentTypes.sort((item1, item2) => item1.compareTo(item2));
+    sortedIncidentTypes.forEach((value) {
+      widgets.add(_buildCheckBox(value, items, UserHelper.negativeIncidents));
     });
 
     List<Widget> rows = [];
     for (var i = 0; i < items.length; i += 2) {
-      var row = Row(children: <Widget>[widgets[i], widgets[i + 1]]);
-      var box = Container(
-        width: MediaQuery.of(context).size.width,
-        height: 55.0,
-        child: row,
-      );
-      rows.add(box);
+      if (i + 1 < items.length) {
+        var row = Row(children: <Widget>[widgets[i], widgets[i + 1]]);
+        var box = Container(
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: 55.0,
+          child: row,
+        );
+        rows.add(box);
+      } else {
+        var row = Row(children: <Widget>[widgets[i], const SizedBox()]);
+        var box = Container(
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: 55.0,
+          child: row,
+        );
+        rows.add(box);
+      }
     }
 
     return Column(children: rows);

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -31,9 +31,7 @@ class PdfHandler {
     }
     if (!_canceled) {
       hideLoading(context);
-      final Config config = Config();
-      config.multiTabEnabled = true;
-      PdftronFlutter.openDocument(pdfFilePath, config: config);
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PDF().fromPath(pdfFilePath)));
     }
   }
 
@@ -125,9 +123,7 @@ class PdfHandler {
       downloadStream.close();
       hideLoading(context);
       if (localPdfPath.isNotEmpty) {
-        final Config config = Config();
-        config.multiTabEnabled = true;
-        PdftronFlutter.openDocument(localPdfPath, config: config);
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PDF().fromPath(localPdfPath)));
       }
     }
   }
@@ -154,7 +150,7 @@ class PdfHandler {
         final taskSubscription = pdfDownloadTask.snapshotEvents.listen((event) {
           if (event.state == TaskState.running) {
             final progress = (event.bytesTransferred / event.totalBytes * 100).toInt();
-            if (dialogStream != null) {
+            if (dialogStream != null && !dialogStream.isClosed) {
               dialogStream.add(progress);
             }
           }

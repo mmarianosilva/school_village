@@ -24,7 +24,6 @@ class BroadcastMessaging extends StatefulWidget {
 }
 
 class _BroadcastMessagingState extends State<BroadcastMessaging> {
-
   _BroadcastMessagingState(this._editable) {
     this.selectGroups = SelectGroups((value) => amberAlert = value);
   }
@@ -59,7 +58,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
         if (user.data()["associatedSchools"][schoolId]["groups"]
-        [keys.elementAt(i)] ==
+                [keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
@@ -89,7 +88,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   _convertDateToKey(createdAt) {
     return DateTime.fromMillisecondsSinceEpoch(createdAt)
-        .millisecondsSinceEpoch ~/
+            .millisecondsSinceEpoch ~/
         Constants.oneDay;
   }
 
@@ -180,17 +179,17 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
                         height: 12.0,
                         child: Center(
                             child: Container(
-                              height: 1.0,
-                              decoration: BoxDecoration(color: Colors.black12),
-                            ))),
+                          height: 1.0,
+                          decoration: BoxDecoration(color: Colors.black12),
+                        ))),
                     Container(
                       color: Colors.white,
                       child: Center(
                           child: Text(
-                            messageList[index].date,
-                            maxLines: 1,
-                            style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
-                          )),
+                        messageList[index].date,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 12.0, letterSpacing: 1.1),
+                      )),
                       margin: const EdgeInsets.only(left: 40.0, right: 40.0),
                     )
                   ],
@@ -208,8 +207,10 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             return BroadcastMessage(
               text: document.data()['body'],
               name: "${document.data()['createdBy']}",
-              timestamp: document.data()['createdAt'] is Timestamp ? document.data()['createdAt'] : Timestamp.fromMillisecondsSinceEpoch(document.data()['createdAt']),
-              groups: groups,
+              timestamp: document.data()['createdAt'] is Timestamp
+                  ? document.data()['createdAt']
+                  : Timestamp.fromMillisecondsSinceEpoch(
+                      document.data()['createdAt']),
               imageUrl: document.data()['image'],
               message: document,
               isVideo: document.data()['isVideo'] ?? false,
@@ -245,10 +246,11 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendMessage(File image, text, isVideo) {
-    if (selectGroups.key.currentState.selectedGroups.length < 1) {
-      showErrorDialog(localize("Please select group to send the broadcast message"));
-      return;
-    }
+    // if (selectGroups.key.currentState.selectedGroups.length < 1) {
+    //   showErrorDialog(
+    //       localize("Please select group to send the broadcast message"));
+    //   return;
+    // }
 
     if (text.length < 8) {
       showErrorDialog(localize("Text length should be at least 8 characters"));
@@ -259,10 +261,14 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(localize('Are you sure you want to send this message?')),
+            title: Text(localize('Send Message?')),
             content: SingleChildScrollView(
               child: ListBody(
-                children: [Text(localize('This cannot be undone'))],
+                children: [
+                  Text(localize(
+                      'This message will be sent to all Users of the App in the Marina.')),
+                  Text(localize("Do You want to continue?")),
+                ],
               ),
             ),
             actions: [
@@ -286,7 +292,8 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   _sendBroadcasts(image, alertBody, isVideo) {
     if (role == 'district') {
-      DocumentSnapshot selectedSchool = selectGroups.key.currentState.selectedSchool;
+      DocumentSnapshot selectedSchool =
+          selectGroups.key.currentState.selectedSchool;
       if (selectedSchool == null) {
         selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
           _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
@@ -308,14 +315,15 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       schoolId = _schoolId;
     }
     final broadcastPath = 'schools/$schoolId/broadcasts';
-    CollectionReference collection = FirebaseFirestore.instance.collection(broadcastPath);
+    CollectionReference collection =
+        FirebaseFirestore.instance.collection(broadcastPath);
     final DocumentReference document = collection.doc();
 
     var path = '';
     if (image != null) {
       _showLoading();
       path =
-      '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.id}';
+          '${broadcastPath[0].toUpperCase()}${broadcastPath.substring(1)}/${document.id}';
       String type = 'jpeg';
       type = image.path.split(".").last != null
           ? image.path.split(".").last
@@ -327,11 +335,8 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       _hideLoading();
     }
 
-    print('saveBroadcast is vidoe ' + isVideo.toString());
-
     document.set(<String, dynamic>{
       'body': alertBody,
-      'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
       'image': image == null ? null : path,
@@ -373,7 +378,12 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          _editable ? selectGroups : SizedBox(width: 0.0, height: 0.0,),
+          _editable
+              ? selectGroups
+              : SizedBox(
+                  width: 0.0,
+                  height: 0.0,
+                ),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),
@@ -383,17 +393,16 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           ), //new
           _editable
               ? Column(children: [
-            // selectGroups,
-            Container(
-              color: SVColors.colorFromHex('#e5e5ea'),
-              padding: EdgeInsets.only(bottom: 14.0),
-              child: inputField,
-            )
-          ])
+                  Container(
+                    color: SVColors.colorFromHex('#e5e5ea'),
+                    padding: EdgeInsets.only(bottom: 14.0),
+                    child: inputField,
+                  )
+                ])
               : SizedBox(
-            width: 0.0,
-            height: 0.0,
-          )
+                  width: 0.0,
+                  height: 0.0,
+                )
         ]));
   }
 }
