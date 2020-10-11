@@ -16,7 +16,7 @@ dependencies:
   firebase_storage: 5.0.0-dev.1
   shared_preferences: 0.5.7+3
   crypto: 2.1.4
-  path_provider: 1.6.9
+  path_provider: 1.6.18
   url_launcher: 5.4.10
   location: 3.0.2
   http: 0.12.1
@@ -36,10 +36,7 @@ dependencies:
   google_maps_flutter: 0.5.28+1
   rxdart: 0.24.1
   searchable_dropdown: 1.1.3
-  pdftron_flutter:
-    git:
-      url: git://github.com/PDFTron/pdftron-flutter.git
-
+  flutter_cached_pdfview: ^0.2.3+4
 
 
 dev_dependencies:
@@ -61,6 +58,9 @@ flutter:
     - assets/images/logo.png
     - assets/images/alert.png
     - assets/images/alert_armed.png
+    - assets/images/alert_auto_accident_injury.png
+    - assets/images/alert_boat_accident_injury.png
+    - assets/images/alert_explosion.png
     - assets/images/alert_fire.png
     - assets/images/alert_intruder.png
     - assets/images/alert_other.png

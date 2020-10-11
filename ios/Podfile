@@ -53,8 +53,6 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
-  pod 'PDFNet', podspec: 'https://www.pdftron.com/downloads/ios/cocoapods/pdfnet/latest.podspec'
-
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
   # plugin_pods = parse_KV_file('../.flutter-plugins')

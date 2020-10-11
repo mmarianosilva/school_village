@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>801521806783-fl8d6ufv7j4kauuku268idhtptbefs3j.apps.googleusercontent.com</string>
+	<string>1083635958124-1paielard05uvrgp9d55q1cqdb726rht.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.801521806783-fl8d6ufv7j4kauuku268idhtptbefs3j</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>801521806783-divjebmq1tqb9v0ekb7q5j963bggi92c.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.1083635958124-1paielard05uvrgp9d55q1cqdb726rht</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDYoK9Z0lcSAjPmx22Nzr5wL_8ln7IEmsI</string>
+	<string>AIzaSyDWIkHsIORKwaNv1d2Jt-UVuIEPbtHUvkk</string>
 	<key>GCM_SENDER_ID</key>
-	<string>801521806783</string>
+	<string>1083635958124</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.oandmtech.SchoolVillage</string>
+	<string>com.oandmtech.marinavillage</string>
 	<key>PROJECT_ID</key>
-	<string>schoolvillage-1</string>
+	<string>marinavillage-1</string>
 	<key>STORAGE_BUCKET</key>
-	<string>schoolvillage-1.appspot.com</string>
+	<string>marinavillage-1.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:801521806783:ios:4420e02b3687f1b8</string>
+	<string>1:1083635958124:ios:c9307ab00bde09f4427349</string>
 	<key>DATABASE_URL</key>
-	<string>https://schoolvillage-1.firebaseio.com</string>
+	<string>https://marinavillage-1.firebaseio.com</string>
 </dict>
 </plist>
