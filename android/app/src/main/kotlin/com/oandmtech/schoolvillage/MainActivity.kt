@@ -1,10 +1,10 @@
 package com.oandmtech.schoolvillage
 
-import io.flutter.app.FlutterActivity
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugins.GeneratedPluginRegistrant
-import android.os.Bundle
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodCall
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.net.Uri
@@ -14,9 +14,8 @@ import android.content.Intent
 
 class MainActivity : FlutterActivity() {
 
-    protected override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        GeneratedPluginRegistrant.registerWith(this)
+    public override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             // Amber alert channel
             val CHANNEL_ID = "sv_alert"
@@ -40,7 +39,7 @@ class MainActivity : FlutterActivity() {
             notificationManager.createNotificationChannel(channel)
             notificationManager.createNotificationChannel(defaultChannel)
         }
-        MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler(
                 object : MethodChannel.MethodCallHandler {
                     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result): Unit {
                         val key: String = call.arguments.toString()
