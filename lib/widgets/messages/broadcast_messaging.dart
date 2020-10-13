@@ -93,10 +93,10 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleMessageMapInsert(shot) {
-    if (!belongsToGroup(shot['groups'].keys)) {
-      return;
-    }
-    var day = _convertDateToKey(shot['createdAt']);
+    // if (!belongsToGroup(shot.data()['groups'].keys)) {
+    //   return;
+    // }
+    var day = _convertDateToKey(shot.data()['createdAt']);
 
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
@@ -198,11 +198,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             }
 
             final DocumentSnapshot document = messageList[index].message;
-            final groups = List<String>();
-
-            for (var value in (document.data()['groups'].keys)) {
-              groups.add(value);
-            }
 
             return BroadcastMessage(
               text: document.data()['body'],

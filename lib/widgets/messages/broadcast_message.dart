@@ -67,7 +67,7 @@ class BroadcastMessage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, style: nameTextStyle),
-                    _getGroups(),
+                    // _getGroups(),
                     Container(
                       child: Text(getMessageDate(timestamp),
                           style: TextStyle(fontSize: 11.0)),
@@ -82,7 +82,7 @@ class BroadcastMessage extends StatelessWidget {
               _getImage(context)
             ],
           )),
-          SizedBox(width: 32.0)
+          const SizedBox(width: 32.0)
         ],
       ),
     );
@@ -90,7 +90,7 @@ class BroadcastMessage extends StatelessWidget {
 
   _getImage(context) {
     if (imageUrl == null || imageUrl.trim() == '') {
-      return SizedBox();
+      return const SizedBox();
     }
 
     return ProgressImage(
