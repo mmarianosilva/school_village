@@ -31,7 +31,14 @@ class PdfHandler {
     }
     if (!_canceled) {
       hideLoading(context);
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PDF().fromPath(pdfFilePath)));
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(pdfFilePath.split('/').last),
+          ),
+          body: PDF().fromPath(pdfFilePath),
+        ),
+      ));
     }
   }
 
@@ -123,7 +130,14 @@ class PdfHandler {
       downloadStream.close();
       hideLoading(context);
       if (localPdfPath.isNotEmpty) {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PDF().fromPath(localPdfPath)));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: Text(localPdfPath.split('/').last),
+            ),
+            body: PDF().fromPath(localPdfPath),
+          ),
+        ));
       }
     }
   }
@@ -149,7 +163,8 @@ class PdfHandler {
         final pdfDownloadTask = fileRef.writeToFile(destination);
         final taskSubscription = pdfDownloadTask.snapshotEvents.listen((event) {
           if (event.state == TaskState.running) {
-            final progress = (event.bytesTransferred / event.totalBytes * 100).toInt();
+            final progress =
+                (event.bytesTransferred / event.totalBytes * 100).toInt();
             if (dialogStream != null && !dialogStream.isClosed) {
               dialogStream.add(progress);
             }
