@@ -60,28 +60,30 @@ class BroadcastMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Flexible(
-              child: Column(
-            children: [
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: nameTextStyle),
-                    // _getGroups(),
-                    Container(
-                      child: Text(getMessageDate(timestamp),
-                          style: TextStyle(fontSize: 11.0)),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 5.0),
-                      child: Text(text),
-                    ),
-                  ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name, style: nameTextStyle),
+                      // _getGroups(),
+                      Container(
+                        child: Text(getMessageDate(timestamp),
+                            style: TextStyle(fontSize: 11.0)),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 5.0),
+                        child: Text(text),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              _getImage(context)
-            ],
-          )),
+                _getImage(context)
+              ],
+            ),
+          ),
           const SizedBox(width: 32.0)
         ],
       ),
@@ -98,7 +100,8 @@ class BroadcastMessage extends StatelessWidget {
       firebasePath: imageUrl,
       isVideo: isVideo,
       onTap: (imgUrl) {
-        NavigationHelper.openMedia(context, imgUrl, isVideo: isVideo, title: text);
+        NavigationHelper.openMedia(context, imgUrl,
+            isVideo: isVideo, title: text);
       },
     );
   }
