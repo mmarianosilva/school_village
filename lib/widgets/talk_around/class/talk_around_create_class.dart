@@ -101,7 +101,10 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Padding(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 64.0,
+                  ),
                   padding: const EdgeInsets.all(8.0),
                   child: Image.asset("assets/images/sv_icon_menu.png"),
                 ),
