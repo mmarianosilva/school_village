@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1094421769111-5q02ioksegn4h5ffbc8cknugq5it54ul.apps.googleusercontent.com</string>
+	<string>648040488287-55v52l4ptfp309irk7364bl9l7go98m1.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1094421769111-5q02ioksegn4h5ffbc8cknugq5it54ul</string>
+	<string>com.googleusercontent.apps.648040488287-55v52l4ptfp309irk7364bl9l7go98m1</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCt4CEHZJxJJeH84YH8jSxBx5um0ftKCEU</string>
+	<string>AIzaSyApqtpBav_8DXYTRdFCuJ-gDEPD-ZmFY2c</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1094421769111</string>
+	<string>648040488287</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.oandmtech.schoolvillage.dev</string>
+	<string>com.oandmtech.marinavillage.dev</string>
 	<key>PROJECT_ID</key>
-	<string>schoolvillage-dev</string>
+	<string>marinavillage-dev</string>
 	<key>STORAGE_BUCKET</key>
-	<string>schoolvillage-dev.appspot.com</string>
+	<string>marinavillage-dev.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1094421769111:ios:2998aa7510839f17d9b2d2</string>
+	<string>1:648040488287:ios:92dc78e72f516edaf66aea</string>
 	<key>DATABASE_URL</key>
-	<string>https://schoolvillage-dev.firebaseio.com</string>
+	<string>https://marinavillage-dev.firebaseio.com</string>
 </dict>
 </plist>
