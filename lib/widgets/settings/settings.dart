@@ -172,7 +172,7 @@ class _SettingsState extends State<Settings> {
                       if (token != null) {
                         await Clipboard.setData(ClipboardData(text: token));
                         final snackBar = SnackBar(
-                          content: Text('FCM token copied to clipboard.'),
+                          content: Text('Copied to clipboard:\n${token.substring(0, 10)}...'),
                           duration: const Duration(seconds: 3),
                         );
                         _scaffoldKey.currentState.showSnackBar(snackBar);

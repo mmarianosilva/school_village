@@ -47,7 +47,7 @@ class HeaderButtons extends StatelessWidget {
 
     if (role == 'school_security') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
@@ -63,7 +63,7 @@ class HeaderButtons extends StatelessWidget {
       ));
     } else if (role == 'school_admin' || role == 'district' || role == 'pd-fire-ems') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
@@ -79,7 +79,7 @@ class HeaderButtons extends StatelessWidget {
       ));
     } else if (role == 'school_staff') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
         onTap: () => _openMessaging(context),
       ));
       widgets.add(GestureDetector(
@@ -97,7 +97,7 @@ class HeaderButtons extends StatelessWidget {
         onTap: () => _openBroadcast(context, false),
       ));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', width: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
         onTap: () => _openMessaging(context),
       ));
       widgets.add(GestureDetector(
@@ -106,7 +106,8 @@ class HeaderButtons extends StatelessWidget {
       ));
     }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: widgets,
     );
   }
