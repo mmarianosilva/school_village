@@ -59,7 +59,7 @@ android {
             dimension "default"
             resValue "string", "app_name", "Marina Village Dev"
             versionNameSuffix "-dev"
-//            applicationId "com.oandmtech.schoolvillage.dev"
+            applicationId "com.oandmtech.marinavillage.dev"
         }
         prod {
             dimension "default"
