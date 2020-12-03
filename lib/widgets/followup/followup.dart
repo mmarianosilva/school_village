@@ -37,8 +37,9 @@ class _FollowupState extends State<Followup> {
             UserHelper.positiveIncidents;
         final Map<String, String> negativeIncidents =
             UserHelper.negativeIncidents;
+        _originalData = <String, dynamic>{...snapshot.data()};
         String flattenedIncidents = '';
-        for (String incident in snapshot.data()['incidents']) {
+        for (String incident in _originalData['incidents']) {
           if (positiveIncidents.containsKey(incident)) {
             flattenedIncidents =
                 '$flattenedIncidents${positiveIncidents[incident]}, ';
@@ -48,42 +49,42 @@ class _FollowupState extends State<Followup> {
           }
         }
         if (flattenedIncidents.length > 2) {
-          snapshot.data()['flattenedIncidents'] =
+          _originalData['flattenedIncidents'] =
               flattenedIncidents.substring(0, flattenedIncidents.length - 2);
         } else {
-          snapshot.data()['flattenedIncidents'] = 'Missing data';
+          _originalData['flattenedIncidents'] = 'Missing data';
         }
         // Flatten subjects
         String flattenedSubjects = '';
-        for (String subject in snapshot.data()['subjects']) {
+        for (String subject in _originalData['subjects']) {
           flattenedSubjects = '$flattenedSubjects$subject, ';
         }
         if (flattenedSubjects.length > 2) {
-          snapshot.data()['flattenedSubjects'] =
+          _originalData['flattenedSubjects'] =
               flattenedSubjects.substring(0, flattenedSubjects.length - 2);
         } else {
-          snapshot.data()['flattenedSubjects'] = 'Missing data';
+          _originalData['flattenedSubjects'] = 'Missing data';
         }
         // Flatten witnesses
         String flattenedWitnesses = '';
-        for (String witness in snapshot.data()['witnesses']) {
+        for (String witness in _originalData['witnesses']) {
           flattenedWitnesses = '$flattenedWitnesses$witness, ';
         }
         if (flattenedWitnesses.length > 2) {
-          snapshot.data()['flattenedWitnesses'] =
+          _originalData['flattenedWitnesses'] =
               flattenedWitnesses.substring(0, flattenedWitnesses.length - 2);
         } else {
-          snapshot.data()['flattenedWitnesses'] = 'Missing data';
+          _originalData['flattenedWitnesses'] = 'Missing data';
         }
         // Flatten image URL
-        if (snapshot.data()['image'] != null &&
-            snapshot.data()['image'].isNotEmpty) {
+        if (_originalData['image'] != null &&
+            _originalData['image'].isNotEmpty) {
           try {
             String url = await FirebaseStorage.instance
                 .ref()
-                .child(snapshot.data()['image'])
+                .child(_originalData['image'])
                 .getDownloadURL();
-            snapshot.data()['flattenedImageUrl'] = url;
+            _originalData['flattenedImageUrl'] = url;
           } on PlatformException catch (ex) {
             if (ex.code == 'FIRStorageErrorDomain') {
               debugPrint('Unable to retrieve photo from storage');
@@ -91,9 +92,7 @@ class _FollowupState extends State<Followup> {
           }
         }
       }
-      setState(() {
-        _originalData = snapshot.data();
-      });
+      setState(() {});
     });
   }
 
