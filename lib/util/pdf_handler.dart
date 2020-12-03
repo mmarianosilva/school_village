@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +36,7 @@ class PdfHandler {
           appBar: AppBar(
             title: Text(pdfFilePath.split('/').last),
           ),
-          body: PDF().fromPath(pdfFilePath),
+          body: PDFView(filePath: pdfFilePath),
         ),
       ));
     }
@@ -135,7 +135,7 @@ class PdfHandler {
             appBar: AppBar(
               title: Text(localPdfPath.split('/').last),
             ),
-            body: PDF().fromPath(localPdfPath),
+            body: PDFView(filePath: localPdfPath),
           ),
         ));
       }
