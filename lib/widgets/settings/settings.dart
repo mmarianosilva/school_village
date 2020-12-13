@@ -42,7 +42,7 @@ class _SettingsState extends State<Settings> {
       _userSnapshot = userSnapshot;
       name = _userSnapshot != null
           ? "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"
-          : "An error ocurred while loading user data";
+          : "An error occurred while loading user data";
       isLoaded = true;
       _userId = user != null ? user.uid : "";
     });
@@ -87,7 +87,7 @@ class _SettingsState extends State<Settings> {
       context,
       MaterialPageRoute(builder: (context) => SchoolList()),
     );
-    if (result) {
+    if (result ?? false) {
       Navigator.pop(context);
     }
   }
@@ -130,8 +130,8 @@ class _SettingsState extends State<Settings> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 FlatButton.icon(
-                  icon: Icon(Icons.school, size: 32.0),
-                  label: Text(localize('Change School'),
+                  icon: Icon(Icons.location_on, size: 32.0),
+                  label: Text(localize('Change Location'),
                       style: TextStyle(
                           fontSize: 18.0, fontWeight: FontWeight.bold)),
                   onPressed: () {

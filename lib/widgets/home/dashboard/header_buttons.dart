@@ -9,7 +9,7 @@ class HeaderButtons extends StatelessWidget {
   final String role;
   final SchoolAlert alert;
 
-  static const double iconSize = 90.0;
+  static const double iconSize = 80.0;
 
   const HeaderButtons({Key key, this.role, this.alert}) : super(key: key);
 
@@ -47,61 +47,61 @@ class HeaderButtons extends StatelessWidget {
 
     if (role == 'school_security') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
         widgets.add(GestureDetector(
             child: Image.asset(
-                'assets/images/incident_management_icon.png', width: iconSize),
+                'assets/images/incident_management_icon.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
             onTap: () => _openIncidentManagement(context)
         ));
       }
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openBroadcast(context, true),
       ));
     } else if (role == 'school_admin' || role == 'district' || role == 'pd-fire-ems') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),
       ));
       if (alert != null) {
         widgets.add(GestureDetector(
             child: Image.asset(
-                'assets/images/incident_management_icon.png', width: iconSize),
+                'assets/images/incident_management_icon.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
             onTap: () => _openIncidentManagement(context)
         ));
       }
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openBroadcast(context, true),
       ));
     } else if (role == 'school_staff') {
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),
       ));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openBroadcast(context, false),
       ));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
+        child: Image.asset('assets/images/anonymous_img.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openHotline(context),
       ));
     } else {
       // Student, Family
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize),
+        child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openBroadcast(context, false),
       ));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/group_message_btn.png', height: iconSize),
+        child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),
       ));
       widgets.add(GestureDetector(
-        child: Image.asset('assets/images/anonymous_img.png', width: iconSize),
+        child: Image.asset('assets/images/anonymous_img.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openHotline(context),
       ));
     }
