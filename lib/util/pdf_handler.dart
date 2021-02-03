@@ -76,8 +76,8 @@ class PdfHandler {
           LocalizationHelper.of(context).localized("Downloading Document")),
       content: Row(
         children: <Widget>[
-          CircularProgressIndicator(),
-          SizedBox(width: 12.0),
+          const CircularProgressIndicator(),
+          const SizedBox(width: 12.0),
           Expanded(
               child: downloadStream != null
                   ? StreamBuilder<int>(

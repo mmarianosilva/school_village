@@ -56,37 +56,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/pdf/safety.pdf
-    - assets/images/logo.png
-    - assets/images/alert.png
-    - assets/images/alert_armed.png
-    - assets/images/alert_auto_accident_injury.png
-    - assets/images/alert_boat_accident_injury.png
-    - assets/images/alert_explosion.png
-    - assets/images/alert_fire.png
-    - assets/images/alert_intruder.png
-    - assets/images/alert_other.png
-    - assets/images/alert_medical.png
-    - assets/images/alert_fight.png
-    - assets/images/splash_text.png
-    - assets/images/broadcast_btn.png
-    - assets/images/security_btn.png
-    - assets/images/alert_hand_icon.png
-    - assets/images/hotline_header.png
-    - assets/images/hotline_bg.png
-    - assets/images/camera.png
-    - assets/images/incident_type.png
-    - assets/images/incident_details.png
-    - assets/images/feature_image.png
-    - assets/images/incident_management_icon.png
-    - assets/images/group_message_btn.png
-    - assets/images/sop_btn.png
-    - assets/images/stop_sign.png
-    - assets/images/warning_sign.png
-    - assets/images/anonymous_img.png
-    - assets/images/sv_icon_menu.png
-    - assets/images/incident_report_log.png
-    - assets/images/add_dm_user_btn.png
-    - assets/images/school_map_btn.png
+    - assets/images/
     - assets/audio/alarm.wav
     - assets/audio/message.wav
 

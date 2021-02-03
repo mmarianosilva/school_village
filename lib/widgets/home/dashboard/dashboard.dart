@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/widgets/vendor/vendor_category_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:location/location.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -226,10 +227,16 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
               )),
-              Icon(Icons.chevron_right, color: Colors.grey)
+              const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
-        )
+        ),
+              const SizedBox(height: 14.0),
+              Container(
+                height: 0.5,
+                width: MediaQuery.of(context).size.width,
+                color: Colors.grey,
+              )
       ],
     );
   }
@@ -268,7 +275,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                           fontSize: 18.0,
                           color: SVColors.dashboardItemFontColor),
                     )),
-                    Icon(Icons.chevron_right, color: Colors.grey)
+                    const Icon(Icons.chevron_right, color: Colors.grey)
                   ],
                 ),
                 const SizedBox(height: 14.0),
@@ -313,6 +320,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           _launchURL(snapshot.data()["documents"][index - 4]["location"]);
         }
       },
+      onLongPress: () {
+        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
+
+        } else if (snapshot.data()["documents"][index - 4]["type"] == "linked-pdf") {
+
+        }
+      },
       child: Column(
         children: <Widget>[
           const SizedBox(height: 14.0),
@@ -348,7 +362,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
               )),
-              Icon(Icons.chevron_right, color: Colors.grey)
+              const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
@@ -400,7 +414,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
               )),
-              Icon(Icons.chevron_right, color: Colors.grey)
+              const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
@@ -448,7 +462,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
               )),
-              Icon(Icons.chevron_right, color: Colors.grey)
+              const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
@@ -492,7 +506,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
               )),
-              Icon(Icons.chevron_right, color: Colors.grey)
+              const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
@@ -831,6 +845,45 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     );
   }
 
+  _buildServiceProvidersOption() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorCategoryList()));
+      },
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
+            children: <Widget>[
+              Container(
+                width: 56.0,
+                child: Center(
+                  child: Image.asset('assets/images/marine_services.png'),
+                ),
+              ),
+              SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  localize('Marine Services'),
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey)
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -917,9 +970,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 7) {
                               return _buildSettingsOption();
                             }
+                            if (index == documentCount + 8) {
+                              return _buildServiceProvidersOption();
+                            }
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 8);
+                          itemCount: documentCount + 9);
                 }
               }
               return Center(
