@@ -644,9 +644,9 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MarinaVillage Dev Development";
+				PROVISIONING_PROFILE_SPECIFIER = "SchoolVillage Dev Development";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -682,9 +682,9 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MarinaVillage Dev Distribution";
+				PROVISIONING_PROFILE_SPECIFIER = "SchoolVillage Dev Distribution";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -773,9 +773,9 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MarinaVillage Dev Development";
+				PROVISIONING_PROFILE_SPECIFIER = "SchoolVillage Dev Development";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -894,7 +894,7 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Development MarinaVillage";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -1011,9 +1011,9 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MarinaVillage Dev Distribution";
+				PROVISIONING_PROFILE_SPECIFIER = "SchoolVillage Dev Distribution";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -1125,7 +1125,7 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = 1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.marinavillage;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oandmtech.schoolvillage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "AppStore Marina Village";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

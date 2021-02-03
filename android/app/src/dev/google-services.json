@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "648040488287",
-    "firebase_url": "https://marinavillage-dev.firebaseio.com",
-    "project_id": "marinavillage-dev",
-    "storage_bucket": "marinavillage-dev.appspot.com"
+    "project_number": "1094421769111",
+    "firebase_url": "https://schoolvillage-dev.firebaseio.com",
+    "project_id": "schoolvillage-dev",
+    "storage_bucket": "schoolvillage-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:648040488287:android:c29ed4744a23c45af66aea",
+        "mobilesdk_app_id": "1:1094421769111:android:7fa603ae93bc46bad9b2d2",
         "android_client_info": {
-          "package_name": "com.oandmtech.marinavillage.dev"
+          "package_name": "com.oandmtech.schoolvillage.dev"
         }
       },
       "oauth_client": [
         {
-          "client_id": "648040488287-o5vqfm6t7e7imtm14fd1u61i39ifotm0.apps.googleusercontent.com",
+          "client_id": "1094421769111-04omv4imbioiqkff4fdv6a34qagk87tt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBzKcY6_MU4-XqdHsMtAOpz6DH2k7gsAFI"
+          "current_key": "AIzaSyBOZlJZDCL0Jv5rHAYQ4iwpj_Aw5LqUaMk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "648040488287-o5vqfm6t7e7imtm14fd1u61i39ifotm0.apps.googleusercontent.com",
+              "client_id": "1094421769111-04omv4imbioiqkff4fdv6a34qagk87tt.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "648040488287-55v52l4ptfp309irk7364bl9l7go98m1.apps.googleusercontent.com",
+              "client_id": "1094421769111-5q02ioksegn4h5ffbc8cknugq5it54ul.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.oandmtech.marinavillage.dev"
+                "bundle_id": "com.oandmtech.schoolvillage.dev"
               }
             }
           ]

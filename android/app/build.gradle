@@ -37,9 +37,9 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.oandmtech.marinavillage"
+        applicationId "com.oandmtech.schoolvillage"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -57,13 +57,13 @@ android {
     productFlavors {
         dev {
             dimension "default"
-            resValue "string", "app_name", "Marina Village Dev"
+            resValue "string", "app_name", "School Village Dev"
             versionNameSuffix "-dev"
-            applicationId "com.oandmtech.marinavillage.dev"
+            applicationId "com.oandmtech.schooolvillage.dev"
         }
         prod {
             dimension "default"
-            resValue "string", "app_name", "MarinaVillage"
+            resValue "string", "app_name", "School Village"
         }
     }
 
