@@ -30,7 +30,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     lintOptions {
         disable 'InvalidPackage'
@@ -59,7 +59,7 @@ android {
             dimension "default"
             resValue "string", "app_name", "School Village Dev"
             versionNameSuffix "-dev"
-            applicationId "com.oandmtech.schooolvillage.dev"
+            applicationId "com.oandmtech.schoolvillage.dev"
         }
         prod {
             dimension "default"
