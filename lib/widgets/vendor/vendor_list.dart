@@ -1,45 +1,73 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/vendor.dart';
+import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/vendor/vendor_details.dart';
 
 class VendorList extends StatefulWidget {
+  const VendorList(this.category);
+
+  final VendorCategory category;
+
   @override
   _VendorListState createState() => _VendorListState();
 }
 
 class _VendorListState extends State<VendorList> {
+  final List<Vendor> list = <Vendor>[];
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection('vendors')
+        .where('category',
+            isEqualTo: FirebaseFirestore.instance
+                .doc('services/${widget.category.id}'))
+        .get()
+        .then((snapshot) {
+      list.addAll(
+          snapshot.docs.map((document) => Vendor.fromDocument(document)));
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BaseAppBar(
         leading: BackButton(color: Colors.grey.shade800),
-        title: Text(localize('Marine Services - Painting'),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+        title: Text(
+          localize('${widget.category.name}'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            letterSpacing: 1.29,
+          ),
+        ),
         backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
       ),
       body: ListView.builder(
         itemBuilder: _buildVendorListItem,
-        itemCount: 2,
+        itemCount: list.length,
       ),
     );
   }
 
   Widget _buildVendorListItem(BuildContext context, int index) {
+    final item = list[index];
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => VendorDetailsScreen(),
+            builder: (context) => VendorDetailsScreen(widget.category, item),
           ),
         );
       },
       child: Container(
-        constraints: BoxConstraints(
-          maxHeight: 192.0,
-        ),
         decoration: BoxDecoration(
           border: Border.all(color: Color(0x979797)),
           borderRadius: BorderRadius.circular(8.0),
@@ -60,15 +88,17 @@ class _VendorListState extends State<VendorList> {
                 children: [
                   const SizedBox(width: 8.0),
                   Image.network(
-                      "https://www.lipsum.com/images/banners/grey_234x60.gif",
-                      fit: BoxFit.fitWidth,
-                      width: 128.0),
+                    item.coverPhotoUrl,
+                    fit: BoxFit.cover,
+                    height: 64.0,
+                    width: 128.0,
+                  ),
                   const SizedBox(width: 8.0),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Louisiana Charlie's"),
+                        Text("${item.name}"),
                         _buildRatingWidget(context, 4, 11),
                       ],
                     ),
@@ -78,14 +108,19 @@ class _VendorListState extends State<VendorList> {
               Row(
                 children: [
                   const SizedBox(width: 8.0),
-                  const Icon(Icons.anchor),
-                  Text("Painting"),
+                  Image.network(
+                    widget.category.icon,
+                    fit: BoxFit.contain,
+                    width: 32.0,
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text("${widget.category.name}"),
                 ],
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                  item.about,
                   maxLines: 2,
                 ),
               ),
@@ -163,6 +198,7 @@ class _VendorListState extends State<VendorList> {
                   ),
                 ],
               ),
+              const SizedBox(height: 8.0),
             ],
           ),
         ),

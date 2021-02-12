@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/vendor.dart';
+import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VendorDetailsScreen extends StatefulWidget {
+  const VendorDetailsScreen(this.category, this.vendor);
+
+  final VendorCategory category;
+  final Vendor vendor;
+
   @override
   _VendorDetailsScreenState createState() => _VendorDetailsScreenState();
 }
@@ -32,8 +40,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                   constraints: BoxConstraints(
                     maxHeight: 80.0,
                   ),
-                  child: Image.network(
-                      "https://www.lipsum.com/images/banners/grey_234x60.gif"),
+                  child: Image.network(widget.vendor.coverPhotoUrl),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -60,20 +67,27 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                 Row(
                   children: [
                     Text(
-                      "Parker's Lighthouse",
+                      widget.vendor.name,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
                     const Icon(Icons.link),
                     const SizedBox(width: 8.0),
-                    Text(
-                      "website",
-                      style: TextStyle(color: Colors.lightBlue),
+                    GestureDetector(
+                      onTap: () async {
+                        if (await canLaunch(widget.vendor.url)) {
+                          await launch(widget.vendor.url);
+                        }
+                      },
+                      child: Text(
+                        "website",
+                        style: TextStyle(color: Colors.lightBlue),
+                      ),
                     ),
                   ],
                 ),
                 Text(
-                  "Service: Restaurant",
+                  "Service: ${widget.category.name}",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -94,7 +108,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
-                            "435 Shoreline Village Drive, Long Beach, CA 90802",
+                            widget.vendor.address,
                             maxLines: 2,
                             style: TextStyle(
                               color: Color(0xff10a2c7),
@@ -142,7 +156,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Perry Parker",
+                                widget.vendor.contactName,
                                 maxLines: 1,
                                 style: TextStyle(
                                   color: Color(0xff323339),
@@ -169,7 +183,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         const Icon(Icons.phone_android),
                         const SizedBox(width: 16.0),
                         Text(
-                          "+1 (222) 222-2222",
+                          widget.vendor.contactPhone,
                           style: TextStyle(
                             color: Color(0xff10a2c7),
                             fontSize: 18.0,
@@ -183,7 +197,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         const Icon(Icons.mail),
                         const SizedBox(width: 16.0),
                         Text(
-                          "pjp@parkerslighthouse.com",
+                          widget.vendor.email,
                           style: TextStyle(
                             color: Color(0xff10a2c7),
                             fontSize: 18.0,
@@ -209,7 +223,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SingleChildScrollView(
                 child: Text(
-                  "We outfit, educate, and inspire boaters! West Marine opened the biggest boating store in the U.S. in Fort Lauderdale, Florida in 2011. This 50,000 sq. ft. store, not only had an expanded selection of core boating products, but it offered a large selection of footwear, casual and technical apparel for those who enjoy being out and on the water.",
+                  widget.vendor.about,
                   maxLines: null,
                 ),
               ),
