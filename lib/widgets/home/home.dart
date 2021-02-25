@@ -482,7 +482,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
 
   checkIfOnlyOneSchool() async {
     var schools = await UserHelper.getSchools();
-    if (schools.length == 1) {
+    if (schools.length < 2) {
       print("Only 1 School");
       var school = await FirebaseFirestore.instance.doc(schools[0]['ref']).get();
       print(school.data()["name"]);

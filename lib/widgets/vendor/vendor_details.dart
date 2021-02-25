@@ -71,7 +71,8 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
-                    const Icon(Icons.link),
+                    Image.asset("assets/images/website_www_2.png",
+                        height: 24.0),
                     const SizedBox(width: 8.0),
                     GestureDetector(
                       onTap: () async {
@@ -94,8 +95,9 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: Card(
+              elevation: 4.0,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -119,12 +121,13 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8.0),
                     Row(
                       children: [
                         const Icon(Icons.business_outlined),
                         const SizedBox(width: 16.0),
                         Text(
-                          "+1 (562) 432-6500",
+                          widget.vendor.contactPhone,
                           style: TextStyle(
                             color: Color(0xff10a2c7),
                             fontSize: 18.0,
@@ -139,8 +142,9 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Card(
+              elevation: 4.0,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -148,6 +152,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Icon(Icons.perm_contact_cal),
                         const SizedBox(width: 16.0),
@@ -178,6 +183,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8.0),
                     Row(
                       children: [
                         const Icon(Icons.phone_android),
@@ -192,6 +198,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8.0),
                     Row(
                       children: [
                         const Icon(Icons.mail),
@@ -212,7 +219,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.only(left: 24.0, top: 8.0, right: 24.0),
             child: Text(
               "About Us",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -220,7 +227,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: SingleChildScrollView(
                 child: Text(
                   widget.vendor.about,
@@ -239,11 +246,17 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
     final List<Widget> outlined = [];
     for (int i = 0; i < 5; i++) {
       if (i < average) {
-        full.add(
-          Icon(Icons.auto_awesome, color: Colors.amber),
-        );
+        full.add(Image.asset(
+          "assets/images/star_4_selected.png",
+          height: 24.0,
+          color: Color(0xfffbdf68),
+          colorBlendMode: BlendMode.srcATop,
+        ));
       } else {
-        outlined.add(Icon(Icons.auto_awesome, color: Colors.white10));
+        outlined.add(Image.asset(
+          "assets/images/star_4_unselected.png",
+          height: 24.0,
+        ));
       }
     }
     return Row(
