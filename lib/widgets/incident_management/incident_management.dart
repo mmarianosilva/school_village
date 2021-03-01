@@ -86,10 +86,14 @@ class _IncidentManagementState extends State<IncidentManagement>
     DocumentSnapshot schoolData =
         await FirebaseFirestore.instance.doc(_schoolId).get();
     if (schoolData.data()["sop"][alert.type] != null) {
-      PdfHandler.showPdfFile(context, schoolData.data()["sop"][alert.type]["location"],
+      PdfHandler.showPdfFile(
+          context,
+          schoolData.data()["sop"][alert.type]["location"],
           schoolData.data()["sop"][alert.type]["title"]);
     } else {
-      PdfHandler.showPdfFile(context, schoolData.data()["sop"]["other"]["location"],
+      PdfHandler.showPdfFile(
+          context,
+          schoolData.data()["sop"]["other"]["location"],
           schoolData.data()["sop"]["other"]["title"]);
     }
   }
@@ -102,8 +106,8 @@ class _IncidentManagementState extends State<IncidentManagement>
           : closureComment;
       final String author = UserHelper.getDisplayName(_userSnapshot);
       FirebaseFirestore.instance.runTransaction((transaction) {
-        DocumentReference alertRef =
-            FirebaseFirestore.instance.doc("$_schoolId/notifications/${alert.id}");
+        DocumentReference alertRef = FirebaseFirestore.instance
+            .doc("$_schoolId/notifications/${alert.id}");
         transaction.update(alertRef, {
           "endedAt": FieldValue.serverTimestamp(),
           "resolution": finalMessage,
@@ -151,7 +155,9 @@ class _IncidentManagementState extends State<IncidentManagement>
       return;
     }
     if (snapshot.first.doc.reference.parent.path ==
-        FirebaseFirestore.instance.collection('$_schoolId/notifications').path) {
+        FirebaseFirestore.instance
+            .collection('$_schoolId/notifications')
+            .path) {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
             data.doc.data()["title"],
@@ -169,8 +175,12 @@ class _IncidentManagementState extends State<IncidentManagement>
     } else if (snapshot.first.doc.reference.parent.path ==
         FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
-        Map<String, bool> targetGroups =
-            Map<String, bool>.from(item.doc.data()['groups']);
+        Map<String, bool> targetGroups = item.doc.data()['groups'] != null
+            ? Map<String, bool>.from(item.doc.data()['groups'])
+            : null;
+        if (targetGroups == null) {
+          return false;
+        }
         for (String key in targetGroups.keys) {
           if (this._broadcastGroupData.containsKey(key) &&
               this._broadcastGroupData[key] &&
@@ -182,14 +192,19 @@ class _IncidentManagementState extends State<IncidentManagement>
       });
       List<TalkAroundMessage> newList = snapshot.map((data) {
         String channel = "";
-        Map<String, bool> broadcastGroup =
-            Map<String, bool>.from(data.doc.data()["groups"]);
-        for (String key in broadcastGroup.keys) {
-          if (broadcastGroup[key]) {
-            channel += "$key, ";
+        Map<String, bool> broadcastGroup = data.doc.data()["groups"] != null
+            ? Map<String, bool>.from(data.doc.data()["groups"])
+            : null;
+        if (broadcastGroup != null) {
+          for (String key in broadcastGroup.keys) {
+            if (broadcastGroup[key]) {
+              channel += "$key, ";
+            }
           }
-        }
         channel = channel.substring(0, channel.length - 2);
+        } else {
+          channel = "All";
+        }
         return TalkAroundMessage(
             "Broadcast Message",
             data.doc.id,
@@ -211,18 +226,23 @@ class _IncidentManagementState extends State<IncidentManagement>
         final TalkAroundChannel channel =
             TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
         return TalkAroundMessage(
-            "Channel Message",
-            data.doc.id,
-            channel.groupConversationName(
-                "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"),
-            data.doc.data()["body"],
-            DateTime.fromMicrosecondsSinceEpoch(
-                data.doc.data()["timestamp"].microsecondsSinceEpoch),
-            data.doc.data()["author"],
-            data.doc.data()["authorId"],
-            data.doc.data()["reportedByPhone"],
-            data.doc.data()["location"] != null ? data.doc.data()["location"]["latitude"] : null,
-            data.doc.data()["location"] != null ? data.doc.data()["location"]["longitude"] : null,);
+          "Channel Message",
+          data.doc.id,
+          channel.groupConversationName(
+              "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"),
+          data.doc.data()["body"],
+          DateTime.fromMicrosecondsSinceEpoch(
+              data.doc.data()["timestamp"].microsecondsSinceEpoch),
+          data.doc.data()["author"],
+          data.doc.data()["authorId"],
+          data.doc.data()["reportedByPhone"],
+          data.doc.data()["location"] != null
+              ? data.doc.data()["location"]["latitude"]
+              : null,
+          data.doc.data()["location"] != null
+              ? data.doc.data()["location"]["longitude"]
+              : null,
+        );
       }).toList());
       _fullList.addAll(newList);
     }
@@ -277,7 +297,8 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
-    final List<Map<String, dynamic>> documents = snapshot.data()["documents"]
+    final List<Map<String, dynamic>> documents = snapshot
+        .data()["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
@@ -329,7 +350,8 @@ class _IncidentManagementState extends State<IncidentManagement>
     }
     Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
-        .where("roles", arrayContainsAny: [role, "school_security", "school_admin"]);
+        .where("roles",
+            arrayContainsAny: [role, "school_security", "school_admin"]);
     QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.docs.forEach((channelDocument) {
@@ -601,18 +623,18 @@ class _IncidentManagementState extends State<IncidentManagement>
                                 Text(alert.createdBy,
                                     style: TextStyle(fontSize: 12.0)),
                                 GestureDetector(
-                                    onTap: () => showContactDialog(context,
-                                        alert.createdBy, alert.reportedByPhone),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 4.0, vertical: 0.0),
-                                      child: Text(
-                                          alert.reportedByPhoneFormatted,
-                                          style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: Color.fromARGB(
-                                                  255, 11, 48, 224))),
-                                    ),)
+                                  onTap: () => showContactDialog(context,
+                                      alert.createdBy, alert.reportedByPhone),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 4.0, vertical: 0.0),
+                                    child: Text(alert.reportedByPhoneFormatted,
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            color: Color.fromARGB(
+                                                255, 11, 48, 224))),
+                                  ),
+                                )
                               ],
                             ),
                           ),
@@ -627,40 +649,39 @@ class _IncidentManagementState extends State<IncidentManagement>
                             child: Container(
                               color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                child: Row(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0, vertical: 4.0),
-                                        child: Container(
-                                            child: GestureDetector(
-                                                child: Image.asset(
-                                                    "assets/images/group_message_btn.png",
-                                                    height: 64),
-                                                onTap: _showTalkAround),
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 4.0,
-                                                horizontal: 8.0)),
-                                      ),
-                                      Spacer(),
-                                      Container(
-                                          child: GestureDetector(
-                                              child: Image.asset(
-                                                  "assets/images/broadcast_btn.png",
-                                                  height: 64),
-                                              onTap: _showBroadcast),
-                                          padding: EdgeInsets.all(4)),
-                                      Spacer(),
-                                      Container(
-                                          child: GestureDetector(
-                                              child: Image.asset(
-                                                  "assets/images/sop_btn.png",
-                                                  height: 64),
-                                              onTap: _onSop),
-                                          padding: EdgeInsets.all(4)),
-                                      ..._buildStopAlertItems(),
-                                    ]),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 2.0),
+                                child: Row(children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 4.0),
+                                    child: Container(
+                                        child: GestureDetector(
+                                            child: Image.asset(
+                                                "assets/images/group_message_btn.png",
+                                                height: 64),
+                                            onTap: _showTalkAround),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 4.0, horizontal: 8.0)),
+                                  ),
+                                  Spacer(),
+                                  Container(
+                                      child: GestureDetector(
+                                          child: Image.asset(
+                                              "assets/images/broadcast_btn.png",
+                                              height: 64),
+                                          onTap: _showBroadcast),
+                                      padding: EdgeInsets.all(4)),
+                                  Spacer(),
+                                  Container(
+                                      child: GestureDetector(
+                                          child: Image.asset(
+                                              "assets/images/sop_btn.png",
+                                              height: 64),
+                                          onTap: _onSop),
+                                      padding: EdgeInsets.all(4)),
+                                  ..._buildStopAlertItems(),
+                                ]),
                               ),
                             ),
                             flex: 3);
