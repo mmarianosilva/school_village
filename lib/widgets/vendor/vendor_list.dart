@@ -4,6 +4,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/vendor/vendor_details.dart';
 
 class VendorList extends StatefulWidget {
@@ -21,16 +22,20 @@ class _VendorListState extends State<VendorList> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection('vendors')
-        .where('category',
-            isEqualTo: FirebaseFirestore.instance
-                .doc('services/${widget.category.id}'))
-        .get()
-        .then((snapshot) {
-      list.addAll(
-          snapshot.docs.map((document) => Vendor.fromDocument(document)));
-      setState(() {});
+    UserHelper.getSelectedSchoolID().then((schoolId) {
+      FirebaseFirestore.instance
+          .collection('vendors')
+          .where('category',
+              isEqualTo: FirebaseFirestore.instance
+                  .doc('services/${widget.category.id}'))
+          .where('school',
+              isEqualTo: FirebaseFirestore.instance.doc(schoolId))
+          .get()
+          .then((snapshot) {
+        list.addAll(
+            snapshot.docs.map((document) => Vendor.fromDocument(document)));
+        setState(() {});
+      });
     });
   }
 
@@ -51,6 +56,7 @@ class _VendorListState extends State<VendorList> {
         elevation: 0.0,
       ),
       body: ListView.builder(
+        shrinkWrap: true,
         itemBuilder: _buildVendorListItem,
         itemCount: list.length,
       ),
@@ -87,12 +93,12 @@ class _VendorListState extends State<VendorList> {
               Row(
                 children: [
                   const SizedBox(width: 8.0),
-                  Image.network(
+                  item.coverPhotoUrl?.isNotEmpty ?? false ? Image.network(
                     item.coverPhotoUrl,
                     fit: BoxFit.cover,
                     height: 64.0,
                     width: 128.0,
-                  ),
+                  ) : const Icon(Icons.all_inclusive),
                   const SizedBox(width: 8.0),
                   Expanded(
                     child: Column(
@@ -211,11 +217,17 @@ class _VendorListState extends State<VendorList> {
     final List<Widget> outlined = [];
     for (int i = 0; i < 5; i++) {
       if (i < average) {
-        full.add(
-          Icon(Icons.auto_awesome, color: Colors.amber),
-        );
+        full.add(Image.asset(
+          "assets/images/star_4_selected.png",
+          height: 24.0,
+          color: Color(0xfffbdf68),
+          colorBlendMode: BlendMode.srcATop,
+        ));
       } else {
-        outlined.add(Icon(Icons.auto_awesome, color: Colors.black12));
+        outlined.add(Image.asset(
+          "assets/images/star_4_unselected.png",
+          height: 24.0,
+        ));
       }
     }
     return Row(
@@ -225,7 +237,7 @@ class _VendorListState extends State<VendorList> {
         Text(
           "$total ratings",
           style: TextStyle(
-            color: Color(0xff323339),
+            color: Color(0xfff8f8f8),
             fontSize: 11.0,
             letterSpacing: 0.43,
           ),

@@ -40,7 +40,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                   constraints: BoxConstraints(
                     maxHeight: 80.0,
                   ),
-                  child: Image.network(widget.vendor.coverPhotoUrl),
+                  child: widget.vendor.coverPhotoUrl?.isNotEmpty ?? false ? Image.network(widget.vendor.coverPhotoUrl) : const Icon(Icons.all_inclusive),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -110,11 +110,11 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         const SizedBox(width: 16.0),
                         Expanded(
                           child: Text(
-                            widget.vendor.address,
+                            widget.vendor.address ?? "",
                             maxLines: 2,
                             style: TextStyle(
                               color: Color(0xff10a2c7),
-                              fontSize: 18.0,
+                              fontSize: 16.0,
                               letterSpacing: 0.7,
                             ),
                           ),
@@ -126,11 +126,11 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.business_outlined),
                         const SizedBox(width: 16.0),
-                        Text(
-                          widget.vendor.contactPhone,
+                        SelectableText(
+                          widget.vendor.contactPhone ?? "",
                           style: TextStyle(
                             color: Color(0xff10a2c7),
-                            fontSize: 18.0,
+                            fontSize: 16.0,
                             letterSpacing: 0.7,
                           ),
                         ),
@@ -161,20 +161,20 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.vendor.contactName,
+                                widget.vendor.contactName ?? "",
                                 maxLines: 1,
                                 style: TextStyle(
                                   color: Color(0xff323339),
-                                  fontSize: 18.0,
+                                  fontSize: 16.0,
                                   letterSpacing: 0.7,
                                 ),
                               ),
                               Text(
-                                "Owner Operator",
+                                widget.vendor.contactTitle ?? "",
                                 maxLines: 1,
                                 style: TextStyle(
                                   color: Color(0xff323339),
-                                  fontSize: 18.0,
+                                  fontSize: 16.0,
                                   letterSpacing: 0.7,
                                 ),
                               ),
@@ -188,11 +188,11 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.phone_android),
                         const SizedBox(width: 16.0),
-                        Text(
-                          widget.vendor.contactPhone,
+                        SelectableText(
+                          widget.vendor.contactPhone ?? "",
                           style: TextStyle(
                             color: Color(0xff10a2c7),
-                            fontSize: 18.0,
+                            fontSize: 16.0,
                             letterSpacing: 0.7,
                           ),
                         ),
@@ -203,11 +203,12 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.mail),
                         const SizedBox(width: 16.0),
-                        Text(
-                          widget.vendor.email,
+                        SelectableText(
+                          widget.vendor.email ?? "",
+                          textScaleFactor: (widget.vendor.email?.length ?? 0.0) > 30 ? 0.8 : 1.0,
                           style: TextStyle(
                             color: Color(0xff10a2c7),
-                            fontSize: 18.0,
+                            fontSize: 16.0,
                             letterSpacing: 0.7,
                           ),
                         ),
@@ -230,7 +231,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: SingleChildScrollView(
                 child: Text(
-                  widget.vendor.about,
+                  widget.vendor.about ?? "",
                   maxLines: null,
                 ),
               ),

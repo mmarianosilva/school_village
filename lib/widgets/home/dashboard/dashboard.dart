@@ -185,7 +185,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   openSettings() {
-    _launchURL("https://schoolvillage.org/index_support_dashboard");
+    _launchURL("https://villagesafety.net/index_support_dashboard.html");
   }
 
   openNotifications() {
@@ -204,13 +204,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildSettingsOption() {
-    return Column(
-      children: <Widget>[
-        const SizedBox(height: 14.0),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: openSettings,
-          child: Row(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: openSettings,
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
             children: <Widget>[
               Container(
                 width: 56.0,
@@ -230,14 +230,14 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
-        ),
-              const SizedBox(height: 14.0),
-              Container(
-                height: 0.5,
-                width: MediaQuery.of(context).size.width,
-                color: Colors.grey,
-              )
-      ],
+                const SizedBox(height: 14.0),
+                Container(
+                  height: 0.5,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.grey,
+                )
+        ],
+      ),
     );
   }
 
@@ -847,6 +847,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildServiceProvidersOption() {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorCategoryList()));
       },

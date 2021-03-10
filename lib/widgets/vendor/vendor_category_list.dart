@@ -50,6 +50,7 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
   Widget _buildVendorListItem(BuildContext context, int index) {
     final item = categories[index];
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(

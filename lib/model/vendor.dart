@@ -6,8 +6,10 @@ class Vendor {
   Vendor({
     this.id,
     this.name,
+    this.businessPhone,
     this.contactName,
     this.contactPhone,
+    this.contactTitle,
     this.address,
     this.about,
     this.url,
@@ -17,8 +19,10 @@ class Vendor {
 
   Vendor.fromMap(Map<String, dynamic> data) : this(
     name: data['name'],
+    businessPhone: data['business_phone'],
     contactName: data['contact_name'],
     contactPhone: data['contact_phone'],
+    contactTitle: data['contact_title'],
     address: data['address'],
     about: data['about'],
     url: data['url'],
@@ -29,8 +33,10 @@ class Vendor {
   Vendor.fromDocument(DocumentSnapshot document) : this(
     id: document.id,
     name: document.data()['name'],
+    businessPhone: document.data()['business_phone'],
     contactName: document.data()['contact_name'],
     contactPhone: document.data()['contact_phone'],
+    contactTitle: document.data()['contact_title'],
     address: document.data()['address'],
     about: document.data()['about'],
     url: document.data()['url'],
@@ -40,8 +46,10 @@ class Vendor {
 
   final String id;
   final String name;
+  final String businessPhone;
   final String contactName;
   final String contactPhone;
+  final String contactTitle;
   final String address;
   final String about;
   final String url;
