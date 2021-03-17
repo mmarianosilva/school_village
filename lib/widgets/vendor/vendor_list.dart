@@ -6,6 +6,7 @@ import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/vendor/vendor_details.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class VendorList extends StatefulWidget {
   const VendorList(this.category);
@@ -139,6 +140,11 @@ class _VendorListState extends State<VendorList> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
+                      onPressed: () async {
+                        if (await canLaunch("tel://${item.contactPhone ?? item.businessPhone}")) {
+                          launch("tel://${item.contactPhone ?? item.businessPhone}");
+                        }
+                      },
                       padding: EdgeInsets.zero,
                       child: Row(
                         children: [
@@ -162,6 +168,12 @@ class _VendorListState extends State<VendorList> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
+                      onPressed: () async {
+                        final uri = "";
+                        if (await canLaunch(uri)) {
+                          launch(uri);
+                        }
+                      },
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: Row(
                         children: [
@@ -186,6 +198,13 @@ class _VendorListState extends State<VendorList> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => VendorDetailsScreen(widget.category, item),
+                          ),
+                        );
+                      },
                       padding: EdgeInsets.zero,
                       child: Row(
                         children: [
