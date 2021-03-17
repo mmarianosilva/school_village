@@ -176,12 +176,14 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
                 child: Stack(
                   children: [
                     Container(
-                        height: 12.0,
-                        child: Center(
-                            child: Container(
+                      height: 12.0,
+                      child: Center(
+                        child: Container(
                           height: 1.0,
                           decoration: BoxDecoration(color: Colors.black12),
-                        ))),
+                        ),
+                      ),
+                    ),
                     Container(
                       color: Colors.white,
                       child: Center(
