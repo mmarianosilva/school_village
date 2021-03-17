@@ -8,6 +8,7 @@ import 'package:location/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
+
 // import 'package:school_village/widgets/roll_call/roll_call_log.dart';
 import 'package:school_village/widgets/search/search_dropdown_field.dart';
 import 'package:school_village/main.dart';
@@ -91,8 +92,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         });
         return;
       }
-      final List<QueryDocumentSnapshot> lastAlert = (await alerts.orderBy("endedAt", descending: true).limit(1).get()).docs;
-      final DocumentSnapshot latestResolved = lastAlert.isNotEmpty ? lastAlert.first : null;
+      final List<QueryDocumentSnapshot> lastAlert =
+          (await alerts.orderBy("endedAt", descending: true).limit(1).get())
+              .docs;
+      final DocumentSnapshot latestResolved =
+          lastAlert.isNotEmpty ? lastAlert.first : null;
       final Timestamp lastResolvedTimestamp = latestResolved != null
           ? latestResolved.data()["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
@@ -109,6 +113,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         });
       }
     });
+  }
+
+  void _openIncidentManagement(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IncidentManagement(
+          alert: this.alertInProgress,
+          role: this.role,
+        ),
+      ),
+    );
   }
 
   _showPDF(context, url, name, {List<Map<String, dynamic>> connectedFiles}) {
@@ -230,12 +246,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
-                const SizedBox(height: 14.0),
-                Container(
-                  height: 0.5,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.grey,
-                )
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
         ],
       ),
     );
@@ -322,10 +338,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       },
       onLongPress: () {
         if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
-
-        } else if (snapshot.data()["documents"][index - 4]["type"] == "linked-pdf") {
-
-        }
+        } else if (snapshot.data()["documents"][index - 4]["type"] ==
+            "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -377,12 +391,14 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildSecurityOptions() {
-    return HeaderButtons(role: role, alert: alertInProgress);
+    return HeaderButtons(role: role);
   }
 
   _buildIncidentReport() {
     if (role == 'school_student' ||
+        role == 'student' ||
         role == 'school_family' ||
+        role == 'family' ||
         role == 'pd-fire-ems') {
       return SizedBox();
     }
@@ -521,15 +537,39 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildAlertButton() {
+    const size = HeaderButtons.iconSize * 1.1;
     if (role == 'school_student' || role == 'school_family') {
       return SizedBox(
-        height: 48.0,
+        height: size,
       );
     }
-    return GestureDetector(
-      child:
-          Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
-      onTap: sendAlert,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          const SizedBox(width: size),
+          GestureDetector(
+            child: Image.asset(
+              'assets/images/alert.png',
+              width: size * 1.2,
+              height: size * 1.2,
+            ),
+            onTap: sendAlert,
+          ),
+          alertInProgress != null
+              ? GestureDetector(
+                  child: Image.asset(
+                    'assets/images/incident_management_icon.png',
+                    width: size,
+                    height: size,
+                    fit: BoxFit.fill,
+                  ),
+                  onTap: () => _openIncidentManagement(context))
+              : const Spacer(),
+        ],
+      ),
     );
   }
 
@@ -849,7 +889,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorCategoryList()));
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => VendorCategoryList()));
       },
       child: Column(
         children: <Widget>[
