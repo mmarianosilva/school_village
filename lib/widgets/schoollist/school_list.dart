@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/pdf_handler.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
@@ -14,8 +15,7 @@ class _SchoolListState extends State<SchoolList> {
   BuildContext _context;
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
-    print(schoolId);
-    print("Setting school");
+    PdfHandler.deletePdfFiles();
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
     Navigator.pop(_context, true);

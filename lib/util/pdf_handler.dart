@@ -177,4 +177,12 @@ class PdfHandler {
     }
     return null;
   }
+
+  static Future<void> deletePdfFiles() async {
+    final Directory systemTempDir = await getApplicationDocumentsDirectory();
+    final files = await systemTempDir.list().toList();
+    for (final item in files) {
+      await item.delete(recursive: true);
+    }
+  }
 }

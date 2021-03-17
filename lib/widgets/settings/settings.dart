@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:school_village/util/pdf_handler.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,7 +50,7 @@ class _SettingsState extends State<Settings> {
   }
 
   _logout(context, MainModel model) async {
-    showDialog<Null>(
+    showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
@@ -72,8 +73,7 @@ class _SettingsState extends State<Settings> {
     );
     String token =
         (await SharedPreferences.getInstance()).getString("fcmToken");
-    print(token);
-    print(_userId);
+    await PdfHandler.deletePdfFiles();
     await TokenHelper.deleteToken(token, _userId);
     await UserHelper.logout(token);
     model.setUser(null);
