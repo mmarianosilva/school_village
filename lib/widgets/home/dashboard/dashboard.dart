@@ -493,8 +493,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'school_admin' &&
-        role != 'school_security' &&
+    if (role != 'school_admin' && role != 'admin' &&
+        role != 'school_security' && role != 'security' &&
         role != 'district') {
       return SizedBox();
     }
@@ -590,7 +590,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            if (role == 'school_admin' || role == 'district') ...[
+            if (role == 'admin' || role == 'school_admin' || role == 'district') ...[
               Text(
                 localize('Schoolwide roll call').toUpperCase(),
                 style: TextStyle(
