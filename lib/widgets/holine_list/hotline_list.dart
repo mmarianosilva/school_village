@@ -73,134 +73,137 @@ class _HotLineListState extends State<HotLineList> {
                       if (!snapshot.hasData) return Text(localize('Loading...'));
                       final int messageCount = snapshot.data.documents.length;
                       print(messageCount);
-                      return ListView.builder(
-                        itemCount: messageCount,
-                        itemBuilder: (_, int index) {
-                          final DocumentSnapshot document =
-                              snapshot.data.documents[index];
-                          debugPrint(document.data()['body']);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: ListView.builder(
+                          itemCount: messageCount,
+                          itemBuilder: (_, int index) {
+                            final DocumentSnapshot document =
+                                snapshot.data.documents[index];
+                            debugPrint(document.data()['body']);
 
-                          return GestureDetector(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) => Followup(
-                                        localize('Anonymous Hotline Log'),
-                                        document.reference.path))),
-                            child: Card(
-                              margin: EdgeInsets.all(4.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade300,
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Text(document.data()['createdBy'],
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        Spacer(),
-                                        Text(
-                                            dateFormatting.dateFormatter.format(
-                                                DateTime
-                                                    .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        Spacer(),
-                                        Text(
-                                            dateFormatting.timeFormatter.format(
-                                                DateTime
-                                                    .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0),
-                                      child: Text(document.data()['body']),
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Container(
-                                            child: FutureBuilder(
-                                              future: FirebaseFirestore.instance
-                                                  .doc(
-                                                      document.data()['schoolId'] ??
-                                                          '')
-                                                  .get(),
-                                              initialData: document,
-                                              builder: (BuildContext context,
-                                                      schoolData) =>
-                                                  Text(
-                                                      schoolData.hasData
-                                                          ? schoolData.data[
-                                                                  'name'] ??
-                                                              ''
-                                                          : '',
-                                                      style: TextStyle(
-                                                          fontSize: 12.0,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            child: FutureBuilder(
-                                              future: FirebaseFirestore.instance
-                                                  .collection(
-                                                      '${document.reference.path}/followup')
-                                                  .get(),
-                                              builder: (BuildContext context,
-                                                  AsyncSnapshot<QuerySnapshot>
-                                                      data) {
-                                                if (data.hasData) {
-                                                  return Text(
-                                                    'Follow-up ${data.data.docs.length}',
-                                                    style: TextStyle(
-                                                        color:
-                                                            Colors.blueAccent),
-                                                  );
-                                                }
-                                                return Text('');
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        document.data()['media'] != null
-                                            ? document.data()['isVideo'] ?? false
-                                                ? Icon(
-                                                    Icons.videocam,
-                                                    color: Colors.blueAccent,
-                                                    size: 24.0,
-                                                  )
-                                                : Icon(
-                                                    Icons
-                                                        .photo_size_select_actual,
-                                                    color: Colors.blueAccent,
-                                                    size: 24.0,
-                                                  )
-                                            : SizedBox(
-                                                width: 24.0,
+                            return GestureDetector(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) => Followup(
+                                          localize('Anonymous Hotline Log'),
+                                          document.reference.path))),
+                              child: Card(
+                                margin: EdgeInsets.all(4.0),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Text('Anonymous',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          Spacer(),
+                                          Text(
+                                              dateFormatting.dateFormatter.format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                          document.data()['createdAt'])),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          Spacer(),
+                                          Text(
+                                              dateFormatting.timeFormatter.format(
+                                                  DateTime
+                                                      .fromMillisecondsSinceEpoch(
+                                                          document.data()['createdAt'])),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Text(document.data()['body']),
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Container(
+                                              child: FutureBuilder<DocumentSnapshot>(
+                                                future: FirebaseFirestore.instance
+                                                    .doc(
+                                                        document.data()['schoolId'] ??
+                                                            '')
+                                                    .get(),
+                                                initialData: document,
+                                                builder: (BuildContext context,
+                                                        schoolData) =>
+                                                    Text(
+                                                        schoolData.hasData
+                                                            ? schoolData.data.data()[
+                                                                    'name'] ??
+                                                                ''
+                                                            : '',
+                                                        style: TextStyle(
+                                                            fontSize: 12.0,
+                                                            fontWeight:
+                                                                FontWeight.bold)),
                                               ),
-                                      ],
-                                    ),
-                                  ],
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              child: FutureBuilder(
+                                                future: FirebaseFirestore.instance
+                                                    .collection(
+                                                        '${document.reference.path}/followup')
+                                                    .get(),
+                                                builder: (BuildContext context,
+                                                    AsyncSnapshot<QuerySnapshot>
+                                                        data) {
+                                                  if (data.hasData) {
+                                                    return Text(
+                                                      'Follow-up ${data.data.docs.length}',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.blueAccent),
+                                                    );
+                                                  }
+                                                  return Text('');
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          document.data()['media'] != null
+                                              ? document.data()['isVideo'] ?? false
+                                                  ? Icon(
+                                                      Icons.videocam,
+                                                      color: Colors.blueAccent,
+                                                      size: 24.0,
+                                                    )
+                                                  : Icon(
+                                                      Icons
+                                                          .photo_size_select_actual,
+                                                      color: Colors.blueAccent,
+                                                      size: 24.0,
+                                                    )
+                                              : SizedBox(
+                                                  width: 24.0,
+                                                ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       );
                     }),
                 Align(

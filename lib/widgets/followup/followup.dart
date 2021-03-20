@@ -30,14 +30,14 @@ class _FollowupState extends State<Followup> {
         .doc(widget._firestorePath)
         .get()
         .then((snapshot) async {
-      if (widget._title.toLowerCase() == 'incident report') {
+      _originalData = <String, dynamic>{...snapshot.data()};
+      if (widget._title.toLowerCase() == localize('Incident Report').toLowerCase()) {
         // Flatten incidents
         await UserHelper.loadIncidentTypes();
         final Map<String, String> positiveIncidents =
             UserHelper.positiveIncidents;
         final Map<String, String> negativeIncidents =
             UserHelper.negativeIncidents;
-        _originalData = <String, dynamic>{...snapshot.data()};
         String flattenedIncidents = '';
         for (String incident in _originalData['incidents']) {
           if (positiveIncidents.containsKey(incident)) {
