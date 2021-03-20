@@ -39,10 +39,10 @@ class _SelectGroupsState extends State<SelectGroups> {
     var role = await UserHelper.getSelectedSchoolRole();
     if (role == 'school_security') {
       schoolGroups.removeWhere((item) => item["name"] == 'family');
-    } else if (role == 'district') {
+    } else if (role == 'district' || role == 'superadmin') {
       List<Map<String, dynamic>> schools =
           (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
-      schools.removeWhere((item) => item["role"] != "district");
+      schools.removeWhere((item) => (item["role"] != "district" && item["role"] != "superadmin"));
       List<DocumentSnapshot> unwrappedSchools =
           await _fetchSchoolSnapshots(schools);
       setState(() {
@@ -53,7 +53,7 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = role == 'district' && schoolSnapshots == null;
+      _isLoading = (role == 'district' || role == 'superadmin') && schoolSnapshots == null;
     });
   }
 

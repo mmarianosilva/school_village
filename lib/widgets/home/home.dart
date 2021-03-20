@@ -61,7 +61,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
 
   Future playAlarm() async {
     final role = await UserHelper.getSelectedSchoolRole();
-    if ((role == 'security' || role == 'school_security' || role == 'admin' || role == 'school_admin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
+    if ((role == 'security' || role == 'school_security' || role == 'admin' || role == 'school_admin' || role == 'superadmin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
       return playMessageAlert();
     }
     if (!Platform.isIOS) {

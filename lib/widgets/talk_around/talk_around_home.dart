@@ -68,7 +68,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         });
       }
     });
-    if (_schoolRole != "school_admin" && _schoolRole != "admin" && _schoolRole != "district") {
+    if (_schoolRole != "school_admin" && _schoolRole != "admin" && _schoolRole != "district" && _schoolRole != "superadmin") {
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
           .where("members", arrayContainsAny: [_userSnapshot.reference])

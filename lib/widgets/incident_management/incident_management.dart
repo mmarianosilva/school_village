@@ -145,7 +145,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                 editable: role == 'school_admin' || role == 'admin' ||
                     role == 'school_security' || role == 'security' ||
                     role == 'pd_fire_ems' ||
-                    role == 'district',
+                    role == 'district' || role == 'superadmin',
               )),
     );
   }
