@@ -377,10 +377,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         body: Column(children: [
           _editable
               ? selectGroups
-              : SizedBox(
-                  width: 0.0,
-                  height: 0.0,
-                ),
+              : SizedBox(),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),

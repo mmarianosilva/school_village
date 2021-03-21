@@ -441,7 +441,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   List<Widget> _buildStopAlertItems() {
-    if (role == 'school_security' || role == 'school_admin' || role == 'security' || role == 'admin') {
+    if (role == 'school_security' || role == 'school_admin' || role == 'district' || role == 'security' || role == 'admin' || role == 'superadmin') {
       return [
         Spacer(),
         Container(

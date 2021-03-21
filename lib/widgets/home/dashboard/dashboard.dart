@@ -537,7 +537,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildAlertButton() {
-    const size = HeaderButtons.iconSize * 1.1;
+    const size = HeaderButtons.iconSize;
     if (role == 'school_student' || role == 'school_family') {
       return SizedBox(
         height: size,
@@ -555,6 +555,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               'assets/images/alert.png',
               width: size * 1.2,
               height: size * 1.2,
+              fit: BoxFit.fill,
             ),
             onTap: sendAlert,
           ),
@@ -567,7 +568,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                     fit: BoxFit.fill,
                   ),
                   onTap: () => _openIncidentManagement(context))
-              : const Spacer(),
+              : const SizedBox(width: size),
         ],
       ),
     );
