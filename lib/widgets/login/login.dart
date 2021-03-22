@@ -7,6 +7,7 @@ import 'package:school_village/widgets/contact/contact.dart';
 import 'package:school_village/widgets/forgot/forgot.dart';
 import 'package:school_village/util/analytics_helper.dart';
 import 'package:school_village/widgets/sign_up/request_more_information.dart';
+import 'package:school_village/widgets/sign_up/sign_up_personal.dart';
 import 'package:school_village/widgets/student_login/student_login.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
@@ -206,7 +207,10 @@ class _LoginState extends State<Login> {
                 child: Text(localize("Forgot Password?")),
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SignUpPersonal()));
+                },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(

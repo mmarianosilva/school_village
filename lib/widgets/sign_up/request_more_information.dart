@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
 
 class RequestMoreInformation extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
     return Scaffold(
       appBar: BaseAppBar(
         iconTheme: IconTheme.of(context).copyWith(color: Colors.black),
-        backgroundColor: Color(0x8de5e5ea),
+        backgroundColor: Color(0xffefedea),
         title: Column(
           children: [
             Text(
@@ -68,52 +69,38 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: localize("First Name"),
-              ),
-              maxLines: 1,
+            child: SignUpTextField(
+              hint: localize("First Name"),
             ),
           ),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: localize("Last Name"),
-              ),
-              maxLines: 1,
+            child: SignUpTextField(
+              hint: localize("Last Name"),
             ),
           ),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: localize("Email"),
-              ),
-              keyboardType: TextInputType.emailAddress,
-              maxLines: 1,
+            child: SignUpTextField(
+              hint: localize("Email"),
+              textInputType: TextInputType.emailAddress,
             ),
           ),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: localize("Phone"),
-              ),
-              keyboardType: TextInputType.phone,
-              maxLines: 1,
+            child: SignUpTextField(
+              hint: localize("Phone"),
+              textInputType: TextInputType.phone,
             ),
           ),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: localize("Comments"),
-              ),
+            child: SignUpTextField(
+              hint: localize("Comments"),
               minLines: 4,
               maxLines: 4,
             ),
