@@ -19,10 +19,17 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
     FirebaseFirestore.instance
         .collection('services')
         .where('enabled', isEqualTo: true)
+        .orderBy('name')
         .get()
         .then((list) {
       categories.addAll(
           list.docs.map((doc) => VendorCategory.fromDocument(document: doc)));
+      final indexOfSpecialOffers = categories.indexWhere((item) => item.name == "SPECIAL OFFERS");
+      if (indexOfSpecialOffers != null) {
+        final specialOffer = categories[indexOfSpecialOffers];
+        categories.removeAt(indexOfSpecialOffers);
+        categories.insert(0, specialOffer);
+      }
       setState(() {});
     });
   }
