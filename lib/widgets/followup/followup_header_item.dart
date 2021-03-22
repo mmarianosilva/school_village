@@ -8,10 +8,11 @@ const double _videoHeight = 96;
 
 class FollowupHeaderItem extends StatelessWidget {
   final Map<String, dynamic> _data;
+  final bool _isAnonymous;
 
   String get _media => _data['media'] != null ? _data['media'] : _data['img'];
 
-  FollowupHeaderItem(this._data);
+  FollowupHeaderItem(this._data, this._isAnonymous);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class FollowupHeaderItem extends StatelessWidget {
           Row(
             children: <Widget>[
               Text(
-                _data['createdBy'],
+                _isAnonymous ? "" : _data['createdBy'],
                 style: TextStyle(color: Colors.blueAccent),
               ),
               Spacer(),

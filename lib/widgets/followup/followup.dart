@@ -138,7 +138,7 @@ class _FollowupState extends State<Followup> {
                             _originalData != null
                                 ? widget._title.toLowerCase() !=
                                         'incident report'
-                                    ? FollowupHeaderItem(_originalData)
+                                    ? FollowupHeaderItem(_originalData, widget._title == localize('Anonymous Hotline Log'))
                                     : FollowupIncidentReportHeader(
                                         _originalData)
                                 : Center(child: CircularProgressIndicator()),
@@ -156,7 +156,7 @@ class _FollowupState extends State<Followup> {
                                 return _originalData != null
                                     ? widget._title.toLowerCase() !=
                                             'incident report'
-                                        ? FollowupHeaderItem(_originalData)
+                                        ? FollowupHeaderItem(_originalData, widget._title == localize('Anonymous Hotline Log'))
                                         : FollowupIncidentReportHeader(
                                             _originalData)
                                     : Center(child: CircularProgressIndicator());
