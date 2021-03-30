@@ -26,15 +26,12 @@ class _VendorListState extends State<VendorList> {
     UserHelper.getSelectedSchoolID().then((schoolId) {
       FirebaseFirestore.instance
           .collection('vendors')
-          .where('category',
-              isEqualTo: FirebaseFirestore.instance
-                  .doc('services/${widget.category.id}'))
-          .where('school',
-              isEqualTo: FirebaseFirestore.instance.doc(schoolId))
+          .where('categories', arrayContains: widget.category.id)
+          .where('school', isEqualTo: FirebaseFirestore.instance.doc(schoolId))
           .get()
           .then((snapshot) {
         list.addAll(
-            snapshot.docs.map((document) => Vendor.fromDocument(document)));
+            snapshot.docs.map((document) => Vendor.fromDocument(document)).where((vendor) => !(vendor.deleted ?? false)));
         setState(() {});
       });
     });
@@ -94,12 +91,14 @@ class _VendorListState extends State<VendorList> {
               Row(
                 children: [
                   const SizedBox(width: 8.0),
-                  item.coverPhotoUrl?.isNotEmpty ?? false ? Image.network(
-                    item.coverPhotoUrl,
-                    fit: BoxFit.cover,
-                    height: 64.0,
-                    width: 128.0,
-                  ) : const Icon(Icons.all_inclusive),
+                  item.coverPhotoUrl?.isNotEmpty ?? false
+                      ? Image.network(
+                          item.coverPhotoUrl,
+                          fit: BoxFit.cover,
+                          height: 64.0,
+                          width: 128.0,
+                        )
+                      : const Icon(Icons.all_inclusive),
                   const SizedBox(width: 8.0),
                   Expanded(
                     child: Column(
@@ -141,8 +140,10 @@ class _VendorListState extends State<VendorList> {
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
                       onPressed: () async {
-                        if (await canLaunch("tel://${item.contactPhone ?? item.businessPhone}")) {
-                          launch("tel://${item.contactPhone ?? item.businessPhone}");
+                        if (await canLaunch(
+                            "tel://${item.contactPhone ?? item.businessPhone}")) {
+                          launch(
+                              "tel://${item.contactPhone ?? item.businessPhone}");
                         }
                       },
                       padding: EdgeInsets.zero,
@@ -201,7 +202,8 @@ class _VendorListState extends State<VendorList> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => VendorDetailsScreen(widget.category, item),
+                            builder: (context) =>
+                                VendorDetailsScreen(widget.category, item),
                           ),
                         );
                       },

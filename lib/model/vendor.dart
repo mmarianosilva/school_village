@@ -15,6 +15,7 @@ class Vendor {
     this.url,
     this.coverPhotoUrl,
     this.email,
+    this.deleted,
   });
 
   Vendor.fromMap(Map<String, dynamic> data) : this(
@@ -28,6 +29,7 @@ class Vendor {
     url: data['url'],
     coverPhotoUrl: data['cover_url'],
     email: data['email'],
+    deleted: data['deleted'],
   );
 
   Vendor.fromDocument(DocumentSnapshot document) : this(
@@ -42,6 +44,7 @@ class Vendor {
     url: document.data()['url'],
     coverPhotoUrl: document.data()['cover_url'],
     email: document.data()['email'],
+    deleted: document.data()['deleted'],
   );
 
   final String id;
@@ -55,4 +58,5 @@ class Vendor {
   final String url;
   final String coverPhotoUrl;
   final String email;
+  final bool deleted;
 }
