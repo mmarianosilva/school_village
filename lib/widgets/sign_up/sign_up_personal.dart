@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/sign_up/sign_up_boat.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignUpPersonal extends StatefulWidget {
   @override
@@ -122,16 +125,47 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         TextSpan(
                           text: localize("By continuing you accept our "),
                         ),
-                        TextSpan(
-                          style: TextStyle(color: Color(0xff0a7aff)),
-                          text: localize("Terms"),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (await canLaunch(
+                                  Constants.termsOfServiceUrl)) {
+                                launch(Constants.termsOfServiceUrl);
+                              }
+                            },
+                            child: Text(
+                              localize("Terms"),
+                              style: TextStyle(
+                                color: Color(0xff0a7aff),
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                                height: 20.0 / 16.0,
+                                letterSpacing: 0.62,
+                              ),
+                            ),
+                          ),
                         ),
                         TextSpan(
                           text: localize(" and "),
                         ),
-                        TextSpan(
-                          style: TextStyle(color: Color(0xff0a7aff)),
-                          text: localize("Privacy Policy"),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (await canLaunch(Constants.privacyPolicyUrl)) {
+                                launch(Constants.privacyPolicyUrl);
+                              }
+                            },
+                            child: Text(
+                              localize("Privacy Policy"),
+                              style: TextStyle(
+                                color: Color(0xff0a7aff),
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                                height: 20.0 / 16.0,
+                                letterSpacing: 0.62,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),

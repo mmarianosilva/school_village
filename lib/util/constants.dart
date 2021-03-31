@@ -9,4 +9,6 @@ class Constants {
   static const messagesHorizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0);
   static const pdftronLicenseKey = '';
   static const lastAmberAlertTimestampKey = 'lastAmberAlertTimestamp';
+  static const privacyPolicyUrl = 'https://villagesafety.net/index_privacy_policy-vs.html';
+  static const termsOfServiceUrl = 'https://villagesafety.net/index_privacy_policy-vs.html';
 }
