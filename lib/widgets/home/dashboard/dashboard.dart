@@ -547,28 +547,33 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const SizedBox(width: size),
+          Expanded(
+            child: const SizedBox()
+          ),
           GestureDetector(
             child: Image.asset(
               'assets/images/alert.png',
-              width: size * 1.2,
-              height: size * 1.2,
-              fit: BoxFit.fill,
+              width: size * 2.0,
+              fit: BoxFit.fitWidth,
             ),
             onTap: sendAlert,
           ),
-          alertInProgress != null
-              ? GestureDetector(
-                  child: Image.asset(
-                    'assets/images/incident_management_icon.png',
-                    width: size,
-                    height: size,
-                    fit: BoxFit.fill,
-                  ),
-                  onTap: () => _openIncidentManagement(context))
-              : const SizedBox(width: size),
+          Expanded(
+            child: alertInProgress != null
+                ? GestureDetector(
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/incident_management_icon.png',
+                        width: size,
+                        height: size,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                    onTap: () => _openIncidentManagement(context))
+                : const SizedBox(width: size),
+          ),
         ],
       ),
     );
