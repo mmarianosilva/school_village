@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
-import 'package:school_village/widgets/sign_up/sign_up_boat.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
