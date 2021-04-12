@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/vendor/vendor_rating.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VendorDetailsScreen extends StatefulWidget {
@@ -16,6 +18,28 @@ class VendorDetailsScreen extends StatefulWidget {
 }
 
 class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
+  int _numberOfReviews;
+  double _calculatedRating;
+  
+  @override
+  void initState() {
+    FirebaseFirestore.instance
+        .collection("vendors/${widget.vendor.id}/ratings")
+        .get()
+        .then((value) {
+          final ratings = value.docs;
+          _numberOfReviews = ratings.length;
+          var totalRating = 0.0;
+          for (final rating in ratings) {
+            totalRating = totalRating + rating.data()["stars"];
+          }
+          setState(() {
+            _calculatedRating = totalRating / _numberOfReviews;
+          });
+    });
+    super.initState();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +61,7 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
+                  padding: const EdgeInsets.all(8.0),
                   constraints: BoxConstraints(
                     maxHeight: 80.0,
                   ),
@@ -46,11 +71,16 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      _buildRatingWidget(context, 4, 11),
+                      _buildRatingWidget(context, _calculatedRating, _numberOfReviews),
                       const Spacer(),
-                      Text(
-                        "Write a review",
-                        style: TextStyle(color: Colors.lightBlue),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorRating(widget.vendor)));
+                        },
+                        child: Text(
+                          "Write a review",
+                          style: TextStyle(color: Colors.lightBlue),
+                        ),
                       ),
                     ],
                   ),
@@ -243,6 +273,9 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
   }
 
   Widget _buildRatingWidget(BuildContext context, double average, int total) {
+    if (average == null || total == null) {
+      return const SizedBox();
+    }
     final List<Widget> full = [];
     final List<Widget> outlined = [];
     for (int i = 0; i < 5; i++) {
