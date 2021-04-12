@@ -258,7 +258,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildNotificationsOption(model) {
-    if (role == 'school_student') {
+    if (role == 'school_student' || role == 'enduser') {
       return SizedBox();
     }
     return FutureBuilder(
@@ -396,7 +396,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildIncidentReport() {
     if (role == 'school_student' ||
-        role == 'student' ||
+        role == 'enduser' ||
         role == 'school_family' ||
         role == 'family' ||
         role == 'pd-fire-ems') {
@@ -446,6 +446,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildIncidentList() {
     if (role == 'school_student' ||
+        role == 'enduser' ||
         role == 'school_family' ||
         role == 'pd-fire-ems') {
       return SizedBox();
@@ -493,9 +494,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'school_admin' && role != 'admin' &&
-        role != 'school_security' && role != 'security' &&
-        role != 'district' && role != 'superadmin') {
+    if (role != 'school_admin' &&
+        role != 'admin' &&
+        role != 'school_security' &&
+        role != 'security' &&
+        role != 'district' &&
+        role != 'superadmin') {
       return SizedBox();
     }
     return GestureDetector(
@@ -538,7 +542,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     const size = HeaderButtons.iconSize;
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'school_student' || role == 'enduser' || role == 'school_family') {
       return SizedBox(
         height: size,
       );
@@ -549,9 +553,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
-            child: const SizedBox()
-          ),
+          Expanded(child: const SizedBox()),
           GestureDetector(
             child: Image.asset(
               'assets/images/alert.png',
@@ -596,7 +598,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            if (role == 'admin' || role == 'school_admin' || role == 'district' || role == 'superadmin') ...[
+            if (role == 'admin' ||
+                role == 'school_admin' ||
+                role == 'district' ||
+                role == 'superadmin') ...[
               Text(
                 localize('Schoolwide roll call').toUpperCase(),
                 style: TextStyle(
@@ -845,7 +850,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildRollCallRequest() {
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'school_student' || role == 'enduser' || role == 'school_family') {
       return const SizedBox();
     }
     return GestureDetector(
@@ -943,7 +948,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           _getSchoolId();
         } else {
           checkNewSchool();
-          if (role != 'school_student') {
+          if (role != 'school_student' && role != 'enduser') {
             _getLocationPermission();
           }
         }

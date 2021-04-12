@@ -1,5 +1,6 @@
 const String family = "school_family";
 const String student = "school_student";
+const String enduser = "enduser";
 const String schoolAdmin = "school_admin";
 const String admin = "admin";
 const String schoolSecurity = "school_security";
@@ -13,10 +14,10 @@ const String pdFireEms = "pd-fire-ems";
 class PermissionMatrix {
   static const _talkAroundFamily = [staff, admin, schoolStaff, schoolAdmin];
   static const _talkAroundStudents = [staff, admin, schoolStaff, schoolAdmin];
-  static const _talkAroundStaff = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, family];
-  static const _talkAroundAdmin = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, family, district, superadmin];
+  static const _talkAroundStaff = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family];
+  static const _talkAroundAdmin = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family, district, superadmin];
   static const _talkAroundSecurity = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, district, superadmin];
-  static const _talkAroundDistrict = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, family, district, superadmin];
+  static const _talkAroundDistrict = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family, district, superadmin];
   static const _talkAroundPdFireEms = [admin, schoolAdmin, security, schoolSecurity, district, superadmin];
 
   static List<String> getTalkAroundPermissions(String role) {
@@ -24,6 +25,7 @@ class PermissionMatrix {
       case family:
         return _talkAroundFamily;
       case student:
+      case enduser:
         return _talkAroundStudents;
       case admin:
       case schoolAdmin:

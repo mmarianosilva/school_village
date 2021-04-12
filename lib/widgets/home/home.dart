@@ -200,7 +200,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       return _showBroadcastDialog(message);
     } else if (message["type"] == "hotline") {
       String role = await UserHelper.getSelectedSchoolRole();
-      if (role == 'school_student' || role == 'school_family') {
+      if (role == 'school_student' || role == 'enduser' || role == 'school_family') {
         return true;
       }
       playMessageAlert();
@@ -482,7 +482,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
 
   checkIfOnlyOneSchool() async {
     var schools = await UserHelper.getSchools();
-    if (schools.length < 2) {
+    if (schools != null && schools.length < 2 && schools.isNotEmpty) {
       print("Only 1 School");
       var school = await FirebaseFirestore.instance.doc(schools[0]['ref']).get();
       print(school.data()["name"]);
