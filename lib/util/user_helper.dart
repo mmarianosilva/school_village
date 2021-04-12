@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:location/location.dart';
+import 'package:school_village/util/help_with_migration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'analytics_helper.dart';
@@ -41,8 +42,7 @@ class UserHelper {
           password.isEmpty) {
         return null;
       }
-      await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       return _auth.currentUser();
     }
     AnalyticsHelper.setUserId(user.uid);
@@ -70,37 +70,46 @@ class UserHelper {
     DocumentSnapshot userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
+    if (userSnapshot.data()['associatedSchools'] == null ||
+        userSnapshot.data()['associatedSchools'].isEmpty) {
+      UserHelper.logout("");
+      return schools;
+    }
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
-    setIsOwner(userSnapshot.data()['owner'] != null && userSnapshot.data()['owner'] == true
+    setIsOwner(userSnapshot.data()['owner'] != null &&
+            userSnapshot.data()['owner'] == true
         ? true
         : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]["role"]
+        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]
+            ["role"]
       });
     }
     return schools;
   }
 
   static loadIncidentTypes() async {
-    if (positiveIncidents == null && negativeIncidents == null) {
-      String selectedSchool = await getSelectedSchoolID();
+    String selectedSchool = await getSelectedSchoolID();
 
-      DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
-      DocumentSnapshot schoolSnapshot = await schoolRef.get();
+    await Temporary.updateIncidentDataSingle(selectedSchool);
 
-      var items = schoolSnapshot.data()["incidents"];
+    DocumentReference schoolRef =
+        FirebaseFirestore.instance.doc(selectedSchool);
+    DocumentSnapshot schoolSnapshot = await schoolRef.get();
 
-      negativeIncidents = (Map<String, String>.from(items["negative"]));
-      positiveIncidents =  (Map<String, String>.from(items["positive"]));
-    }
+    var items = schoolSnapshot.data()["incidents"];
+
+    negativeIncidents = (Map<String, String>.from(items["negative"]));
+    positiveIncidents = (Map<String, String>.from(items["positive"]));
   }
 
   static getSchoolAllGroups() async {
     final String selectedSchool = await getSelectedSchoolID();
     print(selectedSchool);
-    DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
+    DocumentReference schoolRef =
+        FirebaseFirestore.instance.doc(selectedSchool);
     DocumentSnapshot schoolSnapshot = await schoolRef.get();
     List<dynamic> groups = [];
     if (schoolSnapshot.data()['groups'] != null) {
