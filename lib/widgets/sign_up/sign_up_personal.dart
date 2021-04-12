@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/sign_up/sign_up_boat.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignUpPersonal extends StatefulWidget {
@@ -12,6 +16,47 @@ class SignUpPersonal extends StatefulWidget {
 
 class _SignUpPersonalState extends State<SignUpPersonal> {
   bool _agreed = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  bool _validateEmail() {
+    return Constants.emailRegEx.hasMatch(_emailController.text);
+  }
+
+  bool _validatePassword() {
+    return _passwordController.text.length > 8 && _passwordController.text == _confirmPasswordController.text;
+  }
+
+  Future<void> _onNextPressed() async {
+    if (!_validateEmail()) {
+      return;
+    }
+    if (!_validatePassword()) {
+      return;
+    }
+    if (!_agreed) {
+      return;
+    }
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final auth = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    if (auth.user != null) {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString("email", email.trim().toLowerCase());
+      sharedPreferences.setString("password", password);
+    }
+    await FirebaseFirestore.instance.collection("users").doc(auth.user.uid).set({
+      "email": email,
+      "firstName": _firstNameController.text,
+      "lastName": _lastNameController.text,
+      "phone": _phoneController.text,
+    });
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpBoat()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +101,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _emailController,
                       hint: localize("Email"),
                       textInputType: TextInputType.emailAddress,
                     ),
@@ -64,6 +110,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _passwordController,
                       hint: localize("Password"),
                       obscureText: true,
                     ),
@@ -72,6 +119,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _confirmPasswordController,
                       hint: localize("Confirm Password"),
                       obscureText: true,
                     ),
@@ -80,6 +128,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _firstNameController,
                       hint: localize("First Name"),
                     ),
                   ),
@@ -87,6 +136,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _lastNameController,
                       hint: localize("Last Name"),
                     ),
                   ),
@@ -94,6 +144,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      controller: _phoneController,
                       hint: localize("Phone"),
                       textInputType: TextInputType.phone,
                     ),
@@ -214,7 +265,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       color: Colors.blueAccent,
                       child: FlatButton(
                         visualDensity: VisualDensity.compact,
-                        onPressed: () {},
+                        onPressed: () {
+                          _onNextPressed();
+                        },
                         child: Text(
                           localize("Next").toUpperCase(),
                           style: TextStyle(

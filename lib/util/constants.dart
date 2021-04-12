@@ -10,5 +10,8 @@ class Constants {
   static const pdftronLicenseKey = '';
   static const lastAmberAlertTimestampKey = 'lastAmberAlertTimestamp';
   static const privacyPolicyUrl = 'https://villagesafety.net/index_privacy_policy-vs.html';
-  static const termsOfServiceUrl = 'https://villagesafety.net/index_privacy_policy-vs.html';
+  static const termsOfServiceUrl = 'https://villagesafety.net/index_termsConditions.html';
+
+  static final emailRegEx = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+$");
+  static final phoneRegEx = RegExp(r"^(?:[+0][1-9]{1,3})?[0-9]{9,10}$");
 }

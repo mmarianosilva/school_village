@@ -7,6 +7,8 @@ class SignUpTextField extends StatelessWidget {
     this.maxLines = 1,
     this.textInputType = TextInputType.text,
     this.obscureText = false,
+    this.enabled = true,
+    this.controller,
   });
 
   final String hint;
@@ -14,6 +16,8 @@ class SignUpTextField extends StatelessWidget {
   final int maxLines;
   final TextInputType textInputType;
   final bool obscureText;
+  final bool enabled;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,9 @@ class SignUpTextField extends StatelessWidget {
         )
       ]),
       child: TextField(
+        autocorrect: false,
+        controller: controller ?? TextEditingController(),
+        enabled: enabled,
         decoration: InputDecoration(
           hintStyle: TextStyle(
             color: Color(0xa6323339),
