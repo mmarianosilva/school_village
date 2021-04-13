@@ -303,7 +303,7 @@ class _IncidentManagementState extends State<IncidentManagement>
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
     final Map<String, dynamic> map = documents
-        .firstWhere((document) => document["category"] == "MAP", orElse: null);
+        .firstWhere((document) => document["category"] == "MAP", orElse: () => null);
     return map;
   }
 
