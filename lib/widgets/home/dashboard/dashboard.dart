@@ -542,7 +542,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     const size = HeaderButtons.iconSize;
-    if (role == 'school_student' || role == 'enduser' || role == 'school_family') {
+    if (role == 'school_student' ||
+        role == 'enduser' ||
+        role == 'school_family') {
       return SizedBox(
         height: size,
       );
@@ -850,7 +852,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildRollCallRequest() {
-    if (role == 'school_student' || role == 'enduser' || role == 'school_family') {
+    if (role == 'school_student' ||
+        role == 'enduser' ||
+        role == 'school_family') {
       return const SizedBox();
     }
     return GestureDetector(
@@ -968,9 +972,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                     snapshot.data.data()["documents"] != null
                         ? snapshot.data
                             .data()["documents"]
-                            .where((snapshot) =>
-                                snapshot["accessRoles"] == null ||
-                                snapshot["accessRoles"].contains(role))
+                            .where((snapshot) {
+                              if (snapshot["accessRoles"] == null) {
+                                return true;
+                              }
+                              final accessRoles =
+                                  (snapshot["accessRoles"] as List).cast<String>();
+                              for (final accessRole in accessRoles) {
+                                if (accessRole.contains(role)) {
+                                  return true;
+                                }
+                              }
+                              return false;
+                            })
                             .toList()
                             .cast<DocumentSnapshot>()
                         : null;
