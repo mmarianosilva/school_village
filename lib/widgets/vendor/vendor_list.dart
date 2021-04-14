@@ -5,6 +5,7 @@ import 'package:school_village/model/vendor.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/util/user_helper.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/vendor/vendor_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -131,6 +132,7 @@ class _VendorListState extends State<VendorList> {
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(
                     decoration: BoxDecoration(
@@ -139,12 +141,8 @@ class _VendorListState extends State<VendorList> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
-                      onPressed: () async {
-                        if (await canLaunch(
-                            "tel://${item.contactPhone ?? item.businessPhone}")) {
-                          launch(
-                              "tel://${item.contactPhone ?? item.businessPhone}");
-                        }
+                      onPressed: () {
+                        showContactDialog(context, item.name, item.contactPhone ?? item.businessPhone);
                       },
                       padding: EdgeInsets.zero,
                       child: Row(
@@ -170,10 +168,10 @@ class _VendorListState extends State<VendorList> {
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
                       onPressed: () async {
-                        final uri = "";
-                        if (await canLaunch(uri)) {
+                        final uri = "https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(item.address)}";
+                        // if (await canLaunch(uri)) {
                           launch(uri);
-                        }
+                        // }
                       },
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: Row(

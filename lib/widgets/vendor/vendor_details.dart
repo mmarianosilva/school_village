@@ -4,7 +4,9 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/contact/contact_dialog.dart';
 import 'package:school_village/widgets/vendor/vendor_rating.dart';
+import 'package:school_village/widgets/vendor/vendor_reviews.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VendorDetailsScreen extends StatefulWidget {
@@ -20,26 +22,26 @@ class VendorDetailsScreen extends StatefulWidget {
 class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
   int _numberOfReviews;
   double _calculatedRating;
-  
+
   @override
   void initState() {
     FirebaseFirestore.instance
         .collection("vendors/${widget.vendor.id}/ratings")
         .get()
         .then((value) {
-          final ratings = value.docs;
-          _numberOfReviews = ratings.length;
-          var totalRating = 0.0;
-          for (final rating in ratings) {
-            totalRating = totalRating + rating.data()["stars"];
-          }
-          setState(() {
-            _calculatedRating = totalRating / _numberOfReviews;
-          });
+      final ratings = value.docs;
+      _numberOfReviews = ratings.length;
+      var totalRating = 0.0;
+      for (final rating in ratings) {
+        totalRating = totalRating + rating.data()["stars"];
+      }
+      setState(() {
+        _calculatedRating = totalRating / _numberOfReviews;
+      });
     });
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,17 +67,30 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                   constraints: BoxConstraints(
                     maxHeight: 80.0,
                   ),
-                  child: widget.vendor.coverPhotoUrl?.isNotEmpty ?? false ? Image.network(widget.vendor.coverPhotoUrl) : const Icon(Icons.all_inclusive),
+                  child: widget.vendor.coverPhotoUrl?.isNotEmpty ?? false
+                      ? Image.network(widget.vendor.coverPhotoUrl)
+                      : const Icon(Icons.all_inclusive),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
-                      _buildRatingWidget(context, _calculatedRating, _numberOfReviews),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorReviews(vendor: widget.vendor)));
+                        },
+                        child: _buildRatingWidget(
+                          context,
+                          _calculatedRating,
+                          _numberOfReviews,
+                        ),
+                      ),
                       const Spacer(),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorRating(widget.vendor)));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  VendorRating(widget.vendor)));
                         },
                         child: Text(
                           "Write a review",
@@ -156,12 +171,21 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.business_outlined),
                         const SizedBox(width: 16.0),
-                        SelectableText(
-                          widget.vendor.contactPhone ?? "",
-                          style: TextStyle(
-                            color: Color(0xff10a2c7),
-                            fontSize: 16.0,
-                            letterSpacing: 0.7,
+                        GestureDetector(
+                          onTap: () {
+                            if (widget.vendor.businessPhone?.isNotEmpty ??
+                                false) {
+                              showContactDialog(context, widget.vendor.name,
+                                  widget.vendor.businessPhone);
+                            }
+                          },
+                          child: Text(
+                            widget.vendor.businessPhone ?? "",
+                            style: TextStyle(
+                              color: Color(0xff10a2c7),
+                              fontSize: 16.0,
+                              letterSpacing: 0.7,
+                            ),
                           ),
                         ),
                       ],
@@ -218,12 +242,23 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.phone_android),
                         const SizedBox(width: 16.0),
-                        SelectableText(
-                          widget.vendor.contactPhone ?? "",
-                          style: TextStyle(
-                            color: Color(0xff10a2c7),
-                            fontSize: 16.0,
-                            letterSpacing: 0.7,
+                        GestureDetector(
+                          onTap: () {
+                            if (widget.vendor.contactPhone?.isNotEmpty ??
+                                false) {
+                              showContactDialog(
+                                  context,
+                                  widget.vendor.contactName,
+                                  widget.vendor.contactPhone);
+                            }
+                          },
+                          child: Text(
+                            widget.vendor.contactPhone ?? "",
+                            style: TextStyle(
+                              color: Color(0xff10a2c7),
+                              fontSize: 16.0,
+                              letterSpacing: 0.7,
+                            ),
                           ),
                         ),
                       ],
@@ -233,13 +268,21 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                       children: [
                         const Icon(Icons.mail),
                         const SizedBox(width: 16.0),
-                        SelectableText(
-                          widget.vendor.email ?? "",
-                          textScaleFactor: (widget.vendor.email?.length ?? 0.0) > 30 ? 0.8 : 1.0,
-                          style: TextStyle(
-                            color: Color(0xff10a2c7),
-                            fontSize: 16.0,
-                            letterSpacing: 0.7,
+                        GestureDetector(
+                          onTap: () {
+                            launch("mailto:${widget.vendor.email}");
+                          },
+                          child: Text(
+                            widget.vendor.email ?? "",
+                            textScaleFactor:
+                                (widget.vendor.email?.length ?? 0.0) > 30
+                                    ? 0.8
+                                    : 1.0,
+                            style: TextStyle(
+                              color: Color(0xff10a2c7),
+                              fontSize: 16.0,
+                              letterSpacing: 0.7,
+                            ),
                           ),
                         ),
                       ],
