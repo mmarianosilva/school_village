@@ -197,7 +197,7 @@ class _HotlineState extends State<Hotline> {
 
   _sendMessage() {
     var text = customAlertController.text;
-    if (text.length < 1 && _selectedMedia != null) return;
+    if (text.length < 1 && _selectedMedia == null) return;
     _saveMessage(text);
   }
 
@@ -206,7 +206,6 @@ class _HotlineState extends State<Hotline> {
     CollectionReference collection = FirebaseFirestore.instance.collection(hotlinePath);
     final DocumentReference document = collection.doc();
 
-    String firebaseStoragePath;
     final String role = await UserHelper.getSelectedSchoolRole();
     final String schoolId = await UserHelper.getSelectedSchoolID();
 
@@ -234,7 +233,7 @@ class _HotlineState extends State<Hotline> {
               'createdBy': role,
               'schoolId': schoolId,
               'isVideo': _isVideo,
-              'media': firebaseStoragePath,
+              'media': url,
             });
       });
       widget._scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -252,33 +251,31 @@ class _HotlineState extends State<Hotline> {
         'createdBy': await UserHelper.getSelectedSchoolRole(),
         'schoolId': await UserHelper.getSelectedSchoolID(),
       });
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(localize('Sent')),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text(localize('Your message has been sent'))
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(localize('Okay')),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
     }
 
-
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(localize('Sent')),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text(localize('Your message has been sent'))
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(localize('Okay')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        });
   }
 
   _buildPreviewBox() {
