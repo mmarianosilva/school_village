@@ -167,11 +167,10 @@ class _VendorListState extends State<VendorList> {
                     ),
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
-                      onPressed: () async {
-                        final uri = "https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(item.address)}";
-                        // if (await canLaunch(uri)) {
-                          launch(uri);
-                        // }
+                      onPressed: () {
+                        final uri =
+                            "https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(item.address)}";
+                        launch(uri);
                       },
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: Row(

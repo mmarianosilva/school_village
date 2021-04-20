@@ -77,7 +77,9 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorReviews(vendor: widget.vendor)));
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  VendorReviews(vendor: widget.vendor)));
                         },
                         child: _buildRatingWidget(
                           context,
@@ -154,13 +156,20 @@ class _VendorDetailsScreenState extends State<VendorDetailsScreen> {
                         const Icon(Icons.location_on),
                         const SizedBox(width: 16.0),
                         Expanded(
-                          child: Text(
-                            widget.vendor.address ?? "",
-                            maxLines: 2,
-                            style: TextStyle(
-                              color: Color(0xff10a2c7),
-                              fontSize: 16.0,
-                              letterSpacing: 0.7,
+                          child: GestureDetector(
+                            onTap: () {
+                              final uri =
+                                  "https://www.google.com/maps/search/?api=1&query=${Uri.encodeQueryComponent(widget.vendor.address)}";
+                              launch(uri);
+                            },
+                            child: Text(
+                              widget.vendor.address ?? "",
+                              maxLines: 2,
+                              style: TextStyle(
+                                color: Color(0xff10a2c7),
+                                fontSize: 16.0,
+                                letterSpacing: 0.7,
+                              ),
                             ),
                           ),
                         ),
