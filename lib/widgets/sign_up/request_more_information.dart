@@ -9,6 +9,12 @@ class RequestMoreInformation extends StatefulWidget {
 }
 
 class _RequestMoreInformationState extends State<RequestMoreInformation> {
+  final TextEditingController _firstnameController = TextEditingController();
+  final TextEditingController _lastnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _commentsController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +76,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SignUpTextField(
+              controller: _firstnameController,
               hint: localize("First Name"),
             ),
           ),
@@ -77,6 +84,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SignUpTextField(
+              controller: _lastnameController,
               hint: localize("Last Name"),
             ),
           ),
@@ -84,6 +92,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SignUpTextField(
+              controller: _emailController,
               hint: localize("Email"),
               textInputType: TextInputType.emailAddress,
             ),
@@ -92,6 +101,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SignUpTextField(
+              controller: _phoneController,
               hint: localize("Phone"),
               textInputType: TextInputType.phone,
             ),
@@ -100,6 +110,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SignUpTextField(
+              controller: _commentsController,
               hint: localize("Comments"),
               minLines: 4,
               maxLines: 4,
@@ -110,9 +121,42 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             color: Colors.white,
             child: Center(
-              child: FlatButton(
-                onPressed: () {},
-                child: Text("Slide right to submit"),
+              child: Container(
+                color: Colors.blueAccent,
+                child: FlatButton(
+                  onPressed: () async {
+                    await showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          height: 192.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                localize(
+                                    "Thank you ${_firstnameController.text}. A representative will contact you soon."),
+                                style: TextStyle(
+                                  color: Color(0xff023280),
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.43,
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    "Submit",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
             ),
           ),

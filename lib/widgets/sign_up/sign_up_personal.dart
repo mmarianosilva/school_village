@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/sign_up/sign_up_boat.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
+import 'package:school_village/widgets/sign_up/sign_up_vendor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,46 +18,101 @@ class SignUpPersonal extends StatefulWidget {
 
 class _SignUpPersonalState extends State<SignUpPersonal> {
   bool _agreed = false;
+  bool _isBoater = true;
+  bool _isVendor = false;
+  String _error;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _phoneController = MaskedTextController(mask: "(000) 000-0000");
 
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
   }
 
   bool _validatePassword() {
-    return _passwordController.text.length > 8 && _passwordController.text == _confirmPasswordController.text;
+    return _passwordController.text.length > 8;
+  }
+
+  bool _validatePasswordsMatch() {
+    return _passwordController.text == _confirmPasswordController.text;
   }
 
   Future<void> _onNextPressed() async {
+    setState(() {
+      _error = null;
+    });
     if (!_validateEmail()) {
+      setState(() {
+        _error = localize("Please enter a valid email address");
+      });
       return;
     }
     if (!_validatePassword()) {
+      setState(() {
+        _error = localize("Password must be longer than 8 characters");
+      });
+      return;
+    }
+    if (!_validatePasswordsMatch()) {
+      setState(() {
+        _error = localize("Passwords do not match");
+      });
+      return;
+    }
+    if (!_isBoater && !_isVendor) {
+      setState(() {
+        _error = localize("Please select at least one user type");
+      });
       return;
     }
     if (!_agreed) {
+      setState(() {
+        _error = localize(
+            "You must agree to Terms and Privacy Policy in order to sign up");
+      });
       return;
     }
     final email = _emailController.text;
     final password = _passwordController.text;
-    final auth = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-    if (auth.user != null) {
-      final sharedPreferences = await SharedPreferences.getInstance();
-      sharedPreferences.setString("email", email.trim().toLowerCase());
-      sharedPreferences.setString("password", password);
+    try {
+      final auth = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      if (auth.user != null) {
+        final sharedPreferences = await SharedPreferences.getInstance();
+        sharedPreferences.setString("email", email.trim().toLowerCase());
+        sharedPreferences.setString("password", password);
+      }
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(auth.user.uid)
+          .set({
+        "email": email,
+        "firstName": _firstNameController.text,
+        "lastName": _lastNameController.text,
+        "phone": _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", ""),
+      });
+      if (_isBoater) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => SignUpBoat()));
+      } else {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => SignUpVendor()));
+      }
+    } on PlatformException catch (ex) {
+      if (ex.code == "ERROR_WEAK_PASSWORD") {
+        setState(() {
+          _error = "Password does not meet the security criteria";
+        });
+      } else if (ex.code == "ERROR_EMAIL_ALREADY_IN_USE") {
+        setState(() {
+          _error = "This email has already been registered";
+        });
+      }
     }
-    await FirebaseFirestore.instance.collection("users").doc(auth.user.uid).set({
-      "email": email,
-      "firstName": _firstNameController.text,
-      "lastName": _lastNameController.text,
-      "phone": _phoneController.text,
-    });
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignUpBoat()));
   }
 
   @override
@@ -91,6 +148,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     color: Color(0xff023280),
@@ -149,6 +207,61 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       textInputType: TextInputType.phone,
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: Text(
+                      localize("User Type:"),
+                      style: TextStyle(
+                        color: Color(0xff023280),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.43,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Spacer(),
+                        Checkbox(
+                          value: _isBoater,
+                          onChanged: (val) {
+                            setState(() {
+                              _isBoater = val;
+                            });
+                          },
+                        ),
+                        Text(
+                          localize("Boater"),
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Color(0xff023280),
+                          ),
+                        ),
+                        const Spacer(),
+                        Checkbox(
+                          value: _isVendor,
+                          onChanged: (val) {
+                            setState(() {
+                              _isVendor = val;
+                            });
+                          },
+                        ),
+                        Text(
+                          localize("Vendor"),
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Color(0xff023280),
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
                 ],
               ),
             ),
@@ -244,6 +357,21 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     const Spacer(),
                   ],
                 ),
+                SizedBox(
+                  height: 40.0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      _error ?? '',
+                      maxLines: 2,
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
                 Row(
                   children: [
                     const Spacer(),
@@ -251,7 +379,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       color: Colors.black,
                       child: FlatButton(
                         visualDensity: VisualDensity.compact,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                         child: Text(
                           localize("Cancel").toUpperCase(),
                           style: TextStyle(
