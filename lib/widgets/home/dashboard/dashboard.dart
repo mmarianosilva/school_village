@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:school_village/util/help_with_migration.dart';
 import 'package:school_village/widgets/vendor/vendor_category_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:location/location.dart';
@@ -543,7 +544,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _buildAlertButton() {
     const size = HeaderButtons.iconSize;
     if (role == 'school_student' ||
-        role == 'enduser' ||
         role == 'school_family') {
       return SizedBox(
         height: size,
@@ -565,7 +565,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             onTap: sendAlert,
           ),
           Expanded(
-            child: alertInProgress != null
+            child: role != 'enduser' && alertInProgress != null
                 ? GestureDetector(
                     child: Center(
                       child: Image.asset(
@@ -979,7 +979,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                               final accessRoles =
                                   (snapshot["accessRoles"] as List).cast<String>();
                               for (final accessRole in accessRoles) {
-                                if (accessRole.contains(role)) {
+                                if (accessRole.contains(role) || Temporary.updateRole(accessRole).contains(role)) {
                                   return true;
                                 }
                               }
