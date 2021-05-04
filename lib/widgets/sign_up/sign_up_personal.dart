@@ -41,6 +41,10 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     return _passwordController.text == _confirmPasswordController.text;
   }
 
+  bool _validatePhoneNumber() {
+    return _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", "").length == 10;
+  }
+
   Future<void> _onNextPressed() async {
     setState(() {
       _error = null;
@@ -60,6 +64,12 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     if (!_validatePasswordsMatch()) {
       setState(() {
         _error = localize("Passwords do not match");
+      });
+      return;
+    }
+    if (!_validatePhoneNumber()) {
+      setState(() {
+        _error = localize("Phone number must have 10 digits");
       });
       return;
     }
@@ -209,7 +219,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
+                        horizontal: 16.0),
                     child: Text(
                       localize("User Type:"),
                       style: TextStyle(
@@ -261,7 +271,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 24.0),
                 ],
               ),
             ),
@@ -415,6 +425,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           ),
         ],
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }

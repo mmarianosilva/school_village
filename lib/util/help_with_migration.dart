@@ -2,6 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class Temporary {
 
+  static String updateRole(String original) {
+    if (original == "school_admin") {
+      return "admin";
+    }
+    if (original == "school_security") {
+      return "security";
+    }
+    if (original == "school_staff") {
+      return "enduser";
+    }
+    if (original == "school_student") {
+      return "enduser";
+    }
+    if (original == "school_family") {
+      return "family";
+    }
+    if (original == "district") {
+      return "superadmin";
+    }
+    return original;
+  }
+
   static Future<void> updateIncidentData() async {
     final list = await FirebaseFirestore.instance.collection("schools").get();
     for (var i = 0; i < list.docs.length; i++) {
