@@ -41,6 +41,14 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     return _passwordController.text == _confirmPasswordController.text;
   }
 
+  bool _validateFirstName() {
+    return _firstNameController.text.isNotEmpty;
+  }
+
+  bool _validateLastName() {
+    return _lastNameController.text.isNotEmpty;
+  }
+
   bool _validatePhoneNumber() {
     return _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", "").length == 10;
   }
@@ -66,6 +74,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         _error = localize("Passwords do not match");
       });
       return;
+    }
+    if (!_validateFirstName()) {
+      setState(() {
+        _error = localize("First name must not be empty");
+      });
+    }
+    if (!_validateLastName()) {
+      setState(() {
+        _error = localize("Last name must not be empty");
+      });
     }
     if (!_validatePhoneNumber()) {
       setState(() {
