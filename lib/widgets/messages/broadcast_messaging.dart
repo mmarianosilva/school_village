@@ -87,15 +87,17 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _convertDateToKey(createdAt) {
-    return DateTime.fromMillisecondsSinceEpoch(createdAt)
+    return DateTime.fromMillisecondsSinceEpoch(
+                createdAt is int ? createdAt : int.parse(createdAt as String))
             .millisecondsSinceEpoch ~/
         Constants.oneDay;
   }
 
   _handleMessageMapInsert(shot) {
-    // if (!belongsToGroup(shot.data()['groups'].keys)) {
-    //   return;
-    // }
+    if (shot.data()['groups'] != null &&
+        !belongsToGroup(shot.data()['groups'].keys)) {
+      return;
+    }
     var day = _convertDateToKey(shot.data()['createdAt']);
 
     var messages = messageMap[day];
@@ -205,7 +207,9 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
               timestamp: document.data()['createdAt'] is Timestamp
                   ? document.data()['createdAt']
                   : Timestamp.fromMillisecondsSinceEpoch(
-                      document.data()['createdAt']),
+                      document.data()['createdAt'] is int
+                          ? document.data()['createdAt']
+                          : int.parse(document.data()['createdAt'] as String)),
               imageUrl: document.data()['image'],
               message: document,
               isVideo: document.data()['isVideo'] ?? false,
@@ -241,11 +245,11 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendMessage(File image, text, isVideo) {
-    // if (selectGroups.key.currentState.selectedGroups.length < 1) {
-    //   showErrorDialog(
-    //       localize("Please select group to send the broadcast message"));
-    //   return;
-    // }
+    if (selectGroups.key.currentState.selectedGroups.length < 1) {
+      showErrorDialog(
+          localize("Please select group to send the broadcast message"));
+      return;
+    }
 
     if (text.length < 8) {
       showErrorDialog(localize("Text length should be at least 8 characters"));
@@ -256,14 +260,10 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(localize('Send Message?')),
+            title: Text(localize('Are you sure you want to send this message?')),
             content: SingleChildScrollView(
               child: ListBody(
-                children: [
-                  Text(localize(
-                      'This message will be sent to all Users of the App in the Marina.')),
-                  Text(localize("Do You want to continue?")),
-                ],
+                children: [Text(localize('This cannot be undone'))],
               ),
             ),
             actions: [
@@ -332,6 +332,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
     document.set(<String, dynamic>{
       'body': alertBody,
+      'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
       'image': image == null ? null : path,
