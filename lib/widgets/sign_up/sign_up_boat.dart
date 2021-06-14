@@ -5,6 +5,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/home/home.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
+import 'package:school_village/widgets/sign_up/sign_up_vendor.dart';
 
 enum BoatLocation {
   dockSlip,
@@ -14,6 +15,10 @@ enum BoatLocation {
 }
 
 class SignUpBoat extends StatefulWidget {
+  const SignUpBoat({Key key, this.userData}) : super(key: key);
+
+  final Map<String, dynamic> userData;
+
   @override
   _SignUpBoatState createState() => _SignUpBoatState();
 }
@@ -68,6 +73,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
             "alerts": {
               "allowed": true,
             },
+            "allowed": true,
             "groups": <String, bool>{},
             "role": "enduser",
           }
@@ -78,10 +84,18 @@ class _SignUpBoatState extends State<SignUpBoat> {
       },
       SetOptions(merge: true),
     );
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => Home()),
-      (route) => false,
-    );
+    if (widget.userData["vendor"] ?? false) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => SignUpVendor(userData: widget.userData)),
+        (route) => route.isFirst,
+      );
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => Home()),
+        (route) => false,
+      );
+    }
   }
 
   void _getMarinaList() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
+import 'package:http/http.dart' as http;
 
 class RequestMoreInformation extends StatefulWidget {
   @override
@@ -125,27 +126,49 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
                 color: Colors.blueAccent,
                 child: FlatButton(
                   onPressed: () async {
+                    final request = <String, dynamic>{
+                      'firstName': _firstnameController.text,
+                      'lastName': _lastnameController.text,
+                      'email': _emailController.text,
+                      'phone': _phoneController.text,
+                      'comments': _commentsController.text,
+                    };
+                    await http.post(
+                        'https://us-central1-marinavillage-dev.cloudfunctions.net/api/contact',
+                        body: request);
                     await showDialog(
                       barrierDismissible: false,
                       context: context,
                       builder: (context) {
-                        return Container(
-                          height: 192.0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                localize(
-                                    "Thank you ${_firstnameController.text}. A representative will contact you soon."),
-                                style: TextStyle(
-                                  color: Color(0xff023280),
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.43,
-                                ),
-                                textAlign: TextAlign.center,
-                              )
-                            ],
+                        return Center(
+                          child: Container(
+                            width: 256.0,
+                            height: 192.0,
+                            child: Material(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    localize(
+                                        "Thank you ${_firstnameController.text}. A representative will contact you soon."),
+                                    style: TextStyle(
+                                      color: Color(0xff023280),
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.43,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 16.0),
+                                  FlatButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text(
+                                      localize("Close").toUpperCase(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },

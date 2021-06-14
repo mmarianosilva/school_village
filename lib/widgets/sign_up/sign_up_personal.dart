@@ -114,21 +114,23 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         sharedPreferences.setString("email", email.trim().toLowerCase());
         sharedPreferences.setString("password", password);
       }
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(auth.user.uid)
-          .set({
+      final data = <String, dynamic>{
         "email": email,
         "firstName": _firstNameController.text,
         "lastName": _lastNameController.text,
         "phone": _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", ""),
-      });
+      };
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(auth.user.uid)
+          .set(data);
+      data["vendor"] = _isVendor ?? false;
       if (_isBoater) {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SignUpBoat()));
+            .push(MaterialPageRoute(builder: (context) => SignUpBoat(userData: data)));
       } else {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SignUpVendor()));
+            .push(MaterialPageRoute(builder: (context) => SignUpVendor(userData: data)));
       }
     } on PlatformException catch (ex) {
       if (ex.code == "ERROR_WEAK_PASSWORD") {
@@ -141,6 +143,18 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         });
       }
     }
+  }
+
+  void _onPhoneInputChanged() {
+    if (_validatePhoneNumber()) {
+      FocusScope.of(context).unfocus();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController.addListener(_onPhoneInputChanged);
   }
 
   @override
@@ -289,12 +303,12 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24.0),
+                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 24.0),
                 ],
               ),
             ),
           ),
-          Container(
+          MediaQuery.of(context).viewInsets.bottom != 0.0 ? const SizedBox() : Container(
             color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -445,5 +459,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       ),
       resizeToAvoidBottomInset: false,
     );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.removeListener(_onPhoneInputChanged);
+    super.dispose();
   }
 }
