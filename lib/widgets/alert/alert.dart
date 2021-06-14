@@ -345,41 +345,41 @@ class _AlertState extends State<Alert> {
                                 ))
                           ],
                         ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                      onTap: () {_sendAlert("auto", "Auto Accident/Injury", "A car accident has been reported at $_schoolName");},
-                                      child: Column(children: [
-                                        Image.asset('assets/images/alert_auto_accident_injury.png',
-                                            width: 72.0, height: 109.8),
-                                      ])),
-                                )),
-                            Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                      onTap: () {_sendAlert("explosion", "Explosion Alert!", "An explosion has been reported at $_schoolName");},
-                                      child: Column(children: [
-                                        Image.asset('assets/images/alert_explosion.png',
-                                            width: 72.0, height: 109.8),
-                                      ])),
-                                )),
-                            Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  child: GestureDetector(
-                                      onTap: () {_sendAlert("boat", "Boat Accident/Injury", "A boat accident has been reported at $_schoolName");},
-                                      child: Column(children: [
-                                        Image.asset('assets/images/alert_boat_accident_injury.png',
-                                            width: 72.0, height: 109.8),
-                                      ])),
-                                ))
-                          ],
-                        ),
+                        // Row(
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   children: <Widget>[
+                        //     Expanded(
+                        //         child: Container(
+                        //           margin: EdgeInsets.all(8.0),
+                        //           child: GestureDetector(
+                        //               onTap: () {_sendAlert("auto", "Auto Accident/Injury", "A car accident has been reported at $_schoolName");},
+                        //               child: Column(children: [
+                        //                 Image.asset('assets/images/alert_auto_accident_injury.png',
+                        //                     width: 72.0, height: 109.8),
+                        //               ])),
+                        //         )),
+                        //     Expanded(
+                        //         child: Container(
+                        //           margin: EdgeInsets.all(8.0),
+                        //           child: GestureDetector(
+                        //               onTap: () {_sendAlert("explosion", "Explosion Alert!", "An explosion has been reported at $_schoolName");},
+                        //               child: Column(children: [
+                        //                 Image.asset('assets/images/alert_explosion.png',
+                        //                     width: 72.0, height: 109.8),
+                        //               ])),
+                        //         )),
+                        //     Expanded(
+                        //         child: Container(
+                        //           margin: EdgeInsets.all(8.0),
+                        //           child: GestureDetector(
+                        //               onTap: () {_sendAlert("boat", "Boat Accident/Injury", "A boat accident has been reported at $_schoolName");},
+                        //               child: Column(children: [
+                        //                 Image.asset('assets/images/alert_boat_accident_injury.png',
+                        //                     width: 72.0, height: 109.8),
+                        //               ])),
+                        //         ))
+                        //   ],
+                        // ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
