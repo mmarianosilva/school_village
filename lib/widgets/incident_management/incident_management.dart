@@ -57,7 +57,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   _IncidentManagementState({this.alert, this.role}) {
     this.markers = Set.from([
       Marker(
-          markerId: MarkerId(alert.createdById),
+          markerId: MarkerId(alert.createdById ?? DateTime.now().toIso8601String()),
           position: LatLng(alert.location.latitude, alert.location.longitude),
           icon:
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
