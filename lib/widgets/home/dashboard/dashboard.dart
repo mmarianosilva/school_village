@@ -8,6 +8,7 @@ import 'package:location/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:school_village/widgets/home/dashboard/dashboard_scope_observer.dart';
+
 // import 'package:school_village/widgets/roll_call/roll_call_log.dart';
 import 'package:school_village/widgets/search/search_dropdown_field.dart';
 import 'package:school_village/main.dart';
@@ -91,8 +92,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         });
         return;
       }
-      final List<QueryDocumentSnapshot> lastAlert = (await alerts.orderBy("endedAt", descending: true).limit(1).get()).docs;
-      final DocumentSnapshot latestResolved = lastAlert.isNotEmpty ? lastAlert.first : null;
+      final List<QueryDocumentSnapshot> lastAlert =
+          (await alerts.orderBy("endedAt", descending: true).limit(1).get())
+              .docs;
+      final DocumentSnapshot latestResolved =
+          lastAlert.isNotEmpty ? lastAlert.first : null;
       final Timestamp lastResolvedTimestamp = latestResolved != null
           ? latestResolved.data()["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
@@ -231,12 +235,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             ],
           ),
         ),
-              const SizedBox(height: 14.0),
-              Container(
-                height: 0.5,
-                width: MediaQuery.of(context).size.width,
-                color: Colors.grey,
-              )
+        const SizedBox(height: 14.0),
+        Container(
+          height: 0.5,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.grey,
+        )
       ],
     );
   }
@@ -294,38 +298,34 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return SizedBox();
   }
 
-  _buildDocumentOption(DocumentSnapshot snapshot, index) {
+  _buildDocumentOption(DocumentSnapshot snapshot,
+      List<Map<String, dynamic>> documents, int index) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
+        if (documents[index - 4]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data()["documents"][index - 4]["connectedFiles"] != null
-                  ? snapshot
-                      .data()["documents"][index - 4]["connectedFiles"]
+              documents[index - 4]["connectedFiles"] != null
+                  ? documents[index - 4]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(context, snapshot.data()["documents"][index - 4]["location"],
-              snapshot.data()["documents"][index - 4]["title"],
+          _showPDF(context, documents[index - 4]["location"],
+              documents[index - 4]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot.data()["documents"][index - 4]["type"] ==
-            "linked-pdf") {
+        } else if (documents[index - 4]["type"] == "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot.data()["documents"][index - 4]["location"],
+            documents[index - 4]["location"],
           );
         } else {
-          _launchURL(snapshot.data()["documents"][index - 4]["location"]);
+          _launchURL(documents[index - 4]["location"]);
         }
       },
       onLongPress: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
-
-        } else if (snapshot.data()["documents"][index - 4]["type"] == "linked-pdf") {
-
-        }
+        if (documents[index - 4]["type"] == "pdf") {
+        } else if (documents[index - 4]["type"] == "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -337,27 +337,20 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data()["documents"][index - 4]["icon"],
-                          context: context),
+                          url: documents[index - 4]["icon"], context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
                         if (snapshot.data == null) {
-                          return Image.asset(
-                            'assets/images/logo.png',
-                            width: 48.0,
-                          );
+                          return Image.asset('assets/images/logo.png');
                         }
-                        return Image.file(
-                          snapshot.data,
-                          width: 48.0,
-                        );
+                        return Image.file(snapshot.data);
                       }),
                 ),
               ),
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data()["documents"][index - 4]["title"],
+                documents[index - 4]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -848,7 +841,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _buildServiceProvidersOption() {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => VendorCategoryList()));
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => VendorCategoryList()));
       },
       child: Column(
         children: <Widget>[
@@ -911,7 +905,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
-                final List<DocumentSnapshot> documents =
+                final List<Map<String, dynamic>> documents =
                     snapshot.data.data()["documents"] != null
                         ? snapshot.data
                             .data()["documents"]
@@ -919,7 +913,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                 snapshot["accessRoles"] == null ||
                                 snapshot["accessRoles"].contains(role))
                             .toList()
-                            .cast<DocumentSnapshot>()
+                            .cast<Map<String, dynamic>>()
                         : null;
                 final int documentCount =
                     documents != null ? documents.length : 0;
@@ -970,12 +964,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 7) {
                               return _buildSettingsOption();
                             }
-                            if (index == documentCount + 8) {
-                              return _buildServiceProvidersOption();
-                            }
-                            return _buildDocumentOption(snapshot.data, index);
+                            // if (index == documentCount + 8) {
+                            //   return _buildServiceProvidersOption();
+                            // }
+                            return _buildDocumentOption(
+                                snapshot.data, documents, index);
                           },
-                          itemCount: documentCount + 9);
+                          itemCount: documentCount + 8);
                 }
               }
               return Center(
