@@ -128,6 +128,7 @@ class SignUpTextField extends StatelessWidget {
   const SignUpTextField({
     this.hint,
     this.minLines,
+    this.maxLength,
     this.maxLines = 1,
     this.textInputType = TextInputType.text,
     this.obscureText = false,
@@ -137,6 +138,7 @@ class SignUpTextField extends StatelessWidget {
 
   final String hint;
   final int minLines;
+  final int maxLength;
   final int maxLines;
   final TextInputType textInputType;
   final bool obscureText;
@@ -169,6 +171,7 @@ class SignUpTextField extends StatelessWidget {
           contentPadding: const EdgeInsets.all(8.0),
         ),
         minLines: minLines,
+        maxLength: maxLength,
         maxLines: maxLines,
         keyboardType: textInputType,
         obscureText: obscureText,

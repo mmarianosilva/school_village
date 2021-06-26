@@ -45,14 +45,14 @@ class IncidentState extends State<IncidentReport> {
   }
 
   loadIncidentTypes() async {
-    await UserHelper.loadIncidentTypes();
-
-    UserHelper.negativeIncidents.forEach((key, value) {
-      items[key] = false;
-    });
-    UserHelper.positiveIncidents.forEach((key, value) {
-      posItems[key] = false;
-    });
+    // await UserHelper.loadIncidentTypes();
+    //
+    // UserHelper.negativeIncidents.forEach((key, value) {
+    //   items[key] = false;
+    // });
+    // UserHelper.positiveIncidents.forEach((key, value) {
+    //   posItems[key] = false;
+    // });
     setState(() {});
   }
 

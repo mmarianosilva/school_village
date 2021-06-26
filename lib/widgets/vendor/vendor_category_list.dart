@@ -23,7 +23,7 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
         .then((list) {
       categories.addAll(
           list.docs.map((doc) => VendorCategory.fromDocument(document: doc)));
-      categories.removeWhere((category) => category.deleted);
+      categories.removeWhere((category) => category.deleted ?? false);
       categories.sort((item1, item2) => item1.name.compareTo(item2.name));
       final indexOfSpecialOffers =
           categories.indexWhere((item) => item.name == "SPECIAL OFFERS");

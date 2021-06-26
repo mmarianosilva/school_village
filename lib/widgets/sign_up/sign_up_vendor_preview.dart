@@ -9,7 +9,6 @@ import 'package:school_village/model/vendor.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/contact/contact_dialog.dart';
-import 'package:school_village/widgets/home/home.dart';
 import 'package:school_village/widgets/sign_up/sign_up_vendor_billing.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -42,9 +41,11 @@ class _SignUpVendorPreviewState extends State<SignUpVendorPreview> {
       photoUrl = await uploadTask.ref.getDownloadURL();
     }
 
-    await FirebaseFirestore.instance
+    final ref = FirebaseFirestore.instance
         .collection("vendors")
-        .doc()
+        .doc();
+
+    await ref
         .set(<String, dynamic>{
       "name": widget.vendor.name,
       "url": widget.vendor.url,
@@ -65,7 +66,7 @@ class _SignUpVendorPreviewState extends State<SignUpVendorPreview> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SignUpVendorBilling(),
+        builder: (context) => SignUpVendorBilling(vendor: widget.vendor.copyWith(id: ref.path),),
       ),
     );
   }

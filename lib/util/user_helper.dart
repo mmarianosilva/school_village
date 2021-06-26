@@ -72,20 +72,18 @@ class UserHelper {
     List<dynamic> schools = [];
     if (userSnapshot.data()['associatedSchools'] == null ||
         userSnapshot.data()['associatedSchools'].isEmpty) {
-      final result = await (FirebaseFirestore.instance.collection("vendors").where("owners", arrayContains: FirebaseFirestore.instance.doc("users/${currentUser.uid}")).get());
+      final result = await FirebaseFirestore.instance.collection("vendors").where("owners", arrayContains: userRef).get();
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
-        final districts = vendorDocument.data()["districts"] as List<DocumentReference>;
+        final districts = (vendorDocument.data()["districts"] as List).cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
           final schoolsInDistrict = (await FirebaseFirestore.instance.collection("schools").where("district", isEqualTo: districts[i]).get()).docs;
           schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-            "ref": item.id,
+            "ref": item.reference.path,
             "role": "enduser",
           }));
         }
-        return schools;
       }
-      UserHelper.logout("");
       return schools;
     }
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;

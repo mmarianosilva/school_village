@@ -24,15 +24,20 @@ class _VendorListState extends State<VendorList> {
   @override
   void initState() {
     super.initState();
-    UserHelper.getSelectedSchoolID().then((schoolId) {
+    UserHelper.getSelectedSchoolID().then((schoolId) async {
+      final schoolDocument = await FirebaseFirestore.instance.doc(schoolId).get();
+      final district = schoolDocument.data()["district"] as DocumentReference;
       FirebaseFirestore.instance
           .collection('vendors')
           .where('categories', arrayContains: widget.category.id)
-          .where('school', isEqualTo: FirebaseFirestore.instance.doc(schoolId))
           .get()
           .then((snapshot) {
+
         list.addAll(
-            snapshot.docs.map((document) => Vendor.fromDocument(document)).where((vendor) => !(vendor.deleted ?? false)));
+            snapshot
+                .docs
+                .where((document) => (document.data()["districts"] as List).contains(district))
+                .map((document) => Vendor.fromDocument(document)).where((vendor) => !(vendor.deleted ?? false)));
         setState(() {});
       });
     });

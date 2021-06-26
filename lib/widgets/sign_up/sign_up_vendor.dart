@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/base_appbar.dart';
@@ -11,7 +10,6 @@ import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
 import 'package:school_village/widgets/sign_up/sign_up_vendor_preview.dart';
-import 'package:uuid/uuid.dart';
 
 enum PrimaryContact {
   mobile,
@@ -491,6 +489,7 @@ class _SignUpVendorState extends State<SignUpVendor> {
                                     child: SignUpTextField(
                                       controller: _zipCodeController,
                                       hint: localize("Zip"),
+                                      textInputType: TextInputType.number,
                                     ),
                                   ),
                                 ),
@@ -501,7 +500,7 @@ class _SignUpVendorState extends State<SignUpVendor> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
                         child: Text(
                           localize(
                               "You must input and select the primary phone number"),
@@ -509,6 +508,7 @@ class _SignUpVendorState extends State<SignUpVendor> {
                           style: TextStyle(
                             color: Color(0xff810317),
                             fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
                             letterSpacing: 0.43,
                           ),
                           textAlign: TextAlign.center,
