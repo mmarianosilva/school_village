@@ -6,6 +6,7 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/contact/contact.dart';
 import 'package:school_village/widgets/forgot/forgot.dart';
 import 'package:school_village/util/analytics_helper.dart';
+import 'package:school_village/widgets/login/request_more_information.dart';
 import 'package:school_village/widgets/student_login/student_login.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
