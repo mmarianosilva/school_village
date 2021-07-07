@@ -204,9 +204,22 @@ class _LoginState extends State<Login> {
                 onPressed: onForgot,
                 child: Text(localize("Forgot Password?")),
               ),
-              FlatButton(
-                onPressed: createAccount,
-                child: Text(localize("Create Account")),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => RequestMoreInformation()));
+                  },
+                  child: Text(
+                    localize("Request more information"),
+                    style: TextStyle(
+                      color: Color(0xff0a7aff),
+                      fontSize: 17.0,
+                      letterSpacing: 0.39,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
