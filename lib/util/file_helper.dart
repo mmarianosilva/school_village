@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_village/util/pdf_handler.dart';
@@ -21,7 +22,9 @@ class FileHelper {
     Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path = "${systemTempDir.path}/$digest";
     final File file = new File(path);
-    if (!file.existsSync()) {
+    if (file.existsSync() && file.lengthSync() != 0) {
+      return file;
+    } else {
       final Reference ref = storage.ref().child(url);
       await file.create();
       assert(await file.readAsString() == "");
@@ -40,7 +43,8 @@ class FileHelper {
       return;
     }
     final DocumentSnapshot school = await firestore.doc(schoolId).get();
-    final List<Map<String, dynamic>> documents = (school.data()["documents"]
+    final List<Map<String, dynamic>> documents = (school
+            .data()["documents"]
             .cast<Map<String, dynamic>>())
         .where((Map<String, dynamic> item) =>
             item["accessRoles"] == null || item["accessRoles"].contains(role))
@@ -55,47 +59,54 @@ class FileHelper {
   static Future<void> _downloadDocument(Map<String, dynamic> document) async {
     if (document["type"] == "pdf") {
       final List<Map<String, dynamic>> connectedFiles =
-      document["connectedFiles"] !=
-          null
-          ? document["connectedFiles"]
-          .map<Map<String, dynamic>>(
-              (untyped) => Map<String, dynamic>.from(untyped))
-          .toList()
-          : null;
+          document["connectedFiles"] != null
+              ? document["connectedFiles"]
+                  .map<Map<String, dynamic>>(
+                      (untyped) => Map<String, dynamic>.from(untyped))
+                  .toList()
+              : null;
       if (connectedFiles != null) {
         final String root = document["name"] ?? document["title"];
-        await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"], parent: root);
+        await PdfHandler.preparePdfFromUrl(
+            document["location"], document["name"] ?? document["title"],
+            parent: root);
         final Iterable<Future> transfer = connectedFiles.map((file) =>
-            PdfHandler.preparePdfFromUrl(file["url"], file["name"] ?? file["title"], parent: root));
+            PdfHandler.preparePdfFromUrl(
+                file["url"], file["name"] ?? file["title"],
+                parent: root));
         await Future.wait(transfer);
       } else {
-        await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"]);
+        await PdfHandler.preparePdfFromUrl(
+            document["location"], document["name"] ?? document["title"]);
       }
     } else if (document["type"] == "linked-pdf") {
       await PdfHandler.downloadLinkedPdf(document["location"], null);
     }
   }
 
-  static Stream<TaskSnapshot> downloadStorageDocument(Map<String, dynamic> document) {
+  static Stream<TaskSnapshot> downloadStorageDocument(
+      Map<String, dynamic> document) {
     if (document["type"] == "pdf") {
       final List<Map<String, dynamic>> connectedFiles =
-      document["connectedFiles"] !=
-          null
-          ? document["connectedFiles"]
-          .map<Map<String, dynamic>>(
-              (untyped) => Map<String, dynamic>.from(untyped))
-          .toList()
-          : null;
+          document["connectedFiles"] != null
+              ? document["connectedFiles"]
+                  .map<Map<String, dynamic>>(
+                      (untyped) => Map<String, dynamic>.from(untyped))
+                  .toList()
+              : null;
       if (connectedFiles != null) {
         final String root = document["name"] ?? document["title"];
-
       } else {
-        final filename = (document["name"] ?? document["title"]).endsWith(".pdf") ? document["name"] ?? document["title"] : "${document["name"] ?? document["title"]}.pdf";
-        return FirebaseStorage.instance.ref(document["location"]).writeToFile(filename).snapshotEvents;
+        final filename =
+            (document["name"] ?? document["title"]).endsWith(".pdf")
+                ? document["name"] ?? document["title"]
+                : "${document["name"] ?? document["title"]}.pdf";
+        return FirebaseStorage.instance
+            .ref(document["location"])
+            .writeToFile(filename)
+            .snapshotEvents;
       }
-    } else if (document["type"] == "linked-pdf") {
-
-    }
+    } else if (document["type"] == "linked-pdf") {}
     return Stream.empty();
   }
 }
