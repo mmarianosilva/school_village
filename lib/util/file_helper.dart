@@ -21,7 +21,9 @@ class FileHelper {
     Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path = "${systemTempDir.path}/$digest";
     final File file = new File(path);
-    if (!file.existsSync()) {
+    if (file.existsSync() && file.lengthSync() != 0) {
+      return file;
+    } else {
       final Reference ref = storage.ref().child(url);
       await file.create();
       assert(await file.readAsString() == "");
