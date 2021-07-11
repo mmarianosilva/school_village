@@ -6,6 +6,7 @@ import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/contact/contact.dart';
 import 'package:school_village/widgets/forgot/forgot.dart';
 import 'package:school_village/util/analytics_helper.dart';
+import 'package:school_village/widgets/login/request_more_information.dart';
 import 'package:school_village/widgets/student_login/student_login.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
@@ -154,7 +155,7 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child:
-                    Image.asset('assets/images/splash_text.png', height: 120),
+                    Image.asset('assets/images/logo.png', height: 120),
               ),
               Container(
                 padding:
@@ -204,9 +205,22 @@ class _LoginState extends State<Login> {
                 onPressed: onForgot,
                 child: Text(localize("Forgot Password?")),
               ),
-              FlatButton(
-                onPressed: createAccount,
-                child: Text(localize("Create Account")),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => RequestMoreInformation()));
+                  },
+                  child: Text(
+                    localize("Request more information"),
+                    style: TextStyle(
+                      color: Color(0xff0a7aff),
+                      fontSize: 17.0,
+                      letterSpacing: 0.39,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
