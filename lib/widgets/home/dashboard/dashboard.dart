@@ -346,16 +346,13 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                           url: documents[index - 4]["icon"], context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
-                        print(" SnapShot hasdata ${snapshot
-                            .hasData} and isdatanull ${snapshot.data !=
-                            null} and connstate is ${snapshot
-                            .connectionState} ");
                         if (snapshot.data == null ||
                             snapshot.data.lengthSync() == 0) {
-                          return Image.asset('assets/images/logo.png');
+                          return Image.asset('assets/images/logo.png',
+                            width: 48.0,);
                         }
-                        print("and length is ${snapshot.data.lengthSync()}");
-                        return Image.file(snapshot.data);
+                        return Image.file(snapshot.data,
+                          width: 48.0,);
                       }),
                 ),
               ),
