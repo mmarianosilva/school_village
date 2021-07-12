@@ -27,7 +27,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = MaskedTextController(mask: "(000) 000-0000");
+  final TextEditingController _phoneController =
+      MaskedTextController(mask: "(000) 000-0000");
 
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
@@ -50,7 +51,13 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   bool _validatePhoneNumber() {
-    return _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", "").length == 10;
+    return _phoneController.text
+            .replaceAll("(", "")
+            .replaceAll(")", "")
+            .replaceAll(" ", "")
+            .replaceAll("-", "")
+            .length ==
+        10;
   }
 
   Future<void> _onNextPressed() async {
@@ -110,15 +117,26 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       final auth = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       if (auth.user != null) {
+        try {
+          await auth.user.sendEmailVerification();
+        } catch (e) {
+          print("An error occured while trying to send email verification");
+          print(e.message);
+        }
         final sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString("email", email.trim().toLowerCase());
         sharedPreferences.setString("password", password);
+
       }
       final data = <String, dynamic>{
         "email": email,
         "firstName": _firstNameController.text,
         "lastName": _lastNameController.text,
-        "phone": _phoneController.text.replaceAll("(", "").replaceAll(")", "").replaceAll(" ", "").replaceAll("-", ""),
+        "phone": _phoneController.text
+            .replaceAll("(", "")
+            .replaceAll(")", "")
+            .replaceAll(" ", "")
+            .replaceAll("-", ""),
       };
       await FirebaseFirestore.instance
           .collection("users")
@@ -126,11 +144,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           .set(data);
       data["vendor"] = _isVendor ?? false;
       if (_isBoater) {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SignUpBoat(userData: data)));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => SignUpBoat(userData: data)));
       } else {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SignUpVendor(userData: data)));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => SignUpVendor(userData: data)));
       }
     } on PlatformException catch (ex) {
       if (ex.code == "ERROR_WEAK_PASSWORD") {
@@ -250,8 +268,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
                       localize("User Type:"),
                       style: TextStyle(
@@ -303,158 +320,162 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                       ],
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 24.0),
+                  SizedBox(
+                      height: MediaQuery.of(context).viewInsets.bottom + 24.0),
                 ],
               ),
             ),
           ),
-          MediaQuery.of(context).viewInsets.bottom != 0.0 ? const SizedBox() : Container(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 8.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0),
-                  child: RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        color: Color(0xff323339),
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                        height: 20.0 / 16.0,
-                        letterSpacing: 0.62,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: localize("By continuing you accept our "),
+          MediaQuery.of(context).viewInsets.bottom != 0.0
+              ? const SizedBox()
+              : Container(
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 8.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                        child: RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              color: Color(0xff323339),
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                              height: 20.0 / 16.0,
+                              letterSpacing: 0.62,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: localize("By continuing you accept our "),
+                              ),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    if (await canLaunch(
+                                        Constants.termsOfServiceUrl)) {
+                                      launch(Constants.termsOfServiceUrl);
+                                    }
+                                  },
+                                  child: Text(
+                                    localize("Terms"),
+                                    style: TextStyle(
+                                      color: Color(0xff0a7aff),
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w600,
+                                      height: 20.0 / 16.0,
+                                      letterSpacing: 0.62,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TextSpan(
+                                text: localize(" and "),
+                              ),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    if (await canLaunch(
+                                        Constants.privacyPolicyUrl)) {
+                                      launch(Constants.privacyPolicyUrl);
+                                    }
+                                  },
+                                  child: Text(
+                                    localize("Privacy Policy"),
+                                    style: TextStyle(
+                                      color: Color(0xff0a7aff),
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w600,
+                                      height: 20.0 / 16.0,
+                                      letterSpacing: 0.62,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        WidgetSpan(
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (await canLaunch(
-                                  Constants.termsOfServiceUrl)) {
-                                launch(Constants.termsOfServiceUrl);
-                              }
+                      ),
+                      Row(
+                        children: [
+                          const Spacer(),
+                          Checkbox(
+                            value: _agreed,
+                            onChanged: (value) {
+                              setState(() {
+                                _agreed = value;
+                              });
                             },
-                            child: Text(
-                              localize("Terms"),
-                              style: TextStyle(
-                                color: Color(0xff0a7aff),
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600,
-                                height: 20.0 / 16.0,
-                                letterSpacing: 0.62,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          Text(
+                            localize("I Agree"),
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 40.0,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
+                            _error ?? '',
+                            maxLines: 2,
+                            style: TextStyle(
+                              color: Colors.deepOrange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const Spacer(),
+                          Container(
+                            color: Colors.black,
+                            child: FlatButton(
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                localize("Cancel").toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        TextSpan(
-                          text: localize(" and "),
-                        ),
-                        WidgetSpan(
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (await canLaunch(Constants.privacyPolicyUrl)) {
-                                launch(Constants.privacyPolicyUrl);
-                              }
-                            },
-                            child: Text(
-                              localize("Privacy Policy"),
-                              style: TextStyle(
-                                color: Color(0xff0a7aff),
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600,
-                                height: 20.0 / 16.0,
-                                letterSpacing: 0.62,
+                          const Spacer(),
+                          Container(
+                            color: Colors.blueAccent,
+                            child: FlatButton(
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () {
+                                _onNextPressed();
+                              },
+                              child: Text(
+                                localize("Next").toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
+                          const Spacer(),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+                    ],
                   ),
                 ),
-                Row(
-                  children: [
-                    const Spacer(),
-                    Checkbox(
-                      value: _agreed,
-                      onChanged: (value) {
-                        setState(() {
-                          _agreed = value;
-                        });
-                      },
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    Text(
-                      localize("I Agree"),
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                SizedBox(
-                  height: 40.0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      _error ?? '',
-                      maxLines: 2,
-                      style: TextStyle(
-                        color: Colors.deepOrange,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Spacer(),
-                    Container(
-                      color: Colors.black,
-                      child: FlatButton(
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          localize("Cancel").toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      color: Colors.blueAccent,
-                      child: FlatButton(
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () {
-                          _onNextPressed();
-                        },
-                        child: Text(
-                          localize("Next").toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-              ],
-            ),
-          ),
         ],
       ),
       resizeToAvoidBottomInset: false,
