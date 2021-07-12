@@ -42,6 +42,7 @@ dependencies:
   flutter_pdfview: 1.0.3+6
   clipboard: 0.1.2+8
   uuid: 2.2.2
+  xml: 3.6.1
 
 dev_dependencies:
   flutter_test:
