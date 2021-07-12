@@ -202,7 +202,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   openSettings() {
-    _launchURL("https://villagesafety.net/index_support_dashboard.html");
+    _launchURL("https://villagesafety.net/support_dashboard_vs");
   }
 
   openNotifications() {
