@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
@@ -40,12 +41,23 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  proceed() async {
-    await checkIfOnlyOneSchool();
-    FileHelper.downloadRequiredDocuments();
-    AnalyticsHelper.logLogin();
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+  proceed(FirebaseUser currentUser) async {
+    String userPath = "/users/${currentUser.uid}";
+    print(currentUser);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
+    DocumentSnapshot userSnapshot = await userRef.get();
+    if (userSnapshot.data() != null &&
+        userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
+        (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
+            .isNotEmpty) {
+      await checkIfOnlyOneSchool();
+      FileHelper.downloadRequiredDocuments();
+      AnalyticsHelper.logLogin();
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+    } else {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    }
   }
 
   RegExp emailExp = new RegExp(
@@ -104,7 +116,7 @@ class _LoginState extends State<Login> {
             password: passwordController.text)
         .then((auth) {
       if (auth.user != null) {
-        proceed();
+        proceed(auth.user);
       }
     }).catchError((error) {
       _scaffoldKey.currentState

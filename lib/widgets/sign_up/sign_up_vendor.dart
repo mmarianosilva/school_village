@@ -489,6 +489,7 @@ class _SignUpVendorState extends State<SignUpVendor> {
                                     child: SignUpTextField(
                                       controller: _zipCodeController,
                                       hint: localize("Zip"),
+                                      maxLength: 5,
                                       textInputType: TextInputType.number,
                                     ),
                                   ),
