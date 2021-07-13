@@ -45,7 +45,7 @@ class _ForgotState extends State<Forgot> {
               title: Text(localize('Email Sent')),
               content: SingleChildScrollView(
                 child: ListBody(
-                  children: [Text(localize('Password Reset Email has been sent'))],
+                  children: [Text(localize('Please check your email and follow the instructions to reset your password.'))],
                 ),
               ),
               actions: [
