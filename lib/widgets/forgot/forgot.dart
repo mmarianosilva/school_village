@@ -34,11 +34,59 @@ class _ForgotState extends State<Forgot> {
     var email = emailController.text.trim().toLowerCase();
 
 
-    await _auth.sendPasswordResetEmail(email: email);
-
-    Navigator.of(context).pop();
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      _scaffoldKey.currentState
+          .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(localize('Email Sent')),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [Text(localize('Password Reset Email has been sent'))],
+                ),
+              ),
+              actions: [
+                FlatButton(
+                  child: Text(localize('Okay')),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    } catch (e) {
+      _scaffoldKey.currentState
+          .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+      showErrorDialog(e.message);
+    }
   }
-
+  showErrorDialog(String error) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(localize('Error Resetting Password')),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [Text(error)],
+              ),
+            ),
+            actions: [
+              FlatButton(
+                child: Text(localize('Okay')),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
   onForgot() {
 
   }
