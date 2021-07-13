@@ -75,7 +75,9 @@ class _SignUpBoatState extends State<SignUpBoat> {
             },
             "allowed": true,
             "groups": <String, bool>{},
-            "role": "enduser",
+            "role": (widget.userData["vendor"])
+                ? "vendor"
+                : "boater",
           }
         },
         "boatName": _boatNameController.text,
