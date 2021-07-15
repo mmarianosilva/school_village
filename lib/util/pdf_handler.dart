@@ -57,7 +57,7 @@ class PdfHandler {
     print(path);
 
     final File tempFile = File(path);
-
+    //TODO Replicate as same as MV app once the decision is taken
     if (!tempFile.existsSync()) {
       final Reference ref = storage.ref().child(url);
       await tempFile.create(recursive: true);
