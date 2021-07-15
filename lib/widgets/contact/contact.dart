@@ -16,7 +16,7 @@ class _ContactState extends State<Contact> {
   final schoolController = TextEditingController();
   final phoneController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String title = "School Village";
+  String title = "SchoolVillage";
 
   onRequest() {
     _scaffoldKey.currentState.showSnackBar(

@@ -15,7 +15,7 @@ class _ForgotState extends State<Forgot> {
   final lNameController = TextEditingController();
   final schoolController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String title = "School Village";
+  String title = "SchoolVillage";
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   onRequest() async{

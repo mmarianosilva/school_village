@@ -50,7 +50,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   static const platform = const MethodChannel('schoolvillage.app/audio');
 
   int index = 0;
-  String title = "School Village";
+  String title = "SchoolVillage";
   bool isLoaded = false;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   String _schoolId;
