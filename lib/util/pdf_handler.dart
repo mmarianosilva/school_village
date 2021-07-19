@@ -46,28 +46,32 @@ class PdfHandler {
       {String parent}) async {
     final Directory systemTempDir = await getApplicationDocumentsDirectory();
     String path;
+    int fileSize = 0;
+    name = url.split('/').last;
     if (!name.endsWith(".pdf")) {
       name = "$name.pdf";
     }
+
     if (parent != null) {
       path = "${systemTempDir.path}/$parent/$name";
     } else {
       path = "${systemTempDir.path}/$name";
     }
     print(path);
-
+    final Reference ref = storage.ref().child(url);
     final File tempFile = File(path);
-
-    if (!tempFile.existsSync()) {
-      final Reference ref = storage.ref().child(url);
+    await ref.getMetadata().then((value) => {fileSize = value.size});
+    if (tempFile.existsSync() && tempFile.lengthSync() == fileSize) {
+      return path;
+    } else {
       await tempFile.create(recursive: true);
       assert(await tempFile.readAsString() == "");
       final DownloadTask task = ref.writeToFile(tempFile);
       final int byteCount = (await task).totalBytes;
       print(byteCount);
       print("Done Downloading");
+      return path;
     }
-    return path;
   }
 
   static void showLoading(BuildContext context, {Stream<int> downloadStream}) {

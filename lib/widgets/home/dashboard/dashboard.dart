@@ -356,7 +356,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
-                        if (snapshot.data == null) {
+                        if (snapshot.data == null ||
+                            snapshot.data.lengthSync() == 0) {
                           return Image.asset(
                             'assets/images/logo.png',
                             width: 48.0,
@@ -543,8 +544,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     const size = HeaderButtons.iconSize;
-    if (role == 'school_student' ||
-        role == 'school_family') {
+    if (role == 'school_student' || role == 'school_family') {
       return SizedBox(
         height: size,
       );
@@ -977,9 +977,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                 return true;
                               }
                               final accessRoles =
-                                  (snapshot["accessRoles"] as List).cast<String>();
+                                  (snapshot["accessRoles"] as List)
+                                      .cast<String>();
                               for (final accessRole in accessRoles) {
-                                if (accessRole.contains(role) || Temporary.updateRole(accessRole).contains(role)) {
+                                if (accessRole.contains(role) ||
+                                    Temporary.updateRole(accessRole)
+                                        .contains(role)) {
                                   return true;
                                 }
                               }
