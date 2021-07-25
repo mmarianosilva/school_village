@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
@@ -175,8 +176,20 @@ class IntradoWrapper {
           }
         });
       }
+
       builder.element("eventTime", nest: () {
-        builder.text(eventTime.toIso8601String());
+        var dateTime = eventTime;
+        var duration = dateTime.timeZoneOffset;
+        var date = DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime);
+        var postfix = "";
+        if (duration.isNegative)
+          postfix =
+          ("-${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
+        else
+          postfix =
+          ("+${duration.inHours.toString().padLeft(2, '0')}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, '0')}");
+
+        builder.text(date+postfix);
       });
     });
     return builder.build().toXmlString(pretty: true);

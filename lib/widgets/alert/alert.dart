@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
@@ -144,6 +145,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
+                                    _isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
@@ -156,8 +158,9 @@ class _AlertState extends State<Alert> {
                                       if (location != null) {
                                         final intradoPayload = IntradoWrapper(
                                           eventAction: EventAction.TextMsg,
-                                          eventDescription: IntradoEventDescription(
-                                              text: alertTitle),
+                                          eventDescription:
+                                              IntradoEventDescription(
+                                                  text: alertTitle),
                                           eventDetails: <IntradoEventDetails>[],
                                           caCivicAddress: IntradoCaCivicAddress(
                                             country: "US",
@@ -167,14 +170,28 @@ class _AlertState extends State<Alert> {
                                             rd: "RD",
                                           ),
                                           geoLocation: IntradoGeoLocation(
-                                            latitude: location["latitude"],
-                                            longitude: location["longitude"],
-                                            altitude: location["altitude"],
-                                            confidence: 80,
-                                          ),
+                                              latitude: location["latitude"],
+                                              longitude: location["longitude"],
+                                              altitude: location["altitude"],
+                                              confidence: 80,
+                                              uncertainty: 150.0),
+                                          serviceProvider:
+                                              IntradoServiceProvider(
+                                                  name: "Golden Security",
+                                                  contactUri:
+                                                      "tel:+18005550100",
+                                                  textChatEnabled: true),
+                                          deviceOwner: IntradoDeviceOwner(name: "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
+                                              tel: "${_userSnapshot.data()['phone']}",
+                                          environment: "Marina",
+                                          mobility: "Fixed"),
                                           eventTime: DateTime.now(),
                                         );
-                                        final token = (await (await FirebaseAuth.instance.currentUser()).getIdToken()).token;
+                                        final token = (await (await FirebaseAuth
+                                                    .instance
+                                                    .currentUser())
+                                                .getIdToken())
+                                            .token;
                                         final response = await http.post(
                                           "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/create-event",
                                           body: intradoPayload.toXml(),
@@ -183,7 +200,10 @@ class _AlertState extends State<Alert> {
                                             "Authorization": "Bearer $token",
                                           },
                                         );
-                                        print(response.body);
+                                        print(
+                                            "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+                                        print(
+                                            "Intrado response is ${response.body}");
                                       }
                                     }
                                     _saveAlert(alertTitle, alertBody, alertType,
@@ -305,6 +325,8 @@ class _AlertState extends State<Alert> {
 
   @override
   Widget build(BuildContext context) {
+
+
     if (!isLoaded) {
       getUserDetails();
     }
