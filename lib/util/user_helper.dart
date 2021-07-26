@@ -102,18 +102,17 @@ class UserHelper {
   }
 
   static loadIncidentTypes() async {
-    String selectedSchool = await getSelectedSchoolID();
+    if (positiveIncidents == null && negativeIncidents == null) {
+      String selectedSchool = await getSelectedSchoolID();
 
-    await Temporary.updateIncidentDataSingle(selectedSchool);
+      DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
+      DocumentSnapshot schoolSnapshot = await schoolRef.get();
 
-    DocumentReference schoolRef =
-        FirebaseFirestore.instance.doc(selectedSchool);
-    DocumentSnapshot schoolSnapshot = await schoolRef.get();
+      var items = schoolSnapshot.data()["incidents"];
 
-    var items = schoolSnapshot.data()["incidents"];
-
-    negativeIncidents = (Map<String, String>.from(items["negative"]));
-    positiveIncidents = (Map<String, String>.from(items["positive"]));
+      negativeIncidents = (Map<String, String>.from(items["negative"]));
+      positiveIncidents =  (Map<String, String>.from(items["positive"]));
+    }
   }
 
   static getSchoolAllGroups() async {
