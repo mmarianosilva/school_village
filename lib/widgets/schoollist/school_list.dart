@@ -13,6 +13,8 @@ class SchoolList extends StatefulWidget {
 class _SchoolListState extends State<SchoolList> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   BuildContext _context;
+  final List<String> harbors = <String>[];
+  final List<String> regions = <String>[];
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     PdfHandler.deletePdfFiles();
@@ -22,8 +24,27 @@ class _SchoolListState extends State<SchoolList> {
   }
 
   @override
+  void initState() {
+    final regionData = UserHelper.getRegionData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _context = context;
+    TextEditingController controller = TextEditingController();
+    Widget _widget(String searchText) {
+      return RaisedButton(
+        elevation: 2,
+        color: Colors.green,
+        child: Text(searchText),
+        onPressed: () {
+          setState(() {
+            //text = searchText;
+          });
+        },
+      );
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: BaseAppBar(
@@ -31,6 +52,61 @@ class _SchoolListState extends State<SchoolList> {
             style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
         leading: BackButton(color: Colors.grey.shade800),
         backgroundColor: Colors.grey.shade200,
+        bottom: PreferredSize(
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(7),
+                child: Container(
+                    height: 45,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white,
+                    ),
+                    child: TextFormField(
+                      controller: controller,
+                      onFieldSubmitted: (covariant) {
+                        setState(() {
+                          text = covariant;
+                        });
+                      },
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.search,
+                          ),
+                          hintText: "Search 1100+ Products",
+                          hintStyle: TextStyle(fontSize: 15)),
+                    )),
+              ),
+              Container(
+                height: 50,
+                color: Colors.white.withOpacity(0.7),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    _widget("Tea"),
+                    _widget("water"),
+                    _widget("Thums Up"),
+                    _widget("H")
+                  ],
+                ),
+              ),
+              Container(
+                height: 30,
+                width: double.infinity,
+                color: Colors.white.withOpacity(0.9),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15, top: 3),
+                  child: Text(
+                    "Seach for: $text",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              )
+            ],
+          ),
+          preferredSize: Size(3, 120),
+        ),
       ),
       body: FutureBuilder(
           future: UserHelper.getSchools(),
@@ -72,21 +148,23 @@ class _SchoolListState extends State<SchoolList> {
                                     children: <Widget>[
                                       Container(
                                         padding: EdgeInsets.only(
-                                            left: 8.0,
-                                            right: 8.0,
-                                            top: 8.0
-                                        ),
+                                            left: 8.0, right: 8.0, top: 8.0),
                                         alignment: Alignment.centerLeft,
                                         child: FlatButton(
-                                            child: Text(schoolSnapshot.data == null
-                                                ? ''
-                                                : schoolSnapshot.data.data()["name"]),
+                                            child: Text(
+                                                schoolSnapshot.data == null
+                                                    ? ''
+                                                    : schoolSnapshot.data
+                                                        .data()["name"]),
                                             onPressed: () {
                                               selectSchool(
-                                                  schoolName:
-                                                  schoolSnapshot.data.data()["name"],
-                                                  schoolId: snapshot.data[index]['ref'],
-                                                  role: snapshot.data[index]['role']);
+                                                  schoolName: schoolSnapshot
+                                                      .data
+                                                      .data()["name"],
+                                                  schoolId: snapshot.data[index]
+                                                      ['ref'],
+                                                  role: snapshot.data[index]
+                                                      ['role']);
                                             }),
                                       ),
                                     ],
@@ -99,8 +177,7 @@ class _SchoolListState extends State<SchoolList> {
                     },
                     itemCount: snapshot.data.length,
                   );
-                }
-                else {
+                } else {
                   return Container(
                     child: Center(
                       child: CircularProgressIndicator(),
@@ -111,4 +188,6 @@ class _SchoolListState extends State<SchoolList> {
           }),
     );
   }
+
+  String text = "a";
 }

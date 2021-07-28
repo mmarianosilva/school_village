@@ -6,6 +6,7 @@ import 'package:school_village/util/help_with_migration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'analytics_helper.dart';
+import '../model/region_data.dart';
 
 class UserHelper {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -59,6 +60,54 @@ class UserHelper {
     return;
   }
 
+
+  static getRegionData() async {
+    final FirebaseUser currentUser = await getUser();
+    if (currentUser == null) {
+      return null;
+    }
+    String userPath = "/users/${currentUser.uid}";
+    print(currentUser);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
+    List<String> harbors = [];
+    List<String> regions = [];
+    final result =
+        (await FirebaseFirestore.instance.collection("districts").get()).docs;
+    if (result.isNotEmpty) {
+      result.forEach((element) {
+        String name = element.data()['name'];
+        if (element.data().containsKey('deleted')) {
+          bool deleted = element.data()['deleted'];
+          if (!deleted) {
+            harbors.add(name);
+            print("Harbor: $name");
+          }
+        } else {
+          harbors.add(name);
+          print("Harbor: $name");
+        }
+      });
+    }
+    final regionsResult =
+        (await FirebaseFirestore.instance.collection("regions").get()).docs;
+    if (regionsResult.isNotEmpty) {
+      regionsResult.forEach((element) {
+        String name = element.data()['name'];
+        if (element.data().containsKey('deleted')) {
+          bool deleted = element.data()['deleted'];
+          if (!deleted) {
+            regions.add(name);
+            print("Region: $name");
+          }
+        } else {
+          regions.add(name);
+          print("Region: $name");
+        }
+      });
+    }
+    return RegionData(regions: regions, harbors: harbors);
+  }
+
   static getSchools() async {
     final FirebaseUser currentUser = await getUser();
     if (currentUser == null) {
@@ -72,25 +121,33 @@ class UserHelper {
     List<dynamic> schools = [];
     if (userSnapshot.data()['associatedSchools'] == null ||
         userSnapshot.data()['associatedSchools'].isEmpty) {
-      final result = await FirebaseFirestore.instance.collection("vendors").where("owners", arrayContains: userRef).get();
+      final result = await FirebaseFirestore.instance
+          .collection("vendors")
+          .where("owners", arrayContains: userRef)
+          .get();
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
-        final districts = (vendorDocument.data()["districts"] as List).cast<DocumentReference>();
+        final districts = (vendorDocument.data()["districts"] as List)
+            .cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
-          final schoolsInDistrict = (await FirebaseFirestore.instance.collection("schools").where("district", isEqualTo: districts[i]).get()).docs;
+          final schoolsInDistrict = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where("district", isEqualTo: districts[i])
+                  .get())
+              .docs;
           schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-            "ref": item.reference.path,
-            "role": "enduser",
-          }));
+                "ref": item.reference.path,
+                "role": "enduser",
+              }));
         }
       }
       return schools;
     }
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
-    setIsOwner(userSnapshot.data()['owner'] != null &&
-            userSnapshot.data()['owner']
-        ? true
-        : false);
+    setIsOwner(
+        userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
+            ? true
+            : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
@@ -105,13 +162,14 @@ class UserHelper {
     if (positiveIncidents == null && negativeIncidents == null) {
       String selectedSchool = await getSelectedSchoolID();
 
-      DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
+      DocumentReference schoolRef =
+          FirebaseFirestore.instance.doc(selectedSchool);
       DocumentSnapshot schoolSnapshot = await schoolRef.get();
 
       var items = schoolSnapshot.data()["incidents"];
 
       negativeIncidents = (Map<String, String>.from(items["negative"]));
-      positiveIncidents =  (Map<String, String>.from(items["positive"]));
+      positiveIncidents = (Map<String, String>.from(items["positive"]));
     }
   }
 
