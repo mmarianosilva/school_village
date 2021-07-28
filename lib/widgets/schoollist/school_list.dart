@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/region_data.dart';
 import 'package:school_village/util/pdf_handler.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
@@ -13,8 +14,10 @@ class SchoolList extends StatefulWidget {
 class _SchoolListState extends State<SchoolList> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   BuildContext _context;
-  final List<String> harbors = <String>[];
-  final List<String> regions = <String>[];
+  List<String> harbors = <String>[];
+  List<String> regions = <String>[];
+  String _defaultHarbor = "All";
+  String _defaultRegion = "All";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     PdfHandler.deletePdfFiles();
@@ -25,7 +28,12 @@ class _SchoolListState extends State<SchoolList> {
 
   @override
   void initState() {
-    final regionData = UserHelper.getRegionData();
+    UserHelper.getRegionData().then((regionData) {
+      regions = regionData.regions;
+      harbors = regionData.harbors;
+      setState(() {});
+    });
+    super.initState();
   }
 
   @override
@@ -43,6 +51,34 @@ class _SchoolListState extends State<SchoolList> {
           });
         },
       );
+    }
+
+    Widget getRegionsDropDown() {
+      return DropdownButton(
+          value: _defaultRegion,
+          icon: Icon(Icons.keyboard_arrow_down),
+          items: regions.map((String items) {
+            return DropdownMenuItem(value: items, child: Text(items));
+          }).toList(),
+          onChanged: (String newValue) {
+            setState(() {
+              _defaultRegion = newValue;
+            });
+          });
+    }
+
+    Widget getHarborsDropDown() {
+      return DropdownButton(
+          value: _defaultHarbor,
+          icon: Icon(Icons.keyboard_arrow_down),
+          items: harbors.map((String items) {
+            return DropdownMenuItem(value: items, child: Text(items));
+          }).toList(),
+          onChanged: (String newValue) {
+            setState(() {
+              _defaultHarbor = newValue;
+            });
+          });
     }
 
     return Scaffold(
@@ -74,7 +110,7 @@ class _SchoolListState extends State<SchoolList> {
                           prefixIcon: Icon(
                             Icons.search,
                           ),
-                          hintText: "Search 1100+ Products",
+                          hintText: "Search Marinas",
                           hintStyle: TextStyle(fontSize: 15)),
                     )),
               ),
@@ -84,10 +120,10 @@ class _SchoolListState extends State<SchoolList> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    _widget("Tea"),
-                    _widget("water"),
-                    _widget("Thums Up"),
-                    _widget("H")
+                    Flexible(child: new Text('Regions')),
+                    Flexible(child: getRegionsDropDown()),
+                    Flexible(child: new Text('Harbors')),
+                    Flexible(child: getHarborsDropDown()),
                   ],
                 ),
               ),
@@ -98,7 +134,7 @@ class _SchoolListState extends State<SchoolList> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, top: 3),
                   child: Text(
-                    "Seach for: $text",
+                    "Search  Results for: $text",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                 ),

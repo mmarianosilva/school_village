@@ -61,7 +61,7 @@ class UserHelper {
   }
 
 
-  static getRegionData() async {
+  static Future<RegionData> getRegionData() async {
     final FirebaseUser currentUser = await getUser();
     if (currentUser == null) {
       return null;
@@ -69,8 +69,8 @@ class UserHelper {
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    List<String> harbors = [];
-    List<String> regions = [];
+    List<String> harbors = ["All"];
+    List<String> regions = ["All"];
     final result =
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
     if (result.isNotEmpty) {
@@ -78,13 +78,16 @@ class UserHelper {
         String name = element.data()['name'];
         if (element.data().containsKey('deleted')) {
           bool deleted = element.data()['deleted'];
-          if (!deleted) {
+          if (!deleted && !harbors.contains(name)) {
             harbors.add(name);
             print("Harbor: $name");
           }
         } else {
-          harbors.add(name);
-          print("Harbor: $name");
+          if(!harbors.contains(name)){
+            harbors.add(name);
+            print("Harbor: $name");
+          }
+
         }
       });
     }
@@ -95,13 +98,16 @@ class UserHelper {
         String name = element.data()['name'];
         if (element.data().containsKey('deleted')) {
           bool deleted = element.data()['deleted'];
-          if (!deleted) {
+          if (!deleted && !regions.contains(name)) {
             regions.add(name);
             print("Region: $name");
           }
         } else {
-          regions.add(name);
-          print("Region: $name");
+          if(!regions.contains(name)){
+            regions.add(name);
+            print("Region: $name");
+          }
+
         }
       });
     }
