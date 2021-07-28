@@ -18,6 +18,7 @@ class _SchoolListState extends State<SchoolList> {
   List<String> regions = <String>[];
   String _defaultHarbor = "All";
   String _defaultRegion = "All";
+  String text = "";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     PdfHandler.deletePdfFiles();
@@ -54,11 +55,11 @@ class _SchoolListState extends State<SchoolList> {
     }
 
     Widget getRegionsDropDown() {
-      return DropdownButton(
+      return DropdownButton(isExpanded: true,
           value: _defaultRegion,
           icon: Icon(Icons.keyboard_arrow_down),
           items: regions.map((String items) {
-            return DropdownMenuItem(value: items, child: Text(items));
+            return DropdownMenuItem(value: items, child: Text(items,overflow: TextOverflow.ellipsis));
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
@@ -68,11 +69,11 @@ class _SchoolListState extends State<SchoolList> {
     }
 
     Widget getHarborsDropDown() {
-      return DropdownButton(
+      return DropdownButton(isExpanded: true,
           value: _defaultHarbor,
           icon: Icon(Icons.keyboard_arrow_down),
-          items: harbors.map((String items) {
-            return DropdownMenuItem(value: items, child: Text(items));
+          items: harbors.map((String item) {
+            return DropdownMenuItem(value: item, child: Text(item,overflow: TextOverflow.ellipsis));
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
@@ -118,7 +119,7 @@ class _SchoolListState extends State<SchoolList> {
                 height: 50,
                 color: Colors.white.withOpacity(0.7),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Flexible(child: new Text('Regions')),
                     Flexible(child: getRegionsDropDown()),
@@ -225,5 +226,5 @@ class _SchoolListState extends State<SchoolList> {
     );
   }
 
-  String text = "a";
+
 }
