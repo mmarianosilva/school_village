@@ -5,10 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../model/intrado_wrapper.dart';
 
@@ -145,14 +147,17 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    //_isTrainingMode = false;
+                                    _isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
                                         content: Text(localize(
                                             "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
                                       ));
+                                      _saveAlert(alertTitle, alertBody, alertType,
+                                          context);
                                     } else {
+                                      final String incidentUrl = await _saveAlert(alertTitle, alertBody, alertType, context);
                                       final location =
                                           await UserHelper.getLocation();
                                       if (location != null) {
@@ -161,7 +166,7 @@ class _AlertState extends State<Alert> {
                                           eventDescription:
                                               IntradoEventDescription(
                                                   text: alertTitle),
-                                          eventDetails: <IntradoEventDetails>[],
+                                          eventDetails: <IntradoEventDetails>[IntradoEventDetails(key: 'incident_url',value: incidentUrl)],
                                           caCivicAddress: IntradoCaCivicAddress(
                                             country: "US",
                                             a1: "CO",
@@ -181,10 +186,13 @@ class _AlertState extends State<Alert> {
                                                   contactUri:
                                                       "tel:+19492741709",
                                                   textChatEnabled: true),
-                                          deviceOwner: IntradoDeviceOwner(name: "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                                              tel: "${_userSnapshot.data()['phone']}",
-                                          environment: "Marina",
-                                          mobility: "Fixed"),
+                                          deviceOwner: IntradoDeviceOwner(
+                                              name:
+                                                  "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
+                                              tel:
+                                                  "${_userSnapshot.data()['phone']}",
+                                              environment: "Marina",
+                                              mobility: "Fixed"),
                                           eventTime: DateTime.now(),
                                         );
                                         final token = (await (await FirebaseAuth
@@ -206,8 +214,6 @@ class _AlertState extends State<Alert> {
                                             "Intrado response is ${response.body}");
                                       }
                                     }
-                                    _saveAlert(alertTitle, alertBody, alertType,
-                                        context);
                                   }),
                               FlatButton(
                                   color: Colors.black45,
@@ -283,11 +289,31 @@ class _AlertState extends State<Alert> {
     return location;
   }
 
-  _saveAlert(alertTitle, alertBody, alertType, context) async {
+  Future<String> _saveAlert(alertTitle, alertBody, alertType, context) async {
+    String randomToken = Uuid().v4();
+    String baseUrl = "";
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      print("Package name is ${packageInfo.packageName}");
+      switch (packageInfo.packageName) {
+        case 'com.oandmtech.marinavillage':
+          baseUrl= "https://marinavillage-dev-web.web.app/i/";
+          break;
+        case 'com.oandmtech.marinavillage.dev':
+          baseUrl= "https://marinavillage-web.web.app/i/";
+          break;
+        case 'com.oandmtech.schoolvillage':
+          baseUrl= "https://schoolvillage-web.firebaseapp.com/i/";
+          break;
+        case 'com.oandmtech.schoolvillage.dev':
+          baseUrl= "https://schoolvillage-dev-web.web.app/i/";
+          break;
+      }
+    });
     CollectionReference collection =
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
 
+    print("Random Token is $randomToken");
     final String room = UserHelper.getRoomNumber(_userSnapshot);
     document.set(<String, dynamic>{
       'title': alertTitle,
@@ -298,6 +324,7 @@ class _AlertState extends State<Alert> {
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'location': await _getLocation(),
       'reportedByPhone': phone,
+      'token': randomToken,
     });
     print("Added Alert");
 
@@ -321,12 +348,11 @@ class _AlertState extends State<Alert> {
             ],
           );
         });
+    return baseUrl+randomToken;
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     if (!isLoaded) {
       getUserDetails();
     }
