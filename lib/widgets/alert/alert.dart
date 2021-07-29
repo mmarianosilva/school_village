@@ -147,7 +147,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    _isTrainingMode = false;
+                                    //_isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
