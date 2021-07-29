@@ -147,7 +147,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    //_isTrainingMode = false;
+                                    _isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
@@ -157,16 +157,17 @@ class _AlertState extends State<Alert> {
                                       _saveAlert(alertTitle, alertBody, alertType,
                                           context);
                                     } else {
-                                      final String incidentUrl = await _saveAlert(alertTitle, alertBody, alertType, context);
                                       final location =
-                                          await UserHelper.getLocation();
+                                      await UserHelper.getLocation();
+                                      final notificationData =  getAlertBody(alertTitle, alertBody, alertType, context, location);
+                                      print("Notification Data is $notificationData");
                                       if (location != null) {
                                         final intradoPayload = IntradoWrapper(
                                           eventAction: EventAction.TextMsg,
                                           eventDescription:
                                               IntradoEventDescription(
                                                   text: alertTitle),
-                                          eventDetails: <IntradoEventDetails>[IntradoEventDetails(key: 'incident_url',value: incidentUrl)],
+                                          eventDetails: <IntradoEventDetails>[],
                                           caCivicAddress: IntradoCaCivicAddress(
                                             country: "US",
                                             a1: "CO",
@@ -200,16 +201,23 @@ class _AlertState extends State<Alert> {
                                                     .currentUser())
                                                 .getIdToken())
                                             .token;
+                                        final body = <String, String>{
+                                          'notificationData':notificationData.toString(),
+                                          'schoolId':_schoolId.split('schools/')[1].trim(),
+                                          'xmlBody': intradoPayload.toXml(),
+
+                                        };
                                         final response = await http.post(
                                           "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/create-event",
-                                          body: intradoPayload.toXml(),
+                                          body:body,
+                                         // body: intradoPayload.toXml(),
                                           encoding: Encoding.getByName("utf8"),
                                           headers: <String, String>{
                                             "Authorization": "Bearer $token",
                                           },
                                         );
                                         print(
-                                            "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+                                            "Body Submitted is ${body} and token is $token");
                                         print(
                                             "Intrado response is ${response.body}");
                                       }
@@ -288,7 +296,19 @@ class _AlertState extends State<Alert> {
     Map<String, double> location = await UserHelper.getLocation();
     return location;
   }
-
+  Map<String,String> getAlertBody(alertTitle, alertBody, alertType, context, location){
+    final String room = UserHelper.getRoomNumber(_userSnapshot);
+  return <String, String>{
+    'title': alertTitle,
+    'body': alertBody,
+    'type': alertType,
+    'createdById': _userId,
+    'createdBy': '$name${room != null ? ', Room $room' : ''}',
+    'createdAt': '${DateTime.now().millisecondsSinceEpoch}',
+    'location': location.toString(),
+    'reportedByPhone': phone,
+  };
+  }
   Future<String> _saveAlert(alertTitle, alertBody, alertType, context) async {
     String randomToken = Uuid().v4();
     String baseUrl = "";
