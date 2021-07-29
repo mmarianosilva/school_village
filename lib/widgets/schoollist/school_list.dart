@@ -38,6 +38,7 @@ class _SchoolListState extends State<SchoolList> {
       harbors = regionData.harbors;
       harborObjects = regionData.harborObjects;
       regionObjects = regionData.regionObjects;
+      //print("Check Stuff $harborObjects and $regionObjects" );
       setState(() {});
     });
     super.initState();
@@ -70,12 +71,12 @@ class _SchoolListState extends State<SchoolList> {
           onChanged: (String newValue) {
 
             setState(() {
-             // _regionSearchKey = newValue;
+             _regionSearchKey = newValue;
               regionObjects.forEach((element) {
                 String name = element.data()['name'];
                 if (name == newValue) {
                   _selectedRegion = element;
-                  _regionSearchKey = newValue;
+                  //_regionSearchKey = newValue;
                 }
 
               });
@@ -92,11 +93,11 @@ class _SchoolListState extends State<SchoolList> {
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
+              _harborSearchKey = newValue;
               harborObjects.forEach((element) {
                 String name = element.data()['name'];
                 if (name == newValue) {
                   _selectedHarbor = element;
-                  _harborSearchKey = newValue;
                 }
 
               });
