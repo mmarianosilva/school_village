@@ -16,9 +16,9 @@ class _SchoolListState extends State<SchoolList> {
   BuildContext _context;
   List<String> harbors = <String>[];
   List<String> regions = <String>[];
-  String _defaultHarbor = "All";
-  String _defaultRegion = "All";
-  String text = "";
+  String _harborSearchKey = "All";
+  String _regionSearchKey = "All";
+  String _searchQuery = "";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     PdfHandler.deletePdfFiles();
@@ -56,28 +56,28 @@ class _SchoolListState extends State<SchoolList> {
 
     Widget getRegionsDropDown() {
       return DropdownButton(isExpanded: true,
-          value: _defaultRegion,
+          value: _regionSearchKey,
           icon: Icon(Icons.keyboard_arrow_down),
           items: regions.map((String items) {
             return DropdownMenuItem(value: items, child: Text(items,overflow: TextOverflow.ellipsis));
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
-              _defaultRegion = newValue;
+              _regionSearchKey = newValue;
             });
           });
     }
 
     Widget getHarborsDropDown() {
       return DropdownButton(isExpanded: true,
-          value: _defaultHarbor,
+          value: _harborSearchKey,
           icon: Icon(Icons.keyboard_arrow_down),
           items: harbors.map((String item) {
             return DropdownMenuItem(value: item, child: Text(item,overflow: TextOverflow.ellipsis));
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
-              _defaultHarbor = newValue;
+              _harborSearchKey = newValue;
             });
           });
     }
@@ -104,7 +104,7 @@ class _SchoolListState extends State<SchoolList> {
                       controller: controller,
                       onFieldSubmitted: (covariant) {
                         setState(() {
-                          text = covariant;
+                          _searchQuery = covariant;
                         });
                       },
                       decoration: InputDecoration(
@@ -135,7 +135,7 @@ class _SchoolListState extends State<SchoolList> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, top: 3),
                   child: Text(
-                    "Search  Results for: $text",
+                    "Search  Results for: $_searchQuery",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -146,7 +146,7 @@ class _SchoolListState extends State<SchoolList> {
         ),
       ),
       body: FutureBuilder(
-          future: UserHelper.getSchools(),
+          future: UserHelper.getFilteredSchools(searchText, region, harbor),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
