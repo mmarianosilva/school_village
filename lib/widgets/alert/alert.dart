@@ -177,9 +177,9 @@ class _AlertState extends State<Alert> {
                                               uncertainty: 150.0),
                                           serviceProvider:
                                               IntradoServiceProvider(
-                                                  name: "Golden Security",
+                                                  name: "Marina Village Safety",
                                                   contactUri:
-                                                      "tel:+18005550100",
+                                                      "tel:+19492741709",
                                                   textChatEnabled: true),
                                           deviceOwner: IntradoDeviceOwner(name: "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
                                               tel: "${_userSnapshot.data()['phone']}",
