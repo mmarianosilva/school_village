@@ -70,6 +70,7 @@ class UserHelper {
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     List<String> harbors = ["All"];
     List<QueryDocumentSnapshot> harborList = [];
+    List<QueryDocumentSnapshot> regionList = [];
     List<String> regions = ["All"];
     final result =
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
@@ -101,17 +102,20 @@ class UserHelper {
           bool deleted = element.data()['deleted'];
           if (!deleted && !regions.contains(name)) {
             regions.add(name);
+            regionList.add(element);
             //print("Region: $name");
           }
         } else {
           if (!regions.contains(name)) {
             regions.add(name);
+            regionList.add(element);
             //print("Region: $name");
           }
         }
       });
     }
-    return RegionData(regions: regions, harbors: harbors,harborObjects: harborList);
+    return RegionData(
+        regions: regions, harbors: harbors, harborObjects: harborList);
   }
 
   static getSchools() async {
@@ -164,8 +168,8 @@ class UserHelper {
     return schools;
   }
 
-  static getFilteredSchools(
-      String searchText, String region, String harbor,QueryDocumentSnapshot harborObj) async {
+  static getFilteredSchools(String searchText, String region, String harbor,
+      QueryDocumentSnapshot harborObj, QueryDocumentSnapshot regionObj) async {
     // Query school list whith the schools from fetched ids i.e associated to user or user is the vendor/owner of it
     // Then Apply the filter settings based on search text, harbor_name, region object
     final FirebaseUser currentUser = await getUser();
@@ -188,26 +192,210 @@ class UserHelper {
         final vendorDocument = result.docs.first;
         final districts = (vendorDocument.data()["districts"] as List)
             .cast<DocumentReference>();
-        for (int i = 0; i < districts.length; i++) {
-          final schoolsInDistrict = (await FirebaseFirestore.instance
-                  .collection("schools")
-                  .where("district", isEqualTo: districts[i])
-                  .get())
-              .docs;
-          schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-                "ref": item.reference.path,
-                "role": "enduser",
-              }));
+        if (harbor == 'All') {
+          for (int i = 0; i < districts.length; i++) {
+            if (searchText.isEmpty) {
+              if (region == 'All') {
+                final schoolsInDistrict = (await FirebaseFirestore.instance
+                        .collection("schools")
+                        .where("district", isEqualTo: districts[i])
+                        .get())
+                    .docs;
+                schools
+                    .addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                          "ref": item.reference.path,
+                          "role": "enduser",
+                        }));
+              } else {
+                final schoolsInDistrict = (await FirebaseFirestore.instance
+                        .collection("schools")
+                        .where('region', isEqualTo: regionObj)
+                        .where("district", isEqualTo: districts[i])
+                        .get())
+                    .docs;
+                schools
+                    .addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                          "ref": item.reference.path,
+                          "role": "enduser",
+                        }));
+              }
+            } else {
+              if (region == 'All') {
+                final schoolsInDistrict = (await FirebaseFirestore.instance
+                        .collection("schools")
+                        .startAt([searchText])
+                        .endAt([searchText + '\uf8ff'])
+                        .where("district", isEqualTo: districts[i])
+                        .get())
+                    .docs;
+                schools
+                    .addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                          "ref": item.reference.path,
+                          "role": "enduser",
+                        }));
+              } else {
+                final schoolsInDistrict = (await FirebaseFirestore.instance
+                        .collection("schools")
+                        .startAt([searchText])
+                        .endAt([searchText + '\uf8ff'])
+                        .where('region', isEqualTo: regionObj)
+                        .where("district", isEqualTo: districts[i])
+                        .get())
+                    .docs;
+                schools
+                    .addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                          "ref": item.reference.path,
+                          "role": "enduser",
+                        }));
+              }
+            }
+          }
+        } else {
+          if (searchText.isEmpty) {
+            if (regionObj == 'All') {
+              final schoolsInDistrict = (await FirebaseFirestore.instance
+                      .collection("schools")
+                      .where("district", isEqualTo: harborObj)
+                      .get())
+                  .docs;
+              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                    "ref": item.reference.path,
+                    "role": "enduser",
+                  }));
+            } else {
+              final schoolsInDistrict = (await FirebaseFirestore.instance
+                      .collection("schools")
+                      .where('region', isEqualTo: regionObj)
+                      .where("district", isEqualTo: harborObj)
+                      .get())
+                  .docs;
+              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                    "ref": item.reference.path,
+                    "role": "enduser",
+                  }));
+            }
+          } else {
+            if (regionObj == 'All') {
+              final schoolsInDistrict = (await FirebaseFirestore.instance
+                      .collection("schools")
+                      .startAt([searchText])
+                      .endAt([searchText + '\uf8ff'])
+                      .where("district", isEqualTo: harborObj)
+                      .get())
+                  .docs;
+              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                    "ref": item.reference.path,
+                    "role": "enduser",
+                  }));
+            } else {
+              final schoolsInDistrict = (await FirebaseFirestore.instance
+                      .collection("schools")
+                      .startAt([searchText])
+                      .endAt([searchText + '\uf8ff'])
+                      .where('region', isEqualTo: regionObj)
+                      .where("district", isEqualTo: harborObj)
+                      .get())
+                  .docs;
+              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
+                    "ref": item.reference.path,
+                    "role": "enduser",
+                  }));
+            }
+          }
         }
       }
       return schools;
     }
+    //Associated Schools
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
     setIsOwner(
         userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
             ? true
             : false);
-    for (int i = 0; i < keys.length; i++) {
+    List<QueryDocumentSnapshot> filteredSchools;
+    if (searchText.isEmpty) {
+      if (region == 'All') {
+        if (harbor == 'All') {
+          filteredSchools = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where('__name__', whereIn: keys.toList())
+                  .get())
+              .docs;
+        } else {
+          filteredSchools = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where('__name__', whereIn: keys.toList())
+                  .where("district", isEqualTo: harborObj)
+                  .get())
+              .docs;
+        }
+      } else {
+        if (harbor == 'All') {
+          filteredSchools = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where('__name__', whereIn: keys.toList())
+                  .where("region", isEqualTo: regionObj)
+                  .get())
+              .docs;
+        } else {
+          filteredSchools = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where('__name__', whereIn: keys.toList())
+                  .where("district", isEqualTo: harborObj)
+                  .where('region', isEqualTo: regionObj)
+                  .get())
+              .docs;
+        }
+      }
+    } else {
+      if (region == 'All') {
+        if (harbor == 'All') {
+          filteredSchools = (await FirebaseFirestore.instance
+              .collection("schools")
+              .startAt([searchText])
+              .endAt([searchText + '\uf8ff'])
+              .where('__name__', whereIn: keys.toList())
+              .get())
+              .docs;
+        } else {
+          filteredSchools = (await FirebaseFirestore.instance
+              .collection("schools")
+              .startAt([searchText])
+              .endAt([searchText + '\uf8ff'])
+              .where('__name__', whereIn: keys.toList())
+              .where("district", isEqualTo: harborObj)
+              .get())
+              .docs;
+        }
+      } else {
+        if (harbor == 'All') {
+          filteredSchools = (await FirebaseFirestore.instance
+              .collection("schools")
+              .startAt([searchText])
+              .endAt([searchText + '\uf8ff'])
+              .where('__name__', whereIn: keys.toList())
+              .where('region', isEqualTo: regionObj)
+              .get())
+              .docs;
+        } else {
+          filteredSchools = (await FirebaseFirestore.instance
+              .collection("schools")
+              .startAt([searchText])
+              .endAt([searchText + '\uf8ff'])
+              .where('__name__', whereIn: keys.toList())
+              .where("district", isEqualTo: harborObj)
+              .where('region', isEqualTo: regionObj)
+              .get())
+              .docs;
+        }
+      }
+    }
+    //Search here for filtered Schools and then based on associated schools, add ref and role to it
+
+    for (int i = 0; i < filteredSchools.length; i++) {
+
+      //print(
+      //    "BUGGER ${filteredSchools[i].reference.id} and ${filteredSchools[i].id} and ${userSnapshot.data()['associatedSchools'][keys.elementAt(i)]} and ${userSnapshot.data()['associatedSchools'][filteredSchools[i].id]["role"]}");
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
         "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]
@@ -216,6 +404,8 @@ class UserHelper {
     }
     return schools;
   }
+
+
 
   static loadIncidentTypes() async {
     if (positiveIncidents == null && negativeIncidents == null) {

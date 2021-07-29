@@ -16,10 +16,12 @@ class _SchoolListState extends State<SchoolList> {
   BuildContext _context;
   List<String> harbors = <String>[];
   List<QueryDocumentSnapshot> harborObjects = <QueryDocumentSnapshot>[];
+  List<QueryDocumentSnapshot> regionObjects = <QueryDocumentSnapshot>[];
   List<String> regions = <String>[];
   String _harborSearchKey = "All";
   String _regionSearchKey = "All";
   QueryDocumentSnapshot _selectedHarbor ;
+  QueryDocumentSnapshot _selectedRegion ;
   String _searchQuery = "";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
@@ -34,6 +36,8 @@ class _SchoolListState extends State<SchoolList> {
     UserHelper.getRegionData().then((regionData) {
       regions = regionData.regions;
       harbors = regionData.harbors;
+      harborObjects = regionData.harborObjects;
+      regionObjects = regionData.regionObjects;
       setState(() {});
     });
     super.initState();
@@ -67,10 +71,10 @@ class _SchoolListState extends State<SchoolList> {
 
             setState(() {
              // _regionSearchKey = newValue;
-              harborObjects.forEach((element) {
+              regionObjects.forEach((element) {
                 String name = element.data()['name'];
                 if (name == newValue) {
-                  _selectedHarbor = element;
+                  _selectedRegion = element;
                   _regionSearchKey = newValue;
                 }
 
@@ -88,7 +92,14 @@ class _SchoolListState extends State<SchoolList> {
           }).toList(),
           onChanged: (String newValue) {
             setState(() {
-              _harborSearchKey = newValue;
+              harborObjects.forEach((element) {
+                String name = element.data()['name'];
+                if (name == newValue) {
+                  _selectedHarbor = element;
+                  _harborSearchKey = newValue;
+                }
+
+              });
             });
           });
     }
@@ -157,7 +168,7 @@ class _SchoolListState extends State<SchoolList> {
         ),
       ),
       body: FutureBuilder(
-          future: UserHelper.getFilteredSchools(_searchQuery, _regionSearchKey, _harborSearchKey,_selectedHarbor),
+          future: UserHelper.getFilteredSchools(_searchQuery, _regionSearchKey, _harborSearchKey,_selectedHarbor,_selectedRegion),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
