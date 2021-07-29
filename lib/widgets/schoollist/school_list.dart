@@ -15,9 +15,11 @@ class _SchoolListState extends State<SchoolList> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   BuildContext _context;
   List<String> harbors = <String>[];
+  List<QueryDocumentSnapshot> harborObjects = <QueryDocumentSnapshot>[];
   List<String> regions = <String>[];
   String _harborSearchKey = "All";
   String _regionSearchKey = "All";
+  QueryDocumentSnapshot _selectedHarbor ;
   String _searchQuery = "";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
@@ -62,8 +64,17 @@ class _SchoolListState extends State<SchoolList> {
             return DropdownMenuItem(value: items, child: Text(items,overflow: TextOverflow.ellipsis));
           }).toList(),
           onChanged: (String newValue) {
+
             setState(() {
-              _regionSearchKey = newValue;
+             // _regionSearchKey = newValue;
+              harborObjects.forEach((element) {
+                String name = element.data()['name'];
+                if (name == newValue) {
+                  _selectedHarbor = element;
+                  _regionSearchKey = newValue;
+                }
+
+              });
             });
           });
     }
@@ -146,7 +157,7 @@ class _SchoolListState extends State<SchoolList> {
         ),
       ),
       body: FutureBuilder(
-          future: UserHelper.getFilteredSchools(searchText, region, harbor),
+          future: UserHelper.getFilteredSchools(_searchQuery, _regionSearchKey, _harborSearchKey,_selectedHarbor),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:

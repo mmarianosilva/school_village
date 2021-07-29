@@ -69,6 +69,7 @@ class UserHelper {
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     List<String> harbors = ["All"];
+    List<QueryDocumentSnapshot> harborList = [];
     List<String> regions = ["All"];
     final result =
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
@@ -79,11 +80,13 @@ class UserHelper {
           bool deleted = element.data()['deleted'];
           if (!deleted && !harbors.contains(name)) {
             harbors.add(name);
+            harborList.add(element);
             //print("Harbor: $name");
           }
         } else {
           if (!harbors.contains(name)) {
             harbors.add(name);
+            harborList.add(element);
             //print("Harbor: $name");
           }
         }
@@ -108,7 +111,7 @@ class UserHelper {
         }
       });
     }
-    return RegionData(regions: regions, harbors: harbors);
+    return RegionData(regions: regions, harbors: harbors,harborObjects: harborList);
   }
 
   static getSchools() async {
@@ -161,7 +164,8 @@ class UserHelper {
     return schools;
   }
 
-  static getFilteredSchools(String searchText,String region,String harbor) async {
+  static getFilteredSchools(
+      String searchText, String region, String harbor,QueryDocumentSnapshot harborObj) async {
     // Query school list whith the schools from fetched ids i.e associated to user or user is the vendor/owner of it
     // Then Apply the filter settings based on search text, harbor_name, region object
     final FirebaseUser currentUser = await getUser();
