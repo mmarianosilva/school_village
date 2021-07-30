@@ -40,6 +40,7 @@ class _AlertState extends State<Alert> {
     print(user.uid);
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
+    _getIncidentUrl();
     _schoolName = await UserHelper.getSchoolName();
     FirebaseFirestore.instance.doc(_schoolId).get().then((school) {
       _isTrainingMode = school.data()['isTraining'];
@@ -154,20 +155,25 @@ class _AlertState extends State<Alert> {
                                         content: Text(localize(
                                             "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
                                       ));
-                                      _saveAlert(alertTitle, alertBody, alertType,
-                                          context);
+                                      _saveAlert(alertTitle, alertBody,
+                                          alertType, context);
                                     } else {
+                                      //final String incidentUrl =
+                                          //await _saveAlert(alertTitle,
+                                              //alertBody, alertType, context);
                                       final location =
-                                      await UserHelper.getLocation();
-                                      final notificationData =  getAlertBody(alertTitle, alertBody, alertType, context, location);
-                                      print("Notification Data is $notificationData");
+                                          await UserHelper.getLocation();
                                       if (location != null) {
                                         final intradoPayload = IntradoWrapper(
                                           eventAction: EventAction.TextMsg,
                                           eventDescription:
                                               IntradoEventDescription(
                                                   text: alertTitle),
-                                          eventDetails: <IntradoEventDetails>[],
+                                          eventDetails: <IntradoEventDetails>[
+                                            IntradoEventDetails(
+                                                key: 'incident_url',
+                                                value: '')
+                                          ],
                                           caCivicAddress: IntradoCaCivicAddress(
                                             country: "US",
                                             a1: "CO",
@@ -201,23 +207,16 @@ class _AlertState extends State<Alert> {
                                                     .currentUser())
                                                 .getIdToken())
                                             .token;
-                                        final body = <String, String>{
-                                          'notificationData':notificationData.toString(),
-                                          'schoolId':_schoolId.split('schools/')[1].trim(),
-                                          'xmlBody': intradoPayload.toXml(),
-
-                                        };
                                         final response = await http.post(
                                           "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/create-event",
-                                          body:body,
-                                         // body: intradoPayload.toXml(),
+                                          body: intradoPayload.toXml(),
                                           encoding: Encoding.getByName("utf8"),
                                           headers: <String, String>{
                                             "Authorization": "Bearer $token",
                                           },
                                         );
                                         print(
-                                            "Body Submitted is ${body} and token is $token");
+                                            "Body Submitted is ${intradoPayload.toXml()} and token is $token");
                                         print(
                                             "Intrado response is ${response.body}");
                                       }
@@ -296,39 +295,65 @@ class _AlertState extends State<Alert> {
     Map<String, double> location = await UserHelper.getLocation();
     return location;
   }
-  Map<String,String> getAlertBody(alertTitle, alertBody, alertType, context, location){
-    final String room = UserHelper.getRoomNumber(_userSnapshot);
-  return <String, String>{
-    'title': alertTitle,
-    'body': alertBody,
-    'type': alertType,
-    'createdById': _userId,
-    'createdBy': '$name${room != null ? ', Room $room' : ''}',
-    'createdAt': '${DateTime.now().millisecondsSinceEpoch}',
-    'location': location.toString(),
-    'reportedByPhone': phone,
-  };
-  }
-  Future<String> _saveAlert(alertTitle, alertBody, alertType, context) async {
-    String randomToken = Uuid().v4();
+
+  String getBaseUrl() {
     String baseUrl = "";
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
       print("Package name is ${packageInfo.packageName}");
       switch (packageInfo.packageName) {
         case 'com.oandmtech.marinavillage':
-          baseUrl= "https://marinavillage-dev-web.web.app/i/";
+          baseUrl = "https://marinavillage-dev-web.web.app/i/";
           break;
         case 'com.oandmtech.marinavillage.dev':
-          baseUrl= "https://marinavillage-web.web.app/i/";
+          baseUrl = "https://marinavillage-web.web.app/i/";
           break;
         case 'com.oandmtech.schoolvillage':
-          baseUrl= "https://schoolvillage-web.firebaseapp.com/i/";
+          baseUrl = "https://schoolvillage-web.firebaseapp.com/i/";
           break;
         case 'com.oandmtech.schoolvillage.dev':
-          baseUrl= "https://schoolvillage-dev-web.web.app/i/";
+          baseUrl = "https://schoolvillage-dev-web.web.app/i/";
           break;
       }
     });
+    return baseUrl;
+  }
+
+  Future<String> _getIncidentUrl() async {
+    String randomToken = Uuid().v4();
+    CollectionReference incidents =
+        FirebaseFirestore.instance.collection("ongoing_incidents");
+    print("Here School id is $_schoolId");
+    String id = _schoolId.split("schools/")[1].trim();
+    print("IDS ARE $_schoolId and $id");
+    await incidents
+        .orderBy("createdAt", descending: true)
+        .where("schoolId", isEqualTo:id )
+        .get()
+        .then((result) {
+      if (result.docs.isEmpty) {
+        return randomToken;
+      } else {
+        result.docChanges.forEach((element) {});
+        final DocumentSnapshot lastResolved = result.docs.firstWhere(
+            (doc) => !doc.data().containsKey('endedAt'),
+            orElse: () => null);
+        if (lastResolved != null) {
+          String dashboardUrl = lastResolved.data()['dashboardUrl'];
+          return dashboardUrl.split(getBaseUrl())[1];
+        } else {
+          return randomToken;
+        }
+      }
+    });
+  }
+
+  // final DocumentSnapshot lastResolved = result.docs
+  //     .firstWhere((doc) => doc.data()["endedAt"] == null,
+  //     orElse: () => null);
+
+  _saveAlert(alertTitle, alertBody, alertType, context) async {
+    String randomToken = Uuid().v4();
+
     CollectionReference collection =
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
@@ -344,7 +369,6 @@ class _AlertState extends State<Alert> {
       'createdAt': DateTime.now().millisecondsSinceEpoch,
       'location': await _getLocation(),
       'reportedByPhone': phone,
-      'token': randomToken,
     });
     print("Added Alert");
 
@@ -368,13 +392,14 @@ class _AlertState extends State<Alert> {
             ],
           );
         });
-    return baseUrl+randomToken;
   }
 
   @override
   Widget build(BuildContext context) {
+
     if (!isLoaded) {
       getUserDetails();
+
     }
 
     return Scaffold(
