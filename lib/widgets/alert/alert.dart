@@ -40,7 +40,6 @@ class _AlertState extends State<Alert> {
     print(user.uid);
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
-    _getIncidentUrl();
     _schoolName = await UserHelper.getSchoolName();
     FirebaseFirestore.instance.doc(_schoolId).get().then((school) {
       _isTrainingMode = school.data()['isTraining'];
@@ -52,7 +51,8 @@ class _AlertState extends State<Alert> {
       _userId = user.id;
       setState(() {
         name =
-            "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
+        "${_userSnapshot.data()['firstName']} ${_userSnapshot
+            .data()['lastName']}";
         phone = "${_userSnapshot.data()['phone']}";
         isLoaded = true;
       });
@@ -114,7 +114,7 @@ class _AlertState extends State<Alert> {
           builder: (_) {
             return AlertDialog(
               title:
-                  Text(localize('Are you sure you want to send this alert?')),
+              Text(localize('Are you sure you want to send this alert?')),
               content: SingleChildScrollView(
                 child: ListBody(
                   children: <Widget>[Text(localize('This cannot be undone'))],
@@ -156,70 +156,93 @@ class _AlertState extends State<Alert> {
                                             "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
                                       ));
                                       _saveAlert(alertTitle, alertBody,
-                                          alertType, context);
+                                          alertType, context, false, "");
                                     } else {
                                       //final String incidentUrl =
-                                          //await _saveAlert(alertTitle,
-                                              //alertBody, alertType, context);
+                                      //await _saveAlert(alertTitle,
+                                      //alertBody, alertType, context);
                                       final location =
-                                          await UserHelper.getLocation();
-                                      if (location != null) {
-                                        final intradoPayload = IntradoWrapper(
-                                          eventAction: EventAction.TextMsg,
-                                          eventDescription:
-                                              IntradoEventDescription(
-                                                  text: alertTitle),
-                                          eventDetails: <IntradoEventDetails>[
-                                            IntradoEventDetails(
-                                                key: 'incident_url',
-                                                value: '')
-                                          ],
-                                          caCivicAddress: IntradoCaCivicAddress(
-                                            country: "US",
-                                            a1: "CO",
-                                            a2: "BOULDER",
-                                            a3: "LONGMONT",
-                                            rd: "RD",
-                                          ),
-                                          geoLocation: IntradoGeoLocation(
-                                              latitude: location["latitude"],
-                                              longitude: location["longitude"],
-                                              altitude: location["altitude"],
-                                              confidence: 80,
-                                              uncertainty: 150.0),
-                                          serviceProvider:
-                                              IntradoServiceProvider(
-                                                  name: "Marina Village Safety",
-                                                  contactUri:
-                                                      "tel:+19492741709",
-                                                  textChatEnabled: true),
-                                          deviceOwner: IntradoDeviceOwner(
-                                              name:
-                                                  "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                                              tel:
-                                                  "${_userSnapshot.data()['phone']}",
-                                              environment: "Marina",
-                                              mobility: "Fixed"),
-                                          eventTime: DateTime.now(),
-                                        );
-                                        final token = (await (await FirebaseAuth
-                                                    .instance
-                                                    .currentUser())
-                                                .getIdToken())
-                                            .token;
-                                        final response = await http.post(
-                                          "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/create-event",
-                                          body: intradoPayload.toXml(),
-                                          encoding: Encoding.getByName("utf8"),
-                                          headers: <String, String>{
-                                            "Authorization": "Bearer $token",
-                                          },
-                                        );
-                                        print(
-                                            "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-                                        print(
-                                            "Intrado response is ${response.body}");
-                                      }
+                                      await UserHelper.getLocation();
+                                      final incident = await _getIncidentUrl();
+                                      print(incident);
+                                      await _saveAlert(
+                                          alertTitle,
+                                          alertBody,
+                                          alertType,
+                                          context,
+                                          incident[1],
+                                          incident[0])
+                                          .then((value) async {
+                                        if (location != null) {
+                                          final incidentUrl =
+                                              incident[2] + incident[0];
+                                          final intradoPayload = IntradoWrapper(
+                                            eventAction: EventAction.TextMsg,
+                                            eventDescription:
+                                            IntradoEventDescription(
+                                                text: alertTitle),
+                                            eventDetails: <IntradoEventDetails>[
+                                              IntradoEventDetails(
+                                                  key: 'incident_url',
+                                                  value: incidentUrl)
+                                            ],
+                                            caCivicAddress:
+                                            IntradoCaCivicAddress(
+                                              country: "US",
+                                              a1: "CO",
+                                              a2: "BOULDER",
+                                              a3: "LONGMONT",
+                                              rd: "RD",
+                                            ),
+                                            geoLocation: IntradoGeoLocation(
+                                                latitude: location["latitude"],
+                                                longitude:
+                                                location["longitude"],
+                                                altitude: location["altitude"],
+                                                confidence: 80,
+                                                uncertainty: 150.0),
+                                            serviceProvider:
+                                            IntradoServiceProvider(
+                                                name:
+                                                "Marina Village Safety",
+                                                contactUri:
+                                                "tel:+19492741709",
+                                                textChatEnabled: true),
+                                            deviceOwner: IntradoDeviceOwner(
+                                                name:
+                                                "${_userSnapshot
+                                                    .data()['firstName']} ${_userSnapshot
+                                                    .data()['lastName']}",
+                                                tel:
+                                                "${_userSnapshot
+                                                    .data()['phone']}",
+                                                environment: "Marina",
+                                                mobility: "Fixed"),
+                                            eventTime: DateTime.now(),
+                                          );
+                                          final token =
+                                              (await (await FirebaseAuth
+                                                  .instance
+                                                  .currentUser())
+                                                  .getIdToken())
+                                                  .token;
+                                          final response = await http.post(
+                                            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
+                                            body: intradoPayload.toXml(),
+                                            encoding:
+                                            Encoding.getByName("utf8"),
+                                            headers: <String, String>{
+                                              "Authorization": "Bearer $token",
+                                            },
+                                          );
+                                          print(
+                                              "Body Submitted is ${intradoPayload
+                                                  .toXml()} and token is $token");
+                                          print(
+                                              "Intrado response is ${response
+                                                  .body}");
+                                        }
+                                      });
                                     }
                                   }),
                               FlatButton(
@@ -240,7 +263,8 @@ class _AlertState extends State<Alert> {
                       style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    _saveAlert(alertTitle, alertBody, alertType, context);
+                    _saveAlert(
+                        alertTitle, alertBody, alertType, context, false, "");
                   },
                 ),
                 FlatButton(
@@ -261,7 +285,7 @@ class _AlertState extends State<Alert> {
           builder: (_) {
             return AlertDialog(
               title:
-                  Text(localize('Are you sure you want to send this alert?')),
+              Text(localize('Are you sure you want to send this alert?')),
               content: SingleChildScrollView(
                 child: ListBody(
                   children: <Widget>[Text(localize('This cannot be undone'))],
@@ -274,7 +298,8 @@ class _AlertState extends State<Alert> {
                       style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    _saveAlert(alertTitle, alertBody, alertType, context);
+                    _saveAlert(
+                        alertTitle, alertBody, alertType, context, false, "");
                   },
                 ),
                 FlatButton(
@@ -296,296 +321,322 @@ class _AlertState extends State<Alert> {
     return location;
   }
 
-  String getBaseUrl() {
-    String baseUrl = "";
-    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-      print("Package name is ${packageInfo.packageName}");
-      switch (packageInfo.packageName) {
-        case 'com.oandmtech.marinavillage':
-          baseUrl = "https://marinavillage-dev-web.web.app/i/";
-          break;
-        case 'com.oandmtech.marinavillage.dev':
-          baseUrl = "https://marinavillage-web.web.app/i/";
-          break;
-        case 'com.oandmtech.schoolvillage':
-          baseUrl = "https://schoolvillage-web.firebaseapp.com/i/";
-          break;
-        case 'com.oandmtech.schoolvillage.dev':
-          baseUrl = "https://schoolvillage-dev-web.web.app/i/";
-          break;
-      }
-    });
-    return baseUrl;
+  Future<String> getBaseUrl() async {
+    String baseurl = "";
+    final packageInfo = await PackageInfo.fromPlatform();
+    switch (packageInfo.packageName.trim()) {
+      case 'com.oandmtech.marinavillage':
+        baseurl = "https://marinavillage-web.web.app/i/";
+        return baseurl;
+
+      case 'com.oandmtech.marinavillage.dev':
+        baseurl = "https://marinavillage-dev-web.web.app/i/";
+        return baseurl;
+
+      case 'com.oandmtech.schoolvillage':
+        baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
+        return baseurl;
+
+      case 'com.oandmtech.schoolvillage.dev':
+        baseurl = "https://schoolvillage-dev-web.web.app/i/";
+        return baseurl;
+
+      default:
+        baseurl = "";
+        return baseurl;
+    }
   }
 
-  Future<String> _getIncidentUrl() async {
+  Future<DocumentSnapshot>getLastResolved(result)async {
+    final DocumentSnapshot lastResolved = result.docs.firstWhere((doc) {
+      return !doc.data().containsKey('endedAt');
+    }, orElse: () {
+      return null;
+    });
+    return lastResolved;
+  }
+
+  Future<List<dynamic>> _getIncidentUrl() async {
     String randomToken = Uuid().v4();
-    CollectionReference incidents =
-        FirebaseFirestore.instance.collection("ongoing_incidents");
-    print("Here School id is $_schoolId");
+    final baseurl = await getBaseUrl();
     String id = _schoolId.split("schools/")[1].trim();
-    print("IDS ARE $_schoolId and $id");
-    await incidents
-        .orderBy("createdAt", descending: true)
-        .where("schoolId", isEqualTo:id )
-        .get()
-        .then((result) {
-      if (result.docs.isEmpty) {
-        return randomToken;
+    final result = await FirebaseFirestore.instance
+        .collection("ongoing_incidents")
+        .where("schoolId", isEqualTo: id)
+        .get();
+    if (result.docs.isEmpty) {
+      return [randomToken, true, baseurl];
+    } else {
+      final lastResolved = await getLastResolved(result);
+      if (lastResolved != null) {
+        String dashboardUrl = lastResolved.data()['dashboardUrl'];
+
+        return [dashboardUrl.split(baseurl)[1], false, baseurl];
       } else {
-        result.docChanges.forEach((element) {});
-        final DocumentSnapshot lastResolved = result.docs.firstWhere(
-            (doc) => !doc.data().containsKey('endedAt'),
-            orElse: () => null);
-        if (lastResolved != null) {
-          String dashboardUrl = lastResolved.data()['dashboardUrl'];
-          return dashboardUrl.split(getBaseUrl())[1];
-        } else {
-          return randomToken;
-        }
+
+        return [randomToken, true, baseurl];
       }
-    });
+    }
   }
 
-  // final DocumentSnapshot lastResolved = result.docs
-  //     .firstWhere((doc) => doc.data()["endedAt"] == null,
-  //     orElse: () => null);
+Future<String> _saveAlert(alertTitle, alertBody, alertType, context,
+    updateToken, token) async {
+    print("TOKENUPDATE is $updateToken");
+  CollectionReference collection =
+  FirebaseFirestore.instance.collection('$_schoolId/notifications');
+  final DocumentReference document = collection.doc();
 
-  _saveAlert(alertTitle, alertBody, alertType, context) async {
-    String randomToken = Uuid().v4();
+  final String room = UserHelper.getRoomNumber(_userSnapshot);
 
-    CollectionReference collection =
-        FirebaseFirestore.instance.collection('$_schoolId/notifications');
-    final DocumentReference document = collection.doc();
-
-    print("Random Token is $randomToken");
-    final String room = UserHelper.getRoomNumber(_userSnapshot);
+  if (updateToken) {
     document.set(<String, dynamic>{
       'title': alertTitle,
       'body': alertBody,
       'type': alertType,
       'createdById': _userId,
       'createdBy': '$name${room != null ? ', Room $room' : ''}',
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
+      'createdAt': DateTime
+          .now()
+          .millisecondsSinceEpoch,
+      'location': await _getLocation(),
+      'reportedByPhone': phone,
+      'token': token,
+    });
+  } else {
+    document.set(<String, dynamic>{
+      'title': alertTitle,
+      'body': alertBody,
+      'type': alertType,
+      'createdById': _userId,
+      'createdBy': '$name${room != null ? ', Room $room' : ''}',
+      'createdAt': DateTime
+          .now()
+          .millisecondsSinceEpoch,
       'location': await _getLocation(),
       'reportedByPhone': phone,
     });
-    print("Added Alert");
+  }
+  print("Added Alert");
 
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(localize('Alert Sent')),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[Text('')],
-              ),
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localize('Alert Sent')),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[Text('')],
             ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(localize('Okay')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
-        });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    if (!isLoaded) {
-      getUserDetails();
-
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: BaseAppBar(
-        title: Text(localize('Alert'),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
-        backgroundColor: Colors.grey.shade200,
-        elevation: 0.0,
-        leading: BackButton(color: Colors.grey.shade800),
-      ),
-      body: Builder(builder: (BuildContext context) {
-        _scaffold = context;
-        return SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              SizedBox(height: 32.0),
-              Container(
-                  padding: EdgeInsets.all(12.0),
-                  child: Text(
-                    localize("TAP AN ICON BELOW TO SEND AN ALERT"),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold),
-                  )),
-              SizedBox(height: 32.0),
-              Image.asset('assets/images/alert_hand_icon.png',
-                  width: 48.0, height: 48.0),
-              SizedBox(height: 16.0),
-              Container(
-                height: 0.5,
-                margin: EdgeInsets.all(12.0),
-                width: MediaQuery.of(context).size.width,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 16.0),
-              Card(
-                margin: EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("armed", "Armed Assailant Alert!",
-                                    "An Armed Assailant has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_armed.png',
-                                    width: 72.0, height: 108.0),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("fight", "Fight Alert!",
-                                    "A fight has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_fight.png',
-                                    width: 72.0, height: 95.4),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("medical", "Medical Alert!",
-                                    "A medical emergency has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_medical.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        ))
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("auto", "Auto Accident/Injury",
-                                    "A car accident has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset(
-                                    'assets/images/alert_auto_accident_injury.png',
-                                    width: 72.0,
-                                    height: 109.8),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("explosion", "Explosion Alert!",
-                                    "An explosion has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_explosion.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("boat", "Boat Accident/Injury",
-                                    "A boat accident has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset(
-                                    'assets/images/alert_boat_accident_injury.png',
-                                    width: 72.0,
-                                    height: 109.8),
-                              ])),
-                        ))
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("fire", "Fire Alert!",
-                                    "A fire has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_fire.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("intruder", "Intruder Alert!",
-                                    "An intruder has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_intruder.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
-                        Expanded(
-                            child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendCustomAlert(context);
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_other.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        ))
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
           ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(localize('Okay')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
         );
-      }),
-    );
-  }
+      });
+  return "";
 }
+
+@override
+Widget build(BuildContext context) {
+  if (!isLoaded) {
+    getUserDetails();
+  }
+
+  return Scaffold(
+    backgroundColor: Colors.grey.shade100,
+    appBar: BaseAppBar(
+      title: Text(localize('Alert'),
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black, letterSpacing: 1.29)),
+      backgroundColor: Colors.grey.shade200,
+      elevation: 0.0,
+      leading: BackButton(color: Colors.grey.shade800),
+    ),
+    body: Builder(builder: (BuildContext context) {
+      _scaffold = context;
+      return SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            SizedBox(height: 32.0),
+            Container(
+                padding: EdgeInsets.all(12.0),
+                child: Text(
+                  localize("TAP AN ICON BELOW TO SEND AN ALERT"),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold),
+                )),
+            SizedBox(height: 32.0),
+            Image.asset('assets/images/alert_hand_icon.png',
+                width: 48.0, height: 48.0),
+            SizedBox(height: 16.0),
+            Container(
+              height: 0.5,
+              margin: EdgeInsets.all(12.0),
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16.0),
+            Card(
+              margin: EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert(
+                                      "armed", "Armed Assailant Alert!",
+                                      "An Armed Assailant has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset('assets/images/alert_armed.png',
+                                      width: 72.0, height: 108.0),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("fight", "Fight Alert!",
+                                      "A fight has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset('assets/images/alert_fight.png',
+                                      width: 72.0, height: 95.4),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("medical", "Medical Alert!",
+                                      "A medical emergency has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset(
+                                      'assets/images/alert_medical.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          ))
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("auto", "Auto Accident/Injury",
+                                      "A car accident has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset(
+                                      'assets/images/alert_auto_accident_injury.png',
+                                      width: 72.0,
+                                      height: 109.8),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("explosion", "Explosion Alert!",
+                                      "An explosion has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset(
+                                      'assets/images/alert_explosion.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("boat", "Boat Accident/Injury",
+                                      "A boat accident has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset(
+                                      'assets/images/alert_boat_accident_injury.png',
+                                      width: 72.0,
+                                      height: 109.8),
+                                ])),
+                          ))
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("fire", "Fire Alert!",
+                                      "A fire has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset('assets/images/alert_fire.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendAlert("intruder", "Intruder Alert!",
+                                      "An intruder has been reported at $_schoolName");
+                                },
+                                child: Column(children: [
+                                  Image.asset(
+                                      'assets/images/alert_intruder.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          )),
+                      Expanded(
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                  _sendCustomAlert(context);
+                                },
+                                child: Column(children: [
+                                  Image.asset('assets/images/alert_other.png',
+                                      width: 72.0, height: 109.8),
+                                ])),
+                          ))
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      );
+    }),
+  );
+}}
