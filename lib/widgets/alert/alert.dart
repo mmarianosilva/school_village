@@ -41,6 +41,7 @@ class _AlertState extends State<Alert> {
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolName = await UserHelper.getSchoolName();
+    getIntradoChats();
     FirebaseFirestore.instance.doc(_schoolId).get().then((school) {
       _isTrainingMode = school.data()['isTraining'];
     });
@@ -354,6 +355,20 @@ class _AlertState extends State<Alert> {
       return null;
     });
     return lastResolved;
+  }
+
+  getIntradoChats()async{
+    final result = await FirebaseFirestore.instance
+        .collection("intrado_events")
+        //.where("schoolId", isEqualTo: id)
+        .get();
+    if (result.docs.isEmpty) {
+     print("No Intrado Events");
+    } else {
+      result.docs.forEach((element) {
+        print("Intrado Event : $element");
+      });
+    }
   }
 
   Future<List<dynamic>> _getIncidentUrl() async {
