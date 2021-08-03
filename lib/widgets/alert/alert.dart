@@ -148,7 +148,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    _isTrainingMode = false;
+                                    //_isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
@@ -381,7 +381,7 @@ class _AlertState extends State<Alert> {
 
 Future<String> _saveAlert(alertTitle, alertBody, alertType, context,
     updateToken, token) async {
-    print("TOKENUPDATE is $updateToken");
+    //print("TOKENUPDATE is $updateToken");
   CollectionReference collection =
   FirebaseFirestore.instance.collection('$_schoolId/notifications');
   final DocumentReference document = collection.doc();
