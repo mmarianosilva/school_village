@@ -344,7 +344,6 @@ class UserHelper {
     }
 
     //Search here for filtered Schools and then based on associated schools, add ref and role to it
-    print("Here comes the pain");
     for (int i = 0; i < filteredSchools.length; i++) {
       final school = filteredSchools[i];
       if (searchText.isEmpty) {
