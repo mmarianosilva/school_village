@@ -158,6 +158,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         isOwner = userIsOwner;
         role = userRole;
         hasSchool = true;
+        print("Schoolid is $schoolId and role is $userRole");
       }
       isLoaded = true;
     });
@@ -565,7 +566,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             onTap: sendAlert,
           ),
           Expanded(
-            child: role != 'enduser' && alertInProgress != null
+            child: (role != 'boater' &&
+                        role != 'vendor' &&
+                        role != 'maintenance') &&
+                    alertInProgress != null
                 ? GestureDetector(
                     child: Center(
                       child: Image.asset(
