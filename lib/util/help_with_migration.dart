@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 abstract class Temporary {
 
@@ -10,10 +11,13 @@ abstract class Temporary {
       return "security";
     }
     if (original == "school_staff") {
-      return "enduser";
+      return "boater,vendor,maintenance";
     }
     if (original == "school_student") {
-      return "enduser";
+      return "boater,vendor,maintenance";
+    }
+    if (original == "vendor") {
+      return "boater,vendor,maintenance";
     }
     if (original == "school_family") {
       return "family";
