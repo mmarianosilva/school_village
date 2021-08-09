@@ -398,7 +398,6 @@ class _AlertState extends State<Alert> {
 
   Future<String> _saveAlert(
       alertTitle, alertBody, alertType, context, updateToken, token) async {
-    print("TOKENUPDATE is $updateToken");
     CollectionReference collection =
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
@@ -430,7 +429,7 @@ class _AlertState extends State<Alert> {
         'token': token,
       });
     }
-    print("Schoold id = $_schoolId and notificationToken = ${token}");
+    print("Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
 
     showDialog(
