@@ -158,6 +158,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         isOwner = userIsOwner;
         role = userRole;
         hasSchool = true;
+        debugPrint("Schoolid is $schoolId and role is $userRole");
       }
       isLoaded = true;
     });
@@ -259,7 +260,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildNotificationsOption(model) {
-    if (role == 'school_student' || role == 'enduser') {
+    if (role == 'school_student' || role == 'boater'|| role == 'vendor' || role == 'maintenance') {
       return SizedBox();
     }
     return FutureBuilder(
@@ -565,7 +566,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             onTap: sendAlert,
           ),
           Expanded(
-            child: role != 'enduser' && alertInProgress != null
+            child: (role != 'boater' &&
+                        role != 'vendor' &&
+                        role != 'maintenance') &&
+                    alertInProgress != null
                 ? GestureDetector(
                     child: Center(
                       child: Image.asset(
@@ -979,10 +983,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                               final accessRoles =
                                   (snapshot["accessRoles"] as List)
                                       .cast<String>();
+                              //debugPrint("Access roles are $accessRoles");
                               for (final accessRole in accessRoles) {
                                 if (accessRole.contains(role) ||
                                     Temporary.updateRole(accessRole)
                                         .contains(role)) {
+                                  //debugPrint("Print this");
                                   return true;
                                 }
                               }
