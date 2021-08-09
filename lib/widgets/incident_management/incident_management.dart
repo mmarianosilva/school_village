@@ -324,6 +324,7 @@ class _IncidentManagementState extends State<IncidentManagement>
         _messages = _fullList;
       });
     } else {
+      print("Schoold id = $_schoolId and notificationid = ${alert.id}");
       _alertSubscription = FirebaseFirestore.instance
           .doc("$_schoolId/notifications/${alert.id}")
           .snapshots()
