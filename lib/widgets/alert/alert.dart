@@ -10,6 +10,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:sentry/browser_client.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../model/intrado_wrapper.dart';
@@ -20,6 +21,7 @@ class Alert extends StatefulWidget {
 }
 
 class _AlertState extends State<Alert> {
+  EventAction _eventAction = EventAction.None;
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
@@ -33,6 +35,48 @@ class _AlertState extends State<Alert> {
   bool _isTrainingMode = true;
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
+
+  Future<EventAction> getConversationType() async{
+    showDialog(context: context,  barrierDismissible: false,builder:(_){
+      return AlertDialog(
+        title:
+        Text(localize('What type of interaction would you like with +911')),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[Text(localize('This cannot be undone'))],
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            color: Colors.red,
+            child: Text(localize('Chat'), style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              _eventAction = EventAction.TextMsg;
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            color: Colors.red,
+            child: Text(localize('Voice'), style: TextStyle(color: Colors.white)),
+            onPressed: () async {
+              _eventAction = EventAction.PSAPLink;
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            color: Colors.black45,
+            child:
+            Text(localize('Cancel'), style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              _eventAction = EventAction.None;
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    });
+    return _eventAction;
+  }
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -148,7 +192,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    //_isTrainingMode = false;
+                                    _isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
@@ -164,6 +208,7 @@ class _AlertState extends State<Alert> {
                                           incident[1],
                                           incident[0]);
                                     } else {
+                                      await getConversationType();
                                       //final String incidentUrl =
                                       //await _saveAlert(alertTitle,
                                       //alertBody, alertType, context);
@@ -183,7 +228,7 @@ class _AlertState extends State<Alert> {
                                           final incidentUrl =
                                               incident[2] + incident[0];
                                           final intradoPayload = IntradoWrapper(
-                                            eventAction: EventAction.TextMsg,
+                                            eventAction: _eventAction,
                                             eventDescription:
                                                 IntradoEventDescription(
                                                     text: alertTitle),
@@ -298,7 +343,7 @@ class _AlertState extends State<Alert> {
                   color: Colors.black45,
                   child: Text(localize('YES'),
                       style: TextStyle(color: Colors.white)),
-                  onPressed: () async{
+                  onPressed: () async {
                     Navigator.of(context).pop();
                     final incident = await _getIncidentUrl();
                     _saveAlert(alertTitle, alertBody, alertType, context,
@@ -429,7 +474,8 @@ class _AlertState extends State<Alert> {
         'token': token,
       });
     }
-    print("Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
+    print(
+        "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
 
     showDialog(
