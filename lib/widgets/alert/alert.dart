@@ -197,7 +197,7 @@ class _AlertState extends State<Alert> {
                                       style: TextStyle(color: Colors.white)),
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    _isTrainingMode = false;
+                                    //_isTrainingMode = false;
                                     if (_isTrainingMode) {
                                       Scaffold.of(_scaffold)
                                           .showSnackBar(SnackBar(
@@ -216,6 +216,9 @@ class _AlertState extends State<Alert> {
                                       final mEvent =
                                           await getConversationType();
                                       print("Returned Event is $mEvent");
+                                      if (mEvent == EventAction.None){
+                                        return;
+                                      }
                                       //final String incidentUrl =
                                       //await _saveAlert(alertTitle,
                                       //alertBody, alertType, context);
