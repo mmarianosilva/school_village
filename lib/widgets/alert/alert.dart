@@ -1,16 +1,16 @@
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'package:xml/xml.dart' as xml;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/intrado_response.dart';
 import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
-import 'package:sentry/browser_client.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../model/intrado_wrapper.dart';
@@ -36,45 +36,50 @@ class _AlertState extends State<Alert> {
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
 
-  Future<EventAction> getConversationType() async{
-    showDialog(context: context,  barrierDismissible: false,builder:(_){
-      return AlertDialog(
-        title:
-        Text(localize('What type of interaction would you like with +911')),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[Text(localize('This cannot be undone'))],
-          ),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            color: Colors.red,
-            child: Text(localize('Chat'), style: TextStyle(color: Colors.white)),
-            onPressed: () {
-              _eventAction = EventAction.TextMsg;
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            color: Colors.red,
-            child: Text(localize('Voice'), style: TextStyle(color: Colors.white)),
-            onPressed: () async {
-              _eventAction = EventAction.PSAPLink;
-              Navigator.of(context).pop();
-            },
-          ),
-          FlatButton(
-            color: Colors.black45,
-            child:
-            Text(localize('Cancel'), style: TextStyle(color: Colors.white)),
-            onPressed: () {
-              _eventAction = EventAction.None;
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    });
+  Future<EventAction> getConversationType() async {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(
+                localize('What type of interaction would you like with +911')),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[Text(localize('This cannot be undone'))],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.red,
+                child: Text(localize('Chat'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  _eventAction = EventAction.TextMsg;
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                color: Colors.red,
+                child: Text(localize('Voice'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () async {
+                  _eventAction = EventAction.PSAPLink;
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                color: Colors.black45,
+                child: Text(localize('Cancel'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  _eventAction = EventAction.None;
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
     return _eventAction;
   }
 
@@ -208,7 +213,9 @@ class _AlertState extends State<Alert> {
                                           incident[1],
                                           incident[0]);
                                     } else {
-                                      await getConversationType();
+                                      final mEvent =
+                                          await getConversationType();
+                                      print("Returned Event is $mEvent");
                                       //final String incidentUrl =
                                       //await _saveAlert(alertTitle,
                                       //alertBody, alertType, context);
@@ -287,6 +294,24 @@ class _AlertState extends State<Alert> {
                                               "Body Submitted is ${intradoPayload.toXml()} and token is $token");
                                           print(
                                               "Intrado response is ${response.body}");
+                                          final jsonResponse =
+                                              json.decode(response.body);
+                                          IntradoResponse intradoResponse =
+                                              new IntradoResponse.fromJson(
+                                                  jsonResponse);
+                                          if (intradoResponse.success == true &&
+                                              _eventAction ==
+                                                  EventAction.PSAPLink) {
+                                            var storexml = xml.parse(
+                                                intradoResponse.response);
+                                            final phones = storexml
+                                                .findAllElements('number');
+                                            phones
+                                                .map((node) => node.text)
+                                                .forEach((element) {
+                                              launch("tel://$element");
+                                            });
+                                          }
                                         }
                                       });
                                     }
