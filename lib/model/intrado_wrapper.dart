@@ -196,7 +196,7 @@ class IntradoWrapper {
   }
 }
 
-enum EventAction { TextMsg, PSAPLink }
+enum EventAction { TextMsg, PSAPLink,None }
 
 @immutable
 class IntradoEventDescription {

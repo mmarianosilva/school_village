@@ -12,7 +12,7 @@ class TokenHelper {
     print("Saving token");
     final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
     final String token = await _firebaseMessaging.getToken();
-    print(token);
+    print("Fcm token is $token");
     FirebaseUser user = await UserHelper.getUser();
     String userPath = "/users/${user.uid}";
     print('User path /users/${user.uid}');

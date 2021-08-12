@@ -1,12 +1,13 @@
 import 'dart:convert';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'package:xml/xml.dart' as xml;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/intrado_response.dart';
 import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
@@ -20,6 +21,7 @@ class Alert extends StatefulWidget {
 }
 
 class _AlertState extends State<Alert> {
+  EventAction _eventAction = EventAction.None;
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
@@ -33,6 +35,53 @@ class _AlertState extends State<Alert> {
   bool _isTrainingMode = true;
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
+
+  Future<EventAction> getConversationType() async {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(
+                localize('Connect with +911')),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[Text(localize('Note: This cannot be undone'))],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.red,
+                child: Text(localize('Chat'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  _eventAction = EventAction.TextMsg;
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                color: Colors.red,
+                child: Text(localize('Voice'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () async {
+                  _eventAction = EventAction.PSAPLink;
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                color: Colors.black45,
+                child: Text(localize('Cancel'),
+                    style: TextStyle(color: Colors.white)),
+                onPressed: () {
+                  _eventAction = EventAction.None;
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+    return _eventAction;
+  }
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -107,7 +156,10 @@ class _AlertState extends State<Alert> {
         _role == 'school_security' ||
         _role == 'school_admin' ||
         _role == 'school_staff' ||
-        _role == 'district') {
+        _role == 'district' ||
+        _role == 'boater' ||
+        _role == 'vendor' ||
+        _role == 'maintenance') {
       showDialog(
           context: context,
           barrierDismissible: false,
@@ -164,6 +216,12 @@ class _AlertState extends State<Alert> {
                                           incident[1],
                                           incident[0]);
                                     } else {
+                                      final mEvent =
+                                          await getConversationType();
+                                      print("Returned Event is $mEvent");
+                                      if (mEvent == EventAction.None) {
+                                        return;
+                                      }
                                       //final String incidentUrl =
                                       //await _saveAlert(alertTitle,
                                       //alertBody, alertType, context);
@@ -183,7 +241,7 @@ class _AlertState extends State<Alert> {
                                           final incidentUrl =
                                               incident[2] + incident[0];
                                           final intradoPayload = IntradoWrapper(
-                                            eventAction: EventAction.TextMsg,
+                                            eventAction: _eventAction,
                                             eventDescription:
                                                 IntradoEventDescription(
                                                     text: alertTitle),
@@ -242,6 +300,24 @@ class _AlertState extends State<Alert> {
                                               "Body Submitted is ${intradoPayload.toXml()} and token is $token");
                                           print(
                                               "Intrado response is ${response.body}");
+                                          final jsonResponse =
+                                              json.decode(response.body);
+                                          IntradoResponse intradoResponse =
+                                              new IntradoResponse.fromJson(
+                                                  jsonResponse);
+                                          if (intradoResponse.success == true &&
+                                              _eventAction ==
+                                                  EventAction.PSAPLink) {
+                                            var storexml = xml.parse(
+                                                intradoResponse.response);
+                                            final phones = storexml
+                                                .findAllElements('number');
+                                            phones
+                                                .map((node) => node.text)
+                                                .forEach((element) {
+                                              launch("tel://$element");
+                                            });
+                                          }
                                         }
                                       });
                                     }
@@ -298,7 +374,7 @@ class _AlertState extends State<Alert> {
                   color: Colors.black45,
                   child: Text(localize('YES'),
                       style: TextStyle(color: Colors.white)),
-                  onPressed: () async{
+                  onPressed: () async {
                     Navigator.of(context).pop();
                     final incident = await _getIncidentUrl();
                     _saveAlert(alertTitle, alertBody, alertType, context,
@@ -398,7 +474,6 @@ class _AlertState extends State<Alert> {
 
   Future<String> _saveAlert(
       alertTitle, alertBody, alertType, context, updateToken, token) async {
-    print("TOKENUPDATE is $updateToken");
     CollectionReference collection =
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
@@ -430,7 +505,8 @@ class _AlertState extends State<Alert> {
         'token': token,
       });
     }
-    print("Schoold id = $_schoolId and notificationToken = ${token}");
+    print(
+        "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
 
     showDialog(

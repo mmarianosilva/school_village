@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/model/intrado_message.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
@@ -54,6 +56,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   }
 
   String _buildChannelName() {
+    print("Channel Details ${channel.id}");
     if (!channel.direct) {
       return "#${channel.name}";
     }
@@ -72,6 +75,10 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
       return "$name${members.last.name}";
     }
     return localize("Loading...");
+  }
+
+  bool isIntrado() {
+    return (channel.name == '911 TalkAround Channel');
   }
 
   String _buildTitle() {
@@ -270,16 +277,43 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
               .set({"timestamp": FieldValue.serverTimestamp()},
                   SetOptions(merge: true));
         });
+        if(isIntrado()){
+         await sendIntradoMsg(messageInputController.text);
+        }
         messageInputController.clear();
       } on Exception catch (ex) {
         print("$ex");
       }
+
     }
     setState(() {
       selectedImage = null;
       isVideo = false;
       sending = false;
     });
+  }
+
+  sendIntradoMsg(String msg) async {
+    final intradoPayload = IntradoMessage(session:channel.id,message: msg,messageId: '2' );
+    final token =
+    (await (await FirebaseAuth
+        .instance
+        .currentUser())
+        .getIdToken())
+        .token;
+    final response = await http.post(
+    "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message",
+    body: intradoPayload.toXml(),
+    encoding:
+    Encoding.getByName("utf8"),
+    headers: <String, String>{
+    "Authorization": "Bearer $token",
+    },
+    );
+    print(
+    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+    print(
+    "Intrado response is ${response.body}");
   }
 
   @override
@@ -310,10 +344,25 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             ),
           ),
           actions: (widget.channel.isClass ?? false) &&
-              ((_userSnapshot != null && (_userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "school_admin" || _userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "district" || _userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "admin" || _userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "superadmin")) ||
-              (widget.channel.admin.id ==
-                      FirebaseFirestore.instance
-                          .doc("users/${_userSnapshot?.id ?? "a"}")))
+                  ((_userSnapshot != null &&
+                          (_userSnapshot.data()["associatedSchools"]
+                                          ["${_schoolId.substring("schools/".length)}"]
+                                      ["role"] ==
+                                  "school_admin" ||
+                              _userSnapshot.data()["associatedSchools"]
+                                          ["${_schoolId.substring("schools/".length)}"]
+                                      ["role"] ==
+                                  "district" ||
+                              _userSnapshot.data()["associatedSchools"]
+                                          ["${_schoolId.substring("schools/".length)}"]
+                                      ["role"] ==
+                                  "admin" ||
+                              _userSnapshot.data()["associatedSchools"]
+                                          ["${_schoolId.substring("schools/".length)}"]
+                                      ["role"] ==
+                                  "superadmin")) ||
+                      (widget.channel.admin.id ==
+                          FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
               ? [
                   FlatButton(
                     onPressed: () =>
