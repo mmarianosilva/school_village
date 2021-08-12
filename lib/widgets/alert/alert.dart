@@ -156,7 +156,10 @@ class _AlertState extends State<Alert> {
         _role == 'school_security' ||
         _role == 'school_admin' ||
         _role == 'school_staff' ||
-        _role == 'district') {
+        _role == 'district' ||
+        _role == 'boater' ||
+        _role == 'vendor' ||
+        _role == 'maintenance') {
       showDialog(
           context: context,
           barrierDismissible: false,
@@ -216,7 +219,7 @@ class _AlertState extends State<Alert> {
                                       final mEvent =
                                           await getConversationType();
                                       print("Returned Event is $mEvent");
-                                      if (mEvent == EventAction.None){
+                                      if (mEvent == EventAction.None) {
                                         return;
                                       }
                                       //final String incidentUrl =
