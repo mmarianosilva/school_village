@@ -43,10 +43,10 @@ class _AlertState extends State<Alert> {
         builder: (_) {
           return AlertDialog(
             title: Text(
-                localize('What type of interaction would you like with +911')),
+                localize('Connect with +911')),
             content: SingleChildScrollView(
               child: ListBody(
-                children: <Widget>[Text(localize('This cannot be undone'))],
+                children: <Widget>[Text(localize('Note: This cannot be undone'))],
               ),
             ),
             actions: <Widget>[
