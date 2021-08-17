@@ -55,8 +55,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
-        return (element.data()['name'] == "911 TalkAround Channel") &&
-            (element.data()['createdById'] != _userSnapshot.id);
+        return ((element.data()['name'] == "911 TalkAround Channel") &&
+            (element.data()['createdById'] != _userSnapshot.id)) ||((element.data()['name'] == "911 TalkAround Channel") &&
+            (element.data()['isActive'] == false));
       });
       Iterable<DocumentSnapshot> channels = documentList;
       List<Future<TalkAroundChannel>> processedChannels =
