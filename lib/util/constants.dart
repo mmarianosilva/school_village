@@ -9,8 +9,8 @@ class Constants {
   static const messagesHorizontalMargin = const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0);
   static const pdftronLicenseKey = '';
   static const lastAmberAlertTimestampKey = 'lastAmberAlertTimestamp';
-  static const privacyPolicyUrl = 'https://villagesafety.net/index_privacy_policy-vs.html';
-  static const termsOfServiceUrl = 'https://villagesafety.net/index_termsConditions.html';
+  static const privacyPolicyUrl = 'https://villagesafety.net/privacy_policy-vs';
+  static const termsOfServiceUrl = 'https://villagesafety.net/termsConditions';
 
   static final emailRegEx = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+$");
   static final phoneRegEx = RegExp(r"^(?:[+0][1-9]{1,3})?[0-9]{9,10}$");
