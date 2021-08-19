@@ -100,12 +100,13 @@ class _LoginState extends State<Login> {
       showErrorDialog(localize('Password my be at least 6 characters'));
       return;
     }
-    if (_selectedRadioTile == 0){
+    if (_selectedRadioTile == 0) {
       FocusScope.of(context).unfocus();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Row(
           children: <Widget>[
-            Text(localize("You must accept our Terms and Privacy Policy"))
+            Flexible(
+               child: Text(localize("You must accept our Terms and Privacy Policy"))),
           ],
         ),
         duration: Duration(seconds: 2),
