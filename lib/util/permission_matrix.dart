@@ -10,20 +10,21 @@ const String superadmin = "superadmin";
 const String pdFireEms = "pd_fire_ems";
 
 class PermissionMatrix {
-
-  static const _talkAroundStudents = [staff, admin];
+  static const _talkAroundVendors = [boater,vendor, admin];
+  static const _talkAroundBoaters = [boater,vendor, admin];
   static const _talkAroundStaff = [staff,  admin, security,  vendor, boater, maintenance];
   static const _talkAroundAdmin = [staff,  admin, security,  vendor, boater, maintenance, district, superadmin];
   static const _talkAroundSecurity = [staff,  admin, security,  district, superadmin];
   static const _talkAroundDistrict = [staff,  admin, security,  vendor, boater, maintenance, district, superadmin];
   static const _talkAroundPdFireEms = [admin, security,  district, superadmin];
 
+
   static List<String> getTalkAroundPermissions(String role) {
     switch (role) {
       case maintenance:
       case vendor:
       case boater:
-        return _talkAroundStudents;
+        return _talkAroundBoaters;
       case admin:
         return _talkAroundAdmin;
       case security:
