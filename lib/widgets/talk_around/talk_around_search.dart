@@ -189,7 +189,6 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
 
     final List<String> talkAroundPermissions =
         PermissionMatrix.getTalkAroundPermissions(_role);
-    print("filtered roles $talkAroundPermissions");
     modifiableUserList.removeWhere((userSnapshot) =>
         userSnapshot.data()["associatedSchools"][escapedSchoolId] == null ||
         !talkAroundPermissions.contains(
