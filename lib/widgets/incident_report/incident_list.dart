@@ -50,7 +50,7 @@ class IncidentListState extends State<IncidentList> {
   }
 
   _handleMessageCollection() async {
-    if (_role == 'school_security') {
+    if (_role == 'security') {
       String escapedSchoolId = _schoolId.substring("schools/".length);
       final List<DocumentSnapshot> securityUsers = (await FirebaseFirestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "school_security").get()).docs;
       _incidentListSubscription = FirebaseFirestore.instance
@@ -63,7 +63,7 @@ class IncidentListState extends State<IncidentList> {
               reports = data.docs;
             });
       });
-    } else if (_role != 'school_staff') {
+    } else if (_role != 'boater' && _role !='vendor' && _role!='maintenance') {
       _incidentListSubscription = FirebaseFirestore.instance
           .collection("$_schoolId/incident_reports")
           .orderBy("createdAt", descending: true)

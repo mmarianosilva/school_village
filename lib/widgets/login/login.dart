@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/components/base_appbar.dart';
+import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/file_helper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/contact/contact.dart';
@@ -11,6 +12,7 @@ import 'package:school_village/widgets/sign_up/request_more_information.dart';
 import 'package:school_village/widgets/sign_up/sign_up_personal.dart';
 import 'package:school_village/widgets/student_login/student_login.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -20,6 +22,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool _checkedPolicy = false;
+  int _selectedRadioTile = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "MarinaVillage";
   FocusNode emailFocusNode = FocusNode();
@@ -41,11 +45,7 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  proceed(FirebaseUser currentUser) async {
-    String userPath = "/users/${currentUser.uid}";
-    print(currentUser);
-    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
+  proceed(DocumentSnapshot userSnapshot) async {
     if (userSnapshot.data() != null &&
         userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
         (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
@@ -100,6 +100,20 @@ class _LoginState extends State<Login> {
       showErrorDialog(localize('Password my be at least 6 characters'));
       return;
     }
+    if (_selectedRadioTile == 0) {
+      FocusScope.of(context).unfocus();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Row(
+          children: <Widget>[
+            Flexible(
+               child: Text(localize("You must accept our Terms and Privacy Policy"))),
+          ],
+        ),
+        duration: Duration(seconds: 2),
+      ));
+
+      return;
+    }
 
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Row(
@@ -116,7 +130,12 @@ class _LoginState extends State<Login> {
             password: passwordController.text)
         .then((auth) {
       if (auth.user != null) {
-        proceed(auth.user);
+        String userPath = "/users/${auth.user.uid}";
+        print(auth.user);
+        DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
+        userRef.get().then((userSnapshot) {
+          proceed(userSnapshot);
+        });
       }
     }).catchError((error) {
       _scaffoldKey.currentState
@@ -252,8 +271,82 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+              const SizedBox(height: 72.0),
+              RadioListTile(
+                value: 1,
+                groupValue: _selectedRadioTile,
+                title: termsAndConditionsText(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedRadioTile = 1;
+                  });
+                },
+                activeColor: _selectedRadioTile == 1 ? Colors.blue : Colors.red,
+                selected: true,
+              ),
             ],
           ),
         ));
+  }
+
+  Widget termsAndConditionsText() {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          color: Color(0xff323339),
+          fontSize: 14.0,
+          fontWeight: FontWeight.w600,
+          height: 18.0 / 14.0,
+          letterSpacing: 0.62,
+        ),
+        children: [
+          TextSpan(
+            text: localize("By continuing you accept our "),
+          ),
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () async {
+                if (await canLaunch(Constants.termsOfServiceUrl)) {
+                  launch(Constants.termsOfServiceUrl);
+                }
+              },
+              child: Text(
+                localize("Terms"),
+                style: TextStyle(
+                  color: Color(0xff0a7aff),
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  height: 18.0 / 14.0,
+                  letterSpacing: 0.62,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(
+            text: localize(" and "),
+          ),
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () async {
+                if (await canLaunch(Constants.privacyPolicyUrl)) {
+                  launch(Constants.privacyPolicyUrl);
+                }
+              },
+              child: Text(
+                localize("Privacy Policy"),
+                style: TextStyle(
+                  color: Color(0xff0a7aff),
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  height: 18.0 / 14.0,
+                  letterSpacing: 0.62,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.start,
+    );
   }
 }

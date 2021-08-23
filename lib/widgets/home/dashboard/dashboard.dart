@@ -260,7 +260,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildNotificationsOption(model) {
-    if (role == 'school_student' || role == 'boater'|| role == 'vendor' || role == 'maintenance') {
+    if (role == 'boater' || role == 'vendor' || role == 'maintenance') {
       return SizedBox();
     }
     return FutureBuilder(
@@ -398,11 +398,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentReport() {
-    if (role == 'school_student' ||
-        role == 'enduser' ||
-        role == 'school_family' ||
-        role == 'family' ||
-        role == 'pd-fire-ems') {
+    if (role == 'pd_fire_ems') {
       return SizedBox();
     }
 
@@ -448,10 +444,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentList() {
-    if (role == 'school_student' ||
-        role == 'enduser' ||
-        role == 'school_family' ||
-        role == 'pd-fire-ems') {
+    if (role == 'pd_fire_ems') {
       return SizedBox();
     }
 
@@ -497,12 +490,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'school_admin' &&
-        role != 'admin' &&
-        role != 'school_security' &&
-        role != 'security' &&
-        role != 'district' &&
-        role != 'superadmin') {
+    if (role != 'admin' && role != 'superadmin') {
       return SizedBox();
     }
     return GestureDetector(
@@ -545,7 +533,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _buildAlertButton() {
     const size = HeaderButtons.iconSize;
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'pd_fire_ems') {
       return SizedBox(
         height: size,
       );
@@ -956,7 +944,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           _getSchoolId();
         } else {
           checkNewSchool();
-          if (role != 'school_student' && role != 'enduser') {
+          if (role != 'boater' && role != 'vendor') {
             _getLocationPermission();
           }
         }
@@ -985,9 +973,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                       .cast<String>();
                               //debugPrint("Access roles are $accessRoles");
                               for (final accessRole in accessRoles) {
-                                if (accessRole.contains(role) ||
-                                    Temporary.updateRole(accessRole)
-                                        .contains(role)) {
+                                if (accessRole.contains(role) ) {
+                                  //||
+                                  //                                     Temporary.updateRole(accessRole)
+                                  //                                         .contains(role)
+                                  //Removed above since we're upgrading
                                   //debugPrint("Print this");
                                   return true;
                                 }

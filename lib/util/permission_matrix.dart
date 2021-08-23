@@ -1,44 +1,40 @@
-const String family = "school_family";
-const String student = "school_student";
-const String enduser = "enduser";
-const String schoolAdmin = "school_admin";
+const String maintenance = "maintenance";
+const String vendor = "vendor";
+const String boater = "boater";
 const String admin = "admin";
-const String schoolSecurity = "school_security";
 const String security = "security";
-const String schoolStaff = "school_staff";
+
 const String staff = "staff";
 const String district = "district";
 const String superadmin = "superadmin";
-const String pdFireEms = "pd-fire-ems";
+const String pdFireEms = "pd_fire_ems";
 
 class PermissionMatrix {
-  static const _talkAroundFamily = [staff, admin, schoolStaff, schoolAdmin];
-  static const _talkAroundStudents = [staff, admin, schoolStaff, schoolAdmin];
-  static const _talkAroundStaff = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family];
-  static const _talkAroundAdmin = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family, district, superadmin];
-  static const _talkAroundSecurity = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, district, superadmin];
-  static const _talkAroundDistrict = [staff, schoolStaff, admin, schoolAdmin, security, schoolSecurity, student, enduser, family, district, superadmin];
-  static const _talkAroundPdFireEms = [admin, schoolAdmin, security, schoolSecurity, district, superadmin];
+  static const _talkAroundMaintenance = [admin, security, maintenance];
+  static const _talkAroundVendors = [vendor, admin];
+  static const _talkAroundBoaters = [boater,vendor, admin];
+  static const _talkAroundStaff = [staff,  admin, security,  vendor, boater, maintenance];
+  static const _talkAroundAdmin = [staff,  admin, security,  vendor, boater, maintenance, district, superadmin];
+  static const _talkAroundSecurity = [staff,  admin, security,  district, superadmin];
+  static const _talkAroundPdFireEms = [admin, security,  district, superadmin];
+
 
   static List<String> getTalkAroundPermissions(String role) {
     switch (role) {
-      case family:
-        return _talkAroundFamily;
-      case student:
-      case enduser:
-        return _talkAroundStudents;
-      case admin:
-      case schoolAdmin:
-        return _talkAroundAdmin;
+      case maintenance:
+        return _talkAroundMaintenance;
+      case vendor:
+        return _talkAroundVendors;
+      case boater:
+        return _talkAroundBoaters;
       case security:
-      case schoolSecurity:
         return _talkAroundSecurity;
       case staff:
-      case schoolStaff:
         return _talkAroundStaff;
       case district:
       case superadmin:
-        return _talkAroundDistrict;
+      case admin:
+        return _talkAroundAdmin;
       case pdFireEms:
         return _talkAroundPdFireEms;
       default:
