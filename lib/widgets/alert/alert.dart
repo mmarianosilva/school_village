@@ -90,7 +90,6 @@ class _AlertState extends State<Alert> {
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolName = await UserHelper.getSchoolName();
-    //getIntradoChats();
     FirebaseFirestore.instance.doc(_schoolId).get().then((school) {
       _isTrainingMode = school.data()['isTraining'];
     });
@@ -246,14 +245,6 @@ class _AlertState extends State<Alert> {
                                                   key: 'incident_url',
                                                   value: incidentUrl)
                                             ],
-                                            caCivicAddress:
-                                                IntradoCaCivicAddress(
-                                              country: "US",
-                                              a1: "CO",
-                                              a2: "BOULDER",
-                                              a3: "LONGMONT",
-                                              rd: "RD",
-                                            ),
                                             geoLocation: IntradoGeoLocation(
                                                 latitude: location["latitude"],
                                                 longitude:
@@ -264,7 +255,7 @@ class _AlertState extends State<Alert> {
                                             serviceProvider:
                                                 IntradoServiceProvider(
                                                     name:
-                                                        "Marina Village Safety",
+                                                        "OandMtech",
                                                     contactUri:
                                                         "tel:+19492741709",
                                                     textChatEnabled: true),
