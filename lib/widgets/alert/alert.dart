@@ -176,6 +176,7 @@ class _AlertState extends State<Alert> {
                 textAlign: TextAlign.center,
               ),
               content: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: ListBody(
                   children: <Widget>[
                     Text(
@@ -190,83 +191,75 @@ class _AlertState extends State<Alert> {
                   ],
                 ),
               ),
+              contentPadding: EdgeInsets.zero,
+              actionsOverflowDirection: VerticalDirection.down,
               actions: <Widget>[
-                FlatButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  color: SVColors.alertTitleColor,
-                  child: Text(
-                    localize('CALL 911'),
-                    style: TextStyle(color: Colors.white, fontSize: 17.0),
-                  ),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    _forwardAlert(
-                        EventAction.PSAPLink, alertTitle, alertBody, alertType);
-                    //_isTrainingMode = false;
-                  },
+                Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //ROW 1
+                        children: [
+                          FlatButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)),
+                            color: SVColors.alertTitleColor,
+                            child: Text(
+                              localize('CALL 911'),
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 17.0),
+                            ),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              processAlert(EventAction.PSAPLink, alertTitle,
+                                  alertBody, alertType);
+                              //_isTrainingMode = false;
+                            },
+                          ),
+                          FlatButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)),
+                            color: SVColors.alertTitleColor,
+                            child: Text(
+                              localize('TEXT 911'),
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 17.0),
+                            ),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              processAlert(EventAction.TextMsg, alertTitle,
+                                  alertBody, alertType);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(//ROW 2
+                          children: [
+                        FlatButton(
+                          color: SVColors.alertDescColor,
+                          child: Text(localize('CANCEL'),
+                              style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      ]),
+                    ),
+                  ],
                 ),
-                FlatButton(
-                  color: Colors.red,
-                  child: Text(localize('Only Campus'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    _forwardAlert(
-                        EventAction.TextMsg, alertTitle, alertBody, alertType);
-                  },
-                ),
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('Cancel'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          });
-    } else {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) {
-            return AlertDialog(
-              title:
-                  Text(localize('Are you sure you want to send this alert?')),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[Text(localize('This cannot be undone'))],
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('YES'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    final incident = await _getIncidentUrl();
-                    _saveAlert(alertTitle, alertBody, alertType, context,
-                        incident[1], incident[0]);
-                  },
-                ),
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('NO'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
               ],
             );
           });
     }
   }
 
-  _forwardAlert(EventAction event, alertTitle, alertBody, alertType) async {
+  processAlert(EventAction event, alertTitle, alertBody, alertType) async {
     if (_isTrainingMode) {
       Scaffold.of(_scaffold).showSnackBar(SnackBar(
         content: Text(localize(
