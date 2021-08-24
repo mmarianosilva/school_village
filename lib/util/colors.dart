@@ -7,6 +7,8 @@ class SVColors {
   static const incidentReportRed = const Color.fromRGBO(234, 51, 54, 1.0);
   static const incidentReportGray = const Color.fromRGBO(74, 74, 74, 1.0);
   static const dashboardItemFontColor = const Color.fromRGBO(50, 51, 57, 1.0);
+  static const alertTitleColor = const Color.fromRGBO(129, 3, 23, 1.0);
+  static const alertDescColor = const Color.fromRGBO(72, 72, 74, 1.0);
 
   static colorFromHex(String hex) {
     if (hex.startsWith('#')) {

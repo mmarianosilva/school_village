@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:school_village/util/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../model/intrado_wrapper.dart';
 
 class Alert extends StatefulWidget {
@@ -43,10 +43,15 @@ class _AlertState extends State<Alert> {
         builder: (_) {
           return AlertDialog(
             title: Text(
-                localize('Connect with +911')),
+                localize(
+                    'Send an EMERGENCY ALERT to 911 and Marina Neighbours'),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                    fontSize: 16.0)),
             content: SingleChildScrollView(
               child: ListBody(
-                children: <Widget>[Text(localize('Note: This cannot be undone'))],
+                children: <Widget>[Text(localize('This cannot be undone'))],
               ),
             ),
             actions: <Widget>[
@@ -160,165 +165,45 @@ class _AlertState extends State<Alert> {
           barrierDismissible: false,
           builder: (_) {
             return AlertDialog(
-              title:
-                  Text(localize('Are you sure you want to send this alert?')),
+              insetPadding: EdgeInsets.all(17),
+              title: Text(
+                localize(
+                    'Send an EMERGENCY ALERT \nto 911 and Marina Neighbours'),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: SVColors.alertTitleColor,
+                    fontSize: 20.0),
+                textAlign: TextAlign.center,
+              ),
               content: SingleChildScrollView(
                 child: ListBody(
-                  children: <Widget>[Text(localize('This cannot be undone'))],
+                  children: <Widget>[
+                    Text(
+                      localize('This cannot be undone'),
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: SVColors.alertDescColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                  ],
                 ),
               ),
               actions: <Widget>[
                 FlatButton(
-                  color: Colors.red,
-                  child: Text(localize('911 + Campus'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  color: SVColors.alertTitleColor,
+                  child: Text(
+                    localize('CALL 911'),
+                    style: TextStyle(color: Colors.white, fontSize: 17.0),
+                  ),
+                  onPressed: () async {
                     Navigator.of(context).pop();
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (_) {
-                          return AlertDialog(
-                            title: Text(localize(
-                                'Are you sure you want to send a message to 911?')),
-                            content: SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  Text(localize('This cannot be undone'))
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              FlatButton(
-                                  color: Colors.black45,
-                                  child: Text(localize('Yes'),
-                                      style: TextStyle(color: Colors.white)),
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    //_isTrainingMode = false;
-                                    if (_isTrainingMode) {
-                                      Scaffold.of(_scaffold)
-                                          .showSnackBar(SnackBar(
-                                        content: Text(localize(
-                                            "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
-                                      ));
-                                      final incident = await _getIncidentUrl();
-                                      _saveAlert(
-                                          alertTitle,
-                                          alertBody,
-                                          alertType,
-                                          context,
-                                          incident[1],
-                                          incident[0]);
-                                    } else {
-                                      final mEvent =
-                                          await getConversationType();
-                                      print("Returned Event is $mEvent");
-                                      if (mEvent == EventAction.None) {
-                                        return;
-                                      }
-                                      //final String incidentUrl =
-                                      //await _saveAlert(alertTitle,
-                                      //alertBody, alertType, context);
-                                      final location =
-                                          await UserHelper.getLocation();
-                                      final incident = await _getIncidentUrl();
-                                      print(incident);
-                                      await _saveAlert(
-                                              alertTitle,
-                                              alertBody,
-                                              alertType,
-                                              context,
-                                              incident[1],
-                                              incident[0])
-                                          .then((value) async {
-                                        if (location != null) {
-                                          final incidentUrl =
-                                              incident[2] + incident[0];
-                                          final intradoPayload = IntradoWrapper(
-                                            eventAction: _eventAction,
-                                            eventDescription:
-                                                IntradoEventDescription(
-                                                    text: alertTitle),
-                                            eventDetails: <IntradoEventDetails>[
-                                              IntradoEventDetails(
-                                                  key: 'incident_url',
-                                                  value: incidentUrl)
-                                            ],
-                                            geoLocation: IntradoGeoLocation(
-                                                latitude: location["latitude"],
-                                                longitude:
-                                                    location["longitude"],
-                                                altitude: location["altitude"],
-                                                confidence: 80,
-                                                uncertainty: 150.0),
-                                            serviceProvider:
-                                                IntradoServiceProvider(
-                                                    name:
-                                                        "OandMtech",
-                                                    contactUri:
-                                                        "tel:+19492741709",
-                                                    textChatEnabled: true),
-                                            deviceOwner: IntradoDeviceOwner(
-                                                name:
-                                                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                                                tel:
-                                                    "${_userSnapshot.data()['phone']}",
-                                                environment: "Marina",
-                                                mobility: "Fixed"),
-                                            eventTime: DateTime.now(),
-                                          );
-                                          final token =
-                                              (await (await FirebaseAuth
-                                                          .instance
-                                                          .currentUser())
-                                                      .getIdToken())
-                                                  .token;
-                                          final response = await http.post(
-                                            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
-                                            body: intradoPayload.toXml(),
-                                            encoding:
-                                                Encoding.getByName("utf8"),
-                                            headers: <String, String>{
-                                              "Authorization": "Bearer $token",
-                                            },
-                                          );
-                                          print(
-                                              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-                                          print(
-                                              "Intrado response is ${response.body}");
-                                          final jsonResponse =
-                                              json.decode(response.body);
-                                          IntradoResponse intradoResponse =
-                                              new IntradoResponse.fromJson(
-                                                  jsonResponse);
-                                          if (intradoResponse.success == true &&
-                                              _eventAction ==
-                                                  EventAction.PSAPLink) {
-                                            var storexml = xml.parse(
-                                                intradoResponse.response);
-                                            final phones = storexml
-                                                .findAllElements('number');
-                                            phones
-                                                .map((node) => node.text)
-                                                .forEach((element) {
-                                              launch("tel://$element");
-                                            });
-                                          }
-                                        }
-                                      });
-                                    }
-                                  }),
-                              FlatButton(
-                                  color: Colors.black45,
-                                  child: Text(localize('No'),
-                                      style: TextStyle(color: Colors.white)),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  }),
-                            ],
-                          );
-                        });
+                    _forwardAlert(
+                        EventAction.PSAPLink, alertTitle, alertBody, alertType);
+                    //_isTrainingMode = false;
                   },
                 ),
                 FlatButton(
@@ -327,9 +212,8 @@ class _AlertState extends State<Alert> {
                       style: TextStyle(color: Colors.white)),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                    final incident = await _getIncidentUrl();
-                    _saveAlert(alertTitle, alertBody, alertType, context,
-                        incident[1], incident[0]);
+                    _forwardAlert(
+                        EventAction.TextMsg, alertTitle, alertBody, alertType);
                   },
                 ),
                 FlatButton(
@@ -379,6 +263,86 @@ class _AlertState extends State<Alert> {
               ],
             );
           });
+    }
+  }
+
+  _forwardAlert(EventAction event, alertTitle, alertBody, alertType) async {
+    if (_isTrainingMode) {
+      Scaffold.of(_scaffold).showSnackBar(SnackBar(
+        content: Text(localize(
+            "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
+      ));
+      final incident = await _getIncidentUrl();
+      _saveAlert(
+          alertTitle, alertBody, alertType, context, incident[1], incident[0]);
+    } else {
+      final mEvent = event;
+      print("Returned Event is $mEvent");
+      if (mEvent == EventAction.None) {
+        return;
+      }
+      //final String incidentUrl =
+      //await _saveAlert(alertTitle,
+      //alertBody, alertType, context);
+      final location = await UserHelper.getLocation();
+      final incident = await _getIncidentUrl();
+      print(incident);
+      await _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
+              incident[0])
+          .then((value) async {
+        if (location != null && mEvent != EventAction.None) {
+          final incidentUrl = incident[2] + incident[0];
+          final intradoPayload = IntradoWrapper(
+            eventAction: _eventAction,
+            eventDescription: IntradoEventDescription(text: alertTitle),
+            eventDetails: <IntradoEventDetails>[
+              IntradoEventDetails(key: 'incident_url', value: incidentUrl)
+            ],
+            geoLocation: IntradoGeoLocation(
+                latitude: location["latitude"],
+                longitude: location["longitude"],
+                altitude: location["altitude"],
+                confidence: 80,
+                uncertainty: 150.0),
+            serviceProvider: IntradoServiceProvider(
+                name: "OandMtech",
+                contactUri: "tel:+19492741709",
+                textChatEnabled: true),
+            deviceOwner: IntradoDeviceOwner(
+                name:
+                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
+                tel: "${_userSnapshot.data()['phone']}",
+                environment: "Marina",
+                mobility: "Fixed"),
+            eventTime: DateTime.now(),
+          );
+          final token =
+              (await (await FirebaseAuth.instance.currentUser()).getIdToken())
+                  .token;
+          final response = await http.post(
+            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
+            body: intradoPayload.toXml(),
+            encoding: Encoding.getByName("utf8"),
+            headers: <String, String>{
+              "Authorization": "Bearer $token",
+            },
+          );
+          print(
+              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+          print("Intrado response is ${response.body}");
+          final jsonResponse = json.decode(response.body);
+          IntradoResponse intradoResponse =
+              new IntradoResponse.fromJson(jsonResponse);
+          if (intradoResponse.success == true &&
+              _eventAction == EventAction.PSAPLink) {
+            var storexml = xml.parse(intradoResponse.response);
+            final phones = storexml.findAllElements('number');
+            phones.map((node) => node.text).forEach((element) {
+              launch("tel://$element");
+            });
+          }
+        }
+      });
     }
   }
 
