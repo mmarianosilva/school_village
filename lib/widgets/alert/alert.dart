@@ -21,7 +21,7 @@ class Alert extends StatefulWidget {
 }
 
 class _AlertState extends State<Alert> {
-  EventAction _eventAction = EventAction.None;
+
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
@@ -36,58 +36,7 @@ class _AlertState extends State<Alert> {
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
 
-  Future<EventAction> getConversationType() async {
-    await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) {
-          return AlertDialog(
-            title: Text(
-                localize(
-                    'Send an EMERGENCY ALERT to 911 and Marina Neighbours'),
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                    fontSize: 16.0)),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[Text(localize('This cannot be undone'))],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                color: Colors.red,
-                child: Text(localize('Chat'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  _eventAction = EventAction.TextMsg;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                color: Colors.red,
-                child: Text(localize('Voice'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () async {
-                  _eventAction = EventAction.PSAPLink;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                color: Colors.black45,
-                child: Text(localize('Cancel'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  _eventAction = EventAction.None;
-                  Navigator.of(context).pop();
-                  _showAlertSent("CANCELLED", "911 Alert Not Sent");
-                },
-              ),
-            ],
-          );
-        });
-    return _eventAction;
-  }
+
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -317,10 +266,10 @@ class _AlertState extends State<Alert> {
       await _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
               incident[0])
           .then((value) async {
-        if (location != null && mEvent != EventAction.None) {
+        if (location != null && event != EventAction.None) {
           final incidentUrl = incident[2] + incident[0];
           final intradoPayload = IntradoWrapper(
-            eventAction: _eventAction,
+            eventAction: event,
             eventDescription: IntradoEventDescription(text: alertTitle),
             eventDetails: <IntradoEventDetails>[
               IntradoEventDetails(key: 'incident_url', value: incidentUrl)
@@ -361,7 +310,7 @@ class _AlertState extends State<Alert> {
           IntradoResponse intradoResponse =
               new IntradoResponse.fromJson(jsonResponse);
           if (intradoResponse.success == true &&
-              _eventAction == EventAction.PSAPLink) {
+              event == EventAction.PSAPLink) {
             var storexml = xml.parse(intradoResponse.response);
             final phones = storexml.findAllElements('number');
             phones.map((node) => node.text).forEach((element) {
