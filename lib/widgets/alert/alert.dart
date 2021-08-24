@@ -80,6 +80,7 @@ class _AlertState extends State<Alert> {
                 onPressed: () {
                   _eventAction = EventAction.None;
                   Navigator.of(context).pop();
+                  _showAlertSent("CANCELLED", "911 Alert Not Sent");
                 },
               ),
             ],
@@ -152,6 +153,69 @@ class _AlertState extends State<Alert> {
         });
   }
 
+  Widget _text911Button(alertTitle, alertBody, alertType) {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertTitleColor,
+      child: Text(
+        localize('TEXT 911'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        processAlert(EventAction.TextMsg, alertTitle, alertBody, alertType);
+      },
+    );
+  }
+
+  Widget _call911Button(alertTitle, alertBody, alertType) {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertTitleColor,
+      child: Text(
+        localize('CALL 911'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        processAlert(EventAction.PSAPLink, alertTitle, alertBody, alertType);
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
+  Widget _cancelAlert() {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertDescColor,
+      child: Text(
+        localize('CANCEL'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
+  Widget _dismissButton() {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertOkButtonColor,
+      child: Text(
+        localize('OK'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
   _sendAlert(alertType, alertTitle, alertBody) {
     if (_role == 'security' ||
         _role == 'admin' ||
@@ -159,7 +223,8 @@ class _AlertState extends State<Alert> {
         _role == 'district' ||
         _role == 'boater' ||
         _role == 'vendor' ||
-        _role == 'maintenance') {
+        _role == 'maintenance' ||
+        _role == 'pd_fire_ems') {
       showDialog(
           context: context,
           barrierDismissible: false,
@@ -194,65 +259,34 @@ class _AlertState extends State<Alert> {
               contentPadding: EdgeInsets.zero,
               actionsOverflowDirection: VerticalDirection.down,
               actions: <Widget>[
-                Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        //ROW 1
-                        children: [
-                          FlatButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
-                            color: SVColors.alertTitleColor,
-                            child: Text(
-                              localize('CALL 911'),
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 17.0),
-                            ),
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              processAlert(EventAction.PSAPLink, alertTitle,
-                                  alertBody, alertType);
-                              //_isTrainingMode = false;
-                            },
-                          ),
-                          FlatButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
-                            color: SVColors.alertTitleColor,
-                            child: Text(
-                              localize('TEXT 911'),
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 17.0),
-                            ),
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              processAlert(EventAction.TextMsg, alertTitle,
-                                  alertBody, alertType);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Row(//ROW 2
-                          children: [
-                        FlatButton(
-                          color: SVColors.alertDescColor,
-                          child: Text(localize('CANCEL'),
-                              style: TextStyle(color: Colors.white)),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        )
-                      ]),
-                    ),
-                  ],
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: double.maxFinite,
+                  ),
                 ),
+                Center(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.max,
+                          //ROW 1
+                          children: [
+                            _call911Button(alertTitle, alertBody, alertType),
+                            _text911Button(alertTitle, alertBody, alertType),
+                          ],
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: _cancelAlert(),
+                      ),
+                    ],
+                  ),
+                )
               ],
             );
           });
@@ -452,28 +486,91 @@ class _AlertState extends State<Alert> {
     print(
         "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
+    _showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
+    // showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: Text(localize('Alert Sent')),
+    //         content: SingleChildScrollView(
+    //           child: ListBody(
+    //             children: <Widget>[Text('')],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           FlatButton(
+    //             child: Text(localize('Okay')),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           )
+    //         ],
+    //       );
+    //     });
+    return "";
+  }
 
+  _showAlertSent(String status, String msg) {
     showDialog(
         context: context,
-        builder: (BuildContext context) {
+        barrierDismissible: false,
+        builder: (_) {
           return AlertDialog(
-            title: Text(localize('Alert Sent')),
+            insetPadding: EdgeInsets.all(17),
+            title: Text(
+              localize(status),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: SVColors.alertDescColor,
+                  fontSize: 20.0),
+              textAlign: TextAlign.center,
+            ),
             content: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
               child: ListBody(
-                children: <Widget>[Text('')],
+                children: <Widget>[
+                  Text(
+                    localize(msg),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: SVColors.alertDescColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                ],
               ),
             ),
+            contentPadding: EdgeInsets.zero,
+            actionsOverflowDirection: VerticalDirection.down,
             actions: <Widget>[
-              FlatButton(
-                child: Text(localize('Okay')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: double.maxFinite,
+                ),
+              ),
+              Center(
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        //ROW 1
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: _dismissButton(),
+                    ),
+                  ],
+                ),
               )
             ],
           );
         });
-    return "";
   }
 
   @override
