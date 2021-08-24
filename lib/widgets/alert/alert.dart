@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:school_village/util/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:school_village/model/intrado_wrapper.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../model/intrado_wrapper.dart';
 
 class Alert extends StatefulWidget {
@@ -21,7 +21,6 @@ class Alert extends StatefulWidget {
 }
 
 class _AlertState extends State<Alert> {
-  EventAction _eventAction = EventAction.None;
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
@@ -35,53 +34,6 @@ class _AlertState extends State<Alert> {
   bool _isTrainingMode = true;
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
-
-  Future<EventAction> getConversationType() async {
-    await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) {
-          return AlertDialog(
-            title: Text(
-                localize('Connect with +911')),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[Text(localize('Note: This cannot be undone'))],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                color: Colors.red,
-                child: Text(localize('Chat'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  _eventAction = EventAction.TextMsg;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                color: Colors.red,
-                child: Text(localize('Voice'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () async {
-                  _eventAction = EventAction.PSAPLink;
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                color: Colors.black45,
-                child: Text(localize('Cancel'),
-                    style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  _eventAction = EventAction.None;
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-    return _eventAction;
-  }
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -147,6 +99,69 @@ class _AlertState extends State<Alert> {
         });
   }
 
+  Widget _text911Button(alertTitle, alertBody, alertType) {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertTitleColor,
+      child: Text(
+        localize('TEXT 911'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        processAlert(EventAction.TextMsg, alertTitle, alertBody, alertType);
+      },
+    );
+  }
+
+  Widget _call911Button(alertTitle, alertBody, alertType) {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertTitleColor,
+      child: Text(
+        localize('CALL 911'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        processAlert(EventAction.PSAPLink, alertTitle, alertBody, alertType);
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
+  Widget _cancelAlert() {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertDescColor,
+      child: Text(
+        localize('CANCEL'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        _showAlertSent("CANCELLED","\n911 Alert Not Sent\n");
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
+  Widget _dismissButton() {
+    return FlatButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      color: SVColors.alertOkButtonColor,
+      child: Text(
+        localize('OK'),
+        style: TextStyle(color: Colors.white, fontSize: 17.0),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+
+        //_isTrainingMode = false;
+      },
+    );
+  }
+
   _sendAlert(alertType, alertTitle, alertBody) {
     if (_role == 'security' ||
         _role == 'admin' ||
@@ -154,231 +169,177 @@ class _AlertState extends State<Alert> {
         _role == 'district' ||
         _role == 'boater' ||
         _role == 'vendor' ||
-        _role == 'maintenance') {
+        _role == 'maintenance' ||
+        _role == 'pd_fire_ems') {
       showDialog(
           context: context,
           barrierDismissible: false,
           builder: (_) {
             return AlertDialog(
-              title:
-                  Text(localize('Are you sure you want to send this alert?')),
+              insetPadding: EdgeInsets.all(17),
+              title: Text(
+                localize(
+                    'Send an EMERGENCY ALERT \nto 911 and Marina Neighbours'),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: SVColors.alertTitleColor,
+                    fontSize: 20.0),
+                textAlign: TextAlign.center,
+              ),
               content: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
                 child: ListBody(
-                  children: <Widget>[Text(localize('This cannot be undone'))],
+                  children: <Widget>[
+                    Text(
+                      localize('This cannot be undone'),
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: SVColors.alertDescColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                  ],
                 ),
               ),
+              contentPadding: EdgeInsets.zero,
+              actionsOverflowDirection: VerticalDirection.down,
               actions: <Widget>[
-                FlatButton(
-                  color: Colors.red,
-                  child: Text(localize('911 + Campus'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (_) {
-                          return AlertDialog(
-                            title: Text(localize(
-                                'Are you sure you want to send a message to 911?')),
-                            content: SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  Text(localize('This cannot be undone'))
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              FlatButton(
-                                  color: Colors.black45,
-                                  child: Text(localize('Yes'),
-                                      style: TextStyle(color: Colors.white)),
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    //_isTrainingMode = false;
-                                    if (_isTrainingMode) {
-                                      Scaffold.of(_scaffold)
-                                          .showSnackBar(SnackBar(
-                                        content: Text(localize(
-                                            "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
-                                      ));
-                                      final incident = await _getIncidentUrl();
-                                      _saveAlert(
-                                          alertTitle,
-                                          alertBody,
-                                          alertType,
-                                          context,
-                                          incident[1],
-                                          incident[0]);
-                                    } else {
-                                      final mEvent =
-                                          await getConversationType();
-                                      print("Returned Event is $mEvent");
-                                      if (mEvent == EventAction.None) {
-                                        return;
-                                      }
-                                      //final String incidentUrl =
-                                      //await _saveAlert(alertTitle,
-                                      //alertBody, alertType, context);
-                                      final location =
-                                          await UserHelper.getLocation();
-                                      final incident = await _getIncidentUrl();
-                                      print(incident);
-                                      await _saveAlert(
-                                              alertTitle,
-                                              alertBody,
-                                              alertType,
-                                              context,
-                                              incident[1],
-                                              incident[0])
-                                          .then((value) async {
-                                        if (location != null) {
-                                          final incidentUrl =
-                                              incident[2] + incident[0];
-                                          final intradoPayload = IntradoWrapper(
-                                            eventAction: _eventAction,
-                                            eventDescription:
-                                                IntradoEventDescription(
-                                                    text: alertTitle),
-                                            eventDetails: <IntradoEventDetails>[
-                                              IntradoEventDetails(
-                                                  key: 'incident_url',
-                                                  value: incidentUrl)
-                                            ],
-                                            geoLocation: IntradoGeoLocation(
-                                                latitude: location["latitude"],
-                                                longitude:
-                                                    location["longitude"],
-                                                altitude: location["altitude"],
-                                                confidence: 80,
-                                                uncertainty: 150.0),
-                                            serviceProvider:
-                                                IntradoServiceProvider(
-                                                    name:
-                                                        "OandMtech",
-                                                    contactUri:
-                                                        "tel:+19492741709",
-                                                    textChatEnabled: true),
-                                            deviceOwner: IntradoDeviceOwner(
-                                                name:
-                                                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                                                tel:
-                                                    "${_userSnapshot.data()['phone']}",
-                                                environment: "Marina",
-                                                mobility: "Fixed"),
-                                            eventTime: DateTime.now(),
-                                          );
-                                          final token =
-                                              (await (await FirebaseAuth
-                                                          .instance
-                                                          .currentUser())
-                                                      .getIdToken())
-                                                  .token;
-                                          final response = await http.post(
-                                            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
-                                            body: intradoPayload.toXml(),
-                                            encoding:
-                                                Encoding.getByName("utf8"),
-                                            headers: <String, String>{
-                                              "Authorization": "Bearer $token",
-                                            },
-                                          );
-                                          print(
-                                              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-                                          print(
-                                              "Intrado response is ${response.body}");
-                                          final jsonResponse =
-                                              json.decode(response.body);
-                                          IntradoResponse intradoResponse =
-                                              new IntradoResponse.fromJson(
-                                                  jsonResponse);
-                                          if (intradoResponse.success == true &&
-                                              _eventAction ==
-                                                  EventAction.PSAPLink) {
-                                            var storexml = xml.parse(
-                                                intradoResponse.response);
-                                            final phones = storexml
-                                                .findAllElements('number');
-                                            phones
-                                                .map((node) => node.text)
-                                                .forEach((element) {
-                                              launch("tel://$element");
-                                            });
-                                          }
-                                        }
-                                      });
-                                    }
-                                  }),
-                              FlatButton(
-                                  color: Colors.black45,
-                                  child: Text(localize('No'),
-                                      style: TextStyle(color: Colors.white)),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  }),
-                            ],
-                          );
-                        });
-                  },
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: double.maxFinite,
+                  ),
                 ),
-                FlatButton(
-                  color: Colors.red,
-                  child: Text(localize('Only Campus'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    final incident = await _getIncidentUrl();
-                    _saveAlert(alertTitle, alertBody, alertType, context,
-                        incident[1], incident[0]);
-                  },
-                ),
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('Cancel'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          });
-    } else {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) {
-            return AlertDialog(
-              title:
-                  Text(localize('Are you sure you want to send this alert?')),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[Text(localize('This cannot be undone'))],
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('YES'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                    final incident = await _getIncidentUrl();
-                    _saveAlert(alertTitle, alertBody, alertType, context,
-                        incident[1], incident[0]);
-                  },
-                ),
-                FlatButton(
-                  color: Colors.black45,
-                  child: Text(localize('NO'),
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                Center(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.max,
+                          //ROW 1
+                          children: [
+                            _call911Button(alertTitle, alertBody, alertType),
+                            _text911Button(alertTitle, alertBody, alertType),
+                          ],
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: _cancelAlert(),
+                      ),
+                    ],
+                  ),
                 )
               ],
             );
           });
+    }
+  }
+
+  processAlert(EventAction event, alertTitle, alertBody, alertType) async {
+    if (_isTrainingMode) {
+      Scaffold.of(_scaffold).showSnackBar(SnackBar(
+        content: Text(localize(
+            "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
+      ));
+      final incident = await _getIncidentUrl();
+      _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
+              incident[0])
+          .then((value) {
+        _showAlertSent("SUCCESS", "\nAlert Sent to \nMarina Neighbours\n");
+      });
+    } else {
+      final mEvent = event;
+      print("Returned Event is $mEvent");
+      if (mEvent == EventAction.None) {
+        return;
+      }
+      //final String incidentUrl =
+      //await _saveAlert(alertTitle,
+      //alertBody, alertType, context);
+      final location = await UserHelper.getLocation();
+      final incident = await _getIncidentUrl();
+      print(incident);
+      await _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
+              incident[0])
+          .then((value) async {
+        if (location != null && event != EventAction.None) {
+          final incidentUrl = incident[2] + incident[0];
+          final intradoPayload = IntradoWrapper(
+            eventAction: event,
+            eventDescription: IntradoEventDescription(text: alertTitle),
+            eventDetails: <IntradoEventDetails>[
+              IntradoEventDetails(key: 'incident_url', value: incidentUrl)
+            ],
+            geoLocation: IntradoGeoLocation(
+                latitude: location["latitude"],
+                longitude: location["longitude"],
+                altitude: location["altitude"],
+                confidence: 80,
+                uncertainty: 150.0),
+            caCivicAddress: IntradoCaCivicAddress(
+              country: "US",
+              a1: "CO",
+              a2: "BOULDER",
+              a3: "LONGMONT",
+              rd: "RD",
+            ),
+            serviceProvider: IntradoServiceProvider(
+                name: "OandMtech",
+                contactUri: "tel:+19492741709",
+                textChatEnabled: true),
+            deviceOwner: IntradoDeviceOwner(
+                name:
+                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
+                tel: "${_userSnapshot.data()['phone']}",
+                environment: "Marina",
+                mobility: "Fixed"),
+            eventTime: DateTime.now(),
+          );
+          final token =
+              (await (await FirebaseAuth.instance.currentUser()).getIdToken())
+                  .token;
+          final response = await http.post(
+            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
+            body: intradoPayload.toXml(),
+            encoding: Encoding.getByName("utf8"),
+            headers: <String, String>{
+              "Authorization": "Bearer $token",
+            },
+          );
+          debugPrint(
+              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+          debugPrint("Intrado response is ${response.body}");
+          final jsonResponse = json.decode(response.body);
+          IntradoResponse intradoResponse =
+              new IntradoResponse.fromJson(jsonResponse);
+          if (intradoResponse.success == true &&
+              event == EventAction.PSAPLink) {
+            var storexml = xml.parse(intradoResponse.response);
+            final phones = storexml.findAllElements('number');
+            String phoneNumber = null;
+            phones.map((node) => node.text).forEach((element) {
+              phoneNumber = element;
+            });
+            if (phoneNumber == null) {
+              storexml
+                  .findAllElements('message')
+                  .map((e) => e.text)
+                  .forEach((element) {
+                _showAlertSent("PSAP Error", '\n${element}\n');
+              });
+            } else {
+              launch("tel://$phoneNumber");
+            }
+          } else {
+            _showAlertSent(
+                "SUCCESS", "\nAlert Sent to 911 \nand Marina Neighbours");
+          }
+        }
+      });
     }
   }
 
@@ -420,20 +381,6 @@ class _AlertState extends State<Alert> {
       return null;
     });
     return lastResolved;
-  }
-
-  getIntradoChats() async {
-    final result = await FirebaseFirestore.instance
-        .collection("intrado_events")
-        //.where("schoolId", isEqualTo: id)
-        .get();
-    if (result.docs.isEmpty) {
-      print("No Intrado Events");
-    } else {
-      result.docs.forEach((element) {
-        print("Intrado Event : $element");
-      });
-    }
   }
 
   Future<List<dynamic>> _getIncidentUrl() async {
@@ -495,28 +442,91 @@ class _AlertState extends State<Alert> {
     print(
         "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
+    //_showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
+    // showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: Text(localize('Alert Sent')),
+    //         content: SingleChildScrollView(
+    //           child: ListBody(
+    //             children: <Widget>[Text('')],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           FlatButton(
+    //             child: Text(localize('Okay')),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           )
+    //         ],
+    //       );
+    //     });
+    return "";
+  }
 
+  _showAlertSent(String status, String msg) {
     showDialog(
         context: context,
-        builder: (BuildContext context) {
+        barrierDismissible: false,
+        builder: (_) {
           return AlertDialog(
-            title: Text(localize('Alert Sent')),
+            insetPadding: EdgeInsets.all(17),
+            title: Text(
+              localize(status),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: SVColors.alertDescColor,
+                  fontSize: 20.0),
+              textAlign: TextAlign.center,
+            ),
             content: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
               child: ListBody(
-                children: <Widget>[Text('')],
+                children: <Widget>[
+                  Text(
+                    localize(msg),
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: SVColors.alertDescColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  )
+                ],
               ),
             ),
+            contentPadding: EdgeInsets.zero,
+            actionsOverflowDirection: VerticalDirection.down,
             actions: <Widget>[
-              FlatButton(
-                child: Text(localize('Okay')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: double.maxFinite,
+                ),
+              ),
+              Center(
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        //ROW 1
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: _dismissButton(),
+                    ),
+                  ],
+                ),
               )
             ],
           );
         });
-    return "";
   }
 
   @override
