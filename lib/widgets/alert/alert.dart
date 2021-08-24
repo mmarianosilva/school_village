@@ -21,7 +21,6 @@ class Alert extends StatefulWidget {
 }
 
 class _AlertState extends State<Alert> {
-
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
@@ -35,8 +34,6 @@ class _AlertState extends State<Alert> {
   bool _isTrainingMode = true;
   final customAlertController = TextEditingController();
   BuildContext _scaffold;
-
-
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
@@ -55,7 +52,8 @@ class _AlertState extends State<Alert> {
       _userId = user.id;
       setState(() {
         name =
-            "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
+        "${_userSnapshot.data()['firstName']} ${_userSnapshot
+            .data()['lastName']}";
         phone = "${_userSnapshot.data()['phone']}";
         isLoaded = true;
       });
@@ -250,7 +248,11 @@ class _AlertState extends State<Alert> {
       ));
       final incident = await _getIncidentUrl();
       _saveAlert(
-          alertTitle, alertBody, alertType, context, incident[1], incident[0]);
+          alertTitle, alertBody, alertType, context, incident[1], incident[0])
+          .then((value)
+      {
+      _showAlertSent("SUCCESS", "Alert Sent to  Marina Neighbours");
+      });
     } else {
       final mEvent = event;
       print("Returned Event is $mEvent");
@@ -264,7 +266,7 @@ class _AlertState extends State<Alert> {
       final incident = await _getIncidentUrl();
       print(incident);
       await _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
-              incident[0])
+          incident[0])
           .then((value) async {
         if (location != null && event != EventAction.None) {
           final incidentUrl = incident[2] + incident[0];
@@ -280,13 +282,21 @@ class _AlertState extends State<Alert> {
                 altitude: location["altitude"],
                 confidence: 80,
                 uncertainty: 150.0),
+            caCivicAddress: IntradoCaCivicAddress(
+              country: "US",
+              a1: "CO",
+              a2: "BOULDER",
+              a3: "LONGMONT",
+              rd: "RD",
+            ),
             serviceProvider: IntradoServiceProvider(
                 name: "OandMtech",
                 contactUri: "tel:+19492741709",
                 textChatEnabled: true),
             deviceOwner: IntradoDeviceOwner(
                 name:
-                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
+                "${_userSnapshot.data()['firstName']} ${_userSnapshot
+                    .data()['lastName']}",
                 tel: "${_userSnapshot.data()['phone']}",
                 environment: "Marina",
                 mobility: "Fixed"),
@@ -303,19 +313,33 @@ class _AlertState extends State<Alert> {
               "Authorization": "Bearer $token",
             },
           );
-          print(
-              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-          print("Intrado response is ${response.body}");
+          debugPrint(
+              "Body Submitted is ${intradoPayload
+                  .toXml()} and token is $token");
+          debugPrint("Intrado response is ${response.body}");
           final jsonResponse = json.decode(response.body);
           IntradoResponse intradoResponse =
-              new IntradoResponse.fromJson(jsonResponse);
+          new IntradoResponse.fromJson(jsonResponse);
           if (intradoResponse.success == true &&
               event == EventAction.PSAPLink) {
             var storexml = xml.parse(intradoResponse.response);
             final phones = storexml.findAllElements('number');
+            String phoneNumber = null;
             phones.map((node) => node.text).forEach((element) {
-              launch("tel://$element");
+              phoneNumber = element;
             });
+            if (phoneNumber == null) {
+              storexml
+                  .findAllElements('message')
+                  .map((e) => e.text)
+                  .forEach((element) {
+                _showAlertSent("PSAP Error", element);
+              });
+            } else {
+              launch("tel://$phoneNumber");
+            }
+          } else {
+            _showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
           }
         }
       });
@@ -362,20 +386,6 @@ class _AlertState extends State<Alert> {
     return lastResolved;
   }
 
-  getIntradoChats() async {
-    final result = await FirebaseFirestore.instance
-        .collection("intrado_events")
-        //.where("schoolId", isEqualTo: id)
-        .get();
-    if (result.docs.isEmpty) {
-      print("No Intrado Events");
-    } else {
-      result.docs.forEach((element) {
-        print("Intrado Event : $element");
-      });
-    }
-  }
-
   Future<List<dynamic>> _getIncidentUrl() async {
     String randomToken = Uuid().v4();
     final baseurl = await getBaseUrl();
@@ -399,10 +409,10 @@ class _AlertState extends State<Alert> {
     }
   }
 
-  Future<String> _saveAlert(
-      alertTitle, alertBody, alertType, context, updateToken, token) async {
+  Future<String> _saveAlert(alertTitle, alertBody, alertType, context,
+      updateToken, token) async {
     CollectionReference collection =
-        FirebaseFirestore.instance.collection('$_schoolId/notifications');
+    FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
 
     final String room = UserHelper.getRoomNumber(_userSnapshot);
@@ -414,7 +424,9 @@ class _AlertState extends State<Alert> {
         'type': alertType,
         'createdById': _userId,
         'createdBy': '$name${room != null ? ', Room $room' : ''}',
-        'createdAt': DateTime.now().millisecondsSinceEpoch,
+        'createdAt': DateTime
+            .now()
+            .millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
         'token': token,
@@ -426,7 +438,9 @@ class _AlertState extends State<Alert> {
         'type': alertType,
         'createdById': _userId,
         'createdBy': '$name${room != null ? ', Room $room' : ''}',
-        'createdAt': DateTime.now().millisecondsSinceEpoch,
+        'createdAt': DateTime
+            .now()
+            .millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
         'token': token,
@@ -435,7 +449,7 @@ class _AlertState extends State<Alert> {
     print(
         "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
-    _showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
+    //_showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
     // showDialog(
     //     context: context,
     //     builder: (BuildContext context) {
@@ -561,7 +575,10 @@ class _AlertState extends State<Alert> {
               Container(
                 height: 0.5,
                 margin: EdgeInsets.all(12.0),
-                width: MediaQuery.of(context).size.width,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
                 color: Colors.grey,
               ),
               SizedBox(height: 16.0),
@@ -575,43 +592,45 @@ class _AlertState extends State<Alert> {
                       children: <Widget>[
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("armed", "Armed Assailant Alert!",
-                                    "An Armed Assailant has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_armed.png',
-                                    width: 72.0, height: 108.0),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert(
+                                        "armed", "Armed Assailant Alert!",
+                                        "An Armed Assailant has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset('assets/images/alert_armed.png',
+                                        width: 72.0, height: 108.0),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("fight", "Fight Alert!",
-                                    "A fight has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_fight.png',
-                                    width: 72.0, height: 95.4),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("fight", "Fight Alert!",
+                                        "A fight has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset('assets/images/alert_fight.png',
+                                        width: 72.0, height: 95.4),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("medical", "Medical Alert!",
-                                    "A medical emergency has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_medical.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        ))
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("medical", "Medical Alert!",
+                                        "A medical emergency has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset(
+                                        'assets/images/alert_medical.png',
+                                        width: 72.0, height: 109.8),
+                                  ])),
+                            ))
                       ],
                     ),
                     Row(
@@ -619,47 +638,48 @@ class _AlertState extends State<Alert> {
                       children: <Widget>[
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("auto", "Auto Accident/Injury",
-                                    "A car accident has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset(
-                                    'assets/images/alert_auto_accident_injury.png',
-                                    width: 72.0,
-                                    height: 109.8),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("auto", "Auto Accident/Injury",
+                                        "A car accident has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset(
+                                        'assets/images/alert_auto_accident_injury.png',
+                                        width: 72.0,
+                                        height: 109.8),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("explosion", "Explosion Alert!",
-                                    "An explosion has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_explosion.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("explosion", "Explosion Alert!",
+                                        "An explosion has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset(
+                                        'assets/images/alert_explosion.png',
+                                        width: 72.0, height: 109.8),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("boat", "Boat Accident/Injury",
-                                    "A boat accident has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset(
-                                    'assets/images/alert_boat_accident_injury.png',
-                                    width: 72.0,
-                                    height: 109.8),
-                              ])),
-                        ))
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("boat", "Boat Accident/Injury",
+                                        "A boat accident has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset(
+                                        'assets/images/alert_boat_accident_injury.png',
+                                        width: 72.0,
+                                        height: 109.8),
+                                  ])),
+                            ))
                       ],
                     ),
                     Row(
@@ -667,42 +687,43 @@ class _AlertState extends State<Alert> {
                       children: <Widget>[
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("fire", "Fire Alert!",
-                                    "A fire has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_fire.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("fire", "Fire Alert!",
+                                        "A fire has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset('assets/images/alert_fire.png',
+                                        width: 72.0, height: 109.8),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendAlert("intruder", "Intruder Alert!",
-                                    "An intruder has been reported at $_schoolName");
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_intruder.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        )),
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendAlert("intruder", "Intruder Alert!",
+                                        "An intruder has been reported at $_schoolName");
+                                  },
+                                  child: Column(children: [
+                                    Image.asset(
+                                        'assets/images/alert_intruder.png',
+                                        width: 72.0, height: 109.8),
+                                  ])),
+                            )),
                         Expanded(
                             child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                              onTap: () {
-                                _sendCustomAlert(context);
-                              },
-                              child: Column(children: [
-                                Image.asset('assets/images/alert_other.png',
-                                    width: 72.0, height: 109.8),
-                              ])),
-                        ))
+                              margin: EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    _sendCustomAlert(context);
+                                  },
+                                  child: Column(children: [
+                                    Image.asset('assets/images/alert_other.png',
+                                        width: 72.0, height: 109.8),
+                                  ])),
+                            ))
                       ],
                     ),
                   ],
