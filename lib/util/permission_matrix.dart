@@ -15,7 +15,7 @@ class PermissionMatrix {
   static const _talkAroundBoaters = [boater,vendor, admin];
   static const _talkAroundStaff = [staff,  admin, security,  vendor, boater, maintenance];
   static const _talkAroundAdmin = [staff,  admin, security,  vendor, boater, maintenance, district, superadmin];
-  static const _talkAroundSecurity = [staff,  admin, security,  district, superadmin];
+  static const _talkAroundSecurity = [  admin, security,  district, superadmin];
   static const _talkAroundPdFireEms = [admin, security,  district, superadmin];
 
 
@@ -29,6 +29,28 @@ class PermissionMatrix {
         return _talkAroundBoaters;
       case security:
         return _talkAroundSecurity;
+      case staff:
+        return _talkAroundStaff;
+      case district:
+      case superadmin:
+      case admin:
+        return _talkAroundAdmin;
+      case pdFireEms:
+        return _talkAroundPdFireEms;
+      default:
+        return [];
+    }
+  }
+  static List<String> getTalkAroundGroupPermissions(String role) {
+    switch (role) {
+      case maintenance:
+        return[maintenance,admin];
+      case vendor:
+        return [];
+      case boater:
+        return [];
+      case security:
+        return[security,admin,district];
       case staff:
         return _talkAroundStaff;
       case district:
