@@ -241,15 +241,12 @@ class _AlertState extends State<Alert> {
 
   processAlert(EventAction event, alertTitle, alertBody, alertType) async {
     if (_isTrainingMode) {
-      Scaffold.of(_scaffold).showSnackBar(SnackBar(
-        content: Text(localize(
-            "Training mode is set. During training mode, 911 alerts are disabled. Sending campus alert only.")),
-      ));
+
       final incident = await _getIncidentUrl();
       _saveAlert(alertTitle, alertBody, alertType, context, incident[1],
               incident[0])
           .then((value) {
-        _showAlertSent("SUCCESS", "\nAlert Sent to \nMarina Neighbours\n");
+        _showAlertSent("Your Marina is in Test Mode", "\n911 contacts are disabled and only local \nalerts were sent to Marina Neighbors\n during Test Mode. Dial 911 Using Your\n Phone if you have an actual emergency.\n");
       });
     } else {
       final mEvent = event;
