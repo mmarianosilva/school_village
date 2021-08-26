@@ -137,7 +137,7 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
                         SearchDropdownField(
                           controller: _adminNameController,
                           data: _users != null ? _users : <User>[],
-                          hint: localize('Instructor or Group Admin'),
+                          hint: localize('Group Admin'),
                           itemBuilder: (BuildContext context, Searchable item) {
                             return Text(
                               item.display(),
