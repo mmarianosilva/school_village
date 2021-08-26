@@ -81,6 +81,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         _schoolRole != "admin" &&
         _schoolRole != "district" &&
         _schoolRole != "superadmin") {
+      // For the non elite/admin users  _messageListSubscription is the list of groups(1 on 1) that our user is a member of
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
           .where("members", arrayContainsAny: [_userSnapshot.reference])
@@ -129,6 +130,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             }
           });
     } else {
+      //Here _messageListSubscription seems to be the Admin channels that are probably auto generated or something
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
           .snapshots()
@@ -322,7 +324,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
                                     child: Text(
-                                        localize("Class | Group").toUpperCase(),
+                                        localize("Group").toUpperCase(),
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 199, 199, 204)),
