@@ -48,6 +48,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   }
 
   void getMessageList() async {
+    /* This _channelListSubscription shows up as the List of Channels User is a part of Example (Admin/Security)
+    resolved by querying for the messages of this school/marina that this user's role is contained in'
+    Also as a special case the "911 channel is removed from above list if this user wasnt the creator of it" */
     _channelListSubscription = _firestore
         .collection("$_schoolId/messages")
         .where("roles", arrayContains: _schoolRole)
@@ -56,7 +59,8 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
         return (element.data()['name'] == "911 TalkAround Channel") &&
-            (element.data()['createdById'] != _userSnapshot.id);
+            ((element.data()['createdById'] != _userSnapshot.id) ||
+                (element.data()['isActive'] == false));
       });
       Iterable<DocumentSnapshot> channels = documentList;
       List<Future<TalkAroundChannel>> processedChannels =
@@ -77,6 +81,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         _schoolRole != "admin" &&
         _schoolRole != "district" &&
         _schoolRole != "superadmin") {
+      // For the non elite/admin users  _messageListSubscription is the list of groups(1 on 1) that our user is a member of
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
           .where("members", arrayContainsAny: [_userSnapshot.reference])
@@ -125,6 +130,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             }
           });
     } else {
+      //Here _messageListSubscription seems to be the Admin channels that are probably auto generated or something
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
           .snapshots()
@@ -318,7 +324,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
                                     child: Text(
-                                        localize("Class | Group").toUpperCase(),
+                                        localize("Group").toUpperCase(),
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 199, 199, 204)),
