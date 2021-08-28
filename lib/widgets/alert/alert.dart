@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:school_village/util/DynamicLinksService.dart';
 import 'package:school_village/util/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
@@ -59,7 +60,6 @@ class _AlertState extends State<Alert> {
       print(name);
     });
   }
-
   _sendCustomAlert(context) {
     showDialog(
         context: context,
@@ -264,7 +264,7 @@ class _AlertState extends State<Alert> {
               incident[0])
           .then((value) async {
         if (location != null && event != EventAction.None) {
-          final incidentUrl = incident[2] + incident[0];
+          final incidentUrl = incident[3];
           final intradoPayload = IntradoWrapper(
             eventAction: event,
             eventDescription: IntradoEventDescription(text: alertTitle),
@@ -389,16 +389,19 @@ class _AlertState extends State<Alert> {
         .where("schoolId", isEqualTo: id)
         .get();
     if (result.docs.isEmpty) {
-      return [randomToken, true, baseurl];
+      final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken));
+      return [randomToken, true, baseurl,shortUrl];
     } else {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
         print("Last Resolved Data is ${lastResolved.data()}");
         String dashboardUrl = lastResolved.data()['dashboardUrl'];
-
-        return [dashboardUrl.split(baseurl)[1], false, baseurl];
+        String token = dashboardUrl.split(baseurl)[1];
+        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token));
+        return [token, false, baseurl,shortUrl];
       } else {
-        return [randomToken, true, baseurl];
+        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken));
+        return [randomToken, true, baseurl,shortUrl];
       }
     }
   }
@@ -439,27 +442,7 @@ class _AlertState extends State<Alert> {
     print(
         "Schoold id = $_schoolId and notificationToken = ${token} and TOKENUPDATE is $updateToken");
     print("Added Alert");
-    //_showAlertSent("SUCCESS", "Alert Sent to 911 and Marina Neighbours");
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         title: Text(localize('Alert Sent')),
-    //         content: SingleChildScrollView(
-    //           child: ListBody(
-    //             children: <Widget>[Text('')],
-    //           ),
-    //         ),
-    //         actions: <Widget>[
-    //           FlatButton(
-    //             child: Text(localize('Okay')),
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //           )
-    //         ],
-    //       );
-    //     });
+
     return "";
   }
 
