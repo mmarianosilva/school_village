@@ -18,6 +18,7 @@ class UserHelper {
 
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
+  static StreamSubscription _subscription;
 
   static Future<AuthResult> signIn({email: String, password: String}) async {
     if (_prefs == null) {
@@ -121,6 +122,12 @@ class UserHelper {
         harborObjects: harborList,
         regionObjects: regionList,
         userSnapshot: userSnapshot);
+  }
+
+  static cleanupSubscription() {
+    if (_subscription != null) {
+      _subscription.cancel();
+    }
   }
 
   static getSchools() async {
@@ -306,47 +313,81 @@ class UserHelper {
             ? true
             : false);
     List<QueryDocumentSnapshot> filteredSchools;
-    Map<String, dynamic> allMarinas = {};
-
+    //Map<String, dynamic> allMarinas = {};
+    List<dynamic> allMarinas = [];
     await associatedSchools.forEach((schoolId) {
       final role = userData['associatedSchools'][schoolId]['role'];
 
       String schoolPath = "/schools/${schoolId}";
       DocumentReference schoolRef = FirebaseFirestore.instance.doc(schoolPath);
-
-      schoolRef.snapshots().listen((school) {
+      _subscription = schoolRef.snapshots().listen((school) {
         final data = school.data();
+        if (data == null) {
+          return;
+        }
         final schoolName = data['name'];
         final harborRef = data['district'];
         final regionRef = data['region'];
-        print(
-            "Data is $schoolName and district is $harborRef and harbor is $regionRef");
+        //print(
+        //"Data is $schoolName and district is $harborRef and harbor is $regionRef");
         //print("Filter data is ${regionObj.reference} and ${harborObj.reference} and ${schoolName.contains(regex)}" );
 
         if ((region == 'All') &&
             (harbor == 'All') &&
             schoolName.contains(regex)) {
-          allMarinas[schoolId] = school.data();
+          allMarinas.add(
+            <String, dynamic>{
+              "schoolId": "schools/${school.reference.id}",
+              "role": userSnapshot.data()['associatedSchools']
+                  [school.reference.id]["role"],
+              "name": schoolName,
+            },
+          );
+          //allMarinas[schoolId] = school.data();
         } else if ((region != 'All') && (harbor != 'All')) {
           if (harborRef == harborObj.reference &&
               regionRef == regionObj.reference &&
               schoolName.contains(regex)) {
-            allMarinas[schoolId] = school.data();
+            allMarinas.add(
+              <String, dynamic>{
+                "schoolId": "schools/${school.reference.id}",
+                "role": userSnapshot.data()['associatedSchools']
+                    [school.reference.id]["role"],
+                "name": schoolName,
+              },
+            );
           }
         } else if ((region != 'All') && (harbor == 'All')) {
           if (regionRef == regionObj.reference && schoolName.contains(regex)) {
-            allMarinas[schoolId] = school.data();
+            allMarinas.add(
+              <String, dynamic>{
+                "schoolId": "schools/${school.reference.id}",
+                "role": userSnapshot.data()['associatedSchools']
+                    [school.reference.id]["role"],
+                "name": schoolName,
+              },
+            );
           }
         } else if ((region == 'All') && (harbor != 'All')) {
           if (harborRef == harborObj.reference && schoolName.contains(regex)) {
-            allMarinas[schoolId] = school.data();
+            allMarinas.add(
+              <String, dynamic>{
+                "schoolId": "schools/${school.reference.id}",
+                "role": userSnapshot.data()['associatedSchools']
+                    [school.reference.id]["role"],
+                "name": schoolName,
+              },
+            );
           }
         }
       });
+
       // schoolRef.snapshots().listen((school) {
       //   allMarinas[schoolId] = school.data();
       // });
     });
+
+
     return allMarinas;
     if (region == 'All') {
       if (harbor == 'All') {

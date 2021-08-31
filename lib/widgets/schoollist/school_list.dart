@@ -26,7 +26,12 @@ class _SchoolListState extends State<SchoolList> {
   QueryDocumentSnapshot _selectedRegion;
 
   String _searchQuery = "";
+  @override
+  void dispose() {
+   UserHelper.cleanupSubscription();
 
+    super.dispose();
+  }
   selectSchool({schoolId: String, role: String, schoolName: String}) {
     print("Selectedxid = $schoolId");
     PdfHandler.deletePdfFiles();
@@ -214,13 +219,13 @@ class _SchoolListState extends State<SchoolList> {
                       padding: EdgeInsets.all(22.0),
 //                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
-                        final data = snapshot.data;
+                        final data = snapshot.data[index];
+                        print("Our data is $data");
+                        //final key = data.keys.toList()[index];
 
-                        final key = data.keys.toList()[index];
+                       // final map = data[key];
 
-                        final map = data[key];
-
-                        if (map == null)
+                        if (data == null)
                           return Container(
                             height: 0,
                             width: 0,
@@ -234,15 +239,13 @@ class _SchoolListState extends State<SchoolList> {
                                     left: 8.0, right: 8.0, top: 8.0),
                                 alignment: Alignment.centerLeft,
                                 child: FlatButton(
-                                    child: Text(map == null ? '' : map["name"]),
+                                    child: Text(data == null ? '' : data["name"]),
                                     onPressed: () {
                                       selectSchool(
                                           schoolName:
-                                              (map == null ? '' : map["name"]),
-                                          schoolId: "schools/${key}",
-                                          role: userSnapshot
-                                                  .data()['associatedSchools']
-                                              [key]["role"]);
+                                              (data == null ? '' : data["name"]),
+                                          schoolId: data['schoolId'],
+                                          role: data["role"]);
                                     }),
                               ),
                             ],
