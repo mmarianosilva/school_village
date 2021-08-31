@@ -254,7 +254,7 @@ class _AlertState extends State<Alert> {
       if (mEvent == EventAction.None) {
         return;
       }
-      //
+      //updated Cert
       //final String incidentUrl =
       //await _saveAlert(alertTitle,
       //alertBody, alertType, context);
