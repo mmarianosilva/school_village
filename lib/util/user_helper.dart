@@ -305,11 +305,14 @@ class UserHelper {
             : false);
     List<QueryDocumentSnapshot> filteredSchools;
     Map<String,dynamic> allMarinas ={};
-    associatedSchools.forEach((schoolId) {
+    await associatedSchools.forEach((schoolId) {
       final role = userData['associatedSchools'][schoolId]['role'];
 
       String schoolPath = "/schools/${schoolId}";
       DocumentReference schoolRef = FirebaseFirestore.instance.doc(schoolPath);
+      schoolRef.get().then((school) {
+
+      });
       schoolRef.snapshots().listen((school) {
         allMarinas[schoolId] = school.data();
       });
