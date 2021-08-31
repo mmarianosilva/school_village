@@ -254,9 +254,6 @@ class _AlertState extends State<Alert> {
       if (mEvent == EventAction.None) {
         return;
       }
-      //final String incidentUrl =
-      //await _saveAlert(alertTitle,
-      //alertBody, alertType, context);
       final location = await UserHelper.getLocation();
       final incident = await _getIncidentUrl();
       print(incident);
