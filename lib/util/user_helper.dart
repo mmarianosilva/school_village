@@ -119,7 +119,8 @@ class UserHelper {
         regions: regions,
         harbors: harbors,
         harborObjects: harborList,
-        regionObjects: regionList,userSnapshot: userSnapshot);
+        regionObjects: regionList,
+        userSnapshot: userSnapshot);
   }
 
   static getSchools() async {
@@ -174,6 +175,7 @@ class UserHelper {
 
   static getFilteredSchools(String searchText, String region, String harbor,
       QueryDocumentSnapshot harborObj, QueryDocumentSnapshot regionObj) async {
+    final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
     // Query school list whith the schools from fetched ids i.e associated to user or user is the vendor/owner of it
     // Then Apply the filter settings based on search text, harbor_name, region object
     final FirebaseUser currentUser = await getUser();
@@ -304,18 +306,46 @@ class UserHelper {
             ? true
             : false);
     List<QueryDocumentSnapshot> filteredSchools;
-    Map<String,dynamic> allMarinas ={};
+    Map<String, dynamic> allMarinas = {};
+
     await associatedSchools.forEach((schoolId) {
       final role = userData['associatedSchools'][schoolId]['role'];
 
       String schoolPath = "/schools/${schoolId}";
       DocumentReference schoolRef = FirebaseFirestore.instance.doc(schoolPath);
-      schoolRef.get().then((school) {
 
-      });
       schoolRef.snapshots().listen((school) {
-        allMarinas[schoolId] = school.data();
+        final data = school.data();
+        final schoolName = data['name'];
+        final harborRef = data['district'];
+        final regionRef = data['region'];
+        print(
+            "Data is $schoolName and district is $harborRef and harbor is $regionRef");
+        //print("Filter data is ${regionObj.reference} and ${harborObj.reference} and ${schoolName.contains(regex)}" );
+
+        if ((region == 'All') &&
+            (harbor == 'All') &&
+            schoolName.contains(regex)) {
+          allMarinas[schoolId] = school.data();
+        } else if ((region != 'All') && (harbor != 'All')) {
+          if (harborRef == harborObj.reference &&
+              regionRef == regionObj.reference &&
+              schoolName.contains(regex)) {
+            allMarinas[schoolId] = school.data();
+          }
+        } else if ((region != 'All') && (harbor == 'All')) {
+          if (regionRef == regionObj.reference && schoolName.contains(regex)) {
+            allMarinas[schoolId] = school.data();
+          }
+        } else if ((region == 'All') && (harbor != 'All')) {
+          if (harborRef == harborObj.reference && schoolName.contains(regex)) {
+            allMarinas[schoolId] = school.data();
+          }
+        }
       });
+      // schoolRef.snapshots().listen((school) {
+      //   allMarinas[schoolId] = school.data();
+      // });
     });
     return allMarinas;
     if (region == 'All') {
