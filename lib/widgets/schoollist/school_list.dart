@@ -22,12 +22,13 @@ class _SchoolListState extends State<SchoolList> {
   String _harborSearchKey = "All";
   String _regionSearchKey = "All";
   QueryDocumentSnapshot _selectedHarbor;
-
+  DocumentSnapshot userSnapshot;
   QueryDocumentSnapshot _selectedRegion;
 
   String _searchQuery = "";
 
   selectSchool({schoolId: String, role: String, schoolName: String}) {
+    print("Selectedxid = $schoolId");
     PdfHandler.deletePdfFiles();
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
@@ -41,6 +42,7 @@ class _SchoolListState extends State<SchoolList> {
       harbors = regionData.harbors;
       harborObjects = regionData.harborObjects;
       regionObjects = regionData.regionObjects;
+      userSnapshot = regionData.userSnapshot;
       //print("Check Stuff $harborObjects and $regionObjects" );
       setState(() {});
     });
@@ -212,56 +214,90 @@ class _SchoolListState extends State<SchoolList> {
                       padding: EdgeInsets.all(22.0),
 //                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
-                        return FutureBuilder(
-                          future: FirebaseFirestore.instance
-                              .doc(snapshot.data[index]['ref'])
-                              .get(),
-                          // a Future<String> or null
-                          builder: (BuildContext context,
-                              AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                                return Text(localize('Loading...'));
-                              case ConnectionState.waiting:
-                                return Text(localize('Loading...'));
-                              case ConnectionState.active:
-                                return Text(localize('Loading...'));
-                              default:
-                                if (snapshot.hasError)
-                                  return Text('Error: ${snapshot.error}');
-                                else {
-                                  return Container(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 8.0, right: 8.0, top: 8.0),
-                                          alignment: Alignment.centerLeft,
-                                          child: FlatButton(
-                                              child: Text(
-                                                  schoolSnapshot.data == null
-                                                      ? ''
-                                                      : schoolSnapshot.data
-                                                          .data()["name"]),
-                                              onPressed: () {
-                                                selectSchool(
-                                                    schoolName: schoolSnapshot
-                                                        .data
-                                                        .data()["name"],
-                                                    schoolId: snapshot
-                                                        .data[index]['ref'],
-                                                    role: snapshot.data[index]
-                                                        ['role']);
-                                              }),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                            }
-                          },
+                        final data = snapshot.data;
+
+                        final key = data.keys.toList()[index];
+
+                        final map = data[key];
+
+                        if (map == null)
+                          return Container(
+                            height: 0,
+                            width: 0,
+                          );
+                        return Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.only(
+                                    left: 8.0, right: 8.0, top: 8.0),
+                                alignment: Alignment.centerLeft,
+                                child: FlatButton(
+                                    child: Text(map == null ? '' : map["name"]),
+                                    onPressed: () {
+                                      selectSchool(
+                                          schoolName:
+                                              (map == null ? '' : map["name"]),
+                                          schoolId: "schools/${key}",
+                                          role: userSnapshot
+                                                  .data()['associatedSchools']
+                                              [key]["role"]);
+                                    }),
+                              ),
+                            ],
+                          ),
                         );
+                        // return FutureBuilder(
+                        //   future: FirebaseFirestore.instance
+                        //       .doc(snapshot.data[index]['ref'])
+                        //       .get(),
+                        //   // a Future<String> or null
+                        //   builder: (BuildContext context,
+                        //       AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
+                        //     switch (snapshot.connectionState) {
+                        //       case ConnectionState.none:
+                        //         return Text(localize('Loading...'));
+                        //       case ConnectionState.waiting:
+                        //         return Text(localize('Loading...'));
+                        //       case ConnectionState.active:
+                        //         return Text(localize('Loading...'));
+                        //       default:
+                        //         if (snapshot.hasError)
+                        //           return Text('Error: ${snapshot.error}');
+                        //         else {
+                        //           return Container(
+                        //             child: Column(
+                        //               mainAxisSize: MainAxisSize.min,
+                        //               children: <Widget>[
+                        //                 Container(
+                        //                   padding: EdgeInsets.only(
+                        //                       left: 8.0, right: 8.0, top: 8.0),
+                        //                   alignment: Alignment.centerLeft,
+                        //                   child: FlatButton(
+                        //                       child: Text(
+                        //                           schoolSnapshot.data == null
+                        //                               ? ''
+                        //                               : schoolSnapshot.data
+                        //                                   .data()["name"]),
+                        //                       onPressed: () {
+                        //                         selectSchool(
+                        //                             schoolName: schoolSnapshot
+                        //                                 .data
+                        //                                 .data()["name"],
+                        //                             schoolId: snapshot
+                        //                                 .data[index]['ref'],
+                        //                             role: snapshot.data[index]
+                        //                                 ['role']);
+                        //                       }),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           );
+                        //         }
+                        //     }
+                        //   },
+                        // );
                       },
                       itemCount: snapshot.data.length,
                     );
