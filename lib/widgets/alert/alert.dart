@@ -15,6 +15,7 @@ class _AlertState extends State<Alert> {
   String _schoolId = '';
   String _schoolName = '';
   String _userId = '';
+  String _email = '';
   String _role = '';
   String name = '';
   String phone = '';
@@ -232,7 +233,7 @@ class _AlertState extends State<Alert> {
       'location' : await _getLocation(),
       'reportedByPhone' : phone,
     });
-    print("Added Alert");
+
 
     showDialog(
         context: context,
