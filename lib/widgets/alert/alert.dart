@@ -125,7 +125,7 @@ class _AlertState extends State<Alert> {
       onPressed: () async {
         Navigator.of(context).pop();
         processAlert(EventAction.PSAPLink, alertTitle, alertBody, alertType);
-        //_isTrainingMode = false;
+
       },
     );
   }
