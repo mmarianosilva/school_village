@@ -28,7 +28,6 @@ class _AlertState extends State<Alert> {
 
   getUserDetails() async {
     FirebaseUser user = await UserHelper.getUser();
-    print("User ID");
     print(user.uid);
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
