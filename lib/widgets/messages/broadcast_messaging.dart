@@ -288,7 +288,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendBroadcasts(image, alertBody, isVideo) {
-    if (role == 'district' || role == 'superadmin') {
+    if (role == 'district' || role == 'super_admin') {
       DocumentSnapshot selectedSchool =
           selectGroups.key.currentState.selectedSchool;
       if (selectedSchool == null) {

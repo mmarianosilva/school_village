@@ -80,7 +80,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     if (_schoolRole != "school_admin" &&
         _schoolRole != "admin" &&
         _schoolRole != "district" &&
-        _schoolRole != "superadmin") {
+        _schoolRole != "super_admin") {
       // For the non elite/admin users  _messageListSubscription is the list of groups(1 on 1) that our user is a member of
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
