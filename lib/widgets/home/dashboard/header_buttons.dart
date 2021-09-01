@@ -35,7 +35,7 @@ class HeaderButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = <Widget>[];
-    final postAllowed = role == 'district' || role == 'superadmin' || role == 'maintenance' || role == 'admin' ||  role == 'security';
+    final postAllowed = role == 'district' || role == 'super_admin' || role == 'maintenance' || role == 'admin' ||  role == 'security';
     widgets.add(GestureDetector(
       child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
       onTap: () => _openBroadcast(context, postAllowed),

@@ -5,7 +5,7 @@ const String admin = "admin";
 const String security = "security";
 const String staff = "staff";
 const String district = "district";
-const String superadmin = "superadmin";
+const String superadmin = "super_admin";
 const String pdFireEms = "pd_fire_ems";
 
 class PermissionMatrix {

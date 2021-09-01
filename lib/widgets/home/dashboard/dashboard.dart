@@ -490,7 +490,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'admin' && role != 'superadmin') {
+    if (role != 'admin' && role != 'super_admin') {
       return SizedBox();
     }
     return GestureDetector(
@@ -595,7 +595,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             if (role == 'admin' ||
                 role == 'school_admin' ||
                 role == 'district' ||
-                role == 'superadmin') ...[
+                role == 'super_admin') ...[
               Text(
                 localize('Schoolwide roll call').toUpperCase(),
                 style: TextStyle(
