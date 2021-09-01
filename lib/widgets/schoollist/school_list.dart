@@ -18,6 +18,7 @@ class _SchoolListState extends State<SchoolList> {
   List<String> harbors = <String>[];
   List<QueryDocumentSnapshot> harborObjects = <QueryDocumentSnapshot>[];
   List<QueryDocumentSnapshot> regionObjects = <QueryDocumentSnapshot>[];
+  List<DocumentSnapshot> marinaObjects = <QueryDocumentSnapshot>[];
   List<String> regions = <String>[];
   String _harborSearchKey = "All";
   String _regionSearchKey = "All";
@@ -48,6 +49,7 @@ class _SchoolListState extends State<SchoolList> {
       harborObjects = regionData.harborObjects;
       regionObjects = regionData.regionObjects;
       userSnapshot = regionData.userSnapshot;
+      marinaObjects = regionData.marinaObjects;
       //print("Check Stuff $harborObjects and $regionObjects" );
       setState(() {});
     });
@@ -58,18 +60,6 @@ class _SchoolListState extends State<SchoolList> {
   Widget build(BuildContext context) {
     _context = context;
     TextEditingController controller = TextEditingController();
-    Widget _widget(String searchText) {
-      return RaisedButton(
-        elevation: 2,
-        color: Colors.green,
-        child: Text(searchText),
-        onPressed: () {
-          setState(() {
-            //text = searchText;
-          });
-        },
-      );
-    }
 
     Widget getRegionsDropDown() {
       return DropdownButton(
@@ -204,7 +194,7 @@ class _SchoolListState extends State<SchoolList> {
                 _regionSearchKey,
                 _harborSearchKey,
                 _selectedHarbor,
-                _selectedRegion),
+                _selectedRegion,marinaObjects,userSnapshot),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:

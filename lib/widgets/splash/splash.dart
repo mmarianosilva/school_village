@@ -15,6 +15,7 @@ class Splash extends StatelessWidget {
       currentUser = await UserHelper.getUser();
     } catch (err) {
       print("Bad Password");
+      await FirebaseAuth.instance.signOut();
     }
     if (currentUser != null) {
       String userPath = "/users/${currentUser.uid}";

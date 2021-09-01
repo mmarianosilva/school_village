@@ -73,6 +73,7 @@ class UserHelper {
     List<String> harbors = ["All"];
     List<QueryDocumentSnapshot> harborList = [];
     List<QueryDocumentSnapshot> regionList = [];
+    List<DocumentSnapshot> marinasList = [];
     List<String> regions = ["All"];
     final result =
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
@@ -116,11 +117,65 @@ class UserHelper {
         }
       });
     }
+    if (userSnapshot.data()['associatedSchools'] == null ||
+        userSnapshot.data()['associatedSchools'].isEmpty) {
+      //Vendor Owner cases
+      final result = await FirebaseFirestore.instance
+          .collection("vendors")
+          .where("owners", arrayContains: userRef)
+          .get();
+      if (result.docs.isNotEmpty) {
+        List<QueryDocumentSnapshot> schoolsInDistrict;
+        final vendorDocument = result.docs.first;
+        final districts = (vendorDocument.data()["districts"] as List)
+            .cast<DocumentReference>();
+        districts.forEach((district) async {
+          schoolsInDistrict = (await FirebaseFirestore.instance
+                  .collection("schools")
+                  .where("district", isEqualTo: district)
+                  .get())
+              .docs;
+          schoolsInDistrict.forEach((element) {
+            element.reference.get().then((value) {
+              marinasList.add(value);
+            });
+          });
+        });
+      }
+    } else {
+      //Other cases
+      final userData = userSnapshot.data();
+
+      Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
+
+      setIsOwner(
+          userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
+              ? true
+              : false);
+      List<QueryDocumentSnapshot> filteredSchools;
+      //Map<String, dynamic> allMarinas = {};
+      List<dynamic> allMarinas = [];
+      await associatedSchools.forEach((schoolId) {
+        final role = userData['associatedSchools'][schoolId]['role'];
+
+        String schoolPath = "/schools/${schoolId}";
+        DocumentReference schoolRef =
+            FirebaseFirestore.instance.doc(schoolPath);
+        _subscription = schoolRef.snapshots().listen((school) {
+          final data = school.data();
+          if (data == null) {
+            return;
+          }
+          marinasList.add(school);
+        });
+      });
+    }
     return RegionData(
         regions: regions,
         harbors: harbors,
         harborObjects: harborList,
         regionObjects: regionList,
+        marinaObjects: marinasList,
         userSnapshot: userSnapshot);
   }
 
@@ -180,276 +235,78 @@ class UserHelper {
     return schools;
   }
 
-  static getFilteredSchools(String searchText, String region, String harbor,
-      QueryDocumentSnapshot harborObj, QueryDocumentSnapshot regionObj) async {
-    final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
-    // Query school list whith the schools from fetched ids i.e associated to user or user is the vendor/owner of it
-    // Then Apply the filter settings based on search text, harbor_name, region object
-    final FirebaseUser currentUser = await getUser();
-    if (currentUser == null) {
-      return null;
+  static getFilteredSchools(
+      String searchText,
+      String region,
+      String harbor,
+      QueryDocumentSnapshot harborObj,
+      QueryDocumentSnapshot regionObj,
+      List<DocumentSnapshot> marinas,
+      DocumentSnapshot mSnapshot) async {
+    if(marinas.isEmpty){
+      return[];
     }
-    String userPath = "/users/${currentUser.uid}";
-    print(currentUser);
-    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
-
-    List<dynamic> schools = [];
-    if (userSnapshot.data()['associatedSchools'] == null ||
-        userSnapshot.data()['associatedSchools'].isEmpty) {
-      final result = await FirebaseFirestore.instance
-          .collection("vendors")
-          .where("owners", arrayContains: userRef)
-          .get();
-      if (result.docs.isNotEmpty) {
-        List<QueryDocumentSnapshot> schoolsInDistrict;
-        final vendorDocument = result.docs.first;
-        final districts = (vendorDocument.data()["districts"] as List)
-            .cast<DocumentReference>();
-        if (harbor == 'All') {
-          for (int i = 0; i < districts.length; i++) {
-            if (searchText.isEmpty) {
-              if (region == 'All') {
-                schoolsInDistrict = (await FirebaseFirestore.instance
-                        .collection("schools")
-                        .where("district", isEqualTo: districts[i])
-                        .get())
-                    .docs;
-              } else {
-                schoolsInDistrict = (await FirebaseFirestore.instance
-                        .collection("schools")
-                        .where('region', isEqualTo: regionObj.reference)
-                        .where("district", isEqualTo: districts[i])
-                        .get())
-                    .docs;
-              }
-            } else {
-              if (region == 'All') {
-                schoolsInDistrict = (await FirebaseFirestore.instance
-                        .collection("schools")
-                        .where("district", isEqualTo: districts[i])
-                        .get())
-                    .docs;
-              } else {
-                schoolsInDistrict = (await FirebaseFirestore.instance
-                        .collection("schools")
-                        .where('region', isEqualTo: regionObj.reference)
-                        .where("district", isEqualTo: districts[i])
-                        .get())
-                    .docs;
-              }
-            }
-          }
-        } else {
-          if (searchText.isEmpty) {
-            if (regionObj == 'All') {
-              schoolsInDistrict = (await FirebaseFirestore.instance
-                      .collection("schools")
-                      .where("district", isEqualTo: harborObj.reference)
-                      .get())
-                  .docs;
-            } else {
-              schoolsInDistrict = (await FirebaseFirestore.instance
-                      .collection("schools")
-                      .where('region', isEqualTo: regionObj.reference)
-                      .where("district", isEqualTo: harborObj.reference)
-                      .get())
-                  .docs;
-              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-                    "ref": item.reference.path,
-                    "role": "enduser",
-                  }));
-            }
-          } else {
-            if (regionObj == 'All') {
-              schoolsInDistrict = (await FirebaseFirestore.instance
-                      .collection("schools")
-                      .where("district", isEqualTo: harborObj.reference)
-                      .get())
-                  .docs;
-            } else {
-              final schoolsInDistrict = (await FirebaseFirestore.instance
-                      .collection("schools")
-                      .where('region', isEqualTo: regionObj.reference)
-                      .where("district", isEqualTo: harborObj.reference)
-                      .get())
-                  .docs;
-              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-                    "ref": item.reference.path,
-                    "role": "enduser",
-                  }));
-            }
-          }
-        }
-        for (int i = 0; i < schoolsInDistrict.length; i++) {
-          final school = schoolsInDistrict[i];
-          if (searchText.isEmpty) {
-            schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-                  "ref": item.reference.path,
-                  "role": "enduser",
-                }));
-          } else {
-            String schoolName = school.data()['name'];
-            if (schoolName.contains(
-                new RegExp(searchText, caseSensitive: false, unicode: true))) {
-              schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
-                    "ref": item.reference.path,
-                    "role": "enduser",
-                  }));
-            }
-          }
-        }
-      }
-
-      return schools;
-    }
-    //Associated Schools
-    final userData = userSnapshot.data();
-
-    Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
-
-    setIsOwner(
-        userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
-            ? true
-            : false);
-    List<QueryDocumentSnapshot> filteredSchools;
-    //Map<String, dynamic> allMarinas = {};
     List<dynamic> allMarinas = [];
-    await associatedSchools.forEach((schoolId) {
-      final role = userData['associatedSchools'][schoolId]['role'];
-
-      String schoolPath = "/schools/${schoolId}";
-      DocumentReference schoolRef = FirebaseFirestore.instance.doc(schoolPath);
-      _subscription = schoolRef.snapshots().listen((school) {
-        final data = school.data();
-        if (data == null) {
-          return;
-        }
-        final schoolName = data['name'];
-        final harborRef = data['district'];
-        final regionRef = data['region'];
-        //print(
-        //"Data is $schoolName and district is $harborRef and harbor is $regionRef");
-        //print("Filter data is ${regionObj.reference} and ${harborObj.reference} and ${schoolName.contains(regex)}" );
-
-        if ((region == 'All') &&
-            (harbor == 'All') &&
+    final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
+    await marinas.forEach((school) {
+      final data = school.data();
+      if (data == null) {
+        return;
+      }
+      final schoolName = data['name'];
+      final harborRef = data['district'];
+      final regionRef = data['region'];
+      if ((region == 'All') &&
+          (harbor == 'All') &&
+          schoolName.contains(regex)) {
+        allMarinas.add(
+          <String, dynamic>{
+            "schoolId": "schools/${school.reference.id}",
+            "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+                ["role"],
+            "name": schoolName,
+          },
+        );
+        //allMarinas[schoolId] = school.data();
+      } else if ((region != 'All') && (harbor != 'All')) {
+        if (harborRef == harborObj.reference &&
+            regionRef == regionObj.reference &&
             schoolName.contains(regex)) {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": userSnapshot.data()['associatedSchools']
-                  [school.reference.id]["role"],
+              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+                  ["role"],
               "name": schoolName,
             },
           );
-          //allMarinas[schoolId] = school.data();
-        } else if ((region != 'All') && (harbor != 'All')) {
-          if (harborRef == harborObj.reference &&
-              regionRef == regionObj.reference &&
-              schoolName.contains(regex)) {
-            allMarinas.add(
-              <String, dynamic>{
-                "schoolId": "schools/${school.reference.id}",
-                "role": userSnapshot.data()['associatedSchools']
-                    [school.reference.id]["role"],
-                "name": schoolName,
-              },
-            );
-          }
-        } else if ((region != 'All') && (harbor == 'All')) {
-          if (regionRef == regionObj.reference && schoolName.contains(regex)) {
-            allMarinas.add(
-              <String, dynamic>{
-                "schoolId": "schools/${school.reference.id}",
-                "role": userSnapshot.data()['associatedSchools']
-                    [school.reference.id]["role"],
-                "name": schoolName,
-              },
-            );
-          }
-        } else if ((region == 'All') && (harbor != 'All')) {
-          if (harborRef == harborObj.reference && schoolName.contains(regex)) {
-            allMarinas.add(
-              <String, dynamic>{
-                "schoolId": "schools/${school.reference.id}",
-                "role": userSnapshot.data()['associatedSchools']
-                    [school.reference.id]["role"],
-                "name": schoolName,
-              },
-            );
-          }
         }
-      });
-
-      // schoolRef.snapshots().listen((school) {
-      //   allMarinas[schoolId] = school.data();
-      // });
+      } else if ((region != 'All') && (harbor == 'All')) {
+        if (regionRef == regionObj.reference && schoolName.contains(regex)) {
+          allMarinas.add(
+            <String, dynamic>{
+              "schoolId": "schools/${school.reference.id}",
+              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+                  ["role"],
+              "name": schoolName,
+            },
+          );
+        }
+      } else if ((region == 'All') && (harbor != 'All')) {
+        if (harborRef == harborObj.reference && schoolName.contains(regex)) {
+          allMarinas.add(
+            <String, dynamic>{
+              "schoolId": "schools/${school.reference.id}",
+              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+                  ["role"],
+              "name": schoolName,
+            },
+          );
+        }
+      }
     });
-
 
     return allMarinas;
-    if (region == 'All') {
-      if (harbor == 'All') {
-        print("Do the thing");
-        filteredSchools = (await FirebaseFirestore.instance
-                .collection("schools")
-                //.where('__name__', whereIn: associatedSchools.toList())
-                .get())
-            .docs;
-      } else {
-        filteredSchools = (await FirebaseFirestore.instance
-                .collection("schools")
-                //.where('__name__', whereIn: associatedSchools.toList())
-                .where("district", isEqualTo: harborObj.reference)
-                .get())
-            .docs;
-      }
-    } else {
-      if (harbor == 'All') {
-        filteredSchools = (await FirebaseFirestore.instance
-                .collection("schools")
-                //.where('__name__', whereIn: associatedSchools.toList())
-                .where('region', isEqualTo: regionObj.reference)
-                .get())
-            .docs;
-      } else {
-        filteredSchools = (await FirebaseFirestore.instance
-                .collection("schools")
-                //.where('__name__', whereIn: associatedSchools.toList())
-                .where("district", isEqualTo: harborObj.reference)
-                .where('region', isEqualTo: regionObj.reference)
-                .get())
-            .docs;
-      }
-    }
-
-    //Search here for filtered Schools and then based on associated schools, add ref and role to it
-
-    filteredSchools.removeWhere((element) {
-      return !associatedSchools.contains(element);
-    });
-    for (int i = 0; i < filteredSchools.length; i++) {
-      final school = filteredSchools[i];
-      if (searchText.isEmpty) {
-        schools.add({
-          "ref": "schools/${school.reference.id}",
-          "role": userSnapshot.data()['associatedSchools'][school.reference.id]
-              ["role"]
-        });
-      } else {
-        String schoolName = school.data()['name'];
-        if (schoolName.contains(
-            new RegExp(searchText, caseSensitive: false, unicode: true))) {
-          schools.add({
-            "ref": "schools/${school.reference.id.toString().trim()}",
-            "role": userSnapshot.data()['associatedSchools']
-                [school.reference.id]["role"]
-          });
-        }
-      }
-    }
-    return schools;
   }
 
   static loadIncidentTypes() async {
