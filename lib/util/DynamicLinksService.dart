@@ -16,6 +16,7 @@ class DynamicLinksService {
     // final Uri dynamicUrl = await parameters.buildUrl();
     final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
     final Uri shortUrl = shortDynamicLink.shortUrl;
+    print("${shortUrl.toString()}");
     return shortUrl.toString();
   }
 

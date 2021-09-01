@@ -18,16 +18,23 @@ class _SchoolListState extends State<SchoolList> {
   List<String> harbors = <String>[];
   List<QueryDocumentSnapshot> harborObjects = <QueryDocumentSnapshot>[];
   List<QueryDocumentSnapshot> regionObjects = <QueryDocumentSnapshot>[];
+  List<DocumentSnapshot> marinaObjects = <QueryDocumentSnapshot>[];
   List<String> regions = <String>[];
   String _harborSearchKey = "All";
   String _regionSearchKey = "All";
   QueryDocumentSnapshot _selectedHarbor;
-
+  DocumentSnapshot userSnapshot;
   QueryDocumentSnapshot _selectedRegion;
 
   String _searchQuery = "";
+  @override
+  void dispose() {
+   UserHelper.cleanupSubscription();
 
+    super.dispose();
+  }
   selectSchool({schoolId: String, role: String, schoolName: String}) {
+    print("Selectedxid = $schoolId");
     PdfHandler.deletePdfFiles();
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
@@ -41,6 +48,8 @@ class _SchoolListState extends State<SchoolList> {
       harbors = regionData.harbors;
       harborObjects = regionData.harborObjects;
       regionObjects = regionData.regionObjects;
+      userSnapshot = regionData.userSnapshot;
+      marinaObjects = regionData.marinaObjects;
       //print("Check Stuff $harborObjects and $regionObjects" );
       setState(() {});
     });
@@ -51,18 +60,6 @@ class _SchoolListState extends State<SchoolList> {
   Widget build(BuildContext context) {
     _context = context;
     TextEditingController controller = TextEditingController();
-    Widget _widget(String searchText) {
-      return RaisedButton(
-        elevation: 2,
-        color: Colors.green,
-        child: Text(searchText),
-        onPressed: () {
-          setState(() {
-            //text = searchText;
-          });
-        },
-      );
-    }
 
     Widget getRegionsDropDown() {
       return DropdownButton(
@@ -197,7 +194,7 @@ class _SchoolListState extends State<SchoolList> {
                 _regionSearchKey,
                 _harborSearchKey,
                 _selectedHarbor,
-                _selectedRegion),
+                _selectedRegion,marinaObjects,userSnapshot),
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -212,56 +209,83 @@ class _SchoolListState extends State<SchoolList> {
                       padding: EdgeInsets.all(22.0),
 //                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
-                        return FutureBuilder(
-                          future: FirebaseFirestore.instance
-                              .doc(snapshot.data[index]['ref'])
-                              .get(),
-                          // a Future<String> or null
-                          builder: (BuildContext context,
-                              AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                                return Text(localize('Loading...'));
-                              case ConnectionState.waiting:
-                                return Text(localize('Loading...'));
-                              case ConnectionState.active:
-                                return Text(localize('Loading...'));
-                              default:
-                                if (snapshot.hasError)
-                                  return Text('Error: ${snapshot.error}');
-                                else {
-                                  return Container(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 8.0, right: 8.0, top: 8.0),
-                                          alignment: Alignment.centerLeft,
-                                          child: FlatButton(
-                                              child: Text(
-                                                  schoolSnapshot.data == null
-                                                      ? ''
-                                                      : schoolSnapshot.data
-                                                          .data()["name"]),
-                                              onPressed: () {
-                                                selectSchool(
-                                                    schoolName: schoolSnapshot
-                                                        .data
-                                                        .data()["name"],
-                                                    schoolId: snapshot
-                                                        .data[index]['ref'],
-                                                    role: snapshot.data[index]
-                                                        ['role']);
-                                              }),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                            }
-                          },
+                        final data = snapshot.data[index];
+                        if (data == null)
+                          return Container(
+                            height: 0,
+                            width: 0,
+                          );
+                        return Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.only(
+                                    left: 8.0, right: 8.0, top: 8.0),
+                                alignment: Alignment.centerLeft,
+                                child: FlatButton(
+                                    child: Text(data == null ? '' : data["name"]),
+                                    onPressed: () {
+                                      selectSchool(
+                                          schoolName:
+                                              (data == null ? '' : data["name"]),
+                                          schoolId: data['schoolId'],
+                                          role: data["role"]);
+                                    }),
+                              ),
+                            ],
+                          ),
                         );
+                        // return FutureBuilder(
+                        //   future: FirebaseFirestore.instance
+                        //       .doc(snapshot.data[index]['ref'])
+                        //       .get(),
+                        //   // a Future<String> or null
+                        //   builder: (BuildContext context,
+                        //       AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
+                        //     switch (snapshot.connectionState) {
+                        //       case ConnectionState.none:
+                        //         return Text(localize('Loading...'));
+                        //       case ConnectionState.waiting:
+                        //         return Text(localize('Loading...'));
+                        //       case ConnectionState.active:
+                        //         return Text(localize('Loading...'));
+                        //       default:
+                        //         if (snapshot.hasError)
+                        //           return Text('Error: ${snapshot.error}');
+                        //         else {
+                        //           return Container(
+                        //             child: Column(
+                        //               mainAxisSize: MainAxisSize.min,
+                        //               children: <Widget>[
+                        //                 Container(
+                        //                   padding: EdgeInsets.only(
+                        //                       left: 8.0, right: 8.0, top: 8.0),
+                        //                   alignment: Alignment.centerLeft,
+                        //                   child: FlatButton(
+                        //                       child: Text(
+                        //                           schoolSnapshot.data == null
+                        //                               ? ''
+                        //                               : schoolSnapshot.data
+                        //                                   .data()["name"]),
+                        //                       onPressed: () {
+                        //                         selectSchool(
+                        //                             schoolName: schoolSnapshot
+                        //                                 .data
+                        //                                 .data()["name"],
+                        //                             schoolId: snapshot
+                        //                                 .data[index]['ref'],
+                        //                             role: snapshot.data[index]
+                        //                                 ['role']);
+                        //                       }),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           );
+                        //         }
+                        //     }
+                        //   },
+                        // );
                       },
                       itemCount: snapshot.data.length,
                     );
