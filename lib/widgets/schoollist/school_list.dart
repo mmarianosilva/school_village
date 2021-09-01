@@ -210,11 +210,6 @@ class _SchoolListState extends State<SchoolList> {
 //                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
                         final data = snapshot.data[index];
-                        print("Our data is $data");
-                        //final key = data.keys.toList()[index];
-
-                       // final map = data[key];
-
                         if (data == null)
                           return Container(
                             height: 0,
