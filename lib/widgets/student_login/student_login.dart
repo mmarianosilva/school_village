@@ -21,7 +21,7 @@ class _StudentLoginState extends State<StudentLogin> {
 
   final codeController = new TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  String title = "School Village";
+  String title = "MarinaVillage";
   final String role;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 

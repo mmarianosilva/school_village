@@ -18,7 +18,7 @@ class UserHelper {
 
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
-  static StreamSubscription _subscription;
+
 
   static Future<AuthResult> signIn({email: String, password: String}) async {
     if (_prefs == null) {
@@ -161,7 +161,7 @@ class UserHelper {
         String schoolPath = "/schools/${schoolId}";
         DocumentReference schoolRef =
             FirebaseFirestore.instance.doc(schoolPath);
-        _subscription = schoolRef.snapshots().listen((school) {
+        schoolRef.snapshots().listen((school) {
           final data = school.data();
           if (data == null) {
             return;
@@ -179,11 +179,7 @@ class UserHelper {
         userSnapshot: userSnapshot);
   }
 
-  static cleanupSubscription() {
-    if (_subscription != null) {
-      _subscription.cancel();
-    }
-  }
+
 
   static getSchools() async {
     final FirebaseUser currentUser = await getUser();

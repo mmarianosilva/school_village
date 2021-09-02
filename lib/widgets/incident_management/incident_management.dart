@@ -315,7 +315,7 @@ class _IncidentManagementState extends State<IncidentManagement>
           "",
           "${alert.resolution != null ? alert.resolution : "This incident has been resolved and closed."}",
           alert.timestampEnded,
-          alert.resolvedBy ?? "SCHOOL VILLAGE SYSTEM",
+          alert.resolvedBy ?? "MARINA VILLAGE SYSTEM",
           "",
           null,
           null,
@@ -337,7 +337,7 @@ class _IncidentManagementState extends State<IncidentManagement>
               "${snapshot.data()["resolution"] != null ? snapshot.data()["resolution"] : "This incident has been resolved and closed."}",
               DateTime.fromMillisecondsSinceEpoch(
                   snapshot.data()["endedAt"].millisecondsSinceEpoch),
-              snapshot.data()["resolvedBy"] ?? "SCHOOL VILLAGE SYSTEM",
+              snapshot.data()["resolvedBy"] ?? "MARINA VILLAGE SYSTEM",
               "",
               null,
               null,

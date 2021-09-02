@@ -29,8 +29,6 @@ class _SchoolListState extends State<SchoolList> {
   String _searchQuery = "";
   @override
   void dispose() {
-   UserHelper.cleanupSubscription();
-
     super.dispose();
   }
   selectSchool({schoolId: String, role: String, schoolName: String}) {
