@@ -81,6 +81,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
+    print("Fatal Error $schoolId");
     CollectionReference alerts =
         FirebaseFirestore.instance.collection("${schoolId}/notifications");
     _alertSubscription = alerts
@@ -952,7 +953,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         if (!isLoaded || !hasSchool) {
           return Material(
               child:
-                  Text(localize("Please Select A School from Settings Tab")));
+                  Text(localize("Please Select A Marina from Settings Tab")));
         }
 
         return FutureBuilder(
