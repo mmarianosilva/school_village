@@ -234,56 +234,7 @@ class _SchoolListState extends State<SchoolList> {
                             ],
                           ),
                         );
-                        // return FutureBuilder(
-                        //   future: FirebaseFirestore.instance
-                        //       .doc(snapshot.data[index]['ref'])
-                        //       .get(),
-                        //   // a Future<String> or null
-                        //   builder: (BuildContext context,
-                        //       AsyncSnapshot<DocumentSnapshot> schoolSnapshot) {
-                        //     switch (snapshot.connectionState) {
-                        //       case ConnectionState.none:
-                        //         return Text(localize('Loading...'));
-                        //       case ConnectionState.waiting:
-                        //         return Text(localize('Loading...'));
-                        //       case ConnectionState.active:
-                        //         return Text(localize('Loading...'));
-                        //       default:
-                        //         if (snapshot.hasError)
-                        //           return Text('Error: ${snapshot.error}');
-                        //         else {
-                        //           return Container(
-                        //             child: Column(
-                        //               mainAxisSize: MainAxisSize.min,
-                        //               children: <Widget>[
-                        //                 Container(
-                        //                   padding: EdgeInsets.only(
-                        //                       left: 8.0, right: 8.0, top: 8.0),
-                        //                   alignment: Alignment.centerLeft,
-                        //                   child: FlatButton(
-                        //                       child: Text(
-                        //                           schoolSnapshot.data == null
-                        //                               ? ''
-                        //                               : schoolSnapshot.data
-                        //                                   .data()["name"]),
-                        //                       onPressed: () {
-                        //                         selectSchool(
-                        //                             schoolName: schoolSnapshot
-                        //                                 .data
-                        //                                 .data()["name"],
-                        //                             schoolId: snapshot
-                        //                                 .data[index]['ref'],
-                        //                             role: snapshot.data[index]
-                        //                                 ['role']);
-                        //                       }),
-                        //                 ),
-                        //               ],
-                        //             ),
-                        //           );
-                        //         }
-                        //     }
-                        //   },
-                        // );
+
                       },
                       itemCount: snapshot.data.length,
                     );

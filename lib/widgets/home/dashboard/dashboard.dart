@@ -54,7 +54,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   @override
   void initState() {
     super.initState();
-    _checkIfAlertIsInProgress();
+   // _checkIfAlertIsInProgress();
   }
 
   @override
@@ -76,14 +76,14 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     if (widget.listener != null) {
       widget.listener.onDidPopScope();
     }
-    _checkIfAlertIsInProgress();
+    //_checkIfAlertIsInProgress();
   }
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     print("Fatal Error $schoolId");
     CollectionReference alerts =
-        FirebaseFirestore.instance.collection("${schoolId}/notifications");
+       await FirebaseFirestore.instance.collection("${schoolId}/notifications");
     _alertSubscription = alerts
         .orderBy("createdAt", descending: true)
         .snapshots()
