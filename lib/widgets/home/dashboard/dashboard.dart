@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:school_village/util/help_with_migration.dart';
@@ -43,6 +44,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   bool isLoaded = false;
   String ref = "";
   bool isOwner = false;
+  String tempLog = "";
   String role = "";
   Location _location = Location();
   SchoolAlert alertInProgress = null;
@@ -79,51 +81,90 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     _checkIfAlertIsInProgress();
   }
 
+  void appendLog(String str) async {
+    tempLog = tempLog+"\n"+str;
+    // final user= FirebaseFirestore.instance.collection('collection');
+    //  collection
+    //      .doc('doc_id')
+    //      .update({'key' : 'value'}) // <-- Updated data
+    //      .then((_) => print('Success'))
+    //      .catchError((error) => print('Failed: $error'));
+    final FirebaseUser currentUser = await UserHelper.getUser();
+    if (currentUser == null) {
+      return null;
+    }
+    String userPath = "/users/${currentUser.uid}";
+    print(currentUser);
+    DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
+    print("Temp Log is $tempLog");
+    await userRef.update({"debuglog": (tempLog)});
+  }
+
   _checkIfAlertIsInProgress() async {
+    appendLog("Started");
     String schoolId = await UserHelper.getSelectedSchoolID();
+    appendLog("schoolId is $schoolId");
     print("Fatal Error $schoolId");
+    if (schoolId == null){
+      return;
+    }
     try {
+      appendLog("Alerts requested");
       CollectionReference alerts =
-      FirebaseFirestore.instance.collection("${schoolId}/notifications");
+          FirebaseFirestore.instance.collection("${schoolId}/notifications");
+      appendLog("Alerts received");
+      appendLog("Alerts detailed = $alerts");
       _alertSubscription = alerts
           .orderBy("createdAt", descending: true)
           .snapshots()
           .listen((result) async {
         if (result.docs.isEmpty) {
+          appendLog("_alertSubscription is empty");
           this.setState(() {
+            appendLog("Updated alert progress");
             this.alertInProgress = null;
           });
           return;
         }
+        appendLog("Moving ahead");
         final List<QueryDocumentSnapshot> lastAlert =
             (await alerts.orderBy("endedAt", descending: true).limit(1).get())
                 .docs;
+        appendLog("lastalert");
         final DocumentSnapshot latestResolved =
-        lastAlert.isNotEmpty ? lastAlert.first : null;
+            lastAlert.isNotEmpty ? lastAlert.first : null;
+        appendLog("latestResolved $latestResolved");
         final Timestamp lastResolvedTimestamp = latestResolved != null
             ? latestResolved.data()["endedAt"]
             : Timestamp.fromMillisecondsSinceEpoch(0);
+        appendLog("lastResolvedTimestamp $lastResolvedTimestamp");
         final latestAlert = result.docs.lastWhere(
-                (DocumentSnapshot snapshot) =>
-            snapshot.data()["createdAt"] >
+            (DocumentSnapshot snapshot) =>
+                snapshot.data()["createdAt"] >
                 lastResolvedTimestamp.millisecondsSinceEpoch,
             orElse: () => null);
+        appendLog("latestAlert $latestAlert");
         SchoolAlert alert =
-        latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+            latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+        appendLog("SchoolAlert $alert");
         if (this.alertInProgress != alert) {
+          appendLog("alertInProgress 1");
           this.setState(() {
+            appendLog("alertInProgress 2");
             this.alertInProgress = alert;
           });
         }
       });
-    }catch (e){
+    } catch (e) {
+      print("ERROR Caught is $e");
+      print("ERROR Caught is ${e.toString()}");
+      appendLog("catch ${e}");
+      //appendLog("catch ${hasSchool}");
       setState(() {
         hasSchool = false;
       });
       print(e.toString());
     }
-
-
   }
 
   void _openIncidentManagement(BuildContext context) {
@@ -983,7 +1024,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                       .cast<String>();
                               //debugPrint("Access roles are $accessRoles");
                               for (final accessRole in accessRoles) {
-                                if (accessRole.contains(role) ) {
+                                if (accessRole.contains(role)) {
                                   //||
                                   //                                     Temporary.updateRole(accessRole)
                                   //                                         .contains(role)
