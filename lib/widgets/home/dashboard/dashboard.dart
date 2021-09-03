@@ -105,6 +105,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     String schoolId = await UserHelper.getSelectedSchoolID();
     appendLog("schoolId is $schoolId");
     print("Fatal Error $schoolId");
+    if (schoolId == null){
+      return;
+    }
     try {
       appendLog("Alerts requested");
       CollectionReference alerts =
