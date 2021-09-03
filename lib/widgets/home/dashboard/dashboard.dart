@@ -54,7 +54,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   @override
   void initState() {
     super.initState();
-   // _checkIfAlertIsInProgress();
+    _checkIfAlertIsInProgress();
   }
 
   @override
@@ -76,45 +76,54 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     if (widget.listener != null) {
       widget.listener.onDidPopScope();
     }
-    //_checkIfAlertIsInProgress();
+    _checkIfAlertIsInProgress();
   }
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     print("Fatal Error $schoolId");
-    CollectionReference alerts =
-       await FirebaseFirestore.instance.collection("${schoolId}/notifications");
-    _alertSubscription = alerts
-        .orderBy("createdAt", descending: true)
-        .snapshots()
-        .listen((result) async {
-      if (result.docs.isEmpty) {
-        this.setState(() {
-          this.alertInProgress = null;
-        });
-        return;
-      }
-      final List<QueryDocumentSnapshot> lastAlert =
-          (await alerts.orderBy("endedAt", descending: true).limit(1).get())
-              .docs;
-      final DocumentSnapshot latestResolved =
-          lastAlert.isNotEmpty ? lastAlert.first : null;
-      final Timestamp lastResolvedTimestamp = latestResolved != null
-          ? latestResolved.data()["endedAt"]
-          : Timestamp.fromMillisecondsSinceEpoch(0);
-      final latestAlert = result.docs.lastWhere(
-          (DocumentSnapshot snapshot) =>
-              snapshot.data()["createdAt"] >
-              lastResolvedTimestamp.millisecondsSinceEpoch,
-          orElse: () => null);
-      SchoolAlert alert =
-          latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
-      if (this.alertInProgress != alert) {
-        this.setState(() {
-          this.alertInProgress = alert;
-        });
-      }
-    });
+    try {
+      CollectionReference alerts =
+      FirebaseFirestore.instance.collection("${schoolId}/notifications");
+      _alertSubscription = alerts
+          .orderBy("createdAt", descending: true)
+          .snapshots()
+          .listen((result) async {
+        if (result.docs.isEmpty) {
+          this.setState(() {
+            this.alertInProgress = null;
+          });
+          return;
+        }
+        final List<QueryDocumentSnapshot> lastAlert =
+            (await alerts.orderBy("endedAt", descending: true).limit(1).get())
+                .docs;
+        final DocumentSnapshot latestResolved =
+        lastAlert.isNotEmpty ? lastAlert.first : null;
+        final Timestamp lastResolvedTimestamp = latestResolved != null
+            ? latestResolved.data()["endedAt"]
+            : Timestamp.fromMillisecondsSinceEpoch(0);
+        final latestAlert = result.docs.lastWhere(
+                (DocumentSnapshot snapshot) =>
+            snapshot.data()["createdAt"] >
+                lastResolvedTimestamp.millisecondsSinceEpoch,
+            orElse: () => null);
+        SchoolAlert alert =
+        latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+        if (this.alertInProgress != alert) {
+          this.setState(() {
+            this.alertInProgress = alert;
+          });
+        }
+      });
+    }catch (e){
+      setState(() {
+        hasSchool = false;
+      });
+      print(e.toString());
+    }
+
+
   }
 
   void _openIncidentManagement(BuildContext context) {
