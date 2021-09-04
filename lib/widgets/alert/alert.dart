@@ -342,29 +342,32 @@ class _AlertState extends State<Alert> {
     return location;
   }
 
-  Future<String> getBaseUrl() async {
-    String baseurl = "";
+  Future<List<String>> getBaseUrl() async {
+    String baseurl = "",shorturlDomain="";
+
     final packageInfo = await PackageInfo.fromPlatform();
     switch (packageInfo.packageName.trim()) {
       case 'com.oandmtech.marinavillage':
         baseurl = "https://marinavillage-web.web.app/i/";
-        return baseurl;
+        shorturlDomain = "https://onscene.team/i";
+        return [baseurl,shorturlDomain];
 
       case 'com.oandmtech.marinavillage.dev':
         baseurl = "https://marinavillage-dev-web.web.app/i/";
-        return baseurl;
+        shorturlDomain = "https://dev.onscene.team/i";
+        return [baseurl,shorturlDomain];
 
       case 'com.oandmtech.schoolvillage':
         baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
-        return baseurl;
+        return [baseurl,shorturlDomain];
 
       case 'com.oandmtech.schoolvillage.dev':
         baseurl = "https://schoolvillage-dev-web.web.app/i/";
-        return baseurl;
+        return [baseurl,shorturlDomain];
 
       default:
         baseurl = "";
-        return baseurl;
+        return [baseurl,shorturlDomain];
     }
   }
 
@@ -379,14 +382,16 @@ class _AlertState extends State<Alert> {
 
   Future<List<dynamic>> _getIncidentUrl() async {
     String randomToken = Uuid().v4();
-    final baseurl = await getBaseUrl();
+    final baseurlPackage = await getBaseUrl();
+    String baseurl = baseurlPackage[0];
+    String shortLinkDomain = baseurlPackage[1];
     String id = _schoolId.split("schools/")[1].trim();
     final result = await FirebaseFirestore.instance
         .collection("ongoing_incidents")
         .where("schoolId", isEqualTo: id)
         .get();
     if (result.docs.isEmpty) {
-      final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken));
+      final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
       return [randomToken, true, baseurl,shortUrl];
     } else {
       final lastResolved = await getLastResolved(result);
@@ -394,10 +399,10 @@ class _AlertState extends State<Alert> {
         print("Last Resolved Data is ${lastResolved.data()}");
         String dashboardUrl = lastResolved.data()['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
-        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token));
+        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
         return [token, false, baseurl,shortUrl];
       } else {
-        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken));
+        final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
         return [randomToken, true, baseurl,shortUrl];
       }
     }
