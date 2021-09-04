@@ -3,13 +3,12 @@ import 'package:package_info/package_info.dart';
 import 'package:school_village/util/constants.dart';
 
 class DynamicLinksService {
-  static Future<String> createDynamicLink(String parameter) async {
+  static Future<String> createDynamicLink(String parameter,String domain) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     print(packageInfo.packageName);
-    String uriPrefix = Constants.firebase_short_url_prefix;
 
     final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: uriPrefix,
+      uriPrefix: domain,
       link: Uri.parse('$parameter'),
     );
 
