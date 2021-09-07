@@ -29,7 +29,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   static FirebaseStorage storage = FirebaseStorage.instance;
-  FirebaseUser _user;
+  User _user;
   String _userId;
   String name = '';
   String _schoolId = '';
@@ -54,10 +54,10 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
     _userRef = FirebaseFirestore.instance.doc("users/${_user.uid}");
     _userRef.get().then((user) {
-      var keys = user.data()["associatedSchools"][schoolId]["groups"].keys;
+      var keys = user["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user.data()["associatedSchools"][schoolId]["groups"]
+        if (user["associatedSchools"][schoolId]["groups"]
                 [keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
@@ -65,9 +65,9 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       }
       setState(() {
         _userId = user.id;
-        name = "${user.data()['firstName']} ${user.data()['lastName']}";
+        name = "${user['firstName']} ${user['lastName']}";
         _schoolId = schoolId;
-        phone = '${user.data()['phone']}';
+        phone = '${user['phone']}';
         _groups = groups;
         isLoaded = true;
         _handleMessageCollection();

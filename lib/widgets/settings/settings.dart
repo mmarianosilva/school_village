@@ -31,7 +31,7 @@ class _SettingsState extends State<Settings> {
   String _build;
 
   getUserDetails(MainModel model) async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     print("ID: ${user != null ? user.uid : ""}");
     DocumentSnapshot userSnapshot = await model.getUser();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -42,7 +42,7 @@ class _SettingsState extends State<Settings> {
       _version = version;
       _userSnapshot = userSnapshot;
       name = _userSnapshot != null
-          ? "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"
+          ? "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}"
           : "An error occurred while loading user data";
       isLoaded = true;
       _userId = user != null ? user.uid : "";

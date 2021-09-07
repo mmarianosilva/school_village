@@ -46,9 +46,9 @@ class _LoginState extends State<Login> {
   }
 
   proceed(DocumentSnapshot userSnapshot) async {
-    if (userSnapshot.data() != null &&
-        userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
-        (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
+    if (userSnapshot != null &&
+        userSnapshot["associatedSchools"] is Map<String, dynamic> &&
+        (userSnapshot["associatedSchools"] as Map<String, dynamic>)
             .isNotEmpty) {
       await checkIfOnlyOneSchool();
       FileHelper.downloadRequiredDocuments();

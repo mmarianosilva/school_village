@@ -85,13 +85,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
         return null;
       }
       final DocumentSnapshot lastResolved = result.docs
-          .firstWhere((doc) => doc.data()["endedAt"] != null, orElse: () => null);
+          .firstWhere((doc) => doc["endedAt"] != null, orElse: () => null);
       final Timestamp lastResolvedTimestamp = lastResolved != null
-          ? lastResolved.data()["endedAt"]
+          ? lastResolved["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
       result.docs.removeWhere((doc) =>
-          doc.data()["endedAt"] != null ||
-          doc.data()["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
+          doc["endedAt"] != null ||
+          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert = result.docs.isNotEmpty
           ? SchoolAlert.fromMap(result.docs.last)
           : null;
@@ -212,7 +212,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       String path =
           "schools/${message["schoolId"]}/notifications/${message["notificationId"]}";
       DocumentSnapshot alert = await FirebaseFirestore.instance.doc(path).get();
-      if (Timestamp.now().millisecondsSinceEpoch - alert.data()["createdAt"] >
+      if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] >
           7200000) {
         return true;
       }
@@ -244,13 +244,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       debugPrint('Retrieved channelInformation information');
       debugPrint(data.data.toString());
       TalkAroundChannel channel;
-      if (data.data()["direct"] ?? false) {
+      if (data["direct"] ?? false) {
         Stream<TalkAroundUser> membersStream =
             Stream.fromIterable(data.data()["members"]).asyncMap((userId) async {
           final DocumentSnapshot snapshot = await userId.get();
           return TalkAroundUser.fromMapAndGroup(
               snapshot,
-              snapshot.data()["associatedSchools"][escapedSchoolId] != null
+              snapshot["associatedSchools"][escapedSchoolId] != null
                   ? snapshot.data()["associatedSchools"][escapedSchoolId]["role"]
                   : "");
         });

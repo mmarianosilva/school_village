@@ -10,7 +10,7 @@ import '../../util/analytics_helper.dart';
 
 class Splash extends StatelessWidget {
   goToNextPage(BuildContext context) async {
-    FirebaseUser currentUser;
+    User currentUser;
     try {
       currentUser = await UserHelper.getUser();
     } catch (err) {
@@ -22,9 +22,9 @@ class Splash extends StatelessWidget {
       print(currentUser);
       DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
       DocumentSnapshot userSnapshot = await userRef.get();
-      if (userSnapshot.data() != null &&
-          userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
-          (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
+      if (userSnapshot != null &&
+          userSnapshot["associatedSchools"] is Map<String, dynamic> &&
+          (userSnapshot["associatedSchools"] as Map<String, dynamic>)
               .isNotEmpty) {
         FileHelper.downloadRequiredDocuments();
         Navigator.of(context)

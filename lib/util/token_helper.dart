@@ -13,13 +13,13 @@ class TokenHelper {
     final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
     final String token = await _firebaseMessaging.getToken();
     print("Fcm token is $token");
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     String userPath = "/users/${user.uid}";
     print('User path /users/${user.uid}');
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
     DocumentSnapshot userSnapshot = await userRef.get();
-    if (userSnapshot.data()['devices'] != null &&
-        userSnapshot.data()['devices'].keys.contains(token)) {
+    if (userSnapshot['devices'] != null &&
+        userSnapshot['devices'].keys.contains(token)) {
       print("Not adding Token to user");
       (await SharedPreferences.getInstance()).setString("fcmToken", token);
       return;
@@ -34,7 +34,7 @@ class TokenHelper {
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
 
     DocumentSnapshot userSnapshot = await userRef.get();
-    Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot.data()['devices']);
+    Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot['devices']);
 
     print(devices);
 

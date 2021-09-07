@@ -12,7 +12,7 @@ mixin UserModel on Model {
 
   Future<DocumentSnapshot> getUser() async {
     if(_user == null){
-      FirebaseUser user = await UserHelper.getUser();
+      User user = await UserHelper.getUser();
       if (user == null) {
         return null;
       }
@@ -39,7 +39,7 @@ mixin UserModel on Model {
 
   refreshUserIfNull() async{
     if(_user == null){
-      FirebaseUser user = await UserHelper.getUser();
+      User user = await UserHelper.getUser();
       print("User ID");
       print(user.uid);
       DocumentReference userRef = FirebaseFirestore.instance.doc('users/${user.uid}');

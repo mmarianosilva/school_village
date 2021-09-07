@@ -14,12 +14,12 @@ class Rating {
   Rating.fromDocument(DocumentSnapshot snapshot)
       : this(
           id: snapshot.id,
-          stars: snapshot.data()['stars'],
-          title: snapshot.data()['title'],
-          description: snapshot.data()['description'],
-          ratingPhoto: snapshot.data()['ratingPhoto'],
-          userPhoto: snapshot.data()['userPhoto'],
-          userDisplayName: snapshot.data()['userDisplayName'],
+          stars: snapshot['stars'],
+          title: snapshot['title'],
+          description: snapshot['description'],
+          ratingPhoto: snapshot['ratingPhoto'],
+          userPhoto: snapshot['userPhoto'],
+          userDisplayName: snapshot['userDisplayName'],
         );
 
   final String id;

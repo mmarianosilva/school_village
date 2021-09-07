@@ -42,10 +42,10 @@ class FileHelper {
       return;
     }
     final DocumentSnapshot school = await firestore.doc(schoolId).get();
-    if (school.data()["documents"] == null) {
+    if (school["documents"] == null) {
       return;
     }
-    final List<Map<String, dynamic>> documents = (school.data()["documents"]
+    final List<Map<String, dynamic>> documents = (school["documents"]
             .cast<Map<String, dynamic>>())
         .where((Map<String, dynamic> item) =>
             item["accessRoles"] == null || item["accessRoles"].contains(role))

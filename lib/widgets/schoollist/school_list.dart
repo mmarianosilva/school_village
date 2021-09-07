@@ -73,7 +73,7 @@ class _SchoolListState extends State<SchoolList> {
             setState(() {
               _regionSearchKey = newValue;
               regionObjects.forEach((element) {
-                String name = element.data()['name'];
+                String name = element['name'];
                 if (name == newValue) {
                   _selectedRegion = element;
                   //_regionSearchKey = newValue;
@@ -97,7 +97,7 @@ class _SchoolListState extends State<SchoolList> {
             setState(() {
               _harborSearchKey = newValue;
               harborObjects.forEach((element) {
-                String name = element.data()['name'];
+                String name = element['name'];
                 if (name == newValue) {
                   _selectedHarbor = element;
                 }

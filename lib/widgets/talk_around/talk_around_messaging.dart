@@ -44,7 +44,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   _TalkAroundMessagingState(this.channel);
 
   void _getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {

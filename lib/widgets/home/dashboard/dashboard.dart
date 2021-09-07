@@ -108,11 +108,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         final DocumentSnapshot latestResolved =
             lastAlert.isNotEmpty ? lastAlert.first : null;
         final Timestamp lastResolvedTimestamp = latestResolved != null
-            ? latestResolved.data()["endedAt"]
+            ? latestResolved["endedAt"]
             : Timestamp.fromMillisecondsSinceEpoch(0);
         final latestAlert = result.docs.lastWhere(
             (DocumentSnapshot snapshot) =>
-                snapshot.data()["createdAt"] >
+                snapshot["createdAt"] >
                 lastResolvedTimestamp.millisecondsSinceEpoch,
             orElse: () => null);
         SchoolAlert alert =
@@ -332,31 +332,31 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
+        if (snapshot["documents"][index - 4]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data()["documents"][index - 4]["connectedFiles"] != null
+              snapshot["documents"][index - 4]["connectedFiles"] != null
                   ? snapshot
-                      .data()["documents"][index - 4]["connectedFiles"]
+                      ["documents"][index - 4]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(context, snapshot.data()["documents"][index - 4]["location"],
-              snapshot.data()["documents"][index - 4]["title"],
+          _showPDF(context, snapshot["documents"][index - 4]["location"],
+              snapshot["documents"][index - 4]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot.data()["documents"][index - 4]["type"] ==
+        } else if (snapshot["documents"][index - 4]["type"] ==
             "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot.data()["documents"][index - 4]["location"],
+            snapshot["documents"][index - 4]["location"],
           );
         } else {
-          _launchURL(snapshot.data()["documents"][index - 4]["location"]);
+          _launchURL(snapshot["documents"][index - 4]["location"]);
         }
       },
       onLongPress: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
-        } else if (snapshot.data()["documents"][index - 4]["type"] ==
+        if (snapshot["documents"][index - 4]["type"] == "pdf") {
+        } else if (snapshot["documents"][index - 4]["type"] ==
             "linked-pdf") {}
       },
       child: Column(
@@ -369,7 +369,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data()["documents"][index - 4]["icon"],
+                          url: snapshot["documents"][index - 4]["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -390,7 +390,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data()["documents"][index - 4]["title"],
+                snapshot["documents"][index - 4]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -977,9 +977,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
-                    snapshot.data.data()["documents"] != null
+                    snapshot.data["documents"] != null
                         ? snapshot.data
-                            .data()["documents"]
+                            ["documents"]
                             .where((snapshot) {
                               if (snapshot["accessRoles"] == null) {
                                 return true;

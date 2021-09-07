@@ -51,7 +51,7 @@ Future<Null> internalMain(String sentryDsn) async {
                   onPressed: () async {
                     final String token = (await SharedPreferences.getInstance())
                         .getString("fcmToken");
-                    final FirebaseUser user = (await UserHelper.getUser());
+                    final User user = (await UserHelper.getUser());
                     await TokenHelper.deleteToken(token, user.uid);
                     await UserHelper.logout(token);
                     model.setUser(null);

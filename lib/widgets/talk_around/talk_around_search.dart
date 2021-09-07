@@ -115,7 +115,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   }
 
   void _getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     _role = await UserHelper.getSelectedSchoolRole();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {

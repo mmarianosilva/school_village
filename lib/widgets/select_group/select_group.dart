@@ -60,7 +60,7 @@ class _SelectGroupsState extends State<SelectGroups> {
   List<DropdownMenuItem> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All");
-    _schools.addAll(schoolSnapshots.map((item) => item.data()["name"]));
+    _schools.addAll(schoolSnapshots.map((item) => item["name"]));
     return _schools
         .map((value) => DropdownMenuItem(
               value: value,
@@ -220,11 +220,11 @@ class _SelectGroupsState extends State<SelectGroups> {
                       items: _districtSchools(),
                       onChanged: (value) {
                         if (schoolSnapshots
-                            .where((item) => item.data()["name"] == value)
+                            .where((item) => item["name"] == value)
                             .isNotEmpty) {
                           setState(() {
                             selectedSchool = schoolSnapshots.firstWhere(
-                                (item) => item.data()["name"] == value);
+                                (item) => item["name"] == value);
                           });
                         } else {
                           setState(() {
@@ -233,7 +233,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                         }
                       },
                       value: selectedSchool != null
-                          ? selectedSchool.data()["name"]
+                          ? selectedSchool["name"]
                           : "All",
                     )
                   ],

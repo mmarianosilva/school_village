@@ -273,7 +273,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
       DocumentSnapshot schoolDocument =

@@ -34,7 +34,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   bool _isLoading = false;
 
   void getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     final schoolId = await UserHelper.getSelectedSchoolID();
     final schoolRole = await UserHelper.getSelectedSchoolRole();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {

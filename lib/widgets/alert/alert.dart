@@ -37,7 +37,7 @@ class _AlertState extends State<Alert> {
   BuildContext _scaffold;
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     print("User ID");
     print(user.uid);
     _email = user.email;
@@ -53,8 +53,8 @@ class _AlertState extends State<Alert> {
       _userId = user.id;
       setState(() {
         name =
-            "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
-        phone = "${_userSnapshot.data()['phone']}";
+            "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}";
+        phone = "${_userSnapshot['phone']}";
         isLoaded = true;
       });
       print(name);
@@ -287,8 +287,8 @@ class _AlertState extends State<Alert> {
                 textChatEnabled: true),
             deviceOwner: IntradoDeviceOwner(
                 name:
-                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                tel: "${_userSnapshot.data()['phone']}",
+                    "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}",
+                tel: "${_userSnapshot['phone']}",
                 environment: "Marina",
                 mobility: "Fixed"),
             eventTime: DateTime.now(),
@@ -409,7 +409,7 @@ class _AlertState extends State<Alert> {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
         print("Last Resolved Data is ${lastResolved.data()}");
-        String dashboardUrl = lastResolved.data()['dashboardUrl'];
+        String dashboardUrl = lastResolved['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
         return [token, false, baseurl,shortUrl,baseurlPackage[0]];
