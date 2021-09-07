@@ -304,12 +304,22 @@ class _AlertState extends State<Alert> {
               "Authorization": "Bearer $token",
             },
           );
-          debugPrint(
-              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-          debugPrint("Intrado response is ${response.body}");
-          final jsonResponse = json.decode(response.body);
+          //debugPrint(
+          //    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+          //debugPrint("Intrado response is ${response.body}");
+          Map<String, dynamic> parsedJson;
+          try{
+             parsedJson = json.decode(response.body);
+
+
+          }on Exception catch(e){
+            print("EXCEPTION is $e");
+            _showAlertSent(
+                "SUCCESS", "\nAlert Sent to 911 \nand Marina Neighbours");
+            return;
+          }
           IntradoResponse intradoResponse =
-              new IntradoResponse.fromJson(jsonResponse);
+          new IntradoResponse.fromJson(parsedJson);
           if (intradoResponse.success == true &&
               event == EventAction.PSAPLink) {
             var storexml = xml.parse(intradoResponse.response);
