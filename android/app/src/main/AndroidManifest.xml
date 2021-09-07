@@ -37,7 +37,7 @@
                 android:value="AIzaSyBVRFQqX_6Xp01lE2vO2Uozw0TNX9OiUOg" />
 
         <activity
-                android:name="com.oandmtech.schoolvillage.MainActivity"
+                android:name=".MainActivity"
                 android:launchMode="singleTop"
                 android:theme="@style/LaunchTheme"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
@@ -48,8 +48,14 @@
                  there is no splash screen (such as the default splash screen
                  defined in @style/LaunchTheme). -->
             <meta-data
-                    android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
-                    android:value="true"/>
+                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                android:resource="@drawable/launch_background" />
+
+            <!-- Theme to apply as soon as Flutter begins rendering frames -->
+            <meta-data
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"
+                />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
