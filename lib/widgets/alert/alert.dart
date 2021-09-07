@@ -296,17 +296,18 @@ class _AlertState extends State<Alert> {
           final token =
               (await (await FirebaseAuth.instance.currentUser()).getIdToken())
                   .token;
+          print("REQUEST URL IS ${incident[4]}${incident[0]}/create-event");
           final response = await http.post(
-            "${incident[4]}/${incident[0]}/create-event",
+            "${incident[4]}${incident[0]}/create-event",
             body: intradoPayload.toXml(),
             encoding: Encoding.getByName("utf8"),
             headers: <String, String>{
               "Authorization": "Bearer $token",
             },
           );
-          //debugPrint(
-          //    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-          //debugPrint("Intrado response is ${response.body}");
+          debugPrint(
+              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+          debugPrint("Intrado response is ${response.body}");
           Map<String, dynamic> parsedJson;
           try{
              parsedJson = json.decode(response.body);
