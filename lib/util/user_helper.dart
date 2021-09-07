@@ -10,7 +10,7 @@ import '../model/region_data.dart';
 
 class UserHelper {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   static final Future<SharedPreferences> _prefsFuture =
       SharedPreferences.getInstance();
   static SharedPreferences _prefs;
@@ -20,7 +20,7 @@ class UserHelper {
   static Map<String, String> negativeIncidents;
 
 
-  static Future<AuthResult> signIn({email: String, password: String}) async {
+  static Future<UserCredential> signIn({email: String, password: String}) async {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }
@@ -30,8 +30,8 @@ class UserHelper {
         email: email.trim().toLowerCase(), password: password);
   }
 
-  static Future<FirebaseUser> getUser() async {
-    FirebaseUser user = await _auth.currentUser();
+  static Future<User> getUser() async {
+    User user = await _auth.currentUser;
     if (user == null) {
       if (_prefs == null) {
         _prefs = await _prefsFuture;
@@ -45,7 +45,7 @@ class UserHelper {
         return null;
       }
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return _auth.currentUser();
+      return _auth.currentUser;
     }
     AnalyticsHelper.setUserId(user.uid);
     return user;
@@ -62,7 +62,7 @@ class UserHelper {
   }
 
   static Future<RegionData> getRegionData() async {
-    final FirebaseUser currentUser = await getUser();
+    final User currentUser = await getUser();
     if (currentUser == null) {
       return null;
     }
@@ -79,9 +79,9 @@ class UserHelper {
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
     if (result.isNotEmpty) {
       result.forEach((element) {
-        String name = element.data()['name'];
+        String name = element['name'];
         if (element.data().containsKey('deleted')) {
-          bool deleted = element.data()['deleted'];
+          bool deleted = element['deleted'];
           if (!deleted && !harbors.contains(name)) {
             harbors.add(name);
             harborList.add(element);
@@ -100,9 +100,9 @@ class UserHelper {
         (await FirebaseFirestore.instance.collection("regions").get()).docs;
     if (regionsResult.isNotEmpty) {
       regionsResult.forEach((element) {
-        String name = element.data()['name'];
+        String name = element['name'];
         if (element.data().containsKey('deleted')) {
-          bool deleted = element.data()['deleted'];
+          bool deleted = element['deleted'];
           if (!deleted && !regions.contains(name)) {
             regions.add(name);
             regionList.add(element);
@@ -117,8 +117,8 @@ class UserHelper {
         }
       });
     }
-    if (userSnapshot.data()['associatedSchools'] == null ||
-        userSnapshot.data()['associatedSchools'].isEmpty) {
+    if (userSnapshot['associatedSchools'] == null ||
+        userSnapshot['associatedSchools'].isEmpty) {
       //Vendor Owner cases
       final result = await FirebaseFirestore.instance
           .collection("vendors")
@@ -127,7 +127,7 @@ class UserHelper {
       if (result.docs.isNotEmpty) {
         List<QueryDocumentSnapshot> schoolsInDistrict;
         final vendorDocument = result.docs.first;
-        final districts = (vendorDocument.data()["districts"] as List)
+        final districts = (vendorDocument["districts"] as List)
             .cast<DocumentReference>();
         districts.forEach((district) async {
           schoolsInDistrict = (await FirebaseFirestore.instance
@@ -144,12 +144,12 @@ class UserHelper {
       }
     } else {
       //Other cases
-      final userData = userSnapshot.data();
+      final userData = userSnapshot;
 
       Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
 
       setIsOwner(
-          userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
+          userSnapshot['owner'] != null && userSnapshot['owner']
               ? true
               : false);
       List<QueryDocumentSnapshot> filteredSchools;
@@ -162,7 +162,7 @@ class UserHelper {
         DocumentReference schoolRef =
             FirebaseFirestore.instance.doc(schoolPath);
         schoolRef.snapshots().listen((school) {
-          final data = school.data();
+          final data = school;
           if (data == null) {
             return;
           }
@@ -182,7 +182,7 @@ class UserHelper {
 
 
   static getSchools() async {
-    final FirebaseUser currentUser = await getUser();
+    final User currentUser = await getUser();
     if (currentUser == null) {
       return null;
     }
@@ -192,15 +192,15 @@ class UserHelper {
     DocumentSnapshot userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
-    if (userSnapshot.data()['associatedSchools'] == null ||
-        userSnapshot.data()['associatedSchools'].isEmpty) {
+    if (userSnapshot['associatedSchools'] == null ||
+        userSnapshot['associatedSchools'].isEmpty) {
       final result = await FirebaseFirestore.instance
           .collection("vendors")
           .where("owners", arrayContains: userRef)
           .get();
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
-        final districts = (vendorDocument.data()["districts"] as List)
+        final districts = (vendorDocument["districts"] as List)
             .cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
           final schoolsInDistrict = (await FirebaseFirestore.instance
@@ -216,15 +216,15 @@ class UserHelper {
       }
       return schools;
     }
-    Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
+    Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
     setIsOwner(
-        userSnapshot.data()['owner'] != null && userSnapshot.data()['owner']
+        userSnapshot['owner'] != null && userSnapshot['owner']
             ? true
             : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]
+        "role": userSnapshot['associatedSchools'][keys.elementAt(i)]
             ["role"]
       });
     }
@@ -245,7 +245,7 @@ class UserHelper {
     List<dynamic> allMarinas = [];
     final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
     await marinas.forEach((school) {
-      final data = school.data();
+      final data = school;
       if (data == null) {
         return;
       }
@@ -258,12 +258,12 @@ class UserHelper {
         allMarinas.add(
           <String, dynamic>{
             "schoolId": "schools/${school.reference.id}",
-            "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+            "role": mSnapshot['associatedSchools'][school.reference.id]
                 ["role"],
             "name": schoolName,
           },
         );
-        //allMarinas[schoolId] = school.data();
+        //allMarinas[schoolId] = school;
       } else if ((region != 'All') && (harbor != 'All')) {
         if (harborRef == harborObj.reference &&
             regionRef == regionObj.reference &&
@@ -271,7 +271,7 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+              "role": mSnapshot['associatedSchools'][school.reference.id]
                   ["role"],
               "name": schoolName,
             },
@@ -282,7 +282,7 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+              "role": mSnapshot['associatedSchools'][school.reference.id]
                   ["role"],
               "name": schoolName,
             },
@@ -293,7 +293,7 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot.data()['associatedSchools'][school.reference.id]
+              "role": mSnapshot['associatedSchools'][school.reference.id]
                   ["role"],
               "name": schoolName,
             },
@@ -313,7 +313,7 @@ class UserHelper {
           FirebaseFirestore.instance.doc(selectedSchool);
       DocumentSnapshot schoolSnapshot = await schoolRef.get();
 
-      var items = schoolSnapshot.data()["incidents"];
+      var items = schoolSnapshot["incidents"];
 
       negativeIncidents = (Map<String, String>.from(items["negative"]));
       positiveIncidents = (Map<String, String>.from(items["positive"]));
@@ -327,8 +327,8 @@ class UserHelper {
         FirebaseFirestore.instance.doc(selectedSchool);
     DocumentSnapshot schoolSnapshot = await schoolRef.get();
     List<dynamic> groups = [];
-    if (schoolSnapshot.data()['groups'] != null) {
-      Iterable<dynamic> keys = schoolSnapshot.data()['groups'].keys;
+    if (schoolSnapshot['groups'] != null) {
+      Iterable<dynamic> keys = schoolSnapshot['groups'].keys;
       for (int i = 0; i < keys.length; i++) {
         groups.add({
           "name": keys.elementAt(i).toString().trim(),
@@ -403,7 +403,7 @@ class UserHelper {
   }
 
   static updateTopicSubscription() async {
-    final FirebaseUser currentUser = await getUser();
+    final User currentUser = await getUser();
     if (currentUser == null) {
       return null;
     }
@@ -480,10 +480,10 @@ class UserHelper {
   }
 
   static String getDisplayName([DocumentSnapshot snapshot]) {
-    return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
+    return "${snapshot["firstName"]} ${snapshot["lastName"]} ${snapshot["room"] != null && snapshot["room"].isNotEmpty ? ' (${snapshot["room"]})' : ''}";
   }
 
   static String getRoomNumber([DocumentSnapshot snapshot]) {
-    return snapshot.data()["room"];
+    return snapshot["room"];
   }
 }
