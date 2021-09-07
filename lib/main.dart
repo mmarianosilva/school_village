@@ -23,7 +23,12 @@ RouteObserver<PageRoute>();
 final model = MainModel();
 
 Future<Null> internalMain(String sentryDsn) async {
-  final SentryClient _sentry = SentryClient(dsn: sentryDsn);
+
+  await Sentry.init(
+        (options) {
+      options.dsn = sentryDsn;
+    },
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   ErrorWidget.builder = (FlutterErrorDetails error) {
@@ -95,7 +100,7 @@ Future<Null> internalMain(String sentryDsn) async {
       ));
     });
   }, (error, stackTrace) async {
-    await _reportError(_sentry, error, stackTrace);
+    await Sentry.captureException(error, stackTrace: stackTrace);
   });
 }
 
@@ -105,21 +110,4 @@ bool get isInDebugMode {
   return inDebugMode;
 }
 
-Future<Null> _reportError(SentryClient _sentry, dynamic error, dynamic stackTrace) async {
-  print('Caught error: $error');
-  if (isInDebugMode) {
-    print(stackTrace);
-    print('In dev mode. Not sending report to Sentry.io.');
-    return;
-  }
-  print('Reporting to Sentry.io...');
-  final SentryResponse response = await _sentry.captureException(
-    exception: error,
-    stackTrace: stackTrace,
-  );
-  if (response.isSuccessful) {
-    print('Success! Event ID: ${response.eventId}');
-  } else {
-    print('Failed to report to Sentry.io: ${response.error}');
-  }
-}
+

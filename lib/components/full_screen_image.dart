@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_scale_boundary.dart';
-import 'package:photo_view/photo_view_scale_state.dart';
+
 import 'package:school_village/components/icon_button.dart';
 import 'package:school_village/util/localizations/localization.dart';
 
@@ -37,7 +36,7 @@ class ImageViewScreen extends StatelessWidget {
       imageProvider: NetworkImage(imageAddress),
       loadingChild: Text(localize("Loading", context),
           style: TextStyle(color: Colors.white)),
-      minScale: PhotoViewScaleState.contained,
+      minScale: PhotoViewScaleState.covering  ,
     );
   }
 // Widget oldpicView() {
