@@ -33,7 +33,7 @@ class _VendorRatingState extends State<VendorRating> {
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.currentUser().then((value) async {
+    FirebaseAuth.instance.userChanges().listen((value) async{
       final userId = value.uid;
       final ratingDocument = await FirebaseFirestore.instance
           .doc("vendors/${widget.vendor.id}/ratings/${userId}")
@@ -50,6 +50,7 @@ class _VendorRatingState extends State<VendorRating> {
         _isLoading = false;
       });
     });
+
   }
 
   Future<void> _onSubmitPressed() async {
@@ -59,7 +60,7 @@ class _VendorRatingState extends State<VendorRating> {
     setState(() {
       _isLoading = true;
     });
-    final userId = (await FirebaseAuth.instance.currentUser()).uid;
+    final userId = (await FirebaseAuth.instance.currentUser).uid;
     if (_ratingPhoto != null) {
       final id = "$userId-${DateTime.now().millisecondsSinceEpoch}";
       final storageRef = FirebaseStorage.instance.ref("vendors/ratings/$id");

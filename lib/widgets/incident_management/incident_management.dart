@@ -4,8 +4,9 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/pdf_handler.dart';
@@ -278,10 +279,10 @@ class _IncidentManagementState extends State<IncidentManagement>
     if (schoolId != null) {
       DocumentSnapshot schoolDocument =
           await FirebaseFirestore.instance.doc(schoolId).get();
-      if (schoolDocument.data()["documents"] != null) {
+      if (schoolDocument["documents"] != null) {
         _mapData = _getMapData(schoolDocument);
       }
-      _schoolAddress = schoolDocument.data()['address'];
+      _schoolAddress = schoolDocument['address'];
     }
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
@@ -298,7 +299,7 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
     final List<Map<String, dynamic>> documents = snapshot
-        .data()["documents"]
+        ["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();

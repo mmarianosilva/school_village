@@ -145,7 +145,7 @@ class _HotLineListState extends State<HotLineList> {
                                                         schoolData) =>
                                                     Text(
                                                         schoolData.hasData
-                                                            ? schoolData.data.data()[
+                                                            ? schoolData.data[
                                                                     'name'] ??
                                                                 ''
                                                             : '',
@@ -179,8 +179,8 @@ class _HotLineListState extends State<HotLineList> {
                                               ),
                                             ),
                                           ),
-                                          document.data()['media'] != null
-                                              ? document.data()['isVideo'] ?? false
+                                          document['media'] != null
+                                              ? document['isVideo'] ?? false
                                                   ? Icon(
                                                       Icons.videocam,
                                                       color: Colors.blueAccent,

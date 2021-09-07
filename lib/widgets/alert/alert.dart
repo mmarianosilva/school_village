@@ -294,10 +294,9 @@ class _AlertState extends State<Alert> {
             eventTime: DateTime.now(),
           );
           final token =
-              (await (await FirebaseAuth.instance.currentUser()).getIdToken())
-                  .token;
+              (await (await FirebaseAuth.instance.currentUser).getIdToken());
           final response = await http.post(
-            "${incident[4]}/${incident[0]}/create-event",
+            Uri.parse("${incident[4]}/${incident[0]}/create-event"),
             body: intradoPayload.toXml(),
             encoding: Encoding.getByName("utf8"),
             headers: <String, String>{
