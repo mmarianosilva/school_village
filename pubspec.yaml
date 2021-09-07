@@ -2,6 +2,7 @@ name: school_village
 description: School Village
 environment:
   sdk: '>=2.10.0 <3.0.0'
+  version: 1.0.2+4
 dependencies:
   flutter:
     sdk: flutter
