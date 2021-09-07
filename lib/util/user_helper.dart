@@ -216,9 +216,10 @@ class UserHelper {
       }
       return schools;
     }
+    print("Investigate ${userSnapshot['associatedSchools']}");
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
     setIsOwner(
-        userSnapshot['owner'] != null && userSnapshot['owner']
+        userSnapshot['owner'] == null && userSnapshot['owner']
             ? true
             : false);
     for (int i = 0; i < keys.length; i++) {
