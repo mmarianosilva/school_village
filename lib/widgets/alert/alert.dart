@@ -366,7 +366,7 @@ class _AlertState extends State<Alert> {
       case 'com.oandmtech.marinavillage.dev':
         baseurl = "https://marinavillage-dev-web.web.app/i/";
         shorturlDomain = "https://dev.onscene.team/i";
-        intradoRequestUrl ="https://us-central1-marinavillage-1.cloudfunctions.net/api/intrado";
+        intradoRequestUrl ="https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado";
         return [baseurl,shorturlDomain,intradoRequestUrl];
 
       case 'com.oandmtech.schoolvillage':
