@@ -55,9 +55,9 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
     final List<DocumentSnapshot> modifiableUserList = [...users.docs];
 
     modifiableUserList.removeWhere((userSnapshot) =>
-        userSnapshot.data()["associatedSchools"][escapedSchoolId] == null ||
+        userSnapshot["associatedSchools"][escapedSchoolId] == null ||
         !talkAroundPermissions.contains(
-            userSnapshot.data()["associatedSchools"][escapedSchoolId]["role"]));
+            userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
     final Iterable<User> data = modifiableUserList.map((e) {
       return User.fromMapAndSchool(e, escapedSchoolId);
     });

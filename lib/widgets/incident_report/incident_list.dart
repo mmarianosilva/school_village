@@ -40,7 +40,7 @@ class IncidentListState extends State<IncidentList> {
     id = (await UserHelper.getUser()).uid;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolSnapshot = await FirebaseFirestore.instance.doc(_schoolId).get();
-    _schoolName = _schoolSnapshot.data()['name'];
+    _schoolName = _schoolSnapshot['name'];
     _role = await UserHelper.getSelectedSchoolRole();
     _handleMessageCollection();
     await UserHelper.loadIncidentTypes();
@@ -93,12 +93,12 @@ class IncidentListState extends State<IncidentList> {
       itemCount: reports.length,
       itemBuilder: (_, int index) {
         final DocumentSnapshot document = reports[index];
-        List<String> subjectNames = List<String>.from(document.data()['subjects']);
-        List<String> witnessNames = List<String>.from(document.data()['witnesses']);
+        List<String> subjectNames = List<String>.from(document['subjects']);
+        List<String> witnessNames = List<String>.from(document['witnesses']);
 
-        List<String> items = List<String>.from(document.data()['incidents']);
+        List<String> items = List<String>.from(document['incidents']);
         List<String> posItems =
-        List<String>.from(document.data()['positiveIncidents']);
+        List<String>.from(document['positiveIncidents']);
 
         var report = '';
 
@@ -110,7 +110,7 @@ class IncidentListState extends State<IncidentList> {
           report += '${UserHelper.positiveIncidents[value] ?? 'Unknown incident'}' + ', ';
         });
 
-        var other = document.data()['other'];
+        var other = document['other'];
         if (other == null || other.isEmpty) {
           report = report.substring(0, report.length - 2);
         } else {
@@ -126,7 +126,7 @@ class IncidentListState extends State<IncidentList> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document.data()['createdAt']))}"),
+                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}"),
               trailing: FlatButton(
                 child: Text(localize('VIEW')),
                 onPressed: () {
@@ -136,18 +136,18 @@ class IncidentListState extends State<IncidentList> {
                       builder: (context) => IncidentDetails(
                           firestoreDocument: document,
                           demo: false,
-                          details: document.data()['details'],
+                          details: document['details'],
                           date: DateTime.fromMillisecondsSinceEpoch(
-                              document.data()['date']),
-                          name: document.data()['createdBy'],
-                          reportedById: document.data()['createdById'],
-                          location: document.data()['location'],
+                              document['date']),
+                          name: document['createdBy'],
+                          reportedById: document['createdById'],
+                          location: document['location'],
                           witnessNames: witnessNames,
                           subjectNames: subjectNames,
                           items: items,
                           posItems: posItems,
-                          imgUrl: document.data()['image'],
-                          other: document.data()['other'],),
+                          imgUrl: document['image'],
+                          other: document['other'],),
                     ),
                   );
                 },

@@ -60,7 +60,7 @@ class _SignUpVendorPreviewState extends State<SignUpVendorPreview> {
       "cover_url": photoUrl,
       "owners": [
         FirebaseFirestore.instance
-            .doc("users/${(await FirebaseAuth.instance.currentUser()).uid}")
+            .doc("users/${(await FirebaseAuth.instance.currentUser).uid}")
       ],
     });
 

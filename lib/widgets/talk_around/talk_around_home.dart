@@ -58,9 +58,9 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
-        return (element.data()['name'] == "911 TalkAround Channel") &&
-            ((element.data()['createdById'] != _userSnapshot.id) ||
-                (element.data()['isActive'] == false));
+        return (element['name'] == "911 TalkAround Channel") &&
+            ((element['createdById'] != _userSnapshot.id) ||
+                (element['isActive'] == false));
       });
       Iterable<DocumentSnapshot> channels = documentList;
       List<Future<TalkAroundChannel>> processedChannels =
@@ -94,13 +94,13 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             List<Future<TalkAroundChannel>> processedGroupMessages =
                 groupMessages.map((channel) async {
               Stream<TalkAroundUser> members =
-                  Stream.fromIterable(channel.data()["members"])
+                  Stream.fromIterable(channel["members"])
                       .asyncMap((id) async {
                 final DocumentSnapshot user = await id.get();
                 TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                     user,
-                    user.data()["associatedSchools"][escapedSchoolId] != null
-                        ? user.data()["associatedSchools"][escapedSchoolId]
+                    user["associatedSchools"][escapedSchoolId] != null
+                        ? user["associatedSchools"][escapedSchoolId]
                             ["role"]
                         : "");
                 return member;
@@ -139,21 +139,21 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         List<DocumentSnapshot> documentList = snapshot.docs;
         Iterable<DocumentSnapshot> groupMessages = documentList.toList()
           ..removeWhere((chatroom) =>
-              !(chatroom.data()["class"] ?? false) &&
-              !(chatroom.data()["members"] != null &&
+              !(chatroom["class"] ?? false) &&
+              !(chatroom["members"] != null &&
                   chatroom
-                      .data()["members"]
+                      ["members"]
                       .contains(_userSnapshot.reference)));
         List<Future<TalkAroundChannel>> processedGroupMessages =
             groupMessages.map((channel) async {
           Stream<TalkAroundUser> members =
-              Stream.fromIterable(channel.data()["members"])
+              Stream.fromIterable(channel["members"])
                   .asyncMap((id) async {
             final DocumentSnapshot user = await id.get();
             TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                 user,
-                user.data()["associatedSchools"][escapedSchoolId] != null
-                    ? user.data()["associatedSchools"][escapedSchoolId]["role"]
+                user["associatedSchools"][escapedSchoolId] != null
+                    ? user["associatedSchools"][escapedSchoolId]["role"]
                     : "");
             return member;
           });

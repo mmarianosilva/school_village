@@ -93,7 +93,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleMessageMapInsert(shot) {
-    // if (!belongsToGroup(shot.data()['groups'].keys)) {
+    // if (!belongsToGroup(shot['groups'].keys)) {
     //   return;
     // }
     var day = _convertDateToKey(shot.data()['createdAt']);
@@ -202,15 +202,15 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             final DocumentSnapshot document = messageList[index].message;
 
             return BroadcastMessage(
-              text: document.data()['body'],
-              name: "${document.data()['createdBy']}",
-              timestamp: document.data()['createdAt'] is Timestamp
-                  ? document.data()['createdAt']
+              text: document['body'],
+              name: "${document['createdBy']}",
+              timestamp: document['createdAt'] is Timestamp
+                  ? document['createdAt']
                   : Timestamp.fromMillisecondsSinceEpoch(
-                      document.data()['createdAt']),
-              imageUrl: document.data()['image'],
+                      document['createdAt']),
+              imageUrl: document['image'],
               message: document,
-              isVideo: document.data()['isVideo'] ?? false,
+              isVideo: document['isVideo'] ?? false,
             );
           });
     }

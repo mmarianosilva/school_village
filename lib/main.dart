@@ -27,7 +27,7 @@ Future<Null> internalMain(String sentryDsn) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   ErrorWidget.builder = (FlutterErrorDetails error) {
-    if (FirebaseAuth.instance.currentUser() != null) {
+    if (FirebaseAuth.instance.currentUser != null) {
       return Builder(
         builder: (context) => Scaffold(
           appBar: null,
@@ -51,7 +51,7 @@ Future<Null> internalMain(String sentryDsn) async {
                   onPressed: () async {
                     final String token = (await SharedPreferences.getInstance())
                         .getString("fcmToken");
-                    final User user = (await UserHelper.getUser());
+                    final user = (await UserHelper.getUser());
                     await TokenHelper.deleteToken(token, user.uid);
                     await UserHelper.logout(token);
                     model.setUser(null);

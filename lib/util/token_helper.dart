@@ -10,7 +10,7 @@ import 'package:device_info/device_info.dart';
 class TokenHelper {
   static saveToken() async {
     print("Saving token");
-    final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
     final String token = await _firebaseMessaging.getToken();
     print("Fcm token is $token");
     User user = await UserHelper.getUser();

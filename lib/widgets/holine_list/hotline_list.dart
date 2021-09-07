@@ -137,7 +137,7 @@ class _HotLineListState extends State<HotLineList> {
                                               child: FutureBuilder<DocumentSnapshot>(
                                                 future: FirebaseFirestore.instance
                                                     .doc(
-                                                        document.data()['schoolId'] ??
+                                                        document['schoolId'] ??
                                                             '')
                                                     .get(),
                                                 initialData: document,

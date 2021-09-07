@@ -33,8 +33,8 @@ class User implements Searchable {
     data["firstName"],
     data["lastName"],
     data["phone"],
-    data.data()["room"],
-    data.data()["associatedSchools"][schoolId]["role"],
+    data["room"],
+    data["associatedSchools"][schoolId]["role"],
   );
 
   final String id;

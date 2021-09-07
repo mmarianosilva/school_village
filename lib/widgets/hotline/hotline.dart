@@ -372,7 +372,7 @@ class _HotlineState extends State<Hotline> {
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
                 SelectImageUsecase();
-                File image = await selectImageUsecase.takeImage();
+                File image = File((await selectImageUsecase.takeImage()).path);
                 if (image != null) {
                   setState(() {
                     _selectedMedia = image;
@@ -392,7 +392,7 @@ class _HotlineState extends State<Hotline> {
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
                 SelectImageUsecase();
-                File video = await selectImageUsecase.selectVideo();
+                File video = File((await selectImageUsecase.selectVideo()).path);
                 if (video != null) {
                   setState(() {
                     isLoaded = false;
@@ -418,7 +418,7 @@ class _HotlineState extends State<Hotline> {
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
                 SelectImageUsecase();
-                File image = await selectImageUsecase.selectImage();
+                File image = File((await selectImageUsecase.selectImage()).path);
                 if (image != null) {
                   setState(() {
                     _selectedMedia = image;

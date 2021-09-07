@@ -64,7 +64,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
         boatLocation["description"] = _descriptionController.text;
         break;
     }
-    final user = await FirebaseAuth.instance.currentUser();
+    final user = await FirebaseAuth.instance.currentUser;
     final document = FirebaseFirestore.instance.doc("users/${user.uid}");
     await document.set(
       {

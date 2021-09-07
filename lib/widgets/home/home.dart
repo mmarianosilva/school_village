@@ -52,7 +52,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   int index = 0;
   String title = "MarinaVillage";
   bool isLoaded = false;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   String _schoolId;
   String _token;
   AudioPlayer audioPlugin;
@@ -145,22 +145,35 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     super.initState();
     audioPlugin = AudioPlayer();
     TokenHelper.saveToken();
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
         debugPrint('on Message : ${message.toString()}');
-        return _onNotification(message, true);
-      },
-      onLaunch: (Map<String, dynamic> message) {
-        debugPrint('onLaunch : ${message.toString()}');
-        return _onNotification(message);
-      },
-      onResume: (Map<String, dynamic> message) {
-        debugPrint('onResume : ${message.toString()}');
-        return _onNotification(message);
-      },
+        return _onNotification(message.data, true);
+      }
+    });
+    // _firebaseMessaging.configure(
+    //   onMessage: (Map<String, dynamic> message) {
+    //     debugPrint('on Message : ${message.toString()}');
+    //     return _onNotification(message, true);
+    //   },
+    //   onLaunch: (Map<String, dynamic> message) {
+    //     debugPrint('onLaunch : ${message.toString()}');
+    //     return _onNotification(message);
+    //   },
+    //   onResume: (Map<String, dynamic> message) {
+    //     debugPrint('onResume : ${message.toString()}');
+    //     return _onNotification(message);
+    //   },
+    // );
+    Future<NotificationSettings> settings =  _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
     );
-    _firebaseMessaging.requestNotificationPermissions(
-        IosNotificationSettings(sound: true, badge: true, alert: true));
+
     _firebaseMessaging.getToken().then((token) {
       setState(() {
         _token = token;
@@ -251,7 +264,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
           return TalkAroundUser.fromMapAndGroup(
               snapshot,
               snapshot["associatedSchools"][escapedSchoolId] != null
-                  ? snapshot.data()["associatedSchools"][escapedSchoolId]["role"]
+                  ? snapshot["associatedSchools"][escapedSchoolId]["role"]
                   : "");
         });
         final List<TalkAroundUser> members = await membersStream.toList();
@@ -543,7 +556,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       isLoaded = true;
       _schoolId = schoolId;
     });
-    _firebaseMessaging.requestNotificationPermissions();
+
   }
 
   void _select(Choice choice) {

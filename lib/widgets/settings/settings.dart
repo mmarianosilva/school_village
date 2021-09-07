@@ -168,7 +168,8 @@ class _SettingsState extends State<Settings> {
                         style: TextStyle(
                             fontSize: 14.0, fontWeight: FontWeight.bold)),
                     onLongPress: () async {
-                      final token = await FirebaseMessaging().getToken();
+
+                      final token = await FirebaseMessaging.instance.getToken();
                       if (token != null) {
                         await Clipboard.setData(ClipboardData(text: token));
                         final snackBar = SnackBar(

@@ -144,7 +144,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onTakePhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.takeImage();
+    final File photo = File((await selectImageUsecase.takeImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -152,7 +152,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectPhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.selectImage();
+    final File photo = File((await selectImageUsecase.selectImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -160,7 +160,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectVideo() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File video = await selectImageUsecase.selectVideo();
+    final File video = File((await selectImageUsecase.selectVideo()).path);
     if (video != null) {
       setState(() {
         sending = true;
@@ -206,7 +206,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot.data()["phone"]
+            "phone": _userSnapshot["phone"]
           };
           try {
             FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -265,7 +265,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         // "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot.data()["phone"]
+        "phone": _userSnapshot["phone"]
       };
       try {
         FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -298,11 +298,10 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     final token =
     (await (await FirebaseAuth
         .instance
-        .currentUser())
-        .getIdToken())
-        .token;
+        .currentUser)
+        .getIdToken());
     final response = await http.post(
-    "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message",
+    Uri.parse("https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message"),
     body: intradoPayload.toXml(),
     encoding:
     Encoding.getByName("utf8"),
@@ -345,19 +344,19 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
           ),
           actions: (widget.channel.isClass ?? false) &&
                   ((_userSnapshot != null &&
-                          (_userSnapshot.data()["associatedSchools"]
+                          (_userSnapshot["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "school_admin" ||
-                              _userSnapshot.data()["associatedSchools"]
+                              _userSnapshot["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "district" ||
-                              _userSnapshot.data()["associatedSchools"]
+                              _userSnapshot["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "admin" ||
-                              _userSnapshot.data()["associatedSchools"]
+                              _userSnapshot["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "super_admin")) ||
