@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:location/location.dart';
 import 'package:school_village/util/help_with_migration.dart';
+import 'package:school_village/util/permission_matrix.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'analytics_helper.dart';
@@ -10,7 +11,8 @@ import '../model/region_data.dart';
 
 class UserHelper {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
   static final Future<SharedPreferences> _prefsFuture =
       SharedPreferences.getInstance();
   static SharedPreferences _prefs;
@@ -19,8 +21,8 @@ class UserHelper {
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
 
-
-  static Future<UserCredential> signIn({email: String, password: String}) async {
+  static Future<UserCredential> signIn(
+      {email: String, password: String}) async {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }
@@ -117,8 +119,7 @@ class UserHelper {
         }
       });
     }
-    if (userSnapshot['associatedSchools'] == null ||
-        userSnapshot['associatedSchools'].isEmpty) {
+    if ((userSnapshot['associatedSchools'] == null) ? true : false) {
       //Vendor Owner cases
       final result = await FirebaseFirestore.instance
           .collection("vendors")
@@ -127,8 +128,8 @@ class UserHelper {
       if (result.docs.isNotEmpty) {
         List<QueryDocumentSnapshot> schoolsInDistrict;
         final vendorDocument = result.docs.first;
-        final districts = (vendorDocument["districts"] as List)
-            .cast<DocumentReference>();
+        final districts =
+            (vendorDocument["districts"] as List).cast<DocumentReference>();
         districts.forEach((district) async {
           schoolsInDistrict = (await FirebaseFirestore.instance
                   .collection("schools")
@@ -145,19 +146,12 @@ class UserHelper {
     } else {
       //Other cases
       final userData = userSnapshot;
-
       Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
-
-      setIsOwner(
-          userSnapshot['owner'] != null && userSnapshot['owner']
-              ? true
-              : false);
-      List<QueryDocumentSnapshot> filteredSchools;
-      //Map<String, dynamic> allMarinas = {};
-      List<dynamic> allMarinas = [];
+      setIsOwner((userSnapshot.data().toString().contains('owner') &&
+          userSnapshot['owner'] != null)
+          ? true
+          : false);
       await associatedSchools.forEach((schoolId) {
-        final role = userData['associatedSchools'][schoolId]['role'];
-
         String schoolPath = "/schools/${schoolId}";
         DocumentReference schoolRef =
             FirebaseFirestore.instance.doc(schoolPath);
@@ -179,8 +173,6 @@ class UserHelper {
         userSnapshot: userSnapshot);
   }
 
-
-
   static getSchools() async {
     final User currentUser = await getUser();
     if (currentUser == null) {
@@ -192,16 +184,15 @@ class UserHelper {
     DocumentSnapshot userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
-    if (userSnapshot['associatedSchools'] == null ||
-        userSnapshot['associatedSchools'].isEmpty) {
+    if ((userSnapshot['associatedSchools'] == null) ? true : false) {
       final result = await FirebaseFirestore.instance
           .collection("vendors")
           .where("owners", arrayContains: userRef)
           .get();
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
-        final districts = (vendorDocument["districts"] as List)
-            .cast<DocumentReference>();
+        final districts =
+            (vendorDocument["districts"] as List).cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
           final schoolsInDistrict = (await FirebaseFirestore.instance
                   .collection("schools")
@@ -210,7 +201,7 @@ class UserHelper {
               .docs;
           schools.addAll(schoolsInDistrict.map((item) => <String, dynamic>{
                 "ref": item.reference.path,
-                "role": "enduser",
+                "role": 'vendor',
               }));
         }
       }
@@ -218,15 +209,15 @@ class UserHelper {
     }
     print("Investigate ${userSnapshot['associatedSchools']}");
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
-    setIsOwner(
-        userSnapshot['owner'] == null && userSnapshot['owner']
-            ? true
-            : false);
+    setIsOwner((userSnapshot.data().toString().contains('owner') &&
+            userSnapshot['owner'] != null)
+        ? true
+        : false);
+    print("Schools list ${keys.length}");
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot['associatedSchools'][keys.elementAt(i)]
-            ["role"]
+        "role": userSnapshot['associatedSchools'][keys.elementAt(i)]["role"]
       });
     }
     return schools;
@@ -240,8 +231,8 @@ class UserHelper {
       QueryDocumentSnapshot regionObj,
       List<DocumentSnapshot> marinas,
       DocumentSnapshot mSnapshot) async {
-    if(marinas.isEmpty){
-      return[];
+    if (marinas.isEmpty) {
+      return [];
     }
     List<dynamic> allMarinas = [];
     final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
@@ -259,8 +250,7 @@ class UserHelper {
         allMarinas.add(
           <String, dynamic>{
             "schoolId": "schools/${school.reference.id}",
-            "role": mSnapshot['associatedSchools'][school.reference.id]
-                ["role"],
+            "role": mSnapshot['associatedSchools'][school.reference.id]["role"],
             "name": schoolName,
           },
         );

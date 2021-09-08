@@ -208,7 +208,7 @@ class _SchoolListState extends State<SchoolList> {
 //                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
                         final data = snapshot.data[index];
-                        if (data == null)
+                        if (data == null || !data.toString().contains('name')|| !data.toString().contains('schoolId')|| !data.toString().contains('role'))
                           return Container(
                             height: 0,
                             width: 0,
