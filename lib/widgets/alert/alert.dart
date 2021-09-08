@@ -282,7 +282,7 @@ class _AlertState extends State<Alert> {
               rd: "RD",
             ),
             serviceProvider: IntradoServiceProvider(
-                name: "OandMtech",
+                name: "OandMtech|amit",
                 contactUri: "tel:+19492741709",
                 textChatEnabled: true),
             deviceOwner: IntradoDeviceOwner(
@@ -296,18 +296,16 @@ class _AlertState extends State<Alert> {
           final token =
               (await (await FirebaseAuth.instance.currentUser()).getIdToken())
                   .token;
-          print("REQUEST URL IS ${incident[4]}${incident[0]}/create-event");
+          final constructedUrl = "${incident[4]}/${incident[0]}/create-event";
           final response = await http.post(
-            "${incident[4]}${incident[0]}/create-event",
+            constructedUrl,
             body: intradoPayload.toXml(),
             encoding: Encoding.getByName("utf8"),
             headers: <String, String>{
               "Authorization": "Bearer $token",
             },
           );
-          debugPrint(
-              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-          debugPrint("Intrado response is ${response.body}");
+
           Map<String, dynamic> parsedJson;
           try{
              parsedJson = json.decode(response.body);
@@ -405,7 +403,7 @@ class _AlertState extends State<Alert> {
         .get();
     if (result.docs.isEmpty) {
       final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-      return [randomToken, true, baseurl,shortUrl,baseurlPackage[0]];
+      return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
     } else {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
@@ -413,10 +411,10 @@ class _AlertState extends State<Alert> {
         String dashboardUrl = lastResolved.data()['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
-        return [token, false, baseurl,shortUrl,baseurlPackage[0]];
+        return [token, false, baseurl,shortUrl,baseurlPackage[2]];
       } else {
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-        return [randomToken, true, baseurl,shortUrl,baseurlPackage[0]];
+        return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
       }
     }
   }
