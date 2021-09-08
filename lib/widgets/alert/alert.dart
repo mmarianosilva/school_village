@@ -282,7 +282,7 @@ class _AlertState extends State<Alert> {
               rd: "RD",
             ),
             serviceProvider: IntradoServiceProvider(
-                name: "OandMtech",
+                name: "OandMtech|amit",
                 contactUri: "tel:+19492741709",
                 textChatEnabled: true),
             deviceOwner: IntradoDeviceOwner(
@@ -296,20 +296,29 @@ class _AlertState extends State<Alert> {
           final token =
               (await (await FirebaseAuth.instance.currentUser()).getIdToken())
                   .token;
+          final constructedUrl = "${incident[4]}/${incident[0]}/create-event";
           final response = await http.post(
-            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/${incident[0]}/create-event",
+            constructedUrl,
             body: intradoPayload.toXml(),
             encoding: Encoding.getByName("utf8"),
             headers: <String, String>{
               "Authorization": "Bearer $token",
             },
           );
-          debugPrint(
-              "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-          debugPrint("Intrado response is ${response.body}");
-          final jsonResponse = json.decode(response.body);
+
+          Map<String, dynamic> parsedJson;
+          try{
+             parsedJson = json.decode(response.body);
+
+
+          }on Exception catch(e){
+            print("EXCEPTION is $e");
+            _showAlertSent(
+                "SUCCESS", "\nAlert Sent to 911 \nand Marina Neighbours");
+            return;
+          }
           IntradoResponse intradoResponse =
-              new IntradoResponse.fromJson(jsonResponse);
+          new IntradoResponse.fromJson(parsedJson);
           if (intradoResponse.success == true &&
               event == EventAction.PSAPLink) {
             var storexml = xml.parse(intradoResponse.response);
@@ -342,20 +351,22 @@ class _AlertState extends State<Alert> {
     return location;
   }
 
-  Future<List<String>> getBaseUrl() async {
-    String baseurl = "",shorturlDomain="";
+  Future<List<String>> getPackageDependentDetails() async {
+    String baseurl = "",shorturlDomain="",intradoRequestUrl="";
 
     final packageInfo = await PackageInfo.fromPlatform();
     switch (packageInfo.packageName.trim()) {
       case 'com.oandmtech.marinavillage':
         baseurl = "https://marinavillage-web.web.app/i/";
         shorturlDomain = "https://onscene.team/i";
-        return [baseurl,shorturlDomain];
+        intradoRequestUrl ="https://us-central1-marinavillage-1.cloudfunctions.net/api/intrado";
+        return [baseurl,shorturlDomain,intradoRequestUrl];
 
       case 'com.oandmtech.marinavillage.dev':
         baseurl = "https://marinavillage-dev-web.web.app/i/";
         shorturlDomain = "https://dev.onscene.team/i";
-        return [baseurl,shorturlDomain];
+        intradoRequestUrl ="https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado";
+        return [baseurl,shorturlDomain,intradoRequestUrl];
 
       case 'com.oandmtech.schoolvillage':
         baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
@@ -382,7 +393,7 @@ class _AlertState extends State<Alert> {
 
   Future<List<dynamic>> _getIncidentUrl() async {
     String randomToken = Uuid().v4();
-    final baseurlPackage = await getBaseUrl();
+    final baseurlPackage = await getPackageDependentDetails();
     String baseurl = baseurlPackage[0];
     String shortLinkDomain = baseurlPackage[1];
     String id = _schoolId.split("schools/")[1].trim();
@@ -392,7 +403,7 @@ class _AlertState extends State<Alert> {
         .get();
     if (result.docs.isEmpty) {
       final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-      return [randomToken, true, baseurl,shortUrl];
+      return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
     } else {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
@@ -400,10 +411,10 @@ class _AlertState extends State<Alert> {
         String dashboardUrl = lastResolved.data()['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
-        return [token, false, baseurl,shortUrl];
+        return [token, false, baseurl,shortUrl,baseurlPackage[2]];
       } else {
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-        return [randomToken, true, baseurl,shortUrl];
+        return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
       }
     }
   }
