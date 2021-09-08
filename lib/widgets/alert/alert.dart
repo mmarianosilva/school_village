@@ -403,7 +403,7 @@ class _AlertState extends State<Alert> {
         .get();
     if (result.docs.isEmpty) {
       final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-      return [randomToken, true, baseurl,shortUrl,baseurlPackage[0]];
+      return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
     } else {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
@@ -411,10 +411,10 @@ class _AlertState extends State<Alert> {
         String dashboardUrl = lastResolved['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
-        return [token, false, baseurl,shortUrl,baseurlPackage[0]];
+        return [token, false, baseurl,shortUrl,baseurlPackage[2]];
       } else {
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+randomToken,shortLinkDomain));
-        return [randomToken, true, baseurl,shortUrl,baseurlPackage[0]];
+        return [randomToken, true, baseurl,shortUrl,baseurlPackage[2]];
       }
     }
   }
