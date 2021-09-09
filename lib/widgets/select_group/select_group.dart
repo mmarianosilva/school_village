@@ -42,7 +42,8 @@ class _SelectGroupsState extends State<SelectGroups> {
     } else if (role == 'district' || role == 'super_admin') {
       List<Map<String, dynamic>> schools =
           (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
-      schools.removeWhere((item) => (item["role"] != "district" && item["role"] != "super_admin"));
+      schools.removeWhere((item) =>
+          (item["role"] != "district" && item["role"] != "super_admin"));
       List<DocumentSnapshot> unwrappedSchools =
           await _fetchSchoolSnapshots(schools);
       setState(() {
@@ -53,18 +54,29 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = (role == 'district' || role == 'super_admin') && schoolSnapshots == null;
+      _isLoading = (role == 'district' || role == 'super_admin') &&
+          schoolSnapshots == null;
     });
   }
 
   List<DropdownMenuItem> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All");
-    _schools.addAll(schoolSnapshots.map((item) => item.data()["name"]));
+    // schoolSnapshots.removeWhere((element) {
+    //   return
+    // });
+    schoolSnapshots.forEach((element) {
+      if (element != null && element.data() != null) {
+        _schools.add(element.data()["name"]);
+      }
+    });
+    // _schools.addAll(schoolSnapshots.map((item) {
+    //   return item.data()["name"];
+    // }));
     return _schools
         .map((value) => DropdownMenuItem(
               value: value,
-              child: Text(value),
+              child: Text(value, overflow: TextOverflow.ellipsis),
             ))
         .toList();
   }
@@ -91,6 +103,28 @@ class _SelectGroupsState extends State<SelectGroups> {
     return _isLoading
         ? Center(child: Text(localize('Loading...')))
         : _getList();
+  }
+
+  Widget getGroupDropDown() {
+    return DropdownButton(
+      isExpanded: true,
+      items: _districtSchools(),
+      onChanged: (value) {
+        if (schoolSnapshots
+            .where((item) => item.data()["name"] == value)
+            .isNotEmpty) {
+          setState(() {
+            selectedSchool = schoolSnapshots
+                .firstWhere((item) => item.data()["name"] == value);
+          });
+        } else {
+          setState(() {
+            selectedSchool = null;
+          });
+        }
+      },
+      value: selectedSchool != null ? selectedSchool.data()["name"] : "All",
+    );
   }
 
   _getList() {
@@ -208,34 +242,13 @@ class _SelectGroupsState extends State<SelectGroups> {
           ],
         ),
         schoolSnapshots != null
-            ? Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            ? Container(
+                height: 50,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    Text(localize("Send to: ")),
-                    DropdownButton(
-                      items: _districtSchools(),
-                      onChanged: (value) {
-                        if (schoolSnapshots
-                            .where((item) => item.data()["name"] == value)
-                            .isNotEmpty) {
-                          setState(() {
-                            selectedSchool = schoolSnapshots.firstWhere(
-                                (item) => item.data()["name"] == value);
-                          });
-                        } else {
-                          setState(() {
-                            selectedSchool = null;
-                          });
-                        }
-                      },
-                      value: selectedSchool != null
-                          ? selectedSchool.data()["name"]
-                          : "All",
-                    )
+                    Flexible(flex: 2, child: new Text(localize("Send to: "))),
+                    Flexible(flex: 3, child: getGroupDropDown()),
                   ],
                 ),
               )
