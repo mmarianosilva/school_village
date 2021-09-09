@@ -72,6 +72,7 @@ flutter:
     - assets/images/feature_image.png
     - assets/images/incident_report_log.png
     - assets/images/marine_services.png
+    - assets/images/incident_management_icon.png
     - assets/images/security_btn.png
     - assets/images/alert_hand_icon.png
     - assets/images/hotline_header.png

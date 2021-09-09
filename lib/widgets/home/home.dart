@@ -93,7 +93,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
           doc["endedAt"] != null ||
           doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
       final latestAlert = result.docs.isNotEmpty
-          ? SchoolAlert.fromMap(result.docs.last)
+          ? SchoolAlert.fromMap(result.docs.last.id,result.docs.last.reference.path,result.docs.last.data())
           : null;
       return latestAlert;
     });
@@ -468,7 +468,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
                   context,
                   MaterialPageRoute(
                     builder: (context) => NotificationDetail(
-                        notification: SchoolAlert.fromMap(notification)),
+                        notification: SchoolAlert.fromMap(notification.id,notification.reference.path,notification.data())),
                   ),
                 );
               },

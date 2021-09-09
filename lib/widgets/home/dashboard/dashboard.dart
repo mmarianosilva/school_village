@@ -115,7 +115,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 lastResolvedTimestamp.millisecondsSinceEpoch,
             orElse: () => null);
         SchoolAlert alert =
-            latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+            latestAlert != null ? SchoolAlert.fromMap(latestAlert.id,latestAlert.reference.path,latestAlert.data()) : null;
         if (this.alertInProgress != alert) {
           this.setState(() {
             this.alertInProgress = alert;

@@ -39,7 +39,7 @@ class _NotificationsState extends State<Notifications> {
         .limit(25);
     ref.get().then((querySnapshot) {
       notifications.addAll(querySnapshot.docs
-          .map((document) => SchoolAlert.fromMap(document)));
+          .map((document) => SchoolAlert.fromMap(document.id,document.reference.path,document.data())));
       setState(() {
         isLoaded = true;
         _alerts = notifications;

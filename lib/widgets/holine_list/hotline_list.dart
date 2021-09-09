@@ -28,8 +28,7 @@ class _HotLineListState extends State<HotLineList> {
       var keys = user["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = new List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user["associatedSchools"][schoolId]["groups"]
-                [keys.elementAt(i)] ==
+        if (user["associatedSchools"][schoolId]["groups"][keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
@@ -70,8 +69,9 @@ class _HotLineListState extends State<HotLineList> {
                         .snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
-                      if (!snapshot.hasData) return Text(localize('Loading...'));
-                      final int messageCount = snapshot.data.documents.length;
+                      if (!snapshot.hasData)
+                        return Text(localize('Loading...'));
+                      final int messageCount = snapshot.data.docs.length;
                       print(messageCount);
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -79,16 +79,17 @@ class _HotLineListState extends State<HotLineList> {
                           itemCount: messageCount,
                           itemBuilder: (_, int index) {
                             final DocumentSnapshot document =
-                                snapshot.data.documents[index];
+                                snapshot.data.docs[index];
                             debugPrint(document['body']);
-
+                            Map<String, dynamic> docData = document.data();
                             return GestureDetector(
                               onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (BuildContext context) => Followup(
-                                          localize('Anonymous Hotline Log'),
-                                          document.reference.path))),
+                                      builder: (BuildContext context) =>
+                                          Followup(
+                                              localize('Anonymous Hotline Log'),
+                                              document.reference.path))),
                               child: Card(
                                 margin: EdgeInsets.all(4.0),
                                 child: Container(
@@ -109,18 +110,20 @@ class _HotLineListState extends State<HotLineList> {
                                                   fontWeight: FontWeight.bold)),
                                           Spacer(),
                                           Text(
-                                              dateFormatting.dateFormatter.format(
-                                                  DateTime
+                                              dateFormatting.dateFormatter
+                                                  .format(DateTime
                                                       .fromMillisecondsSinceEpoch(
-                                                          document['createdAt'])),
+                                                          document[
+                                                              'createdAt'])),
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold)),
                                           Spacer(),
                                           Text(
-                                              dateFormatting.timeFormatter.format(
-                                                  DateTime
+                                              dateFormatting.timeFormatter
+                                                  .format(DateTime
                                                       .fromMillisecondsSinceEpoch(
-                                                          document['createdAt'])),
+                                                          document[
+                                                              'createdAt'])),
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold)),
                                         ],
@@ -134,32 +137,40 @@ class _HotLineListState extends State<HotLineList> {
                                         children: <Widget>[
                                           Expanded(
                                             child: Container(
-                                              child: FutureBuilder<DocumentSnapshot>(
-                                                future: FirebaseFirestore.instance
-                                                    .doc(
-                                                        document['schoolId'] ??
-                                                            '')
+                                              child: FutureBuilder<
+                                                  DocumentSnapshot>(
+                                                future: FirebaseFirestore
+                                                    .instance
+                                                    .doc(docData['schoolId'] ??
+                                                        '')
                                                     .get(),
                                                 initialData: document,
                                                 builder: (BuildContext context,
-                                                        schoolData) =>
-                                                    Text(
-                                                        schoolData.hasData
-                                                            ? schoolData.data[
-                                                                    'name'] ??
-                                                                ''
-                                                            : '',
-                                                        style: TextStyle(
-                                                            fontSize: 12.0,
-                                                            fontWeight:
-                                                                FontWeight.bold)),
+                                                    schoolData) {
+                                                  String name = '';
+                                                  Map<String, dynamic> data;
+                                                  if(schoolData.hasData){
+                                                    data = schoolData.data.data();
+                                                  }else{
+                                                    data = Map<String, dynamic>();
+                                                    name = '';
+                                                  }
+                                                  return Text(
+                                                      data['name'] ??
+                                                             '',
+                                                      style: TextStyle(
+                                                          fontSize: 12.0,
+                                                          fontWeight:
+                                                              FontWeight.bold));
+                                                },
                                               ),
                                             ),
                                           ),
                                           Expanded(
                                             child: Container(
                                               child: FutureBuilder(
-                                                future: FirebaseFirestore.instance
+                                                future: FirebaseFirestore
+                                                    .instance
                                                     .collection(
                                                         '${document.reference.path}/followup')
                                                     .get(),
@@ -170,8 +181,8 @@ class _HotLineListState extends State<HotLineList> {
                                                     return Text(
                                                       'Follow-up ${data.data.docs.length}',
                                                       style: TextStyle(
-                                                          color:
-                                                              Colors.blueAccent),
+                                                          color: Colors
+                                                              .blueAccent),
                                                     );
                                                   }
                                                   return Text('');
@@ -179,8 +190,8 @@ class _HotLineListState extends State<HotLineList> {
                                               ),
                                             ),
                                           ),
-                                          document['media'] != null
-                                              ? document['isVideo'] ?? false
+                                          docData['media'] != null
+                                              ? docData['isVideo'] ?? false
                                                   ? Icon(
                                                       Icons.videocam,
                                                       color: Colors.blueAccent,

@@ -343,7 +343,7 @@ class _IncidentManagementState extends State<IncidentManagement>
               null,
               null,
               null));
-          final alert = SchoolAlert.fromMap(snapshot);
+          final alert = SchoolAlert.fromMap(snapshot.id,snapshot.reference.path,snapshot.data());
           setState(() {
             this.alert = alert;
           });
