@@ -78,6 +78,13 @@ flutter:
     - assets/images/hotline_header.png
     - assets/images/hotline_bg.png
     - assets/images/camera.png
+    - assets/images/alert_boat_accident_injury.png
+    - assets/images/alert_explosion.png
+    - assets/images/sop_btn.png
+    - assets/images/stop_sign.png
+    - assets/images/warning_sign.png
+    - assets/images/alert_auto_accident_injury.png
+    - assets/images/sv_icon_menu.png
     - assets/audio/alarm.wav
   # To add assets to your application, add an assets section, like this:
   # assets:
