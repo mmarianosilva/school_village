@@ -42,11 +42,10 @@ class _SelectGroupsState extends State<SelectGroups> {
     } else if (role == 'district' || role == 'super_admin') {
       List<Map<String, dynamic>> schools =
           (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
-      schools.removeWhere((item) => (item["role"] != "district" && item["role"] != "super_admin"));
-      print("School num ${schools.length}");
+      schools.removeWhere((item) =>
+          (item["role"] != "district" && item["role"] != "super_admin"));
       List<DocumentSnapshot> unwrappedSchools =
           await _fetchSchoolSnapshots(schools);
-      print("School num ${unwrappedSchools.length}");
       setState(() {
         schoolSnapshots = unwrappedSchools;
         _isLoading = false;
@@ -55,7 +54,8 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = (role == 'district' || role == 'super_admin') && schoolSnapshots == null;
+      _isLoading = (role == 'district' || role == 'super_admin') &&
+          schoolSnapshots == null;
     });
   }
 
@@ -63,17 +63,17 @@ class _SelectGroupsState extends State<SelectGroups> {
     List<String> _schools = List<String>();
     _schools.add("All");
     schoolSnapshots.forEach((element) {
-      if(element!=null && element.data()!=null){
-        _schools.add((element.data() as Map<String,dynamic>)['name']);
+      if (element != null && element.data() != null) {
+        _schools.add((element.data() as Map<String, dynamic>)['name']);
       }
     });
 
-    return _schools
-        .map((value) => DropdownMenuItem(
-              value: value,
-              child: Text(value),
-            ))
-        .toList();
+    return _schools.map((value) {
+      return DropdownMenuItem(
+        value: value,
+        child: Text(value, overflow: TextOverflow.ellipsis),
+      );
+    }).toList();
   }
 
   Future<List<DocumentSnapshot>> _fetchSchoolSnapshots(
@@ -98,6 +98,26 @@ class _SelectGroupsState extends State<SelectGroups> {
     return _isLoading
         ? Center(child: Text(localize('Loading...')))
         : _getList();
+  }
+
+  Widget getGroupDropDown() {
+    return DropdownButton(
+      isExpanded: true,
+      items: _districtSchools(),
+      onChanged: (value) {
+        if (schoolSnapshots.where((item) => item["name"] == value).isNotEmpty) {
+          setState(() {
+            selectedSchool =
+                schoolSnapshots.firstWhere((item) => item["name"] == value);
+          });
+        } else {
+          setState(() {
+            selectedSchool = null;
+          });
+        }
+      },
+      value: selectedSchool != null ? selectedSchool["name"] : "All",
+    );
   }
 
   _getList() {
@@ -215,34 +235,16 @@ class _SelectGroupsState extends State<SelectGroups> {
           ],
         ),
         schoolSnapshots != null
-            ? Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            ? Container(
+                height: 50,
+
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    Text(localize("Send to: ")),
-                    DropdownButton(
-                      items: _districtSchools(),
-                      onChanged: (value) {
-                        if (schoolSnapshots
-                            .where((item) => item["name"] == value)
-                            .isNotEmpty) {
-                          setState(() {
-                            selectedSchool = schoolSnapshots.firstWhere(
-                                (item) => item["name"] == value);
-                          });
-                        } else {
-                          setState(() {
-                            selectedSchool = null;
-                          });
-                        }
-                      },
-                      value: selectedSchool != null
-                          ? selectedSchool["name"]
-                          : "All",
-                    )
+                    //Text(localize("Send to: ")),
+                    //getGroupDropDown(),
+                    Flexible(flex: 2, child: new Text('Send to: ')),
+                    Flexible(flex: 3, child: getGroupDropDown()),
                   ],
                 ),
               )

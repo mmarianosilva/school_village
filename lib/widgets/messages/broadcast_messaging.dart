@@ -62,7 +62,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           groups.add(keys.elementAt(i));
         }
       }
-      print("Keys length ${keys.length} and groups length ${groups.length}");
       setState(() {
         _userId = user.id;
         name = "${user['firstName']} ${user['lastName']}";
@@ -93,12 +92,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleMessageMapInsert(shot) {
-    // if (!belongsToGroup(shot['groups'].keys)) {
-    //   return;
-    // }
-    print("Check 4");
     var day = _convertDateToKey(shot.data()['createdAt']);
-    print("Check 5");
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
     if (messages == null) {
@@ -146,21 +140,13 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-      print("Check 1");
       _handleDocumentChanges(data.docs);
     });
   }
 
   _handleDocumentChanges(documentChanges) {
-    print("Check 2");
     documentChanges.forEach((change) {
-      print("Check 3.1 ${change.data()}");
-      try {
-        print("Check 3");
         _handleMessageMapInsert(change);
-      } catch (error, stacktrace) {
-        print("Error $error $stacktrace");
-      }
     });
   }
 
@@ -337,7 +323,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           : type;
 
       path = path + "." + type;
-      print(path);
       await uploadFile(path, image);
       _hideLoading();
     }
