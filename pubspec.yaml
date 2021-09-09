@@ -67,6 +67,11 @@ flutter:
     - assets/images/alert_fight.png
     - assets/images/splash_text.png
     - assets/images/broadcast_btn.png
+    - assets/images/group_message_btn.png
+    - assets/images/anonymous_img.png
+    - assets/images/feature_image.png
+    - assets/images/incident_report_log.png
+    - assets/images/marine_services.png
     - assets/images/security_btn.png
     - assets/images/alert_hand_icon.png
     - assets/images/hotline_header.png

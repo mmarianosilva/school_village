@@ -85,7 +85,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    print("Fatal Error $schoolId");
     if (schoolId == null){
       return;
     }
