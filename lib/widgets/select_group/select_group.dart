@@ -43,8 +43,10 @@ class _SelectGroupsState extends State<SelectGroups> {
       List<Map<String, dynamic>> schools =
           (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
       schools.removeWhere((item) => (item["role"] != "district" && item["role"] != "super_admin"));
+      print("School num ${schools.length}");
       List<DocumentSnapshot> unwrappedSchools =
           await _fetchSchoolSnapshots(schools);
+      print("School num ${unwrappedSchools.length}");
       setState(() {
         schoolSnapshots = unwrappedSchools;
         _isLoading = false;

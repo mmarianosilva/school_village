@@ -57,12 +57,12 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
       var keys = user["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user["associatedSchools"][schoolId]["groups"]
-                [keys.elementAt(i)] ==
+        if (user["associatedSchools"][schoolId]["groups"][keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
       }
+      print("Keys length ${keys.length} and groups length ${groups.length}");
       setState(() {
         _userId = user.id;
         name = "${user['firstName']} ${user['lastName']}";
@@ -96,8 +96,9 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     // if (!belongsToGroup(shot['groups'].keys)) {
     //   return;
     // }
+    print("Check 4");
     var day = _convertDateToKey(shot.data()['createdAt']);
-
+    print("Check 5");
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
     if (messages == null) {
@@ -145,14 +146,20 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
         .orderBy("createdAt")
         .snapshots()
         .listen((data) {
-      _handleDocumentChanges(data.docChanges);
+      print("Check 1");
+      _handleDocumentChanges(data.docs);
     });
   }
 
   _handleDocumentChanges(documentChanges) {
+    print("Check 2");
     documentChanges.forEach((change) {
-      if (change.type == DocumentChangeType.added) {
-        _handleMessageMapInsert(change.document);
+      print("Check 3.1 ${change.data()}");
+      try {
+        print("Check 3");
+        _handleMessageMapInsert(change);
+      } catch (error, stacktrace) {
+        print("Error $error $stacktrace");
       }
     });
   }
@@ -206,11 +213,14 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
               name: "${document['createdBy']}",
               timestamp: document['createdAt'] is Timestamp
                   ? document['createdAt']
-                  : Timestamp.fromMillisecondsSinceEpoch(
-                      document['createdAt']),
-              imageUrl: document['image'],
+                  : Timestamp.fromMillisecondsSinceEpoch(document['createdAt']),
+              imageUrl: ((document.data() as Map<String, dynamic>) == null)
+                  ? null
+                  : (document.data() as Map<String, dynamic>)['image'],
               message: document,
-              isVideo: document['isVideo'] ?? false,
+              isVideo: ((document.data() as Map<String, dynamic>) == null)
+                  ? false
+                  : (document.data() as Map<String, dynamic>)['isVideo'],
             );
           });
     }
@@ -375,9 +385,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          _editable
-              ? selectGroups
-              : SizedBox(),
+          _editable ? selectGroups : SizedBox(),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),
