@@ -62,7 +62,12 @@ class _SelectGroupsState extends State<SelectGroups> {
   List<DropdownMenuItem> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All");
-    _schools.addAll(schoolSnapshots.map((item) => item["name"]));
+    schoolSnapshots.forEach((element) {
+      if(element!=null && element.data()!=null){
+        _schools.add((element.data() as Map<String,dynamic>)['name']);
+      }
+    });
+
     return _schools
         .map((value) => DropdownMenuItem(
               value: value,
