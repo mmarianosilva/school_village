@@ -207,7 +207,6 @@ class UserHelper {
       }
       return schools;
     }
-    print("Investigate ${userSnapshot['associatedSchools']}");
     Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
     setIsOwner((userSnapshot.data().toString().contains('owner') &&
             userSnapshot['owner'] != null)

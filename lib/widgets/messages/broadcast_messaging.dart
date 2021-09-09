@@ -146,7 +146,13 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   _handleDocumentChanges(documentChanges) {
     documentChanges.forEach((change) {
+      try {
         _handleMessageMapInsert(change);
+      } on Exception catch(exception) {
+        print("Exception $exception");
+      } catch (error, stacktrace) {
+        print("Error $error $stacktrace");
+      }
     });
   }
 
