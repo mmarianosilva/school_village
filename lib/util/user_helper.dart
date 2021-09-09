@@ -148,7 +148,7 @@ class UserHelper {
       final userData = userSnapshot;
       Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
       setIsOwner((userSnapshot.data().toString().contains('owner') &&
-          userSnapshot['owner'] != null)
+              userSnapshot['owner'] != null)
           ? true
           : false);
       await associatedSchools.forEach((schoolId) {
@@ -237,13 +237,20 @@ class UserHelper {
     List<dynamic> allMarinas = [];
     final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
     await marinas.forEach((school) {
-      final data = school;
+      final schoolData = school.data();
+      final data = schoolData as Map<String, dynamic>;
+
       if (data == null) {
         return;
       }
-      final schoolName = data['name'];
-      final harborRef = data['district'];
-      final regionRef = data['region'];
+
+      final schoolName = data['name'] ?? null;
+      if (schoolName == null) {
+        return;
+      }
+      final harborRef = data['district']?? null;
+      final regionRef = data['region']?? null;
+
       if ((region == 'All') &&
           (harbor == 'All') &&
           schoolName.contains(regex)) {
