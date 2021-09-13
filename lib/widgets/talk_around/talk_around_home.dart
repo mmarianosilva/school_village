@@ -51,6 +51,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     /* This _channelListSubscription shows up as the List of Channels User is a part of Example (Admin/Security)
     resolved by querying for the messages of this school/marina that this user's role is contained in'
     Also as a special case the "911 channel is removed from above list if this user wasnt the creator of it" */
+    print("_schoolRole $_schoolRole and $_schoolId");
     _channelListSubscription = _firestore
         .collection("$_schoolId/messages")
         .where("roles", arrayContains: _schoolRole)
@@ -58,6 +59,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
+        print("Guess ChannelName ${element.data()['name']}");
         return (element.data()['name'] == "911 TalkAround Channel") &&
             ((element.data()['createdById'] != _userSnapshot.id) ||
                 (element.data()['isActive'] == false));
@@ -69,6 +71,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
+      print("RETR Channels ${retrievedChannels.length}");
       if (mounted) {
         setState(() {
           _isLoading = false;

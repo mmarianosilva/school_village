@@ -81,12 +81,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     _checkIfAlertIsInProgress();
   }
 
-
-
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     print("Fatal Error $schoolId");
-    if (schoolId == null){
+    if (schoolId == null) {
       return;
     }
     try {
@@ -506,7 +504,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'admin' && role != 'super_admin') {
+    if (role != 'admin' &&
+        role != 'super_admin' &&
+        role != 'security' &&
+        role != 'district') {
       return SizedBox();
     }
     return GestureDetector(
