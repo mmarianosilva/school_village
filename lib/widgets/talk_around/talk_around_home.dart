@@ -63,9 +63,11 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                 (element['isActive'] == false));
       });
       Iterable<DocumentSnapshot> channels = documentList;
+
       List<Future<TalkAroundChannel>> processedChannels =
           channels.map((channel) async {
-        return TalkAroundChannel.fromMapAndUsers(channel, null);
+
+            return TalkAroundChannel.fromMapAndUsers(channel, null);
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
