@@ -81,11 +81,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     _checkIfAlertIsInProgress();
   }
 
-
-
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    if (schoolId == null){
+    if (schoolId == null) {
       return;
     }
     try {
@@ -114,8 +112,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 snapshot["createdAt"] >
                 lastResolvedTimestamp.millisecondsSinceEpoch,
             orElse: () => null);
-        SchoolAlert alert =
-            latestAlert != null ? SchoolAlert.fromMap(latestAlert.id,latestAlert.reference.path,latestAlert.data()) : null;
+        SchoolAlert alert = latestAlert != null
+            ? SchoolAlert.fromMap(
+                latestAlert.id, latestAlert.reference.path, latestAlert.data())
+            : null;
         if (this.alertInProgress != alert) {
           this.setState(() {
             this.alertInProgress = alert;
@@ -334,8 +334,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         if (snapshot["documents"][index - 4]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
               snapshot["documents"][index - 4]["connectedFiles"] != null
-                  ? snapshot
-                      ["documents"][index - 4]["connectedFiles"]
+                  ? snapshot["documents"][index - 4]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
@@ -343,8 +342,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           _showPDF(context, snapshot["documents"][index - 4]["location"],
               snapshot["documents"][index - 4]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot["documents"][index - 4]["type"] ==
-            "linked-pdf") {
+        } else if (snapshot["documents"][index - 4]["type"] == "linked-pdf") {
           _showLinkedPDF(
             context,
             snapshot["documents"][index - 4]["location"],
@@ -355,8 +353,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       },
       onLongPress: () {
         if (snapshot["documents"][index - 4]["type"] == "pdf") {
-        } else if (snapshot["documents"][index - 4]["type"] ==
-            "linked-pdf") {}
+        } else if (snapshot["documents"][index - 4]["type"] == "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -505,7 +502,10 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'admin' && role != 'super_admin') {
+    if (role != 'admin' &&
+        role != 'super_admin' &&
+        role != 'security' &&
+        role != 'district') {
       return SizedBox();
     }
     return GestureDetector(
@@ -977,8 +977,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
                     snapshot.data["documents"] != null
-                        ? snapshot.data
-                            ["documents"]
+                        ? snapshot.data["documents"]
                             .where((snapshot) {
                               if (snapshot["accessRoles"] == null) {
                                 return true;
