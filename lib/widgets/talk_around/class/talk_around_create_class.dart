@@ -23,8 +23,8 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
   final TextEditingController _groupController = TextEditingController();
   final TextEditingController _adminNameController = TextEditingController();
 
-  final List<User> _users = List<User>();
-  final List<User> _members = List<User>();
+  final List<User> _users = [];
+  final List<User> _members = [];
 
   User _admin;
   bool _isLoading = true;
@@ -42,6 +42,7 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
   }
 
   Future<void> getUsers() async {
+    print("Check Users 1");
     _schoolId = await UserHelper.getSelectedSchoolID();
     _role = await UserHelper.getSelectedSchoolRole();
     final escapedSchoolId = _schoolId.substring("schools/".length);
