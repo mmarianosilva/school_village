@@ -71,7 +71,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
-      print("RETR Channels ${retrievedChannels.length}");
+      print("RETR Channels ${retrievedChannels.length} and userref ${_userSnapshot.reference} and userid ${ _userSnapshot.id}");
       if (mounted) {
         setState(() {
           _isLoading = false;
