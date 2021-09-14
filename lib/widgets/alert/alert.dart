@@ -350,36 +350,7 @@ class _AlertState extends State<Alert> {
     return location;
   }
 
-  Future<List<String>> getPackageDependentDetails() async {
-    String baseurl = "",shorturlDomain="",intradoRequestUrl="";
 
-    final packageInfo = await PackageInfo.fromPlatform();
-    switch (packageInfo.packageName.trim()) {
-      case 'com.oandmtech.marinavillage':
-        baseurl = "https://marinavillage-web.web.app/i/";
-        shorturlDomain = "https://onscene.team/i";
-        intradoRequestUrl ="https://us-central1-marinavillage-1.cloudfunctions.net/api/intrado";
-        return [baseurl,shorturlDomain,intradoRequestUrl];
-
-      case 'com.oandmtech.marinavillage.dev':
-        baseurl = "https://marinavillage-dev-web.web.app/i/";
-        shorturlDomain = "https://dev.onscene.team/i";
-        intradoRequestUrl ="https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado";
-        return [baseurl,shorturlDomain,intradoRequestUrl];
-
-      case 'com.oandmtech.schoolvillage':
-        baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
-        return [baseurl,shorturlDomain];
-
-      case 'com.oandmtech.schoolvillage.dev':
-        baseurl = "https://schoolvillage-dev-web.web.app/i/";
-        return [baseurl,shorturlDomain];
-
-      default:
-        baseurl = "";
-        return [baseurl,shorturlDomain];
-    }
-  }
 
   Future<DocumentSnapshot> getLastResolved(result) async {
     final DocumentSnapshot lastResolved = result.docs.firstWhere((doc) {
@@ -392,7 +363,7 @@ class _AlertState extends State<Alert> {
 
   Future<List<dynamic>> _getIncidentUrl() async {
     String randomToken = Uuid().v4();
-    final baseurlPackage = await getPackageDependentDetails();
+    final baseurlPackage = await UserHelper.getPackageDependentDetails();
     String baseurl = baseurlPackage[0];
     String shortLinkDomain = baseurlPackage[1];
     String id = _schoolId.split("schools/")[1].trim();

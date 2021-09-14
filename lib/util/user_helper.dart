@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:location/location.dart';
+import 'package:package_info/package_info.dart';
 import 'package:school_village/util/help_with_migration.dart';
 import 'package:school_village/util/permission_matrix.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,6 +31,39 @@ class UserHelper {
     _prefs.setString("password", password);
     return _auth.signInWithEmailAndPassword(
         email: email.trim().toLowerCase(), password: password);
+  }
+
+  static Future<List<String>> getPackageDependentDetails() async {
+    String baseurl = "", shorturlDomain = "", intradoRequestUrl = "";
+
+    final packageInfo = await PackageInfo.fromPlatform();
+    switch (packageInfo.packageName.trim()) {
+      case 'com.oandmtech.marinavillage':
+        baseurl = "https://marinavillage-web.web.app/i/";
+        shorturlDomain = "https://onscene.team/i";
+        intradoRequestUrl =
+            "https://us-central1-marinavillage-1.cloudfunctions.net/api/intrado";
+        return [baseurl, shorturlDomain, intradoRequestUrl];
+
+      case 'com.oandmtech.marinavillage.dev':
+        baseurl = "https://marinavillage-dev-web.web.app/i/";
+        shorturlDomain = "https://dev.onscene.team/i";
+        intradoRequestUrl =
+            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado";
+        return [baseurl, shorturlDomain, intradoRequestUrl];
+
+      case 'com.oandmtech.schoolvillage':
+        baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
+        return [baseurl, shorturlDomain];
+
+      case 'com.oandmtech.schoolvillage.dev':
+        baseurl = "https://schoolvillage-dev-web.web.app/i/";
+        return [baseurl, shorturlDomain];
+
+      default:
+        baseurl = "";
+        return [baseurl, shorturlDomain];
+    }
   }
 
   static Future<User> getUser() async {
@@ -247,8 +281,8 @@ class UserHelper {
       if (schoolName == null) {
         return;
       }
-      final harborRef = data['district']?? null;
-      final regionRef = data['region']?? null;
+      final harborRef = data['district'] ?? null;
+      final regionRef = data['region'] ?? null;
 
       if ((region == 'All') &&
           (harbor == 'All') &&
@@ -476,8 +510,8 @@ class UserHelper {
     return location;
   }
 
-  static String getDisplayName([DocumentSnapshot<Map<String, dynamic>> snapshot]) {
-
+  static String getDisplayName(
+      [DocumentSnapshot<Map<String, dynamic>> snapshot]) {
     return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
