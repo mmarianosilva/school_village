@@ -59,7 +59,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
-        print("Guess ChannelName ${element.data()['name']}");
+        //print("Guess ChannelName ${element.data()['name']}");
         return (element.data()['name'] == "911 TalkAround Channel") &&
             ((element.data()['createdById'] != _userSnapshot.id) ||
                 (element.data()['isActive'] == false));
@@ -71,7 +71,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
-      print("RETR Channels ${retrievedChannels.length} and userref ${_userSnapshot.reference} and userid ${ _userSnapshot.id}");
+      //print("RETR Channels ${retrievedChannels.length} and userref ${_userSnapshot.reference} and userid ${ _userSnapshot.id}");
       if (mounted) {
         setState(() {
           _isLoading = false;
