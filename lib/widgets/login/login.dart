@@ -226,6 +226,19 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 16.0),
+              RadioListTile(
+                value: 1,
+                groupValue: _selectedRadioTile,
+                title: termsAndConditionsText(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedRadioTile = 1;
+                  });
+                },
+                activeColor: _selectedRadioTile == 1 ? Colors.blue : Colors.red,
+                selected: true,
+              ),
+              const SizedBox(height: 8.0),
               MaterialButton(
                 minWidth: 200.0,
                 color: Theme.of(context).accentColor,
@@ -272,18 +285,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 72.0),
-              RadioListTile(
-                value: 1,
-                groupValue: _selectedRadioTile,
-                title: termsAndConditionsText(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedRadioTile = 1;
-                  });
-                },
-                activeColor: _selectedRadioTile == 1 ? Colors.blue : Colors.red,
-                selected: true,
-              ),
+
             ],
           ),
         ));
