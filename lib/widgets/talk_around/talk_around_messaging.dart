@@ -356,7 +356,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
                               _userSnapshot.data()["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
-                                  "admin" ||
+                                  "admin" ))||
                       (widget.channel.admin.id ==
                           FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
               ? [
