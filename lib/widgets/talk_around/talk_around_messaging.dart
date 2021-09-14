@@ -31,7 +31,7 @@ class TalkAroundMessaging extends StatefulWidget {
 class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     with TickerProviderStateMixin {
   final TalkAroundChannel channel;
-  DocumentSnapshot<Map<String,dynamic>> _userSnapshot;
+  DocumentSnapshot<Map<String, dynamic>> _userSnapshot;
   String _schoolId;
   bool isLoading = true;
   bool isVideo = false;
@@ -57,31 +57,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   String _buildChannelName() {
     print("Channel Details ${channel.id}");
-    try{
-      print("Channel Details 1.1");
-      if (!channel.direct) {
-        print("Channel Details 1.2 ${channel.name}");
-        return "#${channel.name}";
-      }
-      if (_userSnapshot != null) {
-        print("Channel Details 1.3");
-        final String userId = _userSnapshot.id;
-        final List<TalkAroundUser> members =
-        channel.members.where((user) => user.id.id != userId).toList();
-        members.sort((user1, user2) => user1.name.compareTo(user2.name));
-        print("Channel Details 1.4");
-        if (members.length == 1) {
-          return members.first.name;
-        }
-        String name = "";
-        for (int i = 0; i < members.length - 1; i++) {
-          name += "${members[i].name}, ";
-        }
-        return "$name${members.last.name}";
-      }
-    }catch(error,stacktrace){
-      print("Error is $error and stacktrace is $stacktrace");
-    }
+
     if (!channel.direct) {
       return "#${channel.name}";
     }
@@ -99,7 +75,6 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
       }
       return "$name${members.last.name}";
     }
-    print("CHANNEL BANE");
     return localize("Loading...");
   }
 
@@ -232,7 +207,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot.data()["phone"]??''
+            "phone": _userSnapshot.data()["phone"] ?? ''
           };
           try {
             FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -291,7 +266,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         // "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot.data()["phone"]??''
+        "phone": _userSnapshot.data()["phone"] ?? ''
       };
       try {
         FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -303,14 +278,13 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
               .set({"timestamp": FieldValue.serverTimestamp()},
                   SetOptions(merge: true));
         });
-        if(isIntrado()){
-         await sendIntradoMsg(messageInputController.text);
+        if (isIntrado()) {
+          await sendIntradoMsg(messageInputController.text);
         }
         messageInputController.clear();
       } on Exception catch (ex) {
         print("New Exception $ex");
       }
-
     }
     setState(() {
       selectedImage = null;
@@ -320,25 +294,21 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   }
 
   sendIntradoMsg(String msg) async {
-    final intradoPayload = IntradoMessage(session:channel.id,message: msg,messageId: '2' );
+    final intradoPayload =
+        IntradoMessage(session: channel.id, message: msg, messageId: '2');
     final token =
-    (await (await FirebaseAuth
-        .instance
-        .currentUser)
-        .getIdToken());
+        (await (await FirebaseAuth.instance.currentUser).getIdToken());
     final response = await http.post(
-    Uri.parse("https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message"),
-    body: intradoPayload.toXml(),
-    encoding:
-    Encoding.getByName("utf8"),
-    headers: <String, String>{
-    "Authorization": "Bearer $token",
-    },
+      Uri.parse(
+          "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message"),
+      body: intradoPayload.toXml(),
+      encoding: Encoding.getByName("utf8"),
+      headers: <String, String>{
+        "Authorization": "Bearer $token",
+      },
     );
-    print(
-    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-    print(
-    "Intrado response is ${response.body}");
+    print("Body Submitted is ${intradoPayload.toXml()} and token is $token");
+    print("Intrado response is ${response.body}");
   }
 
   @override
@@ -346,59 +316,42 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     _getUserDetails();
     super.initState();
   }
-  List<Widget> getWidgets(){
-    print("WIDGETS 1");
-    try{
-      final widgets = (widget.channel.isClass ?? false) &&
-          ((_userSnapshot != null &&
-              (_userSnapshot.data()["associatedSchools"]
-              ["${_schoolId.substring("schools/".length)}"]
-              ["role"] ==
-                  "school_admin" ||
-                  _userSnapshot.data()["associatedSchools"]
-                  ["${_schoolId.substring("schools/".length)}"]
-                  ["role"] ==
-                      "district" ||
-                  _userSnapshot.data()["associatedSchools"]
-                  ["${_schoolId.substring("schools/".length)}"]
-                  ["role"] ==
-                      "admin")) ||
-              (widget.channel.admin.id ==
-                  FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
-          ? [
-          FlatButton(
-            onPressed: () =>
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => TalkAroundCreateClass(
-                      group: widget.channel,
-                    ))),
-            child: Text(localize('Edit').toUpperCase(),
-                style: TextStyle(
-                    color: Color.fromARGB(255, 20, 195, 239),
-                    fontSize: 16.0),
-                textAlign: TextAlign.end),
-          )
-          ]
-    : [];
-    }catch(error,stacktrace){
-      print("Error is $error and stacktrace is $stacktrace");
-    }
-    print("WIDGETS 2");
-    return [];
-  }
-  Widget getChat(){
-    try{
-      final chat = Chat(
-        conversation: "$_schoolId/messages/${channel.id}",
-        showLocation: channel.showLocation,
-        showInput: false,
-        user: _userSnapshot,
-        reverseInput: true,
-      );
-    }catch(error,stacktrace){
-      print("Error is $error and stacktrace is $stacktrace");
 
-    }
+  List<Widget> getWidgets() {
+    return (widget.channel.isClass ?? false) &&
+            ((_userSnapshot != null &&
+                    (_userSnapshot.data()["associatedSchools"][
+                                    "${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "school_admin" ||
+                        _userSnapshot.data()["associatedSchools"][
+                                    "${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "district" ||
+                        _userSnapshot.data()["associatedSchools"]
+                                    ["${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "admin")) ||
+                (widget.channel.admin.id ==
+                    FirebaseFirestore.instance
+                        .doc("users/${_userSnapshot?.id ?? "a"}")))
+        ? [
+            FlatButton(
+              onPressed: () =>
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => TalkAroundCreateClass(
+                            group: widget.channel,
+                          ))),
+              child: Text(localize('Edit').toUpperCase(),
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
+                  textAlign: TextAlign.end),
+            )
+          ]
+        : [];
+  }
+
+  Widget getChat() {
     return Chat(
       conversation: "$_schoolId/messages/${channel.id}",
       showLocation: channel.showLocation,
@@ -407,6 +360,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
       reverseInput: true,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
