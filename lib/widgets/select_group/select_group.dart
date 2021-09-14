@@ -42,10 +42,8 @@ class _SelectGroupsState extends State<SelectGroups> {
 
   String getRecipients() {
     if (allMarinas['All'] == true) {
-      print(" All is on");
       return 'Send to: All';
     } else {
-      print(" All is not on");
       String x = '';
       allMarinas.forEach((key, value) {
         if (value == true) {
@@ -186,7 +184,6 @@ class _SelectGroupsState extends State<SelectGroups> {
                         title: Text(_key),
                         checkColor: Colors.white,
                         onChanged: (val) {
-                          print("value changing $_key and $val");
                           setState(() {
                             allMarinas[_key] = val;
                             if (_key == "All" && val == true) {
