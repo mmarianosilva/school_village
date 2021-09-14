@@ -146,7 +146,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                 editable: role == 'school_admin' || role == 'admin' ||
                     role == 'school_security' || role == 'security' ||
                     role == 'pd_fire_ems' ||
-                    role == 'district' || role == 'super_admin',
+                    role == 'district',
               )),
     );
   }
@@ -443,7 +443,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   List<Widget> _buildStopAlertItems() {
-    if (role == 'school_security' || role == 'school_admin' || role == 'district' || role == 'security' || role == 'admin' || role == 'super_admin') {
+    if (role == 'school_security' || role == 'school_admin' || role == 'district' || role == 'security' || role == 'admin' ) {
       return [
         Spacer(),
         Container(
