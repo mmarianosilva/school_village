@@ -476,8 +476,9 @@ class UserHelper {
     return location;
   }
 
-  static String getDisplayName([DocumentSnapshot snapshot]) {
-    return "${snapshot["firstName"]} ${snapshot["lastName"]} ${snapshot["room"] != null && snapshot["room"].isNotEmpty ? ' (${snapshot["room"]})' : ''}";
+  static String getDisplayName([DocumentSnapshot<Map<String, dynamic>> snapshot]) {
+
+    return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
   static String getRoomNumber([DocumentSnapshot snapshot]) {

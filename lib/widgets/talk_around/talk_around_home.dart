@@ -66,8 +66,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
 
       List<Future<TalkAroundChannel>> processedChannels =
           channels.map((channel) async {
-
-            return TalkAroundChannel.fromMapAndUsers(channel, null);
+        return TalkAroundChannel.fromMapAndUsers(channel, null);
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
@@ -95,14 +94,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             List<Future<TalkAroundChannel>> processedGroupMessages =
                 groupMessages.map((channel) async {
               Stream<TalkAroundUser> members =
-                  Stream.fromIterable(channel["members"])
-                      .asyncMap((id) async {
+                  Stream.fromIterable(channel["members"]).asyncMap((id) async {
                 final DocumentSnapshot user = await id.get();
                 TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                     user,
                     user["associatedSchools"][escapedSchoolId] != null
-                        ? user["associatedSchools"][escapedSchoolId]
-                            ["role"]
+                        ? user["associatedSchools"][escapedSchoolId]["role"]
                         : "");
                 return member;
               });
@@ -125,8 +122,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                 _groupMessages = retrievedGroupMessages
                     .where((channel) => channel.isClass)
                     .toList()
-                      ..sort(
-                          (item1, item2) => item1.name.compareTo(item2.name));
+                  ..sort((item1, item2) => item1.name.compareTo(item2.name));
               });
             }
           });
@@ -139,17 +135,19 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         final String escapedSchoolId = _schoolId.substring("schools/".length);
         List<DocumentSnapshot> documentList = snapshot.docs;
         Iterable<DocumentSnapshot> groupMessages = documentList.toList()
-          ..removeWhere((chatroom) =>
-              !(chatroom["class"] ?? false) &&
-              !(chatroom["members"] != null &&
-                  chatroom
-                      ["members"]
-                      .contains(_userSnapshot.reference)));
+          ..removeWhere((chatroom) {
+            final data = chatroom.data() as Map<String, dynamic>;
+            return !(((data["class"] ?? null) != null)
+                    ? data['class']
+                    : false) &&
+                !(((data["members"] ?? null) != null)
+                    ? data["members"].contains(_userSnapshot.reference)
+                    : false);
+          });
         List<Future<TalkAroundChannel>> processedGroupMessages =
             groupMessages.map((channel) async {
           Stream<TalkAroundUser> members =
-              Stream.fromIterable(channel["members"])
-                  .asyncMap((id) async {
+              Stream.fromIterable(channel["members"]).asyncMap((id) async {
             final DocumentSnapshot user = await id.get();
             TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                 user,
@@ -177,7 +175,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             _groupMessages = retrievedGroupMessages
                 .where((channel) => channel.isClass)
                 .toList()
-                  ..sort((item1, item2) => item1.name.compareTo(item2.name));
+              ..sort((item1, item2) => item1.name.compareTo(item2.name));
           });
         }
       });
@@ -324,8 +322,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
-                                    child: Text(
-                                        localize("Group").toUpperCase(),
+                                    child: Text(localize("Group").toUpperCase(),
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 199, 199, 204)),
