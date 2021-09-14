@@ -5,7 +5,6 @@ const String admin = "admin";
 const String security = "security";
 const String staff = "staff";
 const String district = "district";
-const String superadmin = "super_admin";
 const String pdFireEms = "pd_fire_ems";
 
 class PermissionMatrix {
@@ -28,10 +27,9 @@ class PermissionMatrix {
     boater,
     maintenance,
     district,
-    superadmin
   ];
-  static const _talkAroundSecurity = [admin, security, district, superadmin];
-  static const _talkAroundPdFireEms = [admin, security, district, superadmin];
+  static const _talkAroundSecurity = [admin, security, district];
+  static const _talkAroundPdFireEms = [admin, security, district];
 
   static List<String> getTalkAroundPermissions(String role) {
     switch (role) {
@@ -46,7 +44,6 @@ class PermissionMatrix {
       case staff:
         return _talkAroundStaff;
       case district:
-      case superadmin:
       case admin:
         return _talkAroundAdmin;
       case pdFireEms:
@@ -66,7 +63,6 @@ class PermissionMatrix {
       case boater:
         return _talkAroundBoaters;
       case district:
-      case superadmin:
       case admin:
         return _talkAroundAdmin;
       default:
