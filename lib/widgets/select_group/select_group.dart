@@ -42,10 +42,8 @@ class _SelectGroupsState extends State<SelectGroups> {
 
   String getRecipients() {
     if (allMarinas['All'] == true) {
-      print(" All is on");
       return 'Send to: All';
     } else {
-      print(" All is not on");
       String x = '';
       allMarinas.forEach((key, value) {
         if (value == true) {
@@ -65,11 +63,11 @@ class _SelectGroupsState extends State<SelectGroups> {
     var role = await UserHelper.getSelectedSchoolRole();
     if (role == 'school_security') {
       schoolGroups.removeWhere((item) => item["name"] == 'family');
-    } else if (role == 'district' || role == 'super_admin') {
+    } else if (role == 'district' ) {
       List<Map<String, dynamic>> schools =
           (await UserHelper.getSchools()).cast<Map<String, dynamic>>();
       schools.removeWhere((item) =>
-          (item["role"] != "district" && item["role"] != "super_admin"));
+          (item["role"] != "district" ));
       List<DocumentSnapshot> unwrappedSchools =
           await _fetchSchoolSnapshots(schools);
       setState(() {
@@ -91,7 +89,7 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = (role == 'district' || role == 'super_admin') &&
+      _isLoading = (role == 'district') &&
           schoolSnapshots == null;
     });
   }
@@ -186,7 +184,6 @@ class _SelectGroupsState extends State<SelectGroups> {
                         title: Text(_key),
                         checkColor: Colors.white,
                         onChanged: (val) {
-                          print("value changing $_key and $val");
                           setState(() {
                             allMarinas[_key] = val;
                             if (_key == "All" && val == true) {

@@ -165,7 +165,6 @@ class _AlertState extends State<Alert> {
   _sendAlert(alertType, alertTitle, alertBody) {
     if (_role == 'security' ||
         _role == 'admin' ||
-        _role == 'super_admin' ||
         _role == 'district' ||
         _role == 'boater' ||
         _role == 'vendor' ||
