@@ -28,11 +28,37 @@ class _SelectGroupsState extends State<SelectGroups> {
   final textSize = 14.0;
   int numOfRows = 1;
   bool amberAlert = false;
+
   final Function(bool) onToneSelectedCallback;
+  Map<String, bool> allMarinas = Map();
   List<DocumentSnapshot> schoolSnapshots;
-  DocumentSnapshot selectedSchool;
+  List<DocumentSnapshot> selectedSchools;
 
   _SelectGroupsState(this.onToneSelectedCallback);
+
+  String truncateString(String data, int length) {
+    return (data.length >= length) ? '${data.substring(0, length)}...' : data;
+  }
+
+  String getRecipients() {
+    if (allMarinas['All'] == true) {
+      print(" All is on");
+      return 'Send to: All';
+    } else {
+      print(" All is not on");
+      String x = '';
+      allMarinas.forEach((key, value) {
+        if (value == true) {
+          if (x == '') {
+            x = key;
+          } else {
+            x = x + "," + key;
+          }
+        }
+      });
+      return 'Send to: ${x}';
+    }
+  }
 
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
@@ -48,6 +74,17 @@ class _SelectGroupsState extends State<SelectGroups> {
           await _fetchSchoolSnapshots(schools);
       setState(() {
         schoolSnapshots = unwrappedSchools;
+        allMarinas = _districtSchools();
+
+        if (allMarinas['All'] == true) {
+          selectedSchools = schoolSnapshots;
+        } else {
+          selectedSchools = schoolSnapshots.where((element) {
+            return (element != null) &&
+                (element.data() != null) &&
+                (allMarinas[element.data()["name"]] == true);
+          }).toList();
+        }
         _isLoading = false;
       });
     }
@@ -59,7 +96,7 @@ class _SelectGroupsState extends State<SelectGroups> {
     });
   }
 
-  List<DropdownMenuItem> _districtSchools() {
+  Map<String, bool> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All");
     // schoolSnapshots.removeWhere((element) {
@@ -73,12 +110,9 @@ class _SelectGroupsState extends State<SelectGroups> {
     // _schools.addAll(schoolSnapshots.map((item) {
     //   return item.data()["name"];
     // }));
-    return _schools
-        .map((value) => DropdownMenuItem(
-              value: value,
-              child: Text(value, overflow: TextOverflow.ellipsis),
-            ))
-        .toList();
+
+    return Map<String, bool>.fromIterable(_schools,
+        key: (e) => e, value: (e) => true);
   }
 
   Future<List<DocumentSnapshot>> _fetchSchoolSnapshots(
@@ -105,26 +139,73 @@ class _SelectGroupsState extends State<SelectGroups> {
         : _getList();
   }
 
-  Widget getGroupDropDown() {
-    return DropdownButton(
-      isExpanded: true,
-      items: _districtSchools(),
-      onChanged: (value) {
-        if (schoolSnapshots
-            .where((item) => item.data()["name"] == value)
-            .isNotEmpty) {
-          setState(() {
-            selectedSchool = schoolSnapshots
-                .firstWhere((item) => item.data()["name"] == value);
-          });
-        } else {
-          setState(() {
-            selectedSchool = null;
-          });
-        }
-      },
-      value: selectedSchool != null ? selectedSchool.data()["name"] : "All",
-    );
+  Future<Map<String, bool>> _chooseMarinas() async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Choose Marinas'),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context, null);
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        if (allMarinas['All'] == true) {
+                          selectedSchools = schoolSnapshots;
+                        } else {
+                          selectedSchools = schoolSnapshots.where((element) {
+                            return (element != null) &&
+                                (element.data() != null) &&
+                                (allMarinas[element.data()["name"]] == true);
+                          }).toList();
+                        }
+                      });
+                      Navigator.pop(context, null);
+                      //Navigator.pop(context, cityList);
+                    },
+                    child: Text('Done'),
+                  ),
+                ],
+                content: Container(
+                  width: double.minPositive,
+                  height: 300,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: allMarinas.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      String _key = allMarinas.keys.elementAt(index);
+                      return CheckboxListTile(
+                        value: allMarinas[_key],
+                        title: Text(_key),
+                        checkColor: Colors.white,
+                        onChanged: (val) {
+                          print("value changing $_key and $val");
+                          setState(() {
+                            allMarinas[_key] = val;
+                            if (_key == "All" && val == true) {
+                              //toggleAll(true);
+                              allMarinas.updateAll((key, value) => true);
+                            } else if (_key == "All" && val == false) {
+                              allMarinas.updateAll((key, value) => false);
+                              //toggleAll(false);
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        });
   }
 
   _getList() {
@@ -244,11 +325,30 @@ class _SelectGroupsState extends State<SelectGroups> {
         schoolSnapshots != null
             ? Container(
                 height: 50,
+                decoration: BoxDecoration(color: Colors.blue, boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey, blurRadius: 4, offset: Offset(0, 2))
+                ]),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Flexible(flex: 2, child: new Text(localize("Send to: "))),
-                    Flexible(flex: 3, child: getGroupDropDown()),
+                    Flexible(
+                      flex: 1,
+                      child: SizedBox(
+                        height: 10,
+                        width: 10,
+                      ),
+                    ),
+                    Flexible(
+                        flex: 9,
+                        child: InkWell(
+                          onTap: () async {
+                            final data = await _chooseMarinas();
+                            setState(() {});
+                          },
+                          child: new Text(truncateString(getRecipients(), 40)),
+                        )),
+                    //Flexible(flex: 3, child: getGroupDropDown()),
                   ],
                 ),
               )
