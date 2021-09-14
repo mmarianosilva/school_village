@@ -291,14 +291,14 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
   _sendBroadcasts(image, alertBody, isVideo) {
     if (role == 'district' || role == 'super_admin') {
-      DocumentSnapshot selectedSchool =
-          selectGroups.key.currentState.selectedSchool;
-      if (selectedSchool == null) {
+      List<DocumentSnapshot> selectedSchools =
+          selectGroups.key.currentState.selectedSchools;
+      if (selectedSchools!= null) {
         selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
           _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
         });
       } else {
-        _saveBroadcast(image, alertBody, isVideo, selectedSchool.id);
+        _saveBroadcast(image, alertBody, isVideo);
       }
     } else {
       _saveBroadcast(image, alertBody, isVideo);
