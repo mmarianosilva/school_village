@@ -78,7 +78,7 @@ class _SelectGroupsState extends State<SelectGroups> {
           selectedSchools = schoolSnapshots.where((element) {
             return (element != null) &&
                 (element.data() != null) &&
-                (allMarinas[element.data()["name"]] == true);
+                (allMarinas[(element.data() as Map<String,dynamic>)["name"]] == true);
           }).toList();
         }
         _isLoading = false;
@@ -153,7 +153,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                           selectedSchools = schoolSnapshots.where((element) {
                             return (element != null) &&
                                 (element.data() != null) &&
-                                (allMarinas[element.data()["name"]] == true);
+                                (allMarinas[(element.data() as Map<String,dynamic>)["name"]] == true);
                           }).toList();
                         }
                       });
