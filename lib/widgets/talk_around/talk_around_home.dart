@@ -59,7 +59,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
-        print("Guess ChannelName ${element.data()['name']}");
+        //print("Guess ChannelName ${element.data()['name']}");
         return (element.data()['name'] == "911 TalkAround Channel") &&
             ((element.data()['createdById'] != _userSnapshot.id) ||
                 (element.data()['isActive'] == false));
@@ -71,7 +71,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
-      print("RETR Channels ${retrievedChannels.length}");
+      //print("RETR Channels ${retrievedChannels.length} and userref ${_userSnapshot.reference} and userid ${ _userSnapshot.id}");
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -82,8 +82,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     });
     if (_schoolRole != "school_admin" &&
         _schoolRole != "admin" &&
-        _schoolRole != "district" &&
-        _schoolRole != "super_admin") {
+        _schoolRole != "district" ) {
       // For the non elite/admin users  _messageListSubscription is the list of groups(1 on 1) that our user is a member of
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
