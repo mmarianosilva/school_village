@@ -31,7 +31,7 @@ class TalkAroundMessaging extends StatefulWidget {
 class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     with TickerProviderStateMixin {
   final TalkAroundChannel channel;
-  DocumentSnapshot _userSnapshot;
+  DocumentSnapshot<Map<String,dynamic>> _userSnapshot;
   String _schoolId;
   bool isLoading = true;
   bool isVideo = false;
@@ -206,7 +206,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot["phone"]
+            "phone": _userSnapshot.data()["phone"]??''
           };
           try {
             FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -265,7 +265,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         // "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot["phone"]
+        "phone": _userSnapshot.data()["phone"]??''
       };
       try {
         FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -344,15 +344,15 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
           ),
           actions: (widget.channel.isClass ?? false) &&
                   ((_userSnapshot != null &&
-                          (_userSnapshot["associatedSchools"]
+                          (_userSnapshot.data()["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "school_admin" ||
-                              _userSnapshot["associatedSchools"]
+                              _userSnapshot.data()["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "district" ||
-                              _userSnapshot["associatedSchools"]
+                              _userSnapshot.data()["associatedSchools"]
                                           ["${_schoolId.substring("schools/".length)}"]
                                       ["role"] ==
                                   "admin")) ||
