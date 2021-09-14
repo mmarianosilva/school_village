@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:location/location.dart';
+import 'package:package_info/package_info.dart';
 import 'package:school_village/util/help_with_migration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -18,7 +19,6 @@ class UserHelper {
 
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
-
 
   static Future<AuthResult> signIn({email: String, password: String}) async {
     if (_prefs == null) {
@@ -49,6 +49,39 @@ class UserHelper {
     }
     AnalyticsHelper.setUserId(user.uid);
     return user;
+  }
+
+  static Future<List<String>> getPackageDependentDetails() async {
+    String baseurl = "", shorturlDomain = "", intradoRequestUrl = "";
+
+    final packageInfo = await PackageInfo.fromPlatform();
+    switch (packageInfo.packageName.trim()) {
+      case 'com.oandmtech.marinavillage':
+        baseurl = "https://marinavillage-web.web.app/i/";
+        shorturlDomain = "https://onscene.team/i";
+        intradoRequestUrl =
+            "https://us-central1-marinavillage-1.cloudfunctions.net/api/intrado";
+        return [baseurl, shorturlDomain, intradoRequestUrl];
+
+      case 'com.oandmtech.marinavillage.dev':
+        baseurl = "https://marinavillage-dev-web.web.app/i/";
+        shorturlDomain = "https://dev.onscene.team/i";
+        intradoRequestUrl =
+            "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado";
+        return [baseurl, shorturlDomain, intradoRequestUrl];
+
+      case 'com.oandmtech.schoolvillage':
+        baseurl = "https://schoolvillage-web.firebaseapp.com/i/";
+        return [baseurl, shorturlDomain];
+
+      case 'com.oandmtech.schoolvillage.dev':
+        baseurl = "https://schoolvillage-dev-web.web.app/i/";
+        return [baseurl, shorturlDomain];
+
+      default:
+        baseurl = "";
+        return [baseurl, shorturlDomain];
+    }
   }
 
   static logout(token) async {
@@ -179,8 +212,6 @@ class UserHelper {
         userSnapshot: userSnapshot);
   }
 
-
-
   static getSchools() async {
     final FirebaseUser currentUser = await getUser();
     if (currentUser == null) {
@@ -239,8 +270,8 @@ class UserHelper {
       QueryDocumentSnapshot regionObj,
       List<DocumentSnapshot> marinas,
       DocumentSnapshot mSnapshot) async {
-    if(marinas.isEmpty){
-      return[];
+    if (marinas.isEmpty) {
+      return [];
     }
     List<dynamic> allMarinas = [];
     final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));

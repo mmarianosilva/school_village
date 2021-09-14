@@ -294,6 +294,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   }
 
   sendIntradoMsg(String msg) async {
+    final baseurlPackage = await UserHelper.getPackageDependentDetails();
     final intradoPayload = IntradoMessage(session:channel.id,message: msg,messageId: '2' );
     final token =
     (await (await FirebaseAuth
@@ -302,7 +303,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         .getIdToken())
         .token;
     final response = await http.post(
-    "https://us-central1-marinavillage-dev.cloudfunctions.net/api/intrado/send-message",
+    "${baseurlPackage[2]}/send-message",
     body: intradoPayload.toXml(),
     encoding:
     Encoding.getByName("utf8"),
