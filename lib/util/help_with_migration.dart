@@ -23,7 +23,7 @@ abstract class Temporary {
       return "family";
     }
     if (original == "district") {
-      return "super_admin";
+      return "district";
     }
     return original;
   }
