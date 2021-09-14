@@ -28,7 +28,7 @@ class ChatMessage extends StatelessWidget {
   final bool self;
   final String phone;
   final dynamic location;
-  final DocumentSnapshot message;
+  final DocumentSnapshot<Map<String,dynamic>> message;
   final String imageUrl;
   final bool unread;
   final bool isVideo;

@@ -15,7 +15,7 @@ import 'package:school_village/util/localizations/localization.dart';
 class Chat extends StatefulWidget {
   final String conversation;
   final bool showLocation;
-  final DocumentSnapshot user;
+  final DocumentSnapshot<Map<String,dynamic>> user;
   final bool showInput;
   final bool reverseInput;
 
@@ -29,14 +29,14 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   static FirebaseStorage storage = FirebaseStorage.instance;
   final String conversation;
-  final DocumentSnapshot user;
+  final DocumentSnapshot<Map<String,dynamic>> user;
   final bool showInput;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   Location _location = Location();
   List<MessageHolder> messageList = List();
   ScrollController _scrollController;
   final focusNode = FocusNode();
-  Map<int, List<DocumentSnapshot>> messageMap = LinkedHashMap();
+  Map<int, List<DocumentSnapshot<Map<String,dynamic>>>> messageMap = LinkedHashMap();
   bool isLoaded = false;
   StreamSubscription<QuerySnapshot> _messageSubscription;
 
@@ -105,7 +105,7 @@ class _ChatState extends State<Chat> {
       await transaction.set(document, <String, dynamic>{
         'body': text,
         'authorId': user.id,
-        'author': "${user['firstName']} ${user['lastName']}",
+        'author': "${user.data()['firstName']} ${user.data()['lastName']}",
         'timestamp': FieldValue.serverTimestamp(),
         'location': widget.showLocation ? await _getLocation() : null,
         'image': image == null ? null : path
@@ -173,7 +173,7 @@ class _ChatState extends State<Chat> {
   _handleDocumentChanges(documentChanges) {
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
-        _handleMessageMapInsert(change.document);
+        _handleMessageMapInsert(change.doc);
       } else if (change.type == DocumentChangeType.modified) {
 
       } else {
@@ -227,16 +227,16 @@ class _ChatState extends State<Chat> {
               );
             }
 
-            final DocumentSnapshot document = messageList[index].message;
+            final DocumentSnapshot<Map<String,dynamic>> document = messageList[index].message;
             return ChatMessage(
-              text: document['body'],
-              name: "${document['author']}",
-              phone: "${document['phone']}",
-              timestamp: document['timestamp'],
-              self: document['authorId'] == user.id,
-              location: widget.showLocation ? document['location'] : null,
-              imageUrl: document['image'],
-              isVideo: document['isVideo'],
+              text: document.data()['body'],
+              name: "${document.data()['author']}",
+              phone: "${document.data()['phone']}",
+              timestamp: document.data()['timestamp'],
+              self: document.data()['authorId'] == user.id,
+              location: widget.showLocation ? document.data()['location'] : null,
+              imageUrl: document.data()['image'],
+              isVideo: document.data()['isVideo'],
               message: document,
             );
           });

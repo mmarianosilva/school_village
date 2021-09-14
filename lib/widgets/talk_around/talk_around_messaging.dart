@@ -57,6 +57,31 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   String _buildChannelName() {
     print("Channel Details ${channel.id}");
+    try{
+      print("Channel Details 1.1");
+      if (!channel.direct) {
+        print("Channel Details 1.2 ${channel.name}");
+        return "#${channel.name}";
+      }
+      if (_userSnapshot != null) {
+        print("Channel Details 1.3");
+        final String userId = _userSnapshot.id;
+        final List<TalkAroundUser> members =
+        channel.members.where((user) => user.id.id != userId).toList();
+        members.sort((user1, user2) => user1.name.compareTo(user2.name));
+        print("Channel Details 1.4");
+        if (members.length == 1) {
+          return members.first.name;
+        }
+        String name = "";
+        for (int i = 0; i < members.length - 1; i++) {
+          name += "${members[i].name}, ";
+        }
+        return "$name${members.last.name}";
+      }
+    }catch(error,stacktrace){
+      print("Error is $error and stacktrace is $stacktrace");
+    }
     if (!channel.direct) {
       return "#${channel.name}";
     }
@@ -74,6 +99,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
       }
       return "$name${members.last.name}";
     }
+    print("CHANNEL BANE");
     return localize("Loading...");
   }
 
@@ -282,7 +308,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         }
         messageInputController.clear();
       } on Exception catch (ex) {
-        print("$ex");
+        print("New Exception $ex");
       }
 
     }
@@ -320,7 +346,67 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     _getUserDetails();
     super.initState();
   }
+  List<Widget> getWidgets(){
+    print("WIDGETS 1");
+    try{
+      final widgets = (widget.channel.isClass ?? false) &&
+          ((_userSnapshot != null &&
+              (_userSnapshot.data()["associatedSchools"]
+              ["${_schoolId.substring("schools/".length)}"]
+              ["role"] ==
+                  "school_admin" ||
+                  _userSnapshot.data()["associatedSchools"]
+                  ["${_schoolId.substring("schools/".length)}"]
+                  ["role"] ==
+                      "district" ||
+                  _userSnapshot.data()["associatedSchools"]
+                  ["${_schoolId.substring("schools/".length)}"]
+                  ["role"] ==
+                      "admin")) ||
+              (widget.channel.admin.id ==
+                  FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
+          ? [
+          FlatButton(
+            onPressed: () =>
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => TalkAroundCreateClass(
+                      group: widget.channel,
+                    ))),
+            child: Text(localize('Edit').toUpperCase(),
+                style: TextStyle(
+                    color: Color.fromARGB(255, 20, 195, 239),
+                    fontSize: 16.0),
+                textAlign: TextAlign.end),
+          )
+          ]
+    : [];
+    }catch(error,stacktrace){
+      print("Error is $error and stacktrace is $stacktrace");
+    }
+    print("WIDGETS 2");
+    return [];
+  }
+  Widget getChat(){
+    try{
+      final chat = Chat(
+        conversation: "$_schoolId/messages/${channel.id}",
+        showLocation: channel.showLocation,
+        showInput: false,
+        user: _userSnapshot,
+        reverseInput: true,
+      );
+    }catch(error,stacktrace){
+      print("Error is $error and stacktrace is $stacktrace");
 
+    }
+    return Chat(
+      conversation: "$_schoolId/messages/${channel.id}",
+      showLocation: channel.showLocation,
+      showInput: false,
+      user: _userSnapshot,
+      reverseInput: true,
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,37 +428,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
               ],
             ),
           ),
-          actions: (widget.channel.isClass ?? false) &&
-                  ((_userSnapshot != null &&
-                          (_userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "school_admin" ||
-                              _userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "district" ||
-                              _userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "admin")) ||
-                      (widget.channel.admin.id ==
-                          FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
-              ? [
-                  FlatButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => TalkAroundCreateClass(
-                                  group: widget.channel,
-                                ))),
-                    child: Text(localize('Edit').toUpperCase(),
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 20, 195, 239),
-                            fontSize: 16.0),
-                        textAlign: TextAlign.end),
-                  )
-                ]
-              : [],
+          actions: getWidgets(),
         ),
         body: Builder(builder: (context) {
           if (isLoading) {
@@ -391,13 +447,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
                   child: Column(
                     children: <Widget>[
                       Expanded(
-                        child: Chat(
-                          conversation: "$_schoolId/messages/${channel.id}",
-                          showLocation: channel.showLocation,
-                          showInput: false,
-                          user: _userSnapshot,
-                          reverseInput: true,
-                        ),
+                        child: getChat(),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
