@@ -200,7 +200,12 @@ class _HotlineState extends State<Hotline> {
     if (text.length < 1 && _selectedMedia == null) return;
     _saveMessage(text);
   }
-
+  Future<String> _getUserId()async {
+    FirebaseUser user = await UserHelper.getUser();
+    final _user = FirebaseFirestore.instance.doc('users/${user.uid}');
+    final _userId = (await _user.get()).id;
+    return _userId;
+  }
   _saveMessage(message) async {
     final String hotlinePath = '$_schoolId/hotline';
     CollectionReference collection = FirebaseFirestore.instance.collection(hotlinePath);
@@ -208,7 +213,7 @@ class _HotlineState extends State<Hotline> {
 
     final String role = await UserHelper.getSelectedSchoolRole();
     final String schoolId = await UserHelper.getSelectedSchoolID();
-
+    final String userId = await _getUserId();
     if (_selectedMedia != null) {
       setState(() {
         isLoaded = false;
@@ -227,6 +232,7 @@ class _HotlineState extends State<Hotline> {
       onComplete: (String url) {
             document.set({
               'body': message,
+              'createdById': userId,
               'createdAt': DateTime
                   .now()
                   .millisecondsSinceEpoch,
@@ -245,6 +251,7 @@ class _HotlineState extends State<Hotline> {
     } else {
       document.set({
         'body': message,
+        'createdById': userId,
         'createdAt': DateTime
             .now()
             .millisecondsSinceEpoch,
