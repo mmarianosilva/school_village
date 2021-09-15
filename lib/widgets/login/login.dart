@@ -227,8 +227,6 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 16.0),
               CheckboxListTile(
-                //value: 1,
-                //groupValue: _selectedRadioTile,
                 controlAffinity: ListTileControlAffinity.leading,
                 title: termsAndConditionsText(),
                 value: _checkedPolicy,
@@ -237,7 +235,6 @@ class _LoginState extends State<Login> {
                     _checkedPolicy = val;
                   });
                 },
-               // activeColor: _checkedPolicy ? Colors.blue : Colors.red,
                 selected: false,
               ),
               const SizedBox(height: 8.0),
