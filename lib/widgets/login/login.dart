@@ -23,7 +23,6 @@ class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _checkedPolicy = false;
-  int _selectedRadioTile = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "MarinaVillage";
   FocusNode emailFocusNode = FocusNode();
@@ -100,7 +99,7 @@ class _LoginState extends State<Login> {
       showErrorDialog(localize('Password my be at least 6 characters'));
       return;
     }
-    if (_selectedRadioTile == 0) {
+    if (!_checkedPolicy) {
       FocusScope.of(context).unfocus();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Row(
@@ -226,17 +225,16 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              RadioListTile(
-                value: 1,
-                groupValue: _selectedRadioTile,
+              CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.leading,
                 title: termsAndConditionsText(),
+                value: _checkedPolicy,
                 onChanged: (val) {
                   setState(() {
-                    _selectedRadioTile = 1;
+                    _checkedPolicy = val;
                   });
                 },
-                activeColor: _selectedRadioTile == 1 ? Colors.blue : Colors.red,
-                selected: true,
+                selected: false,
               ),
               const SizedBox(height: 8.0),
               MaterialButton(
