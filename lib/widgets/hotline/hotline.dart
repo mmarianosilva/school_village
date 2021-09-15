@@ -201,7 +201,7 @@ class _HotlineState extends State<Hotline> {
     _saveMessage(text);
   }
   Future<String> _getUserId()async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     final _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     final _userId = (await _user.get()).id;
     return _userId;
