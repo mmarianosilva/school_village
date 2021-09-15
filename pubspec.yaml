@@ -1,6 +1,6 @@
 name: school_village
 description: School Village
-version: 1.0.2+4
+version: 1.4.2+4
 environment:
   sdk: '>=2.10.0 <3.0.0'
 
