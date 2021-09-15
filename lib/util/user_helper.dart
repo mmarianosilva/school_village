@@ -515,7 +515,7 @@ class UserHelper {
     return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
-  static String getRoomNumber([DocumentSnapshot snapshot]) {
-    return snapshot["room"];
+  static String getRoomNumber([DocumentSnapshot<Map<String,dynamic>> snapshot]) {
+    return (snapshot.data())["room"];
   }
 }
