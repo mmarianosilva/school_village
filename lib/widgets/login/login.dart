@@ -100,7 +100,7 @@ class _LoginState extends State<Login> {
       showErrorDialog(localize('Password my be at least 6 characters'));
       return;
     }
-    if (_selectedRadioTile == 0) {
+    if (!_checkedPolicy) {
       FocusScope.of(context).unfocus();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Row(
@@ -226,17 +226,19 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              RadioListTile(
-                value: 1,
-                groupValue: _selectedRadioTile,
+              CheckboxListTile(
+                //value: 1,
+                //groupValue: _selectedRadioTile,
+                controlAffinity: ListTileControlAffinity.leading,
                 title: termsAndConditionsText(),
+                value: _checkedPolicy,
                 onChanged: (val) {
                   setState(() {
-                    _selectedRadioTile = 1;
+                    _checkedPolicy = val;
                   });
                 },
-                activeColor: _selectedRadioTile == 1 ? Colors.blue : Colors.red,
-                selected: true,
+               // activeColor: _checkedPolicy ? Colors.blue : Colors.red,
+                selected: false,
               ),
               const SizedBox(height: 8.0),
               MaterialButton(
