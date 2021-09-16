@@ -149,7 +149,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
         _handleMessageMapInsert(change.doc);
-          _handleMessageMapInsert(change);
         }
       });
   }
