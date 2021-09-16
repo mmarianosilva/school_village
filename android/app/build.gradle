@@ -101,6 +101,11 @@ dependencies {
     implementation 'com.github.barteksc:android-pdf-viewer:3.2.0-beta.1'
     implementation 'com.google.firebase:firebase-messaging:20.2.0'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.15.0'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.15.0'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.15.0'
+    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.15.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
