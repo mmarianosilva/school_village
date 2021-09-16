@@ -21,10 +21,10 @@ class Splash extends StatelessWidget {
       String userPath = "/users/${currentUser.uid}";
       print(currentUser);
       DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-      DocumentSnapshot userSnapshot = await userRef.get();
+      DocumentSnapshot<Map<String,dynamic>> userSnapshot = await userRef.get();
       if (userSnapshot != null &&
-          userSnapshot["associatedSchools"] is Map<String, dynamic> &&
-          (userSnapshot["associatedSchools"] as Map<String, dynamic>)
+          userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
+          (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
               .isNotEmpty) {
         FileHelper.downloadRequiredDocuments();
         Navigator.of(context)
