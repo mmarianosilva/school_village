@@ -28,7 +28,7 @@ dependencies:
   audioplayers: 0.15.1
   intl: 0.16.1
   intl_translation: 0.17.9
-  image_picker: 0.6.7+22
+  image_picker: 0.6.7
   photo_view: 0.9.2
   package_info: 0.4.0+18
   awsome_video_player: 1.0.8+1
