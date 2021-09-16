@@ -30,7 +30,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     lintOptions {
         disable 'InvalidPackage'
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.oandmtech.marinavillage"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
