@@ -19,12 +19,12 @@ class VendorCategory {
           deleted: (data['deleted'] as bool) ?? false,
         );
 
-  VendorCategory.fromDocument({DocumentSnapshot document})
+  VendorCategory.fromDocument({DocumentSnapshot<Map<String,dynamic>> document})
       : this(
           id: document.id,
-          name: (document['name'] as String).capitalize,
-          icon: document['icon'] as String,
-          deleted: (document['deleted'] as bool) ?? false,
+          name: (document.data()['name'] as String).capitalize,
+          icon: document.data()['icon'] as String,
+          deleted: (((document.data()['deleted']??null))!=null) ?? false,
         );
 
   final String id;
