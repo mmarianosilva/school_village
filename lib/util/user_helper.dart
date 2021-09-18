@@ -162,7 +162,6 @@ class UserHelper {
           .where("owners", arrayContains: userRef)
           .get();
       if (result.docs.isNotEmpty) {
-        print("Vendor scenarios");
         List<QueryDocumentSnapshot> schoolsInDistrict;
         final vendorDocument = result.docs.first;
         final districts =
@@ -182,7 +181,6 @@ class UserHelper {
         });
       }
     } else {
-      print("Non vendor");
       //Other cases
       final userData = userSnapshot;
       Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
@@ -191,42 +189,17 @@ class UserHelper {
           ? true
           : false);
       marinasLength = associatedSchools.length;
-      print("Associated schools list ${associatedSchools.length}");
-
-
-      await associatedSchools.forEach((schoolId) async {
-
+      await Future.forEach(associatedSchools, (schoolId)async {
         String schoolPath = "/schools/${schoolId}";
-        DocumentReference schoolRef =
-            FirebaseFirestore.instance.doc(schoolPath);
 
-        final marina = await schoolRef.get();
-        if (marina == null || marina.data() == null) {
-          print("Marinas l ${marinasLength}");
-          marinasLength--;
-        } else {
+        FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
           marinasList.add(marina);
-        }
+        });
 
-        // await schoolRef.get().then((school) {
-        //    final data = school;
-        //    if (data == null || data.data() == null ) {
-        //      print("Empty marinas");
-        //      return;
-        //    }
-        //    marinasList.add(school);
-        //  });
-        // schoolRef.snapshots().listen((school) {
-        //   final data = school;
-        //   if (data == null || data.data() == null ) {
-        //     print("Empty marinas");
-        //     return;
-        //   }
-        //   marinasList.add(school);
-        // });
       });
+
+
     }
-    print("Marinas ready ${marinasLength} ${marinasList.length}");
     return RegionData(
         regions: regions,
         harbors: harbors,
@@ -240,16 +213,18 @@ class UserHelper {
   static Future<List<DocumentSnapshot>> getMarinas(
       Iterable<dynamic> associatedSchools) async {
     List<DocumentSnapshot> marinasList = [];
-    associatedSchools.forEach((schoolId) {
+    await Future.forEach(associatedSchools, (schoolId) {
       String schoolPath = "/schools/${schoolId}";
-      DocumentReference schoolRef = FirebaseFirestore.instance.doc(schoolPath);
-      schoolRef.get().then((marina) {
+      FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
         if (marina == null || marina.data() == null) {
+
         } else {
           marinasList.add(marina);
         }
       });
+
     });
+
 
     return marinasList;
   }
@@ -311,12 +286,9 @@ class UserHelper {
       QueryDocumentSnapshot regionObj,
       List<DocumentSnapshot> marinas,
       DocumentSnapshot mSnapshot) async {
-    print("build 2 ${marinas.length}");
     if (marinas.isEmpty) {
-      print("build 3");
       return [];
     }
-    print("build 4 ${marinas.length} and $region and $harbor and $searchText");
     List<dynamic> allMarinas = [];
     final regex = (new RegExp(searchText, caseSensitive: false, unicode: true));
     await marinas.forEach((school) {

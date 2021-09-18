@@ -53,18 +53,12 @@ class _SchoolListState extends State<SchoolList> {
       userSnapshot = regionData.userSnapshot;
       marinaObjects = regionData.marinaObjects;
       marinasLength = regionData.marinasLength;
-      //print("Check Stuff $harborObjects and $regionObjects" );
-
-
     });
-    print("initState 1 recd ${marinaObjects.length}");
     Timer.periodic(Duration(seconds: 1), (Timer t) {
-      print("Marinas ${marinaObjects.length} and should be $marinasLength");
-      if(marinasLength == marinaObjects.length && marinasLength!=0){
+
+      if(marinaObjects.length>0 && marinaObjects.length>=(marinasLength)){
         t.cancel();
         setState(() {
-
-          print("initState 2");
         });
       }
     });
@@ -72,7 +66,6 @@ class _SchoolListState extends State<SchoolList> {
 
   @override
   Widget build(BuildContext context) {
-    print("build 1");
     _context = context;
     TextEditingController controller = TextEditingController();
 
