@@ -33,20 +33,20 @@ class Vendor {
           deleted: data['deleted'],
         );
 
-  Vendor.fromDocument(DocumentSnapshot document)
+  Vendor.fromDocument(DocumentSnapshot<Map<String,dynamic>> document)
       : this(
           id: document.id,
-          name: document['name'],
-          businessPhone: document['business_phone'],
-          contactName: document['contact_name'],
-          contactPhone: document['contact_phone'],
-          contactTitle: document['contact_title'],
-          address: document['address'],
-          about: document['about'],
-          url: document['url'],
-          coverPhotoUrl: document['cover_url'],
-          email: document['email'],
-          deleted: document['deleted'],
+          name: document.data()['name'],
+          businessPhone: document.data()['business_phone'],
+          contactName: document.data()['contact_name'],
+          contactPhone: document.data()['contact_phone'],
+          contactTitle: document.data()['contact_title'],
+          address: document.data()['address'],
+          about: document.data()['about'],
+          url: document.data()['url'],
+          coverPhotoUrl: document.data()['cover_url'],
+          email: document.data()['email'],
+          deleted: document.data()['deleted'],
         );
 
   final String id;

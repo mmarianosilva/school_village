@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,7 @@ class _SchoolListState extends State<SchoolList> {
   QueryDocumentSnapshot _selectedHarbor;
   DocumentSnapshot userSnapshot;
   QueryDocumentSnapshot _selectedRegion;
+  int marinasLength = 0;
 
   String _searchQuery = "";
   @override
@@ -32,7 +35,6 @@ class _SchoolListState extends State<SchoolList> {
     super.dispose();
   }
   selectSchool({schoolId: String, role: String, schoolName: String}) {
-    print("Selectedxid = $schoolId");
     PdfHandler.deletePdfFiles();
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
@@ -41,6 +43,8 @@ class _SchoolListState extends State<SchoolList> {
 
   @override
   void initState() {
+
+    super.initState();
     UserHelper.getRegionData().then((regionData) {
       regions = regionData.regions;
       harbors = regionData.harbors;
@@ -48,10 +52,16 @@ class _SchoolListState extends State<SchoolList> {
       regionObjects = regionData.regionObjects;
       userSnapshot = regionData.userSnapshot;
       marinaObjects = regionData.marinaObjects;
-      //print("Check Stuff $harborObjects and $regionObjects" );
-      setState(() {});
+      marinasLength = regionData.marinasLength;
     });
-    super.initState();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+
+      if(marinaObjects.length>0 && marinaObjects.length>=(marinasLength)){
+        t.cancel();
+        setState(() {
+        });
+      }
+    });
   }
 
   @override

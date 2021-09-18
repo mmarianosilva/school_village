@@ -209,6 +209,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
                                                   const SizedBox(width: 8.0),
                                                   Text(
                                                     item["name"],
+                                                    overflow: TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       color: Color(0xff023280),
                                                       fontSize: 16.0,

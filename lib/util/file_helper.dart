@@ -47,7 +47,7 @@ class FileHelper {
     if ( value == null) {
       return;
     }
-    final List<Map<String, dynamic>> documents = (school["documents"]
+    final List<Map<String, dynamic>> documents = (data["documents"]
             .cast<Map<String, dynamic>>())
         .where((Map<String, dynamic> item) =>
             item["accessRoles"] == null || item["accessRoles"].contains(role))
@@ -62,7 +62,7 @@ class FileHelper {
   static Future<void> _downloadDocument(Map<String, dynamic> document) async {
     if (document["type"] == "pdf") {
       final List<Map<String, dynamic>> connectedFiles =
-      document["connectedFiles"] ? document["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList() : null;
+      ((document["connectedFiles"]??null)!=null) ? document["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList() : null;
       if (connectedFiles != null) {
         final String root = document["name"] ?? document["title"];
         await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"], parent: root);

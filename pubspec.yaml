@@ -85,6 +85,9 @@ flutter:
     - assets/images/warning_sign.png
     - assets/images/alert_auto_accident_injury.png
     - assets/images/sv_icon_menu.png
+    - assets/images/star_4_selected.png
+    - assets/images/star_4_unselected.png
+    - assets/images/website_www_2.png
     - assets/audio/alarm.wav
   # To add assets to your application, add an assets section, like this:
   # assets:

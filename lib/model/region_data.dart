@@ -8,6 +8,7 @@ class RegionData {
   final List<QueryDocumentSnapshot> harborObjects;
   final List<QueryDocumentSnapshot> regionObjects;
   final List<DocumentSnapshot> marinaObjects;
+  final int marinasLength;
   final DocumentSnapshot userSnapshot;
   RegionData({
     this.regions,
@@ -16,5 +17,6 @@ class RegionData {
     this.regionObjects,
     this.marinaObjects,
     this.userSnapshot,
+    this.marinasLength,
   });
 }

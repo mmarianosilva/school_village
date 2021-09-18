@@ -105,19 +105,20 @@ class UserHelper {
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
     List<String> harbors = ["All"];
     List<QueryDocumentSnapshot> harborList = [];
     List<QueryDocumentSnapshot> regionList = [];
     List<DocumentSnapshot> marinasList = [];
     List<String> regions = ["All"];
+    int marinasLength = 0;
     final result =
         (await FirebaseFirestore.instance.collection("districts").get()).docs;
     if (result.isNotEmpty) {
       result.forEach((element) {
-        String name = element['name'];
+        String name = element.data()['name'];
         if (element.data().containsKey('deleted')) {
-          bool deleted = element['deleted'];
+          bool deleted = element.data()['deleted'];
           if (!deleted && !harbors.contains(name)) {
             harbors.add(name);
             harborList.add(element);
@@ -136,9 +137,9 @@ class UserHelper {
         (await FirebaseFirestore.instance.collection("regions").get()).docs;
     if (regionsResult.isNotEmpty) {
       regionsResult.forEach((element) {
-        String name = element['name'];
+        String name = element.data()['name'];
         if (element.data().containsKey('deleted')) {
-          bool deleted = element['deleted'];
+          bool deleted = element.data()['deleted'];
           if (!deleted && !regions.contains(name)) {
             regions.add(name);
             regionList.add(element);
@@ -153,7 +154,8 @@ class UserHelper {
         }
       });
     }
-    if ((userSnapshot['associatedSchools'] == null) ? true : false) {
+
+    if (((userSnapshot.data()['associatedSchools'] ?? null) == null) ?? false) {
       //Vendor Owner cases
       final result = await FirebaseFirestore.instance
           .collection("vendors")
@@ -170,6 +172,7 @@ class UserHelper {
                   .where("district", isEqualTo: district)
                   .get())
               .docs;
+          marinasLength = schoolsInDistrict.length;
           schoolsInDistrict.forEach((element) {
             element.reference.get().then((value) {
               marinasList.add(value);
@@ -182,21 +185,20 @@ class UserHelper {
       final userData = userSnapshot;
       Iterable<dynamic> associatedSchools = userData['associatedSchools'].keys;
       setIsOwner((userSnapshot.data().toString().contains('owner') &&
-              userSnapshot['owner'] != null)
+              userSnapshot.data()['owner'] != null)
           ? true
           : false);
-      await associatedSchools.forEach((schoolId) {
+      marinasLength = associatedSchools.length;
+      await Future.forEach(associatedSchools, (schoolId)async {
         String schoolPath = "/schools/${schoolId}";
-        DocumentReference schoolRef =
-            FirebaseFirestore.instance.doc(schoolPath);
-        schoolRef.snapshots().listen((school) {
-          final data = school;
-          if (data == null) {
-            return;
-          }
-          marinasList.add(school);
+
+        FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
+          marinasList.add(marina);
         });
+
       });
+
+
     }
     return RegionData(
         regions: regions,
@@ -204,7 +206,27 @@ class UserHelper {
         harborObjects: harborList,
         regionObjects: regionList,
         marinaObjects: marinasList,
-        userSnapshot: userSnapshot);
+        userSnapshot: userSnapshot,
+        marinasLength: marinasLength);
+  }
+
+  static Future<List<DocumentSnapshot>> getMarinas(
+      Iterable<dynamic> associatedSchools) async {
+    List<DocumentSnapshot> marinasList = [];
+    await Future.forEach(associatedSchools, (schoolId) {
+      String schoolPath = "/schools/${schoolId}";
+      FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
+        if (marina == null || marina.data() == null) {
+
+        } else {
+          marinasList.add(marina);
+        }
+      });
+
+    });
+
+
+    return marinasList;
   }
 
   static getSchools() async {
@@ -420,6 +442,12 @@ class UserHelper {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }
+    if (schoolId == null || schoolName == null || schoolRole == null) {
+      await _prefs.remove("school_id");
+      await _prefs.remove("school_name");
+      await _prefs.remove("school_role");
+      return;
+    }
     _prefs.setString("school_id", schoolId);
     _prefs.setString("school_name", schoolName);
     _prefs.setString("school_role", schoolRole);
@@ -515,7 +543,8 @@ class UserHelper {
     return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
-  static String getRoomNumber([DocumentSnapshot<Map<String,dynamic>> snapshot]) {
+  static String getRoomNumber(
+      [DocumentSnapshot<Map<String, dynamic>> snapshot]) {
     return (snapshot.data())["room"];
   }
 }
