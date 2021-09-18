@@ -88,6 +88,7 @@ class UserHelper {
   }
 
   static logout(token) async {
+    print("Checkout token $token");
     _auth.signOut();
     if (_prefs == null) {
       _prefs = await _prefsFuture;
@@ -419,6 +420,12 @@ class UserHelper {
       {schoolId: String, schoolName: String, schoolRole: String}) async {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
+    }
+    if(schoolId == null || schoolName==null || schoolRole== null){
+     await _prefs.remove("school_id");
+     await  _prefs.remove("school_name");
+     await  _prefs.remove("school_role");
+     return;
     }
     _prefs.setString("school_id", schoolId);
     _prefs.setString("school_name", schoolName);
