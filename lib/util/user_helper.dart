@@ -230,17 +230,21 @@ class UserHelper {
   }
 
   static getSchools() async {
+    print("post creation 1");
     final User currentUser = await getUser();
+    print("post creation 2");
     if (currentUser == null) {
+      print("post creation 3");
       return null;
     }
+    //TODO Fix The exception issues here
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
+    DocumentSnapshot<Map<String,dynamic>> userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
-    if ((userSnapshot['associatedSchools'] == null) ? true : false) {
+    if (((userSnapshot['associatedSchools'] ?? null)!=null) ? true : false) {
       final result = await FirebaseFirestore.instance
           .collection("vendors")
           .where("owners", arrayContains: userRef)
@@ -248,7 +252,7 @@ class UserHelper {
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
         final districts =
-            (vendorDocument["districts"] as List).cast<DocumentReference>();
+            (vendorDocument.data()["districts"] as List).cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
           final schoolsInDistrict = (await FirebaseFirestore.instance
                   .collection("schools")
@@ -263,16 +267,16 @@ class UserHelper {
       }
       return schools;
     }
-    Iterable<dynamic> keys = userSnapshot['associatedSchools'].keys;
-    setIsOwner((userSnapshot.data().toString().contains('owner') &&
-            userSnapshot['owner'] != null)
+    Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
+    setIsOwner(((userSnapshot['owner'] ?? null)!=null)
+
         ? true
         : false);
     print("Schools list ${keys.length}");
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot['associatedSchools'][keys.elementAt(i)]["role"]
+        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]["role"]
       });
     }
     return schools;

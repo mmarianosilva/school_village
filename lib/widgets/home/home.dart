@@ -144,7 +144,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   void initState() {
     super.initState();
     audioPlugin = AudioPlayer();
+    print("post signup#4");
     TokenHelper.saveToken();
+    print("post signup#5");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
@@ -532,6 +534,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     print("updating schools");
 //    UserHelper.updateTopicSubscription();
     String schoolId = await UserHelper.getSelectedSchoolID();
+    print("SchoolId is $schoolId");
     if (schoolId == null || schoolId == '') {
       if ((await checkIfOnlyOneSchool())) {
         return;
@@ -551,6 +554,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       return;
     }
     String schoolName = await UserHelper.getSchoolName();
+    print("schoolName is $schoolName");
     setState(() {
       title = schoolName;
       isLoaded = true;
@@ -570,7 +574,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     stopSound();
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
+        print("post signup#6");
         model.setToken(_token);
+        print("post signup#7");
         print("Building Home $isLoaded");
         if (!isLoaded) {
           model.refreshUserIfNull();

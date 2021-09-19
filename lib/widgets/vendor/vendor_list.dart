@@ -25,19 +25,24 @@ class _VendorListState extends State<VendorList> {
   void initState() {
     super.initState();
     UserHelper.getSelectedSchoolID().then((schoolId) async {
-      final schoolDocument = await FirebaseFirestore.instance.doc(schoolId).get();
+      final schoolDocument =
+          await FirebaseFirestore.instance.doc(schoolId).get();
       final district = schoolDocument.data()["district"] as DocumentReference;
+      print("District is $district and catId is ${widget.category.id}");
       FirebaseFirestore.instance
           .collection('vendors')
           .where('categories', arrayContains: widget.category.id)
           .get()
           .then((snapshot) {
-
-        list.addAll(
-            snapshot
-                .docs
-                .where((document) => (document.data()["districts"] as List).contains(district))
-                .map((document) => Vendor.fromDocument(document)).where((vendor) => !(vendor.deleted ?? false)));
+        list.addAll(snapshot.docs.where((document) {
+          return ((document.data()["districts"] ?? null) != null)
+              ? document.data()["districts"].contains(district)
+              : false;
+        }).map((document) {
+          return Vendor.fromDocument(document);
+        }).where((vendor) {
+          return !(vendor.deleted ?? false);
+        }));
         setState(() {});
       });
     });
@@ -147,7 +152,8 @@ class _VendorListState extends State<VendorList> {
                     margin: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: MaterialButton(
                       onPressed: () {
-                        showContactDialog(context, item.name, item.contactPhone ?? item.businessPhone);
+                        showContactDialog(context, item.name,
+                            item.contactPhone ?? item.businessPhone);
                       },
                       padding: EdgeInsets.zero,
                       child: Row(

@@ -28,6 +28,7 @@ class _SchoolListState extends State<SchoolList> {
   DocumentSnapshot userSnapshot;
   QueryDocumentSnapshot _selectedRegion;
   int marinasLength = 0;
+  bool isLoading = true;
 
   String _searchQuery = "";
   @override
@@ -59,6 +60,7 @@ class _SchoolListState extends State<SchoolList> {
       if(marinaObjects.length>0 && marinaObjects.length>=(marinasLength)){
         t.cancel();
         setState(() {
+          isLoading = false;
         });
       }
     });
@@ -196,7 +198,9 @@ class _SchoolListState extends State<SchoolList> {
           ),
           preferredSize: Size(3, 250),
         ),
-        body: FutureBuilder(
+        body: isLoading?Center(
+          child: CircularProgressIndicator(),
+        ):FutureBuilder(
             future: UserHelper.getFilteredSchools(
                 _searchQuery,
                 _regionSearchKey,
@@ -206,9 +210,13 @@ class _SchoolListState extends State<SchoolList> {
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return Text(localize('Loading...'));
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 case ConnectionState.waiting:
-                  return Text(localize('Loading...'));
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 default:
                   if (snapshot.hasError)
                     return Text('Error: ${snapshot.error}');
