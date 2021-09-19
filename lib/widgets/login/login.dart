@@ -44,11 +44,9 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  proceed(DocumentSnapshot userSnapshot) async {
-    if (userSnapshot != null &&
-        userSnapshot["associatedSchools"] is Map<String, dynamic> &&
-        (userSnapshot["associatedSchools"] as Map<String, dynamic>)
-            .isNotEmpty) {
+  proceed(DocumentSnapshot<Map<String, dynamic>> userSnapshot) async {
+    if (
+    ((userSnapshot.data()["associatedSchools"] ??null)!=null) ??false) {
       await checkIfOnlyOneSchool();
       FileHelper.downloadRequiredDocuments();
       AnalyticsHelper.logLogin();
