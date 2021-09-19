@@ -28,26 +28,21 @@ class _VendorListState extends State<VendorList> {
       final schoolDocument =
           await FirebaseFirestore.instance.doc(schoolId).get();
       final district = schoolDocument.data()["district"] as DocumentReference;
+      print("District is $district and catId is ${widget.category.id}");
       FirebaseFirestore.instance
           .collection('vendors')
           .where('categories', arrayContains: widget.category.id)
           .get()
           .then((snapshot) {
-        list.addAll(snapshot.docs
-            .where((document) {
-              return ((document.data()["districts"] ??null)!=null)?document.data()["districts"].contains(district):false;
-            })
-            .map((document)  {
-              try{
-                final vendor = Vendor.fromDocument(document);
-              }catch(error, stacktrace){
-                print("Error is $error and $stacktrace");
-              }
-              return Vendor.fromDocument(document);
-        })
-            .where((vendor) {
-              return !(vendor.deleted ?? false);
-            }));
+        list.addAll(snapshot.docs.where((document) {
+          return ((document.data()["districts"] ?? null) != null)
+              ? document.data()["districts"].contains(district)
+              : false;
+        }).map((document) {
+          return Vendor.fromDocument(document);
+        }).where((vendor) {
+          return !(vendor.deleted ?? false);
+        }));
         setState(() {});
       });
     });
