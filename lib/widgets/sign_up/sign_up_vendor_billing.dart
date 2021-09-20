@@ -97,7 +97,6 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
                 : 0);
       }
     });
-    //TODO Fix The parse issues here
     _slipCount = _selectedHarbors
         .map((item) => item.slipCount)
         .reduce((total, current) => total = total + current);
