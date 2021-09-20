@@ -92,8 +92,8 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
         final district = snapshot.data()["district"] as DocumentReference;
         _selectedHarbors
             .firstWhere((item) => item.ref == district)
-            .addToSlipCount(((snapshot.data()["slipsCount"] ?? null) != null)
-                ? int.parse(snapshot.data()["slipsCount"])
+            .addToSlipCount((((snapshot.data()["slipsCount"] ?? null) != null))&&(((snapshot.data()["slipsCount"] ?? null) != ''))
+                ? (snapshot.data()["slipsCount"])
                 : 0);
       }
     });
