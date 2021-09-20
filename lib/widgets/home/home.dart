@@ -144,9 +144,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   void initState() {
     super.initState();
     audioPlugin = AudioPlayer();
-    print("post signup#4");
     TokenHelper.saveToken();
-    print("post signup#5");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
@@ -156,20 +154,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
         return _onNotification(message.data, true);
       }
     });
-    // _firebaseMessaging.configure(
-    //   onMessage: (Map<String, dynamic> message) {
-    //     debugPrint('on Message : ${message.toString()}');
-    //     return _onNotification(message, true);
-    //   },
-    //   onLaunch: (Map<String, dynamic> message) {
-    //     debugPrint('onLaunch : ${message.toString()}');
-    //     return _onNotification(message);
-    //   },
-    //   onResume: (Map<String, dynamic> message) {
-    //     debugPrint('onResume : ${message.toString()}');
-    //     return _onNotification(message);
-    //   },
-    // );
+
     Future<NotificationSettings> settings =  _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
@@ -532,14 +517,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
 
   updateSchool() async {
     print("updating schools");
-//    UserHelper.updateTopicSubscription();
     String schoolId = await UserHelper.getSelectedSchoolID();
-    print("SchoolId is $schoolId");
     if (schoolId == null || schoolId == '') {
       if ((await checkIfOnlyOneSchool())) {
         return;
       }
-      print("Redirecting to Schools");
+      print("Redirecting to Schools $_navigatedToSchoolList");
 
       if (!_navigatedToSchoolList) {
         _navigatedToSchoolList = true;
@@ -574,10 +557,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
     stopSound();
     return ScopedModelDescendant<MainModel>(
       builder: (context, child, model) {
-        print("post signup#6");
         model.setToken(_token);
-        print("post signup#7");
-        print("Building Home $isLoaded");
         if (!isLoaded) {
           model.refreshUserIfNull();
           print("Updating school");

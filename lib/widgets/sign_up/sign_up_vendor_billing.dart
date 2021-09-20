@@ -48,19 +48,16 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
   double get _computedPrice => _slipCount * 0.02;
 
   Future<void> _onNextPressed() async {
-    print("post signup#1");
     await FirebaseFirestore.instance.doc(widget.vendor.id).set(
       <String, dynamic>{
         "districts": _selectedHarbors.map((item) => item.ref).toList(),
       },
       SetOptions(merge: true),
     );
-    print("post signup#2");
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => Home()),
       (route) => false,
     );
-    print("post signup#3");
   }
 
   @override

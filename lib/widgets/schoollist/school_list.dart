@@ -56,7 +56,6 @@ class _SchoolListState extends State<SchoolList> {
       marinasLength = regionData.marinasLength;
     });
     Timer.periodic(Duration(seconds: 1), (Timer t) {
-
       if(marinaObjects.length>0 && marinaObjects.length>=(marinasLength)){
         t.cancel();
         setState(() {
@@ -223,7 +222,6 @@ class _SchoolListState extends State<SchoolList> {
                   else if (snapshot.hasData) {
                     return ListView.builder(
                       padding: EdgeInsets.all(22.0),
-//                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
                         final data = snapshot.data[index];
                         if (data == null || !data.toString().contains('name')|| !data.toString().contains('schoolId')|| !data.toString().contains('role'))
