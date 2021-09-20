@@ -122,13 +122,11 @@ class UserHelper {
           if (!deleted && !harbors.contains(name)) {
             harbors.add(name);
             harborList.add(element);
-            //print("Harbor: $name");
           }
         } else {
           if (!harbors.contains(name)) {
             harbors.add(name);
             harborList.add(element);
-            //print("Harbor: $name");
           }
         }
       });
@@ -143,18 +141,15 @@ class UserHelper {
           if (!deleted && !regions.contains(name)) {
             regions.add(name);
             regionList.add(element);
-            //print("Region: $name");
           }
         } else {
           if (!regions.contains(name)) {
             regions.add(name);
             regionList.add(element);
-            //print("Region: $name");
           }
         }
       });
     }
-
     if (((userSnapshot.data()['associatedSchools'] ?? null) == null) ?? false) {
       //Vendor Owner cases
       final result = await FirebaseFirestore.instance
@@ -164,21 +159,20 @@ class UserHelper {
       if (result.docs.isNotEmpty) {
         List<QueryDocumentSnapshot> schoolsInDistrict;
         final vendorDocument = result.docs.first;
-        final districts =
-            (vendorDocument["districts"] as List).cast<DocumentReference>();
+        final districts = vendorDocument.data()["districts"] ?? null;
+        // final districts =
+        //     (vendorDocument["districts"] as List).cast<DocumentReference>();
         districts.forEach((district) async {
           schoolsInDistrict = (await FirebaseFirestore.instance
                   .collection("schools")
                   .where("district", isEqualTo: district)
                   .get())
               .docs;
-          marinasLength = schoolsInDistrict.length;
-          schoolsInDistrict.forEach((element) {
-            element.reference.get().then((value) {
-              marinasList.add(value);
-            });
+          schoolsInDistrict.forEach((snapshot) {
+            marinasList.add(snapshot);
           });
         });
+        marinasLength = marinasList.length;
       }
     } else {
       //Other cases
@@ -189,16 +183,12 @@ class UserHelper {
           ? true
           : false);
       marinasLength = associatedSchools.length;
-      await Future.forEach(associatedSchools, (schoolId)async {
+      await Future.forEach(associatedSchools, (schoolId) async {
         String schoolPath = "/schools/${schoolId}";
-
         FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
           marinasList.add(marina);
         });
-
       });
-
-
     }
     return RegionData(
         regions: regions,
@@ -210,49 +200,26 @@ class UserHelper {
         marinasLength: marinasLength);
   }
 
-  static Future<List<DocumentSnapshot>> getMarinas(
-      Iterable<dynamic> associatedSchools) async {
-    List<DocumentSnapshot> marinasList = [];
-    await Future.forEach(associatedSchools, (schoolId) {
-      String schoolPath = "/schools/${schoolId}";
-      FirebaseFirestore.instance.doc(schoolPath).get().then((marina) {
-        if (marina == null || marina.data() == null) {
-
-        } else {
-          marinasList.add(marina);
-        }
-      });
-
-    });
-
-
-    return marinasList;
-  }
-
   static getSchools() async {
-    print("post creation 1");
     final User currentUser = await getUser();
-    print("post creation 2");
     if (currentUser == null) {
-      print("post creation 3");
       return null;
     }
     //TODO Fix The exception issues here
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot<Map<String,dynamic>> userSnapshot = await userRef.get();
-
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
     List<dynamic> schools = [];
-    if (((userSnapshot['associatedSchools'] ?? null)!=null) ? true : false) {
+    if (((userSnapshot.data()['associatedSchools'] ?? null) == null) ?? false) {
       final result = await FirebaseFirestore.instance
           .collection("vendors")
           .where("owners", arrayContains: userRef)
           .get();
       if (result.docs.isNotEmpty) {
         final vendorDocument = result.docs.first;
-        final districts =
-            (vendorDocument.data()["districts"] as List).cast<DocumentReference>();
+        final districts = (vendorDocument.data()["districts"] as List)
+            .cast<DocumentReference>();
         for (int i = 0; i < districts.length; i++) {
           final schoolsInDistrict = (await FirebaseFirestore.instance
                   .collection("schools")
@@ -268,15 +235,12 @@ class UserHelper {
       return schools;
     }
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
-    setIsOwner(((userSnapshot['owner'] ?? null)!=null)
-
-        ? true
-        : false);
-    print("Schools list ${keys.length}");
+    setIsOwner(((userSnapshot.data()['owner'] ?? null) != null) ? true : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
-        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]["role"]
+        "role": userSnapshot.data()['associatedSchools'][keys.elementAt(i)]
+            ["role"]
       });
     }
     return schools;
@@ -289,7 +253,7 @@ class UserHelper {
       QueryDocumentSnapshot harborObj,
       QueryDocumentSnapshot regionObj,
       List<DocumentSnapshot> marinas,
-      DocumentSnapshot mSnapshot) async {
+      DocumentSnapshot<Map<String, dynamic>> mSnapshot) async {
     if (marinas.isEmpty) {
       return [];
     }
@@ -298,29 +262,29 @@ class UserHelper {
     await marinas.forEach((school) {
       final schoolData = school.data();
       final data = schoolData as Map<String, dynamic>;
-
       if (data == null) {
         return;
       }
-
       final schoolName = data['name'] ?? null;
       if (schoolName == null) {
         return;
       }
       final harborRef = data['district'] ?? null;
       final regionRef = data['region'] ?? null;
-
       if ((region == 'All') &&
           (harbor == 'All') &&
           schoolName.contains(regex)) {
         allMarinas.add(
           <String, dynamic>{
             "schoolId": "schools/${school.reference.id}",
-            "role": mSnapshot['associatedSchools'][school.reference.id]["role"],
+            "role": (mSnapshot.data()['associatedSchools'] ?? null) != null
+                ? mSnapshot.data()['associatedSchools'][school.reference.id]
+                    ["role"]
+                : 'vendor',
             "name": schoolName,
           },
         );
-        //allMarinas[schoolId] = school;
+
       } else if ((region != 'All') && (harbor != 'All')) {
         if (harborRef == harborObj.reference &&
             regionRef == regionObj.reference &&
@@ -328,8 +292,10 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot['associatedSchools'][school.reference.id]
-                  ["role"],
+              "role": (mSnapshot.data()['associatedSchools'] ?? null) != null
+                  ? mSnapshot.data()['associatedSchools'][school.reference.id]
+              ["role"]
+                  : 'vendor',
               "name": schoolName,
             },
           );
@@ -339,8 +305,10 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot['associatedSchools'][school.reference.id]
-                  ["role"],
+              "role": (mSnapshot.data()['associatedSchools'] ?? null) != null
+                  ? mSnapshot.data()['associatedSchools'][school.reference.id]
+              ["role"]
+                  : 'vendor',
               "name": schoolName,
             },
           );
@@ -350,8 +318,10 @@ class UserHelper {
           allMarinas.add(
             <String, dynamic>{
               "schoolId": "schools/${school.reference.id}",
-              "role": mSnapshot['associatedSchools'][school.reference.id]
-                  ["role"],
+              "role": (mSnapshot.data()['associatedSchools'] ?? null) != null
+                  ? mSnapshot.data()['associatedSchools'][school.reference.id]
+              ["role"]
+                  : 'vendor',
               "name": schoolName,
             },
           );

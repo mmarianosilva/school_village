@@ -45,16 +45,10 @@ class _LoginState extends State<Login> {
   }
 
   proceed(DocumentSnapshot<Map<String, dynamic>> userSnapshot) async {
-    if (
-    ((userSnapshot.data()["associatedSchools"] ??null)!=null) ??false) {
       await checkIfOnlyOneSchool();
       FileHelper.downloadRequiredDocuments();
       AnalyticsHelper.logLogin();
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
-    } else {
-      await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    }
   }
 
   RegExp emailExp = new RegExp(
