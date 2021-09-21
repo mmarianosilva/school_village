@@ -77,6 +77,7 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
       setState(() {});
       return;
     }
+    //TODO find a way to cross 10 limit
     final matchingSchools = await FirebaseFirestore.instance
         .collection("schools")
         .where("district",
