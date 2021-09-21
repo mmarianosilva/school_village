@@ -91,7 +91,7 @@ class _SignUpVendorState extends State<SignUpVendor> {
   }
 
   void _getVendorCategories() {
-    FirebaseFirestore.instance.collection("services").get().then((snapshot) {
+    FirebaseFirestore.instance.collection("services").orderBy('name').get().then((snapshot) {
       _categories.clear();
       _categories.addAll(snapshot.docs.map((doc) =>
           _SelectedCategory(VendorCategory.fromDocument(document: doc))));
