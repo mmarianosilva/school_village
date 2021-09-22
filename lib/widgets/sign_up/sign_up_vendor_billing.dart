@@ -64,7 +64,7 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance.collection("districts").get().then((snapshot) {
+    FirebaseFirestore.instance.collection("districts").where('deleted',isNotEqualTo: true).get().then((snapshot) {
       _availableHarbors.clear();
       _availableHarbors.addAll(snapshot.docs.map((snapshot) =>
           SelectedHarbor(snapshot.reference, snapshot.data()["name"])));
@@ -77,24 +77,36 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
       setState(() {});
       return;
     }
-    //TODO find a way to cross 10 limit
-    final matchingSchools = await FirebaseFirestore.instance
-        .collection("schools")
-        .where("district",
-            whereIn: _selectedHarbors.map((snapshot) => snapshot.ref).toList())
-        .get();
+    List<List<SelectedHarbor>> harborsCollection = [];
+    List<QuerySnapshot<Map<String,dynamic>>> mSchools=[];
+    for (var i = 0; i < _selectedHarbors.length; i += 10) {
+      harborsCollection.add(
+          _selectedHarbors.sublist(i, i + 10> _selectedHarbors.length ? _selectedHarbors.length : i + 10));
+    }
+    for(var collection in harborsCollection){
+      final schools = await FirebaseFirestore.instance
+          .collection("schools")
+          .where("district",
+          whereIn: collection.map((snapshot) => snapshot.ref).toList())
+          .get();
+      mSchools.add(schools);
+    }
+
     _selectedHarbors.forEach((item) {
       item.resetSlipCount();
     });
-    matchingSchools.docs.forEach((snapshot) {
-      if (snapshot.data().containsKey("slipsCount")) {
-        final district = snapshot.data()["district"] as DocumentReference;
-        _selectedHarbors
-            .firstWhere((item) => item.ref == district)
-            .addToSlipCount((((snapshot.data()["slipsCount"] ?? null) != null))&&(((snapshot.data()["slipsCount"] ?? null) != ''))
-                ? (snapshot.data()["slipsCount"])
-                : 0);
-      }
+    mSchools.forEach((element) {
+      element.docs.forEach((snapshot) {
+        if (snapshot.data().containsKey("slipsCount")) {
+          final district = snapshot.data()["district"] as DocumentReference;
+          _selectedHarbors
+              .firstWhere((item) => item.ref == district)
+              .addToSlipCount((((snapshot.data()["slipsCount"] ?? null) != null))&&(((snapshot.data()["slipsCount"] ?? null) != ''))
+              ? (snapshot.data()["slipsCount"])
+              : 0);
+        }
+      });
+
     });
     _slipCount = _selectedHarbors
         .map((item) => item.slipCount)
