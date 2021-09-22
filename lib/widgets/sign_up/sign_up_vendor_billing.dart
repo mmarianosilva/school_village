@@ -64,7 +64,7 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance.collection("districts").get().then((snapshot) {
+    FirebaseFirestore.instance.collection("districts").where('deleted',isNotEqualTo: true).get().then((snapshot) {
       _availableHarbors.clear();
       _availableHarbors.addAll(snapshot.docs.map((snapshot) =>
           SelectedHarbor(snapshot.reference, snapshot.data()["name"])));
