@@ -75,9 +75,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
             },
             "allowed": true,
             "groups": <String, bool>{},
-            "role": (widget.userData["vendor"])
-                ? "vendor"
-                : "boater",
+            "role": (widget.userData["vendor"]) ? "vendor" : "boater",
           }
         },
         "boatName": _boatNameController.text,
@@ -101,7 +99,11 @@ class _SignUpBoatState extends State<SignUpBoat> {
   }
 
   void _getMarinaList() {
-    FirebaseFirestore.instance.collection("schools").get().then((docs) {
+    FirebaseFirestore.instance
+        .collection("schools")
+        .orderBy('name')
+        .get()
+        .then((docs) {
       marinas.clear();
       marinas.addAll(docs.docs
           .map((snapshot) => snapshot.data()..addAll({"id": snapshot.id})));
@@ -191,33 +193,45 @@ class _SignUpBoatState extends State<SignUpBoat> {
                                             onTap: () {
                                               Navigator.of(context).pop(item);
                                             },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 4.0,
-                                                vertical: 8.0,
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.circle,
-                                                    color: Color(0xff023280),
-                                                    size: 8.0,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                //Text(localize("Send to: ")),
+                                                //getGroupDropDown(),
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: SizedBox(
+                                                    height: 32,
+                                                    width: 5,
                                                   ),
-                                                  const SizedBox(width: 8.0),
-                                                  Text(
+                                                ),
+                                                const Icon(
+                                                  Icons.circle,
+                                                  color: Color(0xff023280),
+                                                  size: 8.0,
+                                                ),
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: SizedBox(
+                                                    height: 32,
+                                                    width: 5,
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  flex: 8,
+                                                  child: Text(
                                                     item["name"],
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       color: Color(0xff023280),
                                                       fontSize: 16.0,
                                                       letterSpacing: 0.91,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           );
                                         },
