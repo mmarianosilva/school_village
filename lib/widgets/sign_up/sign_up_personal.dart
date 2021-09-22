@@ -229,7 +229,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
                       controller: _passwordController,
-                      hint: localize("Password"),
+                      hint: localize("Password (atleast 9 characters)"),
                       obscureText: true,
                     ),
                   ),
@@ -246,6 +246,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      capitalisation: TextCapitalization.sentences ,
                       controller: _firstNameController,
                       hint: localize("First Name"),
                     ),
@@ -254,6 +255,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
+                      capitalisation: TextCapitalization.sentences ,
                       controller: _lastNameController,
                       hint: localize("Last Name"),
                     ),
