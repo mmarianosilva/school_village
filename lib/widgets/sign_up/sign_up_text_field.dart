@@ -134,6 +134,7 @@ class SignUpTextField extends StatelessWidget {
     this.obscureText = false,
     this.enabled = true,
     this.controller,
+    this.capitalisation,
   });
 
   final String hint;
@@ -144,6 +145,7 @@ class SignUpTextField extends StatelessWidget {
   final bool obscureText;
   final bool enabled;
   final TextEditingController controller;
+  final TextCapitalization capitalisation;
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +159,7 @@ class SignUpTextField extends StatelessWidget {
         )
       ]),
       child: TextField(
+        textCapitalization:capitalisation?? TextCapitalization.none,
         autocorrect: false,
         controller: controller ?? TextEditingController(),
         enabled: enabled,
