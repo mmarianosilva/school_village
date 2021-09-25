@@ -229,7 +229,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
                       controller: _passwordController,
-                      hint: localize("Password (atleast 9 characters)"),
+                      hint: localize("Password (at least 9 characters)"),
                       obscureText: true,
                     ),
                   ),
