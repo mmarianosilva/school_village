@@ -138,11 +138,12 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
             .replaceAll(" ", "")
             .replaceAll("-", ""),
       };
+      data["vendor"] = _isVendor ?? false;
       await FirebaseFirestore.instance
           .collection("users")
           .doc(auth.user.uid)
           .set(data);
-      data["vendor"] = _isVendor ?? false;
+
       if (_isBoater) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => SignUpBoat(userData: data)));
