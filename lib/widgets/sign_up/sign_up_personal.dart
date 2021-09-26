@@ -126,7 +126,6 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         final sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString("email", email.trim().toLowerCase());
         sharedPreferences.setString("password", password);
-
       }
       final data = <String, dynamic>{
         "email": email,
@@ -151,16 +150,17 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => SignUpVendor(userData: data)));
       }
-    } on PlatformException catch (ex) {
-      if (ex.code == "ERROR_WEAK_PASSWORD") {
+    } on FirebaseAuthException  catch (e) {
+      if (e.code == 'weak-password') {
         setState(() {
           _error = "Password does not meet the security criteria";
         });
-      } else if (ex.code == "ERROR_EMAIL_ALREADY_IN_USE") {
+      } else if (e.code == 'email-already-in-use') {
         setState(() {
           _error = "This email has already been registered";
         });
       }
+
     }
   }
 
@@ -247,7 +247,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
-                      capitalisation: TextCapitalization.sentences ,
+                      capitalisation: TextCapitalization.sentences,
                       controller: _firstNameController,
                       hint: localize("First Name"),
                     ),
@@ -256,7 +256,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: SignUpTextField(
-                      capitalisation: TextCapitalization.sentences ,
+                      capitalisation: TextCapitalization.sentences,
                       controller: _lastNameController,
                       hint: localize("Last Name"),
                     ),
