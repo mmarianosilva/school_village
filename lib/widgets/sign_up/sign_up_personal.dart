@@ -165,6 +165,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   void _onPhoneInputChanged() {
+    _phoneController..selection = TextSelection.collapsed(offset: _phoneController.text.length);
     if (_validatePhoneNumber()) {
       FocusScope.of(context).unfocus();
     }
