@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor_category.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/vendor/vendor_list.dart';
 
 class VendorCategoryList extends StatefulWidget {
@@ -13,9 +14,18 @@ class VendorCategoryList extends StatefulWidget {
 class _VendorCategoryListState extends State<VendorCategoryList> {
   final List<VendorCategory> categories = <VendorCategory>[];
 
+  Future<DocumentReference> fetchMarinaDistrict() async {
+    String schoolId = await UserHelper.getSelectedSchoolID();
+    final schoolDocument = await FirebaseFirestore.instance.doc(schoolId).get();
+    final district = schoolDocument.data()["district"] as DocumentReference;
+
+    return district;
+  }
+
   @override
   void initState() {
     super.initState();
+
     FirebaseFirestore.instance
         .collection('services')
         .where("vendorsCount", isGreaterThan: 0)
