@@ -406,7 +406,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildSecurityOptions() {
-    return HeaderButtons(role: role);
+    return HeaderButtons(role: role, alertInProgress: alertInProgress);
   }
 
   _buildIncidentReport() {
@@ -568,21 +568,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             onTap: sendAlert,
           ),
           Expanded(
-            child: (role != 'boater' &&
-                        role != 'vendor' &&
-                        role != 'maintenance') &&
-                    alertInProgress != null
-                ? GestureDetector(
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/incident_management_icon.png',
-                        width: size,
-                        height: size,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    onTap: () => _openIncidentManagement(context))
-                : const SizedBox(width: size),
+            child:  const SizedBox(width: size),
           ),
         ],
       ),
@@ -1042,18 +1028,16 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 5) {
                               return _buildNotificationsOption(model);
                             }
+
                             if (index == documentCount + 6) {
-                              return _buildHotlineMessages();
-                            }
-                            if (index == documentCount + 7) {
                               return _buildSettingsOption();
                             }
-                            if (index == documentCount + 8) {
+                            if (index == documentCount + 7) {
                               return _buildServiceProvidersOption();
                             }
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 9);
+                          itemCount: documentCount + 8);
                 }
               }
               return Center(

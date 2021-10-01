@@ -7,22 +7,38 @@ import 'package:school_village/widgets/talk_around/talk_around_home.dart';
 
 class HeaderButtons extends StatelessWidget {
   final String role;
+  final SchoolAlert alertInProgress;
 
   static const double iconSize = 80.0;
 
-  const HeaderButtons({Key key, this.role}) : super(key: key);
+  const HeaderButtons({Key key, this.role, this.alertInProgress})
+      : super(key: key);
 
   void _openBroadcast(BuildContext context, bool editable) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => BroadcastMessaging(editable: editable)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => BroadcastMessaging(editable: editable)));
+  }
+
+  void _openIncidentManagement(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IncidentManagement(
+          alert: this.alertInProgress,
+          role: this.role,
+        ),
+      ),
+    );
   }
 
   void _openMessaging(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(
-        builder: (context) => TalkAroundHome(),
-        settings: RouteSettings(
-          name: '/talk-around'
-        )
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TalkAroundHome(),
+            settings: RouteSettings(name: '/talk-around')));
   }
 
   void _openHotline(BuildContext context) {
@@ -35,18 +51,51 @@ class HeaderButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = <Widget>[];
-    final postAllowed = role == 'district' || role == 'maintenance' || role == 'admin' ||  role == 'security';
+    final postAllowed = role == 'district' ||
+        role == 'maintenance' ||
+        role == 'admin' ||
+        role == 'security';
     widgets.add(GestureDetector(
-      child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
+      child: Image.asset('assets/images/broadcast_btn.png',
+          width: iconSize, height: iconSize, fit: BoxFit.fill),
       onTap: () => _openBroadcast(context, postAllowed),
     ));
+    // widgets.add(SizedBox(
+    //   height: iconSize,
+    // ));
+    widgets.add((
+        (role != 'boater' &&
+            role != 'vendor' &&
+            role != 'maintenance') &&
+            alertInProgress != null
+            ? GestureDetector(
+            child: Center(
+              child: Image.asset(
+                'assets/images/incident_management_icon.png',
+                width: iconSize,
+                height: iconSize,
+                fit: BoxFit.fill,
+              ),
+            ),
+            onTap: () => _openIncidentManagement(context))
+            : const SizedBox(width: iconSize)));
+
+    // if (alertInProgress != null) {
+    //   widgets.add(GestureDetector(
+    //     child: Image.asset('assets/images/incident_management_icon.png',
+    //         width: iconSize, height: iconSize, fit: BoxFit.fill),
+    //     onTap: () => _openIncidentManagement(context),
+    //   ));
+    // } else {
+    //   widgets.add(SizedBox(
+    //     height: iconSize,
+    //   ));
+    // }
+
     widgets.add(GestureDetector(
-      child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
+      child: Image.asset('assets/images/group_message_btn.png',
+          width: iconSize, height: iconSize, fit: BoxFit.fill),
       onTap: () => _openMessaging(context),
-    ));
-    widgets.add(GestureDetector(
-      child: Image.asset('assets/images/anonymous_img.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
-      onTap: () => _openHotline(context),
     ));
 
     return Row(
