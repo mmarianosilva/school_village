@@ -13,27 +13,42 @@ class VendorCategoryList extends StatefulWidget {
 
 class _VendorCategoryListState extends State<VendorCategoryList> {
   final List<VendorCategory> categories = <VendorCategory>[];
+  bool isLoading = true;
 
   Future<DocumentReference> fetchMarinaDistrict() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     final schoolDocument = await FirebaseFirestore.instance.doc(schoolId).get();
     final district = schoolDocument.data()["district"] as DocumentReference;
-
+    fetchVendorsInDistrict(district);
     return district;
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    FirebaseFirestore.instance
-        .collection('services')
-        .where("vendorsCount", isGreaterThan: 0)
-        .get()
-        .then((list) {
-      categories.addAll(
-          list.docs.map((doc) => VendorCategory.fromDocument(document: doc)));
-      categories.removeWhere((category) => category.deleted ?? false);
+  void fetchVendorsInDistrict(DocumentReference localDistrict) async {
+    // So here's the logic
+    // First we find vendors that are listed in this district
+    //Then we add thir listed categories in a set
+    //Now we filter those categories to remove categories without vendorCount or if they're deleted
+    var uniqueCategories = <dynamic>{};
+    final vendorsList = (await FirebaseFirestore.instance
+            .collection('vendors')
+            .where('districts', arrayContainsAny: [localDistrict]).get())
+        .docs;
+    if (vendorsList.isNotEmpty) {
+      vendorsList
+          .removeWhere((element) => (element.data()['deleted'] ?? false));
+      vendorsList.forEach((element) {
+        uniqueCategories.addAll(element.data()['categories'] as List<dynamic>);
+      });
+      for (final categoryId in uniqueCategories) {
+        final vendorCat = await FirebaseFirestore.instance
+            .collection('services')
+            .doc(categoryId)
+            .get();
+        categories.add(VendorCategory.fromDocument(document: vendorCat));
+      }
+      categories.removeWhere((category) {
+        return (category.deleted ?? false) || (category.vendorsCount == 0);
+      });
       categories.sort((item1, item2) => item1.name.compareTo(item2.name));
       final indexOfSpecialOffers =
           categories.indexWhere((item) => item.name == "SPECIAL OFFERS");
@@ -42,8 +57,18 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
         categories.removeAt(indexOfSpecialOffers);
         categories.insert(0, specialOffer);
       }
-      setState(() {});
-    });
+      setState(() {
+        isLoading = false;
+      });
+
+      //print("Length 2 ${vendorsList.length}");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMarinaDistrict();
   }
 
   @override
@@ -59,10 +84,14 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
         backgroundColor: Colors.grey.shade200,
         elevation: 0.0,
       ),
-      body: ListView.builder(
-        itemBuilder: _buildVendorListItem,
-        itemCount: categories.length,
-      ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemBuilder: _buildVendorListItem,
+              itemCount: categories.length,
+            ),
     );
   }
 
