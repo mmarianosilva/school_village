@@ -60,8 +60,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
   String _messageAlertAssetFile;
 
   Future playAlarm() async {
-    final role = await UserHelper.getSelectedSchoolRole();
-    if ((role == 'security'  || role == 'admin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
+    if ( ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
       return playMessageAlert();
     }
     if (!Platform.isIOS) {
