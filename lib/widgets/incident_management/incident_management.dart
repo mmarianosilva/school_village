@@ -4,6 +4,8 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding_platform_interface/geocoding_platform_interface.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -31,6 +33,7 @@ class IncidentManagement extends StatefulWidget {
   final String role;
   final bool resolved;
 
+
   IncidentManagement({this.key, this.alert, this.role, this.resolved = false})
       : super(key: key);
 
@@ -43,6 +46,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
+  String _closestAddress;
   String _schoolId = '';
   String _schoolAddress = '';
   Map<String, bool> _broadcastGroupData;
@@ -291,6 +295,7 @@ class _IncidentManagementState extends State<IncidentManagement>
       }
       _schoolAddress = schoolSnapshot.data()['address'];
     }
+    _closestAddress = await _getLocationAddress(alert.location.latitude, alert.location.longitude);
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
@@ -473,6 +478,42 @@ class _IncidentManagementState extends State<IncidentManagement>
     //getUserDetails();
     super.initState();
   }
+  Future<String> _getLocationAddress(double latitude, double longitude) async {
+
+    try{
+      List<Placemark> newPlace =
+      await GeocodingPlatform.instance.placemarkFromCoordinates(latitude, longitude);
+      Placemark placeMark = newPlace[0];
+      String name = placeMark.name;
+      // String subLocality = placeMark.subLocality;
+      String locality = placeMark.locality;
+      String administrativeArea = placeMark.administrativeArea;
+      // String subAdministrativeArea = placeMark.administrativeArea;
+      String postalCode = placeMark.postalCode;
+      String country = placeMark.country;
+      // String subThoroughfare = placeMark.subThoroughfare;
+      String thoroughfare = placeMark.thoroughfare;
+    }catch(error,stacktrace){
+      print("Error is $error and stack is $stacktrace");
+    }
+    List<Placemark> newPlace =
+    await GeocodingPlatform.instance.placemarkFromCoordinates(latitude, longitude);
+    Placemark placeMark = newPlace[0];
+    String name = placeMark.name;
+    // String subLocality = placeMark.subLocality;
+    String locality = placeMark.locality;
+    String administrativeArea = placeMark.administrativeArea;
+    // String subAdministrativeArea = placeMark.administrativeArea;
+    String postalCode = placeMark.postalCode;
+    String country = placeMark.country;
+    // String subThoroughfare = placeMark.subThoroughfare;
+    String thoroughfare = placeMark.thoroughfare;
+    //_isoCountryCode = placeMark.isoCountryCode;
+    print("Ful Location is $name, $thoroughfare, $locality, $administrativeArea, $postalCode, $country");
+    return "$name, $thoroughfare, $locality, $administrativeArea, $postalCode, $country";
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -599,7 +640,7 @@ class _IncidentManagementState extends State<IncidentManagement>
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12.0)),
-                                Text(_schoolAddress,
+                                Text(_closestAddress,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(fontSize: 12.0)),
 
