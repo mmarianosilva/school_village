@@ -558,15 +558,15 @@ class _IncidentManagementState extends State<IncidentManagement>
                               horizontal: 16.0,
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: GestureDetector(
+                                   GestureDetector(
                                     onTap: () {
                                       launch(
                                           "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
                                     },
                                     child: Text(
-                                      "${_schoolAddress}",
+                                      "Directions",
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         color: Color.fromARGB(255, 11, 48, 224),
@@ -574,13 +574,13 @@ class _IncidentManagementState extends State<IncidentManagement>
                                       ),
                                     ),
                                   ),
-                                ),
+
                                 _mapData != null
                                     ? GestureDetector(
                                         onTap: _onSchoolMap,
                                         child: const Icon(
-                                          Icons.map,
-                                          color: Colors.black,
+                                          Icons.directions_car,
+                                          color: Colors.red,
                                         ),
                                       )
                                     : const SizedBox(),
@@ -594,30 +594,15 @@ class _IncidentManagementState extends State<IncidentManagement>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Text(localize("911 Callback: "),
+                                Text(localize("Closest Address: "),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12.0)),
-                                Text(alert.createdBy,
+                                Text(_schoolAddress,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(fontSize: 12.0)),
-                                GestureDetector(
-                                  onTap: () => showContactDialog(context,
-                                      alert.createdBy, alert.reportedByPhone),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0),
-                                    child: Text(
-                                      alert.reportedByPhoneFormatted,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        color: Color.fromARGB(255, 11, 48, 224),
-                                      ),
-                                    ),
-                                  ),
-                                )
+
                               ],
                             ),
                           ),
