@@ -608,8 +608,11 @@ class _IncidentManagementState extends State<IncidentManagement>
                               children: [
                                 GestureDetector(
                                   onTap: () {
+                                    String destination="${alert.location.latitude},${alert.location.longitude}";
+                                    String url = "https://www.google.com/maps/dir/?api=1"  + "&destination=" + destination + "&travelmode=driving&dir_action=navigate";
+                                    //launch(url);
                                     launch(
-                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
+                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(destination)}");
                                   },
                                   child: Text(
                                     "Directions",
