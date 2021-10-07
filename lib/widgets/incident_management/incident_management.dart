@@ -4,6 +4,7 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -43,6 +44,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
+  String _closestAddress;
   String _schoolId = '';
   String _schoolAddress = '';
   Map<String, bool> _broadcastGroupData;
@@ -84,9 +86,9 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   void _onSop() async {
-    DocumentSnapshot<Map<String,dynamic>> schoolData =
+    DocumentSnapshot<Map<String, dynamic>> schoolData =
         await FirebaseFirestore.instance.doc(_schoolId).get();
-    if(schoolData.data()['sop']==null){
+    if (schoolData.data()['sop'] == null) {
       return;
     }
     if (schoolData.data()["sop"][alert.type] != null) {
@@ -146,8 +148,10 @@ class _IncidentManagementState extends State<IncidentManagement>
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-                editable: role == 'school_admin' || role == 'admin' ||
-                    role == 'school_security' || role == 'security' ||
+                editable: role == 'school_admin' ||
+                    role == 'admin' ||
+                    role == 'school_security' ||
+                    role == 'security' ||
                     role == 'pd_fire_ems' ||
                     role == 'district',
               )),
@@ -155,125 +159,133 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   void onMessagesChanged(List<DocumentChange> docChanges) async {
-
-      if (docChanges.isEmpty) {
-        return;
-      }
-      if (docChanges.first.doc.reference.parent.path ==
-          FirebaseFirestore.instance
-              .collection('$_schoolId/notifications')
-              .path) {
-        List<TalkAroundMessage> newList = docChanges.map((data) {
-          return TalkAroundMessage(
-              data.doc["title"],
-              data.doc.id,
-              "",
-              data.doc["body"],
-              DateTime.fromMillisecondsSinceEpoch(data.doc["createdAt"]),
-              data.doc["createdBy"],
-              data.doc["createdById"],
-              data.doc["reportedByPhone"],
-              data.doc["location"]["latitude"],
-              data.doc["location"]["longitude"]);
-        }).toList();
-        _fullList.addAll(newList);
-      } else if (docChanges.first.doc.reference.parent.path ==
-          FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
-        docChanges.removeWhere((item) {
-          Map<String, bool> targetGroups = ((item.doc.data() as Map<String,dynamic>)['groups'] ??null)!=null
-              ? Map<String, bool>.from((item.doc.data() as Map<String,dynamic>)['groups'])
-              : Map();
-          if (targetGroups.isEmpty) {
+    if (docChanges.isEmpty) {
+      return;
+    }
+    if (docChanges.first.doc.reference.parent.path ==
+        FirebaseFirestore.instance
+            .collection('$_schoolId/notifications')
+            .path) {
+      List<TalkAroundMessage> newList = docChanges.map((data) {
+        return TalkAroundMessage(
+            data.doc["title"],
+            data.doc.id,
+            "",
+            data.doc["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc["createdAt"]),
+            data.doc["createdBy"],
+            data.doc["createdById"],
+            data.doc["reportedByPhone"],
+            data.doc["location"]["latitude"],
+            data.doc["location"]["longitude"]);
+      }).toList();
+      _fullList.addAll(newList);
+    } else if (docChanges.first.doc.reference.parent.path ==
+        FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
+      docChanges.removeWhere((item) {
+        Map<String, bool> targetGroups =
+            ((item.doc.data() as Map<String, dynamic>)['groups'] ?? null) !=
+                    null
+                ? Map<String, bool>.from(
+                    (item.doc.data() as Map<String, dynamic>)['groups'])
+                : Map();
+        if (targetGroups.isEmpty) {
+          return false;
+        }
+        for (String key in targetGroups.keys) {
+          if (this._broadcastGroupData.containsKey(key) &&
+              this._broadcastGroupData[key] &&
+              targetGroups[key]) {
             return false;
           }
-          for (String key in targetGroups.keys) {
-            if (this._broadcastGroupData.containsKey(key) &&
-                this._broadcastGroupData[key] &&
-                targetGroups[key]) {
-              return false;
-            }
-          }
-          return true;
-        });
-        List<TalkAroundMessage> newList = docChanges.map((data) {
-          String channel = "";
-          Map<String, bool> broadcastGroup = ((data.doc.data() as Map<String,dynamic>)['groups'] ??null)!=null
-              ? Map<String, bool>.from((data.doc.data() as Map<String,dynamic>)['groups'])
-              : Map();
-          if (broadcastGroup.isNotEmpty) {
-            for (String key in broadcastGroup.keys) {
-              if (broadcastGroup[key]) {
-                channel += "$key, ";
-              }
-            }
-            channel = channel.substring(0, channel.length - 2);
-          } else {
-            channel = "All";
-          }
-
-          return TalkAroundMessage(
-              "Broadcast Message",
-              data.doc.id,
-              channel,
-              (data.doc.data() as Map<String,dynamic>)["body"],
-              DateTime.fromMillisecondsSinceEpoch((data.doc.data() as Map<String,dynamic>)["createdAt"]),
-              (data.doc.data() as Map<String,dynamic>)["createdBy"],
-              (data.doc.data() as Map<String,dynamic>)["createdById"],
-              (data.doc.data() as Map<String,dynamic>)["reportedByPhone"],
-              null,
-              null);
-        }).toList();
-        _fullList.addAll(newList);
-      } else {
-        List<TalkAroundMessage> newList =
-        await Future.wait(docChanges.map((data) async {
-          final DocumentSnapshot<Map<String,dynamic>> channelSnapshot =
-          await data.doc.reference.parent.parent.get();
-          final TalkAroundChannel channel =
-          TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
-          return TalkAroundMessage(
-            "Channel Message",
-            data.doc.id,
-            channel.groupConversationName(
-                "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}"),
-            (data.doc.data() as Map<String,dynamic>)["body"],
-            DateTime.fromMicrosecondsSinceEpoch(
-                (data.doc.data() as Map<String,dynamic>)["timestamp"].microsecondsSinceEpoch),
-            (data.doc.data() as Map<String,dynamic>)["author"],
-            (data.doc.data() as Map<String,dynamic>)["authorId"],
-            (data.doc.data() as Map<String,dynamic>)["reportedByPhone"],
-            (data.doc.data() as Map<String,dynamic>)["location"] != null
-                ? (data.doc.data() as Map<String,dynamic>)["location"]["latitude"]
-                : null,
-            (data.doc.data() as Map<String,dynamic>)["location"] != null
-                ? (data.doc.data() as Map<String,dynamic>)["location"]["longitude"]
-                : null,
-          );
-        }).toList());
-        _fullList.addAll(newList);
-      }
-      _fullList.sort((message1, message2) =>
-      message2.timestamp.millisecondsSinceEpoch -
-          message1.timestamp.millisecondsSinceEpoch);
-      markers.clear();
-      markers.add(Marker(
-          markerId: MarkerId(alert.createdById),
-          position: LatLng(alert.location.latitude, alert.location.longitude),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-          infoWindow: InfoWindow(
-              title: alert.title,
-              snippet:
-              "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}")));
-      for (TalkAroundMessage message in _fullList) {
-        if (message.latitude != null && message.longitude != null) {
-          markers.add(Marker(
-              markerId: MarkerId(message.authorId),
-              position: LatLng(message.latitude, message.longitude),
-              infoWindow:
-              InfoWindow(title: message.author, snippet: message.message)));
         }
-      }
+        return true;
+      });
+      List<TalkAroundMessage> newList = docChanges.map((data) {
+        String channel = "";
+        Map<String, bool> broadcastGroup =
+            ((data.doc.data() as Map<String, dynamic>)['groups'] ?? null) !=
+                    null
+                ? Map<String, bool>.from(
+                    (data.doc.data() as Map<String, dynamic>)['groups'])
+                : Map();
+        if (broadcastGroup.isNotEmpty) {
+          for (String key in broadcastGroup.keys) {
+            if (broadcastGroup[key]) {
+              channel += "$key, ";
+            }
+          }
+          channel = channel.substring(0, channel.length - 2);
+        } else {
+          channel = "All";
+        }
 
+        return TalkAroundMessage(
+            "Broadcast Message",
+            data.doc.id,
+            channel,
+            (data.doc.data() as Map<String, dynamic>)["body"],
+            DateTime.fromMillisecondsSinceEpoch(
+                (data.doc.data() as Map<String, dynamic>)["createdAt"]),
+            (data.doc.data() as Map<String, dynamic>)["createdBy"],
+            (data.doc.data() as Map<String, dynamic>)["createdById"],
+            (data.doc.data() as Map<String, dynamic>)["reportedByPhone"],
+            null,
+            null);
+      }).toList();
+      _fullList.addAll(newList);
+    } else {
+      List<TalkAroundMessage> newList =
+          await Future.wait(docChanges.map((data) async {
+        final DocumentSnapshot<Map<String, dynamic>> channelSnapshot =
+            await data.doc.reference.parent.parent.get();
+        final TalkAroundChannel channel =
+            TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
+        return TalkAroundMessage(
+          "Channel Message",
+          data.doc.id,
+          channel.groupConversationName(
+              "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}"),
+          (data.doc.data() as Map<String, dynamic>)["body"],
+          DateTime.fromMicrosecondsSinceEpoch(
+              (data.doc.data() as Map<String, dynamic>)["timestamp"]
+                  .microsecondsSinceEpoch),
+          (data.doc.data() as Map<String, dynamic>)["author"],
+          (data.doc.data() as Map<String, dynamic>)["authorId"],
+          (data.doc.data() as Map<String, dynamic>)["reportedByPhone"],
+          (data.doc.data() as Map<String, dynamic>)["location"] != null
+              ? (data.doc.data() as Map<String, dynamic>)["location"]
+                  ["latitude"]
+              : null,
+          (data.doc.data() as Map<String, dynamic>)["location"] != null
+              ? (data.doc.data() as Map<String, dynamic>)["location"]
+                  ["longitude"]
+              : null,
+        );
+      }).toList());
+      _fullList.addAll(newList);
+    }
+    _fullList.sort((message1, message2) =>
+        message2.timestamp.millisecondsSinceEpoch -
+        message1.timestamp.millisecondsSinceEpoch);
+    markers.clear();
+    markers.add(Marker(
+        markerId: MarkerId(alert.createdById),
+        position: LatLng(alert.location.latitude, alert.location.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+        infoWindow: InfoWindow(
+            title: alert.title,
+            snippet:
+                "Initial report by ${alert.createdBy} : ${alert.reportedByPhoneFormatted}")));
+    for (TalkAroundMessage message in _fullList) {
+      if (message.latitude != null && message.longitude != null) {
+        markers.add(Marker(
+            markerId: MarkerId(message.authorId),
+            position: LatLng(message.latitude, message.longitude),
+            infoWindow:
+                InfoWindow(title: message.author, snippet: message.message)));
+      }
+    }
 
     setState(() {
       _messages = _fullList;
@@ -284,13 +296,15 @@ class _IncidentManagementState extends State<IncidentManagement>
     User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
-      DocumentSnapshot<Map<String,dynamic>> schoolSnapshot =
+      DocumentSnapshot<Map<String, dynamic>> schoolSnapshot =
           await FirebaseFirestore.instance.doc(schoolId).get();
       if (schoolSnapshot.data()["documents"] != null) {
         _mapData = _getMapData(schoolSnapshot);
       }
       _schoolAddress = schoolSnapshot.data()['address'];
     }
+    _closestAddress = await _getLocationAddressNative(
+        alert.location.latitude, alert.location.longitude);
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
@@ -305,13 +319,13 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
-    final List<Map<String, dynamic>> documents = snapshot
-        ["documents"]
+    final List<Map<String, dynamic>> documents = snapshot["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
-    final Map<String, dynamic> map = documents
-        .firstWhere((document) => document["category"] == "MAP", orElse: () => null);
+    final Map<String, dynamic> map = documents.firstWhere(
+        (document) => document["category"] == "MAP",
+        orElse: () => null);
     return map;
   }
 
@@ -350,7 +364,8 @@ class _IncidentManagementState extends State<IncidentManagement>
               null,
               null,
               null));
-          final alert = SchoolAlert.fromMap(snapshot.id,snapshot.reference.path,snapshot.data());
+          final alert = SchoolAlert.fromMap(
+              snapshot.id, snapshot.reference.path, snapshot.data());
           setState(() {
             this.alert = alert;
           });
@@ -359,8 +374,13 @@ class _IncidentManagementState extends State<IncidentManagement>
     }
     Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
-        .where("roles",
-            arrayContainsAny: [role, "school_security", "school_admin", "security", "admin"]);
+        .where("roles", arrayContainsAny: [
+      role,
+      "school_security",
+      "school_admin",
+      "security",
+      "admin"
+    ]);
     QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.docs.forEach((channelDocument) {
@@ -450,7 +470,11 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   List<Widget> _buildStopAlertItems() {
-    if (role == 'school_security' || role == 'school_admin' || role == 'district' || role == 'security' || role == 'admin' ) {
+    if (role == 'school_security' ||
+        role == 'school_admin' ||
+        role == 'district' ||
+        role == 'security' ||
+        role == 'admin') {
       return [
         Spacer(),
         Container(
@@ -465,15 +489,37 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   @override
   void initState() {
-    try{
+    try {
       getUserDetails();
-    }catch(error,stacktrace){
+    } catch (error, stacktrace) {
       print("Error is $error and stack is $stacktrace");
     }
     //getUserDetails();
     super.initState();
   }
 
+
+  Future<String> _getLocationAddressNative(double latitude, double longitude) async {
+    try{
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude,longitude);
+
+      Placemark placeMark = placemarks[0];
+      String name = placeMark.name;
+      String subLocality = placeMark.subLocality;
+      String locality = placeMark.locality;
+      String administrativeArea = placeMark.administrativeArea;
+      String postalCode = placeMark.postalCode;
+      String country = placeMark.country;
+      String address = "${name}, ${subLocality}, ${locality}, ${administrativeArea} ${postalCode}, ${country}";
+
+      return address;
+    }catch(error,stacktrace){
+      return null;
+    }
+
+
+
+  }
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -558,20 +604,19 @@ class _IncidentManagementState extends State<IncidentManagement>
                               horizontal: 16.0,
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      launch(
-                                          "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
-                                    },
-                                    child: Text(
-                                      "${_schoolAddress}",
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        color: Color.fromARGB(255, 11, 48, 224),
-                                        fontSize: 14.0,
-                                      ),
+                                GestureDetector(
+                                  onTap: () {
+                                    launch(
+                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
+                                  },
+                                  child: Text(
+                                    "Directions",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 11, 48, 224),
+                                      fontSize: 14.0,
                                     ),
                                   ),
                                 ),
@@ -579,8 +624,8 @@ class _IncidentManagementState extends State<IncidentManagement>
                                     ? GestureDetector(
                                         onTap: _onSchoolMap,
                                         child: const Icon(
-                                          Icons.map,
-                                          color: Colors.black,
+                                          Icons.directions_car,
+                                          color: Colors.red,
                                         ),
                                       )
                                     : const SizedBox(),
@@ -594,30 +639,14 @@ class _IncidentManagementState extends State<IncidentManagement>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Text(localize("911 Callback: "),
+                                Text(_closestAddress!=null?localize("Closest Address: "):"",
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12.0)),
-                                Text(alert.createdBy,
+                                Text(_closestAddress!=null?_closestAddress:"",
                                     textAlign: TextAlign.start,
                                     style: TextStyle(fontSize: 12.0)),
-                                GestureDetector(
-                                  onTap: () => showContactDialog(context,
-                                      alert.createdBy, alert.reportedByPhone),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0),
-                                    child: Text(
-                                      alert.reportedByPhoneFormatted,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        color: Color.fromARGB(255, 11, 48, 224),
-                                      ),
-                                    ),
-                                  ),
-                                )
                               ],
                             ),
                           ),

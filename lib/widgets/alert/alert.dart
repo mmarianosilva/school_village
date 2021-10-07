@@ -90,7 +90,7 @@ class _AlertState extends State<Alert> {
                 onPressed: () {
                   Navigator.of(context).pop();
                   _sendAlert("other", "Alert!",
-                      "${customAlertController.text} at $_schoolName");
+                      "${customAlertController.text}");
                   customAlertController.text = "";
                 },
               )
@@ -549,7 +549,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("armed", "Armed Assailant Alert!",
-                                    "An Armed Assailant has been reported at $_schoolName");
+                                    "An Armed Assailant has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_armed.png',
@@ -562,7 +562,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("fight", "Fight Alert!",
-                                    "A fight has been reported at $_schoolName");
+                                    "A fight has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_fight.png',
@@ -575,7 +575,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("medical", "Medical Alert!",
-                                    "A medical emergency has been reported at $_schoolName");
+                                    "A medical emergency has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_medical.png',
@@ -593,7 +593,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("auto", "Auto Accident/Injury",
-                                    "A car accident has been reported at $_schoolName");
+                                    "A car accident has been reported");
                               },
                               child: Column(children: [
                                 Image.asset(
@@ -608,7 +608,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("explosion", "Explosion Alert!",
-                                    "An explosion has been reported at $_schoolName");
+                                    "An explosion has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_explosion.png',
@@ -621,7 +621,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("boat", "Boat Accident/Injury",
-                                    "A boat accident has been reported at $_schoolName");
+                                    "A boat accident has been reported");
                               },
                               child: Column(children: [
                                 Image.asset(
@@ -641,7 +641,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("fire", "Fire Alert!",
-                                    "A fire has been reported at $_schoolName");
+                                    "A fire has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_fire.png',
@@ -654,7 +654,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("intruder", "Intruder Alert!",
-                                    "An intruder has been reported at $_schoolName");
+                                    "An intruder has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_intruder.png',
