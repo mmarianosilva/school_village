@@ -275,9 +275,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildNotificationsOption(model) {
-    if (role == 'boater' || role == 'vendor' || role == 'maintenance') {
-      return SizedBox();
-    }
+
     return FutureBuilder(
         future: model.getAlertGroups(ref.split("/")[1]),
         builder: (context, alertGroups) {
