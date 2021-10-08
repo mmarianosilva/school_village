@@ -28,8 +28,37 @@ import 'package:school_village/util/token_helper.dart';
 import 'package:school_village/model/main_model.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+Future<File> copyLocalAsset(Directory localDir, String bundleDir,
+    String assetName) async {
+  final localAssetFile = File('${localDir.path}/$assetName');
+  if (!(await localAssetFile.exists())) {
+    final data = await rootBundle.load('$bundleDir/$assetName');
+    final bytes = data.buffer.asUint8List();
+    await localAssetFile.writeAsBytes(bytes, flush: true);
+  }
+  return localAssetFile;
+}
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message");
+  print("payload is ${message.notification.android.sound} and ${message.data['sound']}");
+  if (!Platform.isIOS) {
+    final audioPlugin = AudioPlayer();
+    final bundleDir = 'assets/audio';
+    final assetName = 'alarm.wav';
+    final assetName2 = 'message.wav';
+    final localDir = await getTemporaryDirectory();
+
+
+    final _messageAlertAssetFile =
+        (await copyLocalAsset(localDir, bundleDir, assetName2)).path;
+    await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
+  }
+
+
+  print("sound played");
+
+  return null;
+
 }
 class Home extends StatefulWidget {
   @override
