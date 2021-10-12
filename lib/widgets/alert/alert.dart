@@ -395,7 +395,7 @@ class _AlertState extends State<Alert> {
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
 
-    final String room = UserHelper.getRoomNumber(_userSnapshot);
+    //final String room = UserHelper.getRoomNumber(_userSnapshot);
 
     if (updateToken) {
       document.set(<String, dynamic>{
@@ -403,7 +403,7 @@ class _AlertState extends State<Alert> {
         'body': alertBody,
         'type': alertType,
         'createdById': _userId,
-        'createdBy': '$name${room != null ? ', Room $room' : ''}',
+        'createdBy': '$name',
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
@@ -415,7 +415,7 @@ class _AlertState extends State<Alert> {
         'body': alertBody,
         'type': alertType,
         'createdById': _userId,
-        'createdBy': '$name${room != null ? ', Room $room' : ''}',
+        'createdBy': '$name',
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
