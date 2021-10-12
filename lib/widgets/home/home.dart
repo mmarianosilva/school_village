@@ -376,13 +376,9 @@ class _HomeState extends State<Home>
         return true;
       }
       SchoolAlert latestAlert = await _checkIfAlertIsInProgress();
-      print(
-          "Check alert ${latestAlert} and ${latestAlert.id} and ${message["notificationId"]}");
       if (latestAlert != null && latestAlert.id != message["notificationId"]) {
-        print("Check 1");
         playMessageAlert();
       } else {
-        print("Check 2");
         playAlarm();
       }
       return _showItemDialog(message);
