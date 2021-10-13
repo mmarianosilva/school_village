@@ -136,10 +136,11 @@ class _HomeState extends State<Home>
         print("Check First 6= ${incident.data()}");
         final alertId =
             (incident.data()['allNotificationIds'] as List<dynamic>).lastOrNull;
-        FirebaseFirestore.instance
-            .doc("$_schoolId/notifications/${alertId}").get().then((value) {
-              print("What is it ${value.data()}");
-        });
+        final alertObj= await FirebaseFirestore.instance
+            .doc("$_schoolId/notifications/${alertId}").get();
+
+        final schoolalert = SchoolAlert.fromMap(
+            alertObj.id, alertObj.reference.path, alertObj.data());
         print("Check First 7 $alertId");
       } catch (error, stacktrace) {
         print("Error is $error and stacktrace is ${stacktrace}");
@@ -657,7 +658,7 @@ class _HomeState extends State<Home>
           model.refreshUserIfNull();
           print("Updating school");
           updateSchool();
-          findOngoingIncidents();
+          //findOngoingIncidents();
           return Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
@@ -665,7 +666,7 @@ class _HomeState extends State<Home>
           );
         } else {
           checkNewSchool();
-          findOngoingIncidents();
+          //findOngoingIncidents();
         }
 
         return Scaffold(
