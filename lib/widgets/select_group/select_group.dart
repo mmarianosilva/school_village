@@ -118,15 +118,18 @@ class _SelectGroupsState extends State<SelectGroups> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      getGroups();
+      //Uncomment When adding Groups back
+      //getGroups();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: Text(localize('Loading...')))
-        : _getList();
+    //uncomment when adding groups
+    // return _isLoading
+    //     ? Center(child: Text(localize('Loading...')))
+    //     : _getList();
+    return _getToneSelector();
   }
 
   Future<Map<String, bool>> _chooseMarinas() async {
@@ -196,6 +199,75 @@ class _SelectGroupsState extends State<SelectGroups> {
             },
           );
         });
+  }_getToneSelector(){
+    return Container(
+      color: SVColors.colorFromHex('#e5e5ea'),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(localize("Alert tone:")),
+            SizedBox(
+              height: checkBoxHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    activeColor: Colors.red,
+                    checkColor: Colors.white,
+                    value: amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        amberAlert = !amberAlert;
+                      });
+                    },
+                    child: Text(
+                      localize("Amber"),
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: checkBoxHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    value: !amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = !value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        amberAlert = !amberAlert;
+                      });
+                    },
+                    child: Text(localize("2-Tone")),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ]),
+    );
   }
   _getList() {
     List<String> names = List();

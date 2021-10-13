@@ -41,38 +41,7 @@ Future<File> copyLocalAsset(
   }
   return localAssetFile;
 }
-Future<SchoolAlert> _checkIfAlertIsInProgress() async {
-  String schoolId = await UserHelper.getSelectedSchoolID();
-  CollectionReference alerts =
-  FirebaseFirestore.instance.collection("${schoolId}/notifications");
-  return await alerts
-      .orderBy("createdAt", descending: true)
-      .get()
-      .then((result) async {
-    if (result.docs.isEmpty) {
-      return null;
-    }
-    final List<QueryDocumentSnapshot> lastAlert =
-        (await alerts.orderBy("endedAt", descending: true).limit(1).get())
-            .docs;
-    final DocumentSnapshot latestResolved =
-    lastAlert.isNotEmpty ? lastAlert.first : null;
-    final Timestamp lastResolvedTimestamp = latestResolved != null
-        ? latestResolved["endedAt"]
-        : Timestamp.fromMillisecondsSinceEpoch(0);
-    final latestAlert = result.docs.lastWhere(
-            (DocumentSnapshot snapshot) =>
-        snapshot["createdAt"] >
-            lastResolvedTimestamp.millisecondsSinceEpoch,
-        orElse: () => null);
-    SchoolAlert alert = latestAlert != null
-        ? SchoolAlert.fromMap(
-        latestAlert.id, latestAlert.reference.path, latestAlert.data())
-        : null;
 
-    return alert;
-  });
-}
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message ${message.data.toString()}");
   print(
@@ -91,39 +60,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     final _messageAlertAssetFile =
         (await copyLocalAsset(localDir, bundleDir, assetName2)).path;
     await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
-    // //await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
-    // if (data["type"] == "broadcast") {
-    //   bool alarm = data.toString().contains("sound: alarm.wav");
-    //   if (alarm) {
-    //     await audioPlugin.play(_alarmAlertAssetFile, isLocal: true);
-    //   } else {
-    //     await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
-    //   }
-    // } else if (data["type"] == "alert") {
-    //   String path =
-    //       "schools/${data["schoolId"]}/notifications/${data["notificationId"]}";
-    //   DocumentSnapshot alert = await FirebaseFirestore.instance.doc(path).get();
-    //
-    //   if (Timestamp.now().millisecondsSinceEpoch - alert["createdAt"] > 7200000) {
-    //     return true;
-    //   }
-    //   SchoolAlert latestAlert = await _checkIfAlertIsInProgress();
-    //   print(
-    //       "Check alert ${latestAlert} and ${latestAlert.id} and ${data["notificationId"]}");
-    //   if (latestAlert != null && latestAlert.id != data["notificationId"]) {
-    //     print("Check 1");
-    //     await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
-    //   } else {
-    //     print("Check 2");
-    //     await audioPlugin.play(_alarmAlertAssetFile, isLocal: true);
-    //   }
-    // } else {
-    //   await audioPlugin.play(_messageAlertAssetFile, isLocal: true);
-    // }
-    //
-    // print("sound played");
   } else {
-    MethodChannel('schoolvillage.app/audio').invokeMethod('playBackgroundAudio');
+    MethodChannel('schoolvillage.app/audio')
+        .invokeMethod('playBackgroundAudio');
   }
   return null;
 }
@@ -178,6 +117,38 @@ class _HomeState extends State<Home>
         DateTime.now().millisecondsSinceEpoch);
   }
 
+  Future<void> findOngoingIncidents() async {
+    print("Check First 1");
+    String id = _schoolId.split("schools/")[1].trim();
+    print("Check First 2");
+    final result = await FirebaseFirestore.instance
+        .collection("ongoing_incidents")
+        .where("schoolId", isEqualTo: id)
+        //.where('endedAt', is: true)
+        .orderBy("createdAt", descending: true)
+        .get();
+    print("Check First 3");
+    final incident = result.docs.firstOrNull;
+    print("Check First 4");
+    if (incident != null) {
+      print("Check First 5");
+      try {
+        print("Check First 6= ${incident.data()}");
+        final alertId =
+            (incident.data()['allNotificationIds'] as List<dynamic>).lastOrNull;
+        final alertObj = await FirebaseFirestore.instance
+            .doc("$_schoolId/notifications/${alertId}")
+            .get();
+
+        final schoolalert = SchoolAlert.fromMap(
+            alertObj.id, alertObj.reference.path, alertObj.data());
+        print("Check First 7 $alertId");
+      } catch (error, stacktrace) {
+        print("Error is $error and stacktrace is ${stacktrace}");
+      }
+    }
+  }
+
   Future<SchoolAlert> _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts =
@@ -208,42 +179,6 @@ class _HomeState extends State<Home>
           : null;
 
       return alert;
-    });
-  }
-
-  Future<SchoolAlert> _checkIfAlertIsInProgressx() async {
-    String schoolId = await UserHelper.getSelectedSchoolID();
-    CollectionReference alerts =
-        FirebaseFirestore.instance.collection("${schoolId}/notifications");
-    return await alerts
-        .orderBy("createdAt", descending: true)
-        .get()
-        .then((result) {
-      if (result.docs.isEmpty) {
-        return null;
-      }
-      // final DocumentSnapshot lastResolved = result.docs.firstWhereOrNull((doc) {
-      //   return ((doc.data() as Map<String, dynamic>)["endedAt"] ?? null) !=
-      //       null;
-      // });
-      final DocumentSnapshot lastResolved = result.docs.firstWhere(
-          (doc) =>
-              ((doc.data() as Map<String, dynamic>)["endedAt"] ?? null) != null,
-          orElse: null);
-      final Timestamp lastResolvedTimestamp = lastResolved != null
-          ? (lastResolved.data() as Map<String, dynamic>)["endedAt"]
-          : Timestamp.fromMillisecondsSinceEpoch(0);
-      print(
-          "TimestampDetails ${lastResolvedTimestamp} and ${lastResolvedTimestamp.millisecondsSinceEpoch} ");
-      result.docs.removeWhere((doc) =>
-          ((doc.data() as Map<String, dynamic>)["endedAt"] ?? null) != null ||
-          doc["createdAt"] < lastResolvedTimestamp.millisecondsSinceEpoch);
-      print("Size is ${result.docs.length}");
-      final latestAlert = result.docs.isNotEmpty
-          ? SchoolAlert.fromMap(result.docs.last.id,
-              result.docs.last.reference.path, result.docs.last.data())
-          : null;
-      return latestAlert;
     });
   }
 
@@ -291,6 +226,7 @@ class _HomeState extends State<Home>
   @override
   void initState() {
     super.initState();
+
     audioPlugin = AudioPlayer();
     TokenHelper.saveToken();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -338,7 +274,7 @@ class _HomeState extends State<Home>
   _onNotification(Map<String, dynamic> data,
       [bool appInForeground = false]) async {
     Map<String, dynamic> message;
-
+    print("Just received a push");
     if (data["data"] != null) {
       message = new Map<String, dynamic>.from(data["data"]);
     } else {
@@ -723,6 +659,7 @@ class _HomeState extends State<Home>
           model.refreshUserIfNull();
           print("Updating school");
           updateSchool();
+          //findOngoingIncidents();
           return Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
@@ -730,6 +667,7 @@ class _HomeState extends State<Home>
           );
         } else {
           checkNewSchool();
+          //findOngoingIncidents();
         }
 
         return Scaffold(
