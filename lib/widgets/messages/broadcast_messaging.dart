@@ -374,7 +374,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          //_editable ? selectGroups : SizedBox(),
+          _editable ? selectGroups : SizedBox(),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),

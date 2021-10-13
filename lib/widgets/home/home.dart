@@ -136,8 +136,9 @@ class _HomeState extends State<Home>
         print("Check First 6= ${incident.data()}");
         final alertId =
             (incident.data()['allNotificationIds'] as List<dynamic>).lastOrNull;
-        final alertObj= await FirebaseFirestore.instance
-            .doc("$_schoolId/notifications/${alertId}").get();
+        final alertObj = await FirebaseFirestore.instance
+            .doc("$_schoolId/notifications/${alertId}")
+            .get();
 
         final schoolalert = SchoolAlert.fromMap(
             alertObj.id, alertObj.reference.path, alertObj.data());
@@ -273,7 +274,7 @@ class _HomeState extends State<Home>
   _onNotification(Map<String, dynamic> data,
       [bool appInForeground = false]) async {
     Map<String, dynamic> message;
-
+    print("Just received a push");
     if (data["data"] != null) {
       message = new Map<String, dynamic>.from(data["data"]);
     } else {
