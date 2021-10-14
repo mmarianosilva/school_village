@@ -498,10 +498,11 @@ class _IncidentManagementState extends State<IncidentManagement>
     super.initState();
   }
 
-
-  Future<String> _getLocationAddressNative(double latitude, double longitude) async {
-    try{
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude,longitude);
+  Future<String> _getLocationAddressNative(
+      double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
 
       Placemark placeMark = placemarks[0];
       String name = placeMark.name;
@@ -510,16 +511,15 @@ class _IncidentManagementState extends State<IncidentManagement>
       String administrativeArea = placeMark.administrativeArea;
       String postalCode = placeMark.postalCode;
       String country = placeMark.country;
-      String address = "${name}, ${subLocality}, ${locality}, ${administrativeArea} ${postalCode}, ${country}";
+      String address =
+          "${name}, ${subLocality}, ${locality}, ${administrativeArea} ${postalCode}, ${country}";
 
       return address;
-    }catch(error,stacktrace){
+    } catch (error, stacktrace) {
       return null;
     }
-
-
-
   }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -562,16 +562,26 @@ class _IncidentManagementState extends State<IncidentManagement>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 4.0),
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text("${alert.title}",
-                                        style: TextStyle(
-                                            fontSize: 18.0,
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold)),
-                                    Expanded(
-                                        child: Text(
-                                            "${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}",
-                                            textAlign: TextAlign.end))
+                                    RichText(
+                                      text: TextSpan(
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                                style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                text:
+                                                    "\n${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}"),
+                                          ],
+                                          text: "${alert.title}",
+                                          style: TextStyle(
+                                              fontSize: 18.0,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -608,9 +618,8 @@ class _IncidentManagementState extends State<IncidentManagement>
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    String destination="${alert.location.latitude},${alert.location.longitude}";
-                                    String url = "https://www.google.com/maps/dir/?api=1"  + "&destination=" + destination + "&travelmode=driving&dir_action=navigate";
-                                    //launch(url);
+                                    String destination =
+                                        "${alert.location.latitude},${alert.location.longitude}";
                                     launch(
                                         "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(destination)}");
                                   },
@@ -623,33 +632,18 @@ class _IncidentManagementState extends State<IncidentManagement>
                                     ),
                                   ),
                                 ),
-                                _mapData != null
-                                    ? GestureDetector(
-                                        onTap: _onSchoolMap,
-                                        child: const Icon(
-                                          Icons.directions_car,
-                                          color: Colors.red,
-                                        ),
-                                      )
-                                    : const SizedBox(),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(_closestAddress!=null?localize("Closest Address: "):"",
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.0)),
-                                Text(_closestAddress!=null?_closestAddress:"",
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(fontSize: 12.0)),
+                                GestureDetector(
+                                  onTap: () {
+                                    String destination =
+                                        "${alert.location.latitude},${alert.location.longitude}";
+                                    launch(
+                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(destination)}");
+                                  },
+                                  child: const Icon(
+                                    Icons.pin_drop,
+                                    color: Colors.red,
+                                  ),
+                                )
                               ],
                             ),
                           ),
@@ -682,6 +676,35 @@ class _IncidentManagementState extends State<IncidentManagement>
                                   ),
                                 )
                               ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: RichText(maxLines:5,
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black,
+                                          fontSize: 12.0),
+                                      text: _closestAddress != null
+                                          ? _closestAddress
+                                          : "",
+                                    ),
+                                  ],
+
+                                  text:
+                                  (_closestAddress != null
+                                      ? localize("Closest Address: ")
+                                      : ""),
+                                  style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ],
