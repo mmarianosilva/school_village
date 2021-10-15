@@ -99,13 +99,14 @@ class _HomeState extends State<Home>
   String _messageAlertAssetFile;
 
   Future playAlarm() async {
-    if (((await SharedPreferences.getInstance())
-                .getInt(Constants.lastAmberAlertTimestampKey) ??
-            0) >
-        DateTime.now().millisecondsSinceEpoch - 3600000) {
-      print("Alarm 1");
-      return playMessageAlert();
-    }
+    //Removing the timelimit from
+    // if (((await SharedPreferences.getInstance())
+    //             .getInt(Constants.lastAmberAlertTimestampKey) ??
+    //         0) >
+    //     DateTime.now().millisecondsSinceEpoch - 3600000) {
+    //   print("Alarm 1");
+    //   return playMessageAlert();
+    // }
     if (!Platform.isIOS) {
       await copyLocalAssets();
       await audioPlugin.play(_localAssetFile, isLocal: true);
