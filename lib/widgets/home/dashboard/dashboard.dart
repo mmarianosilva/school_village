@@ -218,7 +218,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   openSettings() {
-    _launchURL("https://villagesafety.net/support_dashboard_vs");
+    _launchURL("https://marinavillage.app/support_dashboard_mv");
   }
 
   openNotifications() {
