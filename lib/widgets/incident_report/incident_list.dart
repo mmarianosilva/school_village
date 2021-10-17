@@ -37,6 +37,7 @@ class IncidentListState extends State<IncidentList> {
   IncidentListState({this.id});
 
   getUserDetails(MainModel model) async {
+
     id = (await UserHelper.getUser()).uid;
     _schoolId = await UserHelper.getSelectedSchoolID();
     _schoolSnapshot = await FirebaseFirestore.instance.doc(_schoolId).get();
@@ -52,8 +53,8 @@ class IncidentListState extends State<IncidentList> {
   _handleMessageCollection() async {
     if (_role == 'security') {
       String escapedSchoolId = _schoolId.substring("schools/".length);
-      final List<DocumentSnapshot> securityUsers = (await FirebaseFirestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "school_security").get()).docs;
-      _incidentListSubscription = FirebaseFirestore.instance
+      final List<DocumentSnapshot> securityUsers = (await FirebaseFirestore.instance.collection("users").where("associatedSchools.$escapedSchoolId.role", isEqualTo: "security").get()).docs;
+            _incidentListSubscription = FirebaseFirestore.instance
           .collection("$_schoolId/incident_reports")
           .where("createdById", whereIn: securityUsers.map((security) => security.id).toList())
           .orderBy("createdAt", descending: true)
