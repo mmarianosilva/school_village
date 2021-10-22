@@ -434,7 +434,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Form",
+                "Non-Emergent Incident Report",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -480,7 +480,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Log",
+                "Incident Report Log/Followup",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
