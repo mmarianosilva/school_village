@@ -1017,6 +1017,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == 3) {
                               return _buildIncidentList();
                             }
+                            if (index == 4) {
+                              return _buildServiceProvidersOption();
+                            }
                             // if (index == 4) {
                             //   return _buildRollCallRequest();
                             // }
@@ -1030,12 +1033,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 6) {
                               return _buildSettingsOption();
                             }
-                            if (index == documentCount + 7) {
-                              return _buildServiceProvidersOption();
-                            }
+                            //if (index == documentCount + 7) {
+                             // return _buildServiceProvidersOption();
+                            //}
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 8);
+                          itemCount: documentCount + 7);
                 }
               }
               return Center(
