@@ -434,7 +434,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Form",
+                "Non-Emergent Incident Report",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -480,7 +480,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Log",
+                "Incident Report Log/Followup",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -1017,6 +1017,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == 3) {
                               return _buildIncidentList();
                             }
+                            if (index == 4) {
+                              return _buildServiceProvidersOption();
+                            }
                             // if (index == 4) {
                             //   return _buildRollCallRequest();
                             // }
@@ -1030,12 +1033,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == documentCount + 6) {
                               return _buildSettingsOption();
                             }
-                            if (index == documentCount + 7) {
-                              return _buildServiceProvidersOption();
-                            }
+                            //if (index == documentCount + 7) {
+                             // return _buildServiceProvidersOption();
+                            //}
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 8);
+                          itemCount: documentCount + 7);
                 }
               }
               return Center(
