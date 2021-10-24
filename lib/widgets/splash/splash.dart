@@ -31,6 +31,7 @@ class Splash extends StatelessWidget {
       DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
       DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
       if (userSnapshot != null &&
+          userSnapshot.data() != null &&
           userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
           (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
               .isNotEmpty &&
@@ -110,12 +111,11 @@ class Splash extends StatelessWidget {
                     onPressed: () => _launchURL(APP_STORE_URL),
                   ),
                   FlatButton(
-                    child: Text(btnLabelCancel),
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      exit(0);
-                    }
-                  ),
+                      child: Text(btnLabelCancel),
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                        exit(0);
+                      }),
                 ],
               )
             : new AlertDialog(
