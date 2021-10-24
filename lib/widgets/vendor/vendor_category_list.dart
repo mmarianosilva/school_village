@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor_category.dart';
+import 'package:school_village/util/colors.dart';
 import 'package:school_village/util/localizations/localization.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/vendor/vendor_list.dart';
@@ -106,23 +107,58 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Row(
-          children: [
-            Image.network(
-              item.icon,
-              fit: BoxFit.contain,
-              width: 48.0,
-            ),
-            const SizedBox(width: 16.0),
-            Text("${item.name}"),
-            const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 24.0),
-            const SizedBox(width: 8.0),
-          ],
-        ),
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: 14.0),
+          Row(
+            children: <Widget>[
+              Container(
+                width: 56.0,
+                child: Center(
+                  child: Image.network(
+                    item.icon,
+                    fit: BoxFit.contain,
+                    width: 48.0,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  localize('${item.name}'),
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontSize: 14.0, color: SVColors.dashboardItemFontColor),
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey)
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Container(
+            height: 0.5,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.grey,
+          )
+        ],
       ),
+      // child: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      //   child: Row(
+      //     children: [
+      //       Image.network(
+      //         item.icon,
+      //         fit: BoxFit.contain,
+      //         width: 48.0,
+      //       ),
+      //       const SizedBox(width: 16.0),
+      //       Text("${item.name}"),
+      //       const Spacer(),
+      //       const Icon(Icons.arrow_forward_ios, size: 24.0),
+      //       const SizedBox(width: 8.0),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
