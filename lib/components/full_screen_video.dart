@@ -1,4 +1,3 @@
-import 'package:awsome_video_player/awsome_video_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -30,25 +29,7 @@ class _VideoAppState extends State<FullScreenVideoView> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24.0),
           child: Stack(
             children: <Widget>[
-              Center(
-                child: AwsomeVideoPlayer(
-                  url,
-                  playOptions: VideoPlayOptions(
-                    autoplay: false,
-                    allowScrubbing: true,
-                  ),
-                  onplay: (VideoPlayerValue value) {
-                    setState(() {
-                      _isPlaying = true;
-                    });
-                  },
-                  onpause: (VideoPlayerValue value) {
-                    setState(() {
-                      _isPlaying = false;
-                    });
-                  },
-                )
-              ),
+              centeredPlayer(url),
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: Icon(Icons.close),
@@ -60,4 +41,13 @@ class _VideoAppState extends State<FullScreenVideoView> {
     );
   }
 
+  Widget centeredPlayer(String url) {
+    final options = VideoPlayerOptions(mixWithOthers: false);
+    final controller =
+        VideoPlayerController.network(url, videoPlayerOptions: options);
+    controller.initialize();
+    controller.addListener(() {});
+
+    return VideoPlayer(controller);
+  }
 }
