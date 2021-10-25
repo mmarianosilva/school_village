@@ -135,6 +135,7 @@ class SignUpTextField extends StatelessWidget {
     this.enabled = true,
     this.controller,
     this.capitalisation,
+    this.inputFormatter
   });
 
   final String hint;
@@ -142,6 +143,7 @@ class SignUpTextField extends StatelessWidget {
   final int maxLength;
   final int maxLines;
   final TextInputType textInputType;
+  final TextInputFormatter inputFormatter;
   final bool obscureText;
   final bool enabled;
   final TextEditingController controller;
@@ -159,6 +161,7 @@ class SignUpTextField extends StatelessWidget {
         )
       ]),
       child: TextField(
+        inputFormatters: (inputFormatter!=null)?[inputFormatter]:[],
         textCapitalization:capitalisation?? TextCapitalization.none,
         autocorrect: false,
         controller: controller ?? TextEditingController(),

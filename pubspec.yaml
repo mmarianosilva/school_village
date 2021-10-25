@@ -43,6 +43,7 @@ dependencies:
   geolocator: ^7.7.0
   geocoding: ^2.0.1
   flutter_ffmpeg: ^0.4.2
+  flutter_multi_formatter: ^2.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
