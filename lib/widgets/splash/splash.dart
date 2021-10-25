@@ -20,17 +20,15 @@ class Splash extends StatelessWidget {
     AnalyticsHelper.logAppOpen();
     startTimeout(context);
     return Material(
-      color: Theme
-          .of(context)
-          .primaryColorLight,
+      color: Theme.of(context).primaryColorLight,
       child: Center(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 64.0),
-            child: Image.asset('assets/images/splash_text.png'),
-          )
-      ),
+        padding: const EdgeInsets.symmetric(horizontal: 64.0),
+        child: Image.asset('assets/images/splash_text.png'),
+      )),
     );
   }
+
   goToNextPage(BuildContext context) async {
     User currentUser;
     try {
@@ -39,119 +37,120 @@ class Splash extends StatelessWidget {
       print("Bad Password");
     }
     final versionClearance = await versionCheck(context);
+    print("Check stuff $currentUser and $versionClearance");
     if (currentUser != null && versionClearance) {
-      if (currentUser != null) {
-        FileHelper.downloadRequiredDocuments();
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/home', (Route<dynamic> route) => false);
-      } else {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/login', (Route<dynamic> route) => false);
-      }
+      FileHelper.downloadRequiredDocuments();
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
+    } else {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     }
   }
-    String APP_STORE_URL =
-        'https://apps.apple.com/us/app/marinavillage/id1535375829';
-    String PLAY_STORE_URL =
-        'https://play.google.com/store/apps/details?id=com.oandmtech.marinavillage';
 
-    Future<bool> versionCheck(context) async {
-      final appInfo =
-      await FirebaseFirestore.instance.collection("app_info").get();
-      final appData = appInfo.docs.first;
-      Version versionInfo =
-      appData != null ? Version.fromMap(appData.data()) : null;
-      if (versionInfo == null) {
+  String APP_STORE_URL =
+      'https://apps.apple.com/us/app/schoolvillage/id1374419098';
+  String PLAY_STORE_URL =
+      'https://play.google.com/store/apps/details?id=com.oandmtech.schoolvillage';
+
+  Future<bool> versionCheck(context) async {
+    final appInfo =
+        await FirebaseFirestore.instance.collection("app_info").get();
+    final appData = appInfo.docs.first;
+    Version versionInfo =
+        appData != null ? Version.fromMap(appData.data()) : null;
+    if (versionInfo == null) {
+      return true;
+    } else {
+      //Get Current installed version of app
+      final PackageInfo info = await PackageInfo.fromPlatform();
+      double currentVersion = double.parse(
+          info.version.trim().replaceAll("-dev", "").replaceAll(".", ""));
+      print("Initial version is ${info.version} so $currentVersion");
+
+      if (!Platform.isIOS) {
+        print("Blacklisted versions are ${versionInfo.blacklisted_android}");
+        for (var element in versionInfo.blacklisted_android) {
+          String ver = element.replaceAll("-dev", "").replaceAll(".", "");
+          if (currentVersion <= double.parse(ver)) {
+            await _showVersionDialog(context, versionInfo.update_message,
+                versionInfo.update_changelog);
+            return false;
+          }
+        }
         return true;
       } else {
-        //Get Current installed version of app
-        final PackageInfo info = await PackageInfo.fromPlatform();
-        double currentVersion = double.parse(
-            info.version.trim().replaceAll("-dev", "").replaceAll(".", ""));
-        print("Initial version is ${info.version} so $currentVersion");
-
-        if (!Platform.isIOS) {
-          print("Blacklisted versions are ${versionInfo.blacklisted_android}");
-          for (var element in versionInfo.blacklisted_android) {
-            String ver = element.replaceAll("-dev", "").replaceAll(".", "");
-            if (currentVersion <= double.parse(ver)) {
-              await _showVersionDialog(context, versionInfo.update_message,
-                  versionInfo.update_changelog);
-              return false;
-            }
+        print("Blacklisted versions are ${versionInfo.blacklisted_ios}");
+        for (var element in versionInfo.blacklisted_ios) {
+          String ver = element.replaceAll("-dev", "").replaceAll(".", "");
+          if (currentVersion <= double.parse(ver)) {
+            await _showVersionDialog(context, versionInfo.update_message,
+                versionInfo.update_changelog);
+            return false;
           }
-          return true;
-        } else {
-          print("Blacklisted versions are ${versionInfo.blacklisted_ios}");
-          for (var element in versionInfo.blacklisted_ios) {
-            String ver = element.replaceAll("-dev", "").replaceAll(".", "");
-            if (currentVersion <= double.parse(ver)) {
-              await _showVersionDialog(context, versionInfo.update_message,
-                  versionInfo.update_changelog);
-              return false;
-            }
-          }
-          return true;
         }
+        return true;
       }
     }
-    _showVersionDialog(context, title, message) async {
-      await showDialog<String>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          String btnLabel = "Update Now";
-          String btnLabelCancel = "Exit App";
-          return Platform.isIOS
-              ? new CupertinoAlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(btnLabel),
-                onPressed: () => _launchURL(APP_STORE_URL),
-              ),
-              FlatButton(
-                  child: Text(btnLabelCancel),
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                    exit(0);
-                  }),
-            ],
-          )
-              : new AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(btnLabel),
-                onPressed: () => _launchURL(PLAY_STORE_URL),
-              ),
-              FlatButton(
-                child: Text(btnLabelCancel),
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  SystemNavigator.pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+  }
+
+  _showVersionDialog(context, title, message) async {
+    await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        String btnLabel = "Update Now";
+        String btnLabelCancel = "Exit App";
+        return Platform.isIOS
+            ? new CupertinoAlertDialog(
+                title: Text(title),
+                content: Text(message),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text(btnLabel),
+                    onPressed: () => _launchURL(APP_STORE_URL),
+                  ),
+                  FlatButton(
+                      child: Text(btnLabelCancel),
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                        exit(0);
+                      }),
+                ],
+              )
+            : new AlertDialog(
+                title: Text(title),
+                content: Text(message),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text(btnLabel),
+                    onPressed: () => _launchURL(PLAY_STORE_URL),
+                  ),
+                  FlatButton(
+                    child: Text(btnLabelCancel),
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      SystemNavigator.pop();
+                    },
+                  ),
+                ],
+              );
+      },
+    );
+  }
 
 //
-    _launchURL(String url) async {
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        throw 'Could not launch $url';
-      }
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
-    startTimeout(BuildContext context) async {
-      var duration = const Duration(seconds: 2);
-      return new Timer(duration, () => goToNextPage(context));
-    }
-
-
   }
+
+  startTimeout(BuildContext context) async {
+    var duration = const Duration(seconds: 2);
+    return new Timer(duration, () => goToNextPage(context));
+  }
+}
