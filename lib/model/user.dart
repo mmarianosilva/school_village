@@ -15,13 +15,13 @@ class User implements Searchable {
   User.fromMap(DocumentSnapshot data)
       : this(
           data.id,
-          data.data()["email"],
-          data.data()["firstName"],
-          data.data()["lastName"],
-          data.data()["phone"],
-          data.data()["room"],
-          data.data()["associatedSchools"][
-              (data.data()["associatedSchools"] as Map<String, dynamic>)
+          data["email"],
+          data["firstName"],
+          data["lastName"],
+          data["phone"],
+          data["room"],
+          data["associatedSchools"][
+              (data["associatedSchools"] as Map<String, dynamic>)
                   .keys
                   .first]["role"],
         );
@@ -29,12 +29,12 @@ class User implements Searchable {
   User.fromMapAndSchool(DocumentSnapshot data, String schoolId)
       : this(
     data.id,
-    data.data()["email"],
-    data.data()["firstName"],
-    data.data()["lastName"],
-    data.data()["phone"],
-    data.data()["room"],
-    data.data()["associatedSchools"][schoolId]["role"],
+    data["email"],
+    data["firstName"],
+    data["lastName"],
+    data["phone"],
+    data["room"],
+    data["associatedSchools"][schoolId]["role"],
   );
 
   final String id;

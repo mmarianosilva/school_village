@@ -16,8 +16,8 @@ class VendorCategory {
   VendorCategory.fromDocument({DocumentSnapshot document})
       : this(
           id: document.id,
-          name: (document.data()['name'] as String).capitalize,
-          icon: document.data()['icon'] as String,
+          name: (document['name'] as String).capitalize,
+          icon: document['icon'] as String,
         );
 
   final String id;

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:school_village/usecase/select_image_usecase.dart';
 import 'package:school_village/usecase/upload_file_usecase.dart';
 import 'package:school_village/util/user_helper.dart';
@@ -140,14 +141,16 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
   }
 
   Future<void> _onTakePhoto() async {
-    File photo = await widget._imagePickerUsecase.takeImage();
+    PickedFile mPhoto = await widget._imagePickerUsecase.takeImage();
+    File photo = File(mPhoto.path);
     if (photo != null) {
       _changePreviewPhoto(photo);
     }
   }
 
   Future<void> _onSelectPhoto() async {
-    File photo = await widget._imagePickerUsecase.selectImage();
+    PickedFile mImage = await widget._imagePickerUsecase.selectImage();
+    File photo = File(mImage.path);
     if (photo != null) {
       _isVideo = false;
       _changePreviewPhoto(photo);
@@ -155,7 +158,8 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
   }
 
   Future<void> _onSelectVideo() async {
-    File video = await widget._imagePickerUsecase.selectVideo();
+    PickedFile mFile = await widget._imagePickerUsecase.selectVideo();
+    File video = File(mFile.path);
     if (video != null) {
       setState(() {
         _busy = true;
@@ -198,7 +202,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
           FirebaseFirestore.instance.runTransaction((transaction) async {
             await FirebaseFirestore.instance.collection(path).add({
               'createdById': _userDoc.id,
-              'createdBy': "${_userDoc.data()["firstName"]} ${_userDoc.data()["lastName"]}",
+              'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
               'img': url,
               'timestamp': FieldValue.serverTimestamp(),
               'body': body,
@@ -225,7 +229,7 @@ class _FollowupCommentBoxState extends State<FollowupCommentBox> {
         await FirebaseFirestore.instance.runTransaction((transaction) async {
           await FirebaseFirestore.instance.collection(path).add({
             'createdById': _userDoc.id,
-            'createdBy': "${_userDoc.data()["firstName"]} ${_userDoc.data()["lastName"]}",
+            'createdBy': "${_userDoc["firstName"]} ${_userDoc["lastName"]}",
             'img': uploadUri,
             'timestamp': FieldValue.serverTimestamp(),
             'body': body,

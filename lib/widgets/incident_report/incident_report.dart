@@ -224,20 +224,24 @@ class IncidentState extends State<IncidentReport> {
 
   _getImage(BuildContext context, ImageSource source, bool isVideo) {
     if (!isVideo) {
-      ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
+      ImagePicker.platform.pickImage(source: source, maxWidth: 400.0).then((image) {
+        print(image);
         if (image != null) saveImage(image, isVideo);
       });
     } else {
-      ImagePicker.pickVideo(source: source).then((File video) {
-        if (video != null) saveImage(video, isVideo);
+      ImagePicker.platform.pickVideo(source: source).then((value) {
+        if (value != null) {
+          saveImage(value, isVideo);
+        }
       });
+
     }
   }
 
-  void saveImage(File file, bool isVideoFile) async {
+  void saveImage(PickedFile file, bool isVideoFile) async {
     setState(() {
       this.isVideoFile = isVideoFile;
-      image = file;
+      image = File(file.path);
     });
   }
 

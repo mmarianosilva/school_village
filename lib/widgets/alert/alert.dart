@@ -27,7 +27,7 @@ class _AlertState extends State<Alert> {
   BuildContext _scaffold;
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     print(user.uid);
     _email = user.email;
     _schoolId = await UserHelper.getSelectedSchoolID();
@@ -42,8 +42,8 @@ class _AlertState extends State<Alert> {
       _userId = user.id;
       setState(() {
         name =
-        "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
-        phone = "${_userSnapshot.data()['phone']}";
+        "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}";
+        phone = "${_userSnapshot['phone']}";
         isLoaded = true;
       });
       print(name);

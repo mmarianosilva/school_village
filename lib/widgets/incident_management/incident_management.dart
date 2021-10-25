@@ -85,16 +85,16 @@ class _IncidentManagementState extends State<IncidentManagement>
   void _onSop() async {
     DocumentSnapshot schoolData =
         await FirebaseFirestore.instance.doc(_schoolId).get();
-    if (schoolData.data()["sop"][alert.type] != null) {
+    if (schoolData["sop"][alert.type] != null) {
       PdfHandler.showPdfFile(
           context,
-          schoolData.data()["sop"][alert.type]["location"],
-          schoolData.data()["sop"][alert.type]["title"]);
+          schoolData["sop"][alert.type]["location"],
+          schoolData["sop"][alert.type]["title"]);
     } else {
       PdfHandler.showPdfFile(
           context,
-          schoolData.data()["sop"]["other"]["location"],
-          schoolData.data()["sop"]["other"]["title"]);
+          schoolData["sop"]["other"]["location"],
+          schoolData["sop"]["other"]["title"]);
     }
   }
 
@@ -160,23 +160,23 @@ class _IncidentManagementState extends State<IncidentManagement>
             .path) {
       List<TalkAroundMessage> newList = snapshot.map((data) {
         return TalkAroundMessage(
-            data.doc.data()["title"],
+            data.doc["title"],
             data.doc.id,
             "",
-            data.doc.data()["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
-            data.doc.data()["createdBy"],
-            data.doc.data()["createdById"],
-            data.doc.data()["reportedByPhone"],
-            data.doc.data()["location"]["latitude"],
-            data.doc.data()["location"]["longitude"]);
+            data.doc["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc["createdAt"]),
+            data.doc["createdBy"],
+            data.doc["createdById"],
+            data.doc["reportedByPhone"],
+            data.doc["location"]["latitude"],
+            data.doc["location"]["longitude"]);
       }).toList();
       _fullList.addAll(newList);
     } else if (snapshot.first.doc.reference.parent.path ==
         FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
       snapshot.removeWhere((item) {
-        Map<String, bool> targetGroups = item.doc.data()['groups'] != null
-            ? Map<String, bool>.from(item.doc.data()['groups'])
+        Map<String, bool> targetGroups = item.doc['groups'] != null
+            ? Map<String, bool>.from(item.doc['groups'])
             : null;
         if (targetGroups == null) {
           return false;
@@ -192,8 +192,8 @@ class _IncidentManagementState extends State<IncidentManagement>
       });
       List<TalkAroundMessage> newList = snapshot.map((data) {
         String channel = "";
-        Map<String, bool> broadcastGroup = data.doc.data()["groups"] != null
-            ? Map<String, bool>.from(data.doc.data()["groups"])
+        Map<String, bool> broadcastGroup = data.doc["groups"] != null
+            ? Map<String, bool>.from(data.doc["groups"])
             : null;
         if (broadcastGroup != null) {
           for (String key in broadcastGroup.keys) {
@@ -209,11 +209,11 @@ class _IncidentManagementState extends State<IncidentManagement>
             "Broadcast Message",
             data.doc.id,
             channel,
-            data.doc.data()["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
-            data.doc.data()["createdBy"],
-            data.doc.data()["createdById"],
-            data.doc.data()["reportedByPhone"],
+            data.doc["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc["createdAt"]),
+            data.doc["createdBy"],
+            data.doc["createdById"],
+            data.doc["reportedByPhone"],
             null,
             null);
       }).toList();
@@ -229,18 +229,18 @@ class _IncidentManagementState extends State<IncidentManagement>
           "Channel Message",
           data.doc.id,
           channel.groupConversationName(
-              "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"),
-          data.doc.data()["body"],
+              "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}"),
+          data.doc["body"],
           DateTime.fromMicrosecondsSinceEpoch(
-              data.doc.data()["timestamp"].microsecondsSinceEpoch),
-          data.doc.data()["author"],
-          data.doc.data()["authorId"],
-          data.doc.data()["reportedByPhone"],
-          data.doc.data()["location"] != null
-              ? data.doc.data()["location"]["latitude"]
+              data.doc["timestamp"].microsecondsSinceEpoch),
+          data.doc["author"],
+          data.doc["authorId"],
+          data.doc["reportedByPhone"],
+          data.doc["location"] != null
+              ? data.doc["location"]["latitude"]
               : null,
-          data.doc.data()["location"] != null
-              ? data.doc.data()["location"]["longitude"]
+          data.doc["location"] != null
+              ? data.doc["location"]["longitude"]
               : null,
         );
       }).toList());
@@ -273,15 +273,15 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
       DocumentSnapshot schoolDocument =
           await FirebaseFirestore.instance.doc(schoolId).get();
-      if (schoolDocument.data()["documents"] != null) {
+      if (schoolDocument["documents"] != null) {
         _mapData = _getMapData(schoolDocument);
       }
-      _schoolAddress = schoolDocument.data()['address'];
+      _schoolAddress = schoolDocument['address'];
     }
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
@@ -298,7 +298,7 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
     final List<Map<String, dynamic>> documents = snapshot
-        .data()["documents"]
+        ["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
@@ -341,7 +341,7 @@ class _IncidentManagementState extends State<IncidentManagement>
               null,
               null,
               null));
-          final alert = SchoolAlert.fromMap(snapshot);
+          final alert = SchoolAlert.fromMap(snapshot.id, snapshot.reference.path, snapshot.data());
           setState(() {
             this.alert = alert;
           });

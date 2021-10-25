@@ -40,34 +40,41 @@ class _InputFieldState extends State<InputField> {
 
   _getImage(BuildContext context, ImageSource source, bool isVideo) {
     if (!isVideo) {
-      ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
+      ImagePicker.platform.pickImage(source: source, maxWidth: 400.0).then((image) {
         print(image);
         if (image != null) saveImage(image, isVideo, null);
       });
     } else {
-      ImagePicker.pickVideo(source: source).then((File video) {
-        if (video != null) {
-          this._transcodeVideo(video);
+      ImagePicker.platform.pickVideo(source: source).then((value) {
+        if (value != null) {
+          this._transcodeVideo(value);
         }
       });
+
     }
   }
 
-  _transcodeVideo(File video) async {
+  _transcodeVideo(PickedFile video) async {
     setState(() {
       _loading = true;
     });
 
-    File thumbnail = await VideoHelper.buildThumbnail(video);
-    File processedVideo = await VideoHelper.processVideoForUpload(video);
+    File thumbnail = await VideoHelper.buildThumbnail(File(video.path));
+    File processedVideo = await VideoHelper.processVideoForUpload(File(video.path));
 
-    saveImage(processedVideo, true, thumbnail);
+    saveImageVid(processedVideo, true, thumbnail);
   }
-
-  void saveImage(File file, bool isVideoFile, File thumb) async {
+  void saveImageVid(File file, bool isVideoFile, File thumb) async {
     setState(() {
       this.isVideoFile = isVideoFile;
       image = file;
+      thumbNail = thumb;
+    });
+  }
+  void saveImage(PickedFile file, bool isVideoFile, File thumb) async {
+    setState(() {
+      this.isVideoFile = isVideoFile;
+      image = File(file.path);
       thumbNail = thumb;
     });
   }
