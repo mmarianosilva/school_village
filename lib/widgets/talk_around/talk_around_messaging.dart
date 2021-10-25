@@ -42,7 +42,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   _TalkAroundMessagingState(this.channel);
 
   void _getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
@@ -199,7 +199,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot.data()["phone"]
+            "phone": _userSnapshot["phone"]
           };
           try {
             FirebaseFirestore.instance.runTransaction((transaction) async {

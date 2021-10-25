@@ -96,7 +96,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
   }
 
   getDetails() async {
-    FirebaseUser _user = await UserHelper.getUser();
+    User _user = await UserHelper.getUser();
     DocumentReference _userRef =
         FirebaseFirestore.instance.doc("users/${_user.uid}");
     var schoolId = await UserHelper.getSelectedSchoolID();
@@ -104,7 +104,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       userId = user.id;
       setState(() {
         if (demo) {
-          name = "${user.data()['firstName']} ${user.data()['lastName']}";
+          name = "${user['firstName']} ${user['lastName']}";
           this.loading = false;
         }
         this.schoolId = schoolId;
@@ -114,7 +114,7 @@ class IncidentDetailsState extends State<IncidentDetails> {
       final DocumentSnapshot snapshot =
           await FirebaseFirestore.instance.doc("users/$reportedById").get();
       setState(() {
-        this.phone = snapshot.data()["phone"];
+        this.phone = snapshot["phone"];
         this.loading = false;
       });
     }

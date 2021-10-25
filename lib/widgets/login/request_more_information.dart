@@ -135,7 +135,7 @@ class _RequestMoreInformationState extends State<RequestMoreInformation> {
                       'comments': _commentsController.text,
                     };
                     await http.post(
-                        'https://us-central1-schoolvillage-dev.cloudfunctions.net/api/contact',
+                        Uri.parse('https://us-central1-schoolvillage-dev.cloudfunctions.net/api/contact'),
                         body: request);
                     await showDialog(
                       barrierDismissible: false,

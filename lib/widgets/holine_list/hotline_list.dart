@@ -102,7 +102,7 @@ class _HotLineListState extends State<HotLineList> {
                                   children: <Widget>[
                                     Row(
                                       children: <Widget>[
-                                        Text(document.data()['createdBy'],
+                                        Text(document['createdBy'],
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Spacer(),
@@ -110,7 +110,7 @@ class _HotLineListState extends State<HotLineList> {
                                             dateFormatting.dateFormatter.format(
                                                 DateTime
                                                     .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
+                                                        document['createdAt'])),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Spacer(),

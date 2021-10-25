@@ -24,19 +24,19 @@ class TalkAroundChannel {
       DocumentSnapshot firebaseModel, List<TalkAroundUser> members) {
     return TalkAroundChannel(
         firebaseModel.id,
-        firebaseModel.data()["name"],
-        firebaseModel.data()["direct"] ?? false,
-        firebaseModel.data()["timestamp"] ?? Timestamp.now(),
+        firebaseModel["name"],
+        ((firebaseModel['direct'] ?? null) !=null)? firebaseModel['direct'] : false,
+        ((firebaseModel['timestamp'] ?? null) !=null) ? firebaseModel["timestamp"] : Timestamp.now(),
         members,
-        admin: firebaseModel.data()["admin"] != null
+        admin: firebaseModel["admin"] != null
             ? TalkAroundUser(
                 FirebaseFirestore.instance
-                    .doc("users/${firebaseModel.data()["admin"]}"),
-                firebaseModel.data()["adminName"],
-                firebaseModel.data()["adminRole"],
+                    .doc("users/${firebaseModel["admin"]}"),
+                firebaseModel["adminName"],
+                firebaseModel["adminRole"],
               )
             : null,
-        isClass: firebaseModel.data()["class"] ?? false);
+        isClass: ((firebaseModel['class'] ?? null) !=null) ? firebaseModel['class'] : false);
   }
 
   bool get showLocation => !direct && name.contains("Security");

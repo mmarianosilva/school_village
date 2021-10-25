@@ -150,12 +150,12 @@ class PdfHandler {
         .get();
     if (pdfDocument != null) {
       final String storagePath =
-          '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument.data()["name"]}';
+          '${schoolId[0].toUpperCase()}${schoolId.substring(1)}/Documents/${pdfDocument["name"]}';
       final Reference pdfDirectory =
           FirebaseStorage.instance.ref().child(storagePath);
       final Directory systemTempDir = await getApplicationDocumentsDirectory();
       final String rootPath =
-          '${systemTempDir.path}/${pdfDocument.data()["name"]}';
+          '${systemTempDir.path}/${pdfDocument["name"]}';
       final ListResult list = await pdfDirectory.listAll();
       await list.items.forEach((fileRef) async {
         final String path = '$rootPath/${fileRef.name}';

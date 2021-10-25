@@ -98,15 +98,15 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       final DocumentSnapshot latestResolved =
       lastAlert.isNotEmpty ? lastAlert.first : null;
       final Timestamp lastResolvedTimestamp = latestResolved != null
-          ? latestResolved.data()["endedAt"]
+          ? latestResolved["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
       final latestAlert = result.docs.lastWhere(
               (DocumentSnapshot snapshot) =>
-          snapshot.data()["createdAt"] >
+          snapshot["createdAt"] >
               lastResolvedTimestamp.millisecondsSinceEpoch,
           orElse: () => null);
       SchoolAlert alert =
-      latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+      latestAlert != null ? SchoolAlert.fromMap(latestAlert.id, latestAlert.reference.path, latestAlert.data()) : null;
       if (this.alertInProgress != alert) {
         this.setState(() {
           this.alertInProgress = alert;
@@ -939,9 +939,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 final List<Map<String, dynamic>> documents =
-                snapshot.data.data()["documents"] != null
+                snapshot.data["documents"] != null
                     ? snapshot.data
-                    .data()["documents"]
+                    ["documents"]
                     .where((snapshot) =>
                 snapshot["accessRoles"] == null ||
                     snapshot["accessRoles"].contains(role))
