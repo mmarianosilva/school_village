@@ -173,7 +173,7 @@ class PdfHandler {
         await pdfDownloadTask;
         taskSubscription.cancel();
       });
-      return '$rootPath/${pdfDocument.data()["root"].split('/').last}';
+      return '$rootPath/${pdfDocument["root"].split('/').last}';
     }
     return null;
   }

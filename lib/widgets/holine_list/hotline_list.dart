@@ -118,7 +118,7 @@ class _HotLineListState extends State<HotLineList> {
                                             dateFormatting.timeFormatter.format(
                                                 DateTime
                                                     .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
+                                                        document['createdAt'])),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                       ],
@@ -126,7 +126,7 @@ class _HotLineListState extends State<HotLineList> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 8.0),
-                                      child: Text(document.data()['body']),
+                                      child: Text(document['body']),
                                     ),
                                     Row(
                                       children: <Widget>[
@@ -135,7 +135,7 @@ class _HotLineListState extends State<HotLineList> {
                                             child: FutureBuilder(
                                               future: FirebaseFirestore.instance
                                                   .doc(
-                                                      document.data()['schoolId'] ??
+                                                      document['schoolId'] ??
                                                           '')
                                                   .get(),
                                               initialData: document,
@@ -177,8 +177,8 @@ class _HotLineListState extends State<HotLineList> {
                                             ),
                                           ),
                                         ),
-                                        document.data()['media'] != null
-                                            ? document.data()['isVideo'] ?? false
+                                        document['media'] != null
+                                            ? document['isVideo'] ?? false
                                                 ? Icon(
                                                     Icons.videocam,
                                                     color: Colors.blueAccent,

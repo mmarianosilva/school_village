@@ -137,7 +137,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onTakePhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.takeImage();
+    final File photo = File((await selectImageUsecase.takeImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -145,7 +145,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectPhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.selectImage();
+    final File photo = File((await selectImageUsecase.selectImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -153,7 +153,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectVideo() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File video = await selectImageUsecase.selectVideo();
+    final File video = File((await selectImageUsecase.selectVideo()).path);
     if (video != null) {
       setState(() {
         sending = true;
@@ -258,7 +258,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         // "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot.data()["phone"]
+        "phone": _userSnapshot["phone"]
       };
       try {
         FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -310,7 +310,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             ),
           ),
           actions: (widget.channel.isClass ?? false) &&
-              ((_userSnapshot != null && (_userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "school_admin" || _userSnapshot.data()["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "district")) ||
+              ((_userSnapshot != null && (_userSnapshot["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "school_admin" || _userSnapshot["associatedSchools"]["${_schoolId.substring("schools/".length)}"]["role"] == "district")) ||
               (widget.channel.admin.id ==
                       FirebaseFirestore.instance
                           .doc("users/${_userSnapshot?.id ?? "a"}")))

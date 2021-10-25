@@ -126,7 +126,7 @@ class IncidentListState extends State<IncidentList> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document.data()['createdAt']))}"),
+                  "${dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(document['createdAt']))}"),
               trailing: FlatButton(
                 child: Text(localize('VIEW')),
                 onPressed: () {
@@ -136,18 +136,18 @@ class IncidentListState extends State<IncidentList> {
                       builder: (context) => IncidentDetails(
                           firestoreDocument: document,
                           demo: false,
-                          details: document.data()['details'],
+                          details: document['details'],
                           date: DateTime.fromMillisecondsSinceEpoch(
-                              document.data()['date']),
-                          name: document.data()['createdBy'],
-                          reportedById: document.data()['createdById'],
-                          location: document.data()['location'],
+                              document['date']),
+                          name: document['createdBy'],
+                          reportedById: document['createdById'],
+                          location: document['location'],
                           witnessNames: witnessNames,
                           subjectNames: subjectNames,
                           items: items,
                           posItems: posItems,
-                          imgUrl: document.data()['image'],
-                          other: document.data()['other'],),
+                          imgUrl: document['image'],
+                          other: document['other'],),
                     ),
                   );
                 },
