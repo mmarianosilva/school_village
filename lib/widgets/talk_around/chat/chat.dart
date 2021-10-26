@@ -105,7 +105,7 @@ class _ChatState extends State<Chat> {
       await transaction.set(document, <String, dynamic>{
         'body': text,
         'authorId': user.id,
-        'author': "${user.data()['firstName']} ${user.data()['lastName']}",
+        'author': "${user['firstName']} ${user['lastName']}",
         'timestamp': FieldValue.serverTimestamp(),
         'location': widget.showLocation ? await _getLocation() : null,
         'image': image == null ? null : path
@@ -154,8 +154,8 @@ class _ChatState extends State<Chat> {
   }
 
   _handleMessageMapInsert(DocumentSnapshot shot) {
-    print(shot.data()['timestamp']);
-    var day = _convertDateToKey(shot.data()['timestamp']);
+    print(shot['timestamp']);
+    var day = _convertDateToKey(shot['timestamp']);
 
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
@@ -229,14 +229,14 @@ class _ChatState extends State<Chat> {
 
             final DocumentSnapshot document = messageList[index].message;
             return ChatMessage(
-              text: document.data()['body'],
-              name: "${document.data()['author']}",
-              phone: "${document.data()['phone']}",
-              timestamp: document.data()['timestamp'],
-              self: document.data()['authorId'] == user.id,
-              location: widget.showLocation ? document.data()['location'] : null,
-              imageUrl: document.data()['image'],
-              isVideo: document.data()['isVideo'],
+              text: document['body'],
+              name: "${document['author']}",
+              phone: "${document['phone']}",
+              timestamp: document['timestamp'],
+              self: document['authorId'] == user.id,
+              location: widget.showLocation ? document['location'] : null,
+              imageUrl: document['image'],
+              isVideo: document['isVideo'],
               message: document,
             );
           });

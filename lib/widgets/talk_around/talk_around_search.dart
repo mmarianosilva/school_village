@@ -75,8 +75,8 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
         final DocumentSnapshot user = await id.get();
         TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
             user,
-            user.data()["associatedSchools"][escapedSchoolId] != null
-                ? user.data()["associatedSchools"][escapedSchoolId]["role"]
+            user["associatedSchools"][escapedSchoolId] != null
+                ? user["associatedSchools"][escapedSchoolId]["role"]
                 : "");
         return member;
       });
@@ -115,7 +115,7 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
   }
 
   void _getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     _role = await UserHelper.getSelectedSchoolRole();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
@@ -157,12 +157,12 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
       List<Future<TalkAroundChannel>> processedChannels =
           channels.docs.map((channel) async {
         Stream<TalkAroundUser> members =
-            Stream.fromIterable(channel.data()["members"]).asyncMap((id) async {
+            Stream.fromIterable(channel["members"]).asyncMap((id) async {
           final DocumentSnapshot user = await id.get();
           TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
               user,
-              user.data()["associatedSchools"][escapedSchoolId] != null
-                  ? user.data()["associatedSchools"][escapedSchoolId]["role"]
+              user["associatedSchools"][escapedSchoolId] != null
+                  ? user["associatedSchools"][escapedSchoolId]["role"]
                   : "");
           return member;
         });
@@ -190,9 +190,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
     final List<String> talkAroundPermissions =
         PermissionMatrix.getTalkAroundPermissions(_role);
     modifiableUserList.removeWhere((userSnapshot) =>
-        userSnapshot.data()["associatedSchools"][escapedSchoolId] == null ||
+        userSnapshot["associatedSchools"][escapedSchoolId] == null ||
         !talkAroundPermissions.contains(
-            userSnapshot.data()["associatedSchools"][escapedSchoolId]["role"]));
+            userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
 
     final List<TalkAroundChannel> userList = modifiableUserList.map((doc) {
       return TalkAroundChannel(
@@ -204,9 +204,9 @@ class _TalkAroundSearchState extends State<TalkAroundSearch> {
             TalkAroundUser(
                 doc.reference,
                 UserHelper.getDisplayName(doc),
-                doc.data()["associatedSchools"][escapedSchoolId] != null
+                doc["associatedSchools"][escapedSchoolId] != null
                     ? TalkAroundUser.mapGroup(
-                        doc.data()["associatedSchools"][escapedSchoolId]["role"])
+                        doc["associatedSchools"][escapedSchoolId]["role"])
                     : "")
           ]));
     }).toList();

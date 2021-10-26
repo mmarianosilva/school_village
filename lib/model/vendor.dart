@@ -28,14 +28,14 @@ class Vendor {
 
   Vendor.fromDocument(DocumentSnapshot document) : this(
     id: document.id,
-    name: document.data()['name'],
-    contactName: document.data()['contact_name'],
-    contactPhone: document.data()['contact_phone'],
-    address: document.data()['address'],
-    about: document.data()['about'],
-    url: document.data()['url'],
-    coverPhotoUrl: document.data()['cover_url'],
-    email: document.data()['email'],
+    name: document['name'],
+    contactName: document['contact_name'],
+    contactPhone: document['contact_phone'],
+    address: document['address'],
+    about: document['about'],
+    url: document['url'],
+    coverPhotoUrl: document['cover_url'],
+    email: document['email'],
   );
 
   final String id;

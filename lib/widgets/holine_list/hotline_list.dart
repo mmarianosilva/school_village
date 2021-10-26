@@ -12,7 +12,7 @@ class HotLineList extends StatefulWidget {
 }
 
 class _HotLineListState extends State<HotLineList> {
-  FirebaseUser _userId;
+  User _userId;
   String name = '';
   String _schoolId = '';
   bool isLoaded = false;
@@ -25,10 +25,10 @@ class _HotLineListState extends State<HotLineList> {
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
     _userRef = FirebaseFirestore.instance.doc("users/${_userId.uid}");
     _userRef.get().then((user) {
-      var keys = user.data()["associatedSchools"][schoolId]["groups"].keys;
+      var keys = user["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = new List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user.data()["associatedSchools"][schoolId]["groups"]
+        if (user["associatedSchools"][schoolId]["groups"]
                 [keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
@@ -78,7 +78,7 @@ class _HotLineListState extends State<HotLineList> {
                         itemBuilder: (_, int index) {
                           final DocumentSnapshot document =
                               snapshot.data.documents[index];
-                          debugPrint(document.data()['body']);
+                          debugPrint(document['body']);
 
                           return GestureDetector(
                             onTap: () => Navigator.push(
@@ -102,7 +102,7 @@ class _HotLineListState extends State<HotLineList> {
                                   children: <Widget>[
                                     Row(
                                       children: <Widget>[
-                                        Text(document.data()['createdBy'],
+                                        Text(document['createdBy'],
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Spacer(),
@@ -110,7 +110,7 @@ class _HotLineListState extends State<HotLineList> {
                                             dateFormatting.dateFormatter.format(
                                                 DateTime
                                                     .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
+                                                        document['createdAt'])),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Spacer(),
@@ -118,7 +118,7 @@ class _HotLineListState extends State<HotLineList> {
                                             dateFormatting.timeFormatter.format(
                                                 DateTime
                                                     .fromMillisecondsSinceEpoch(
-                                                        document.data()['createdAt'])),
+                                                        document['createdAt'])),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                       ],
@@ -126,7 +126,7 @@ class _HotLineListState extends State<HotLineList> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 8.0),
-                                      child: Text(document.data()['body']),
+                                      child: Text(document['body']),
                                     ),
                                     Row(
                                       children: <Widget>[
@@ -135,7 +135,7 @@ class _HotLineListState extends State<HotLineList> {
                                             child: FutureBuilder(
                                               future: FirebaseFirestore.instance
                                                   .doc(
-                                                      document.data()['schoolId'] ??
+                                                      document['schoolId'] ??
                                                           '')
                                                   .get(),
                                               initialData: document,
@@ -177,8 +177,8 @@ class _HotLineListState extends State<HotLineList> {
                                             ),
                                           ),
                                         ),
-                                        document.data()['media'] != null
-                                            ? document.data()['isVideo'] ?? false
+                                        document['media'] != null
+                                            ? document['isVideo'] ?? false
                                                 ? Icon(
                                                     Icons.videocam,
                                                     color: Colors.blueAccent,

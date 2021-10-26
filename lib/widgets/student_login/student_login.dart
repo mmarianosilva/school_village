@@ -107,7 +107,7 @@ class _StudentLoginState extends State<StudentLogin> {
         )
     );
     var url = "https://us-central1-schoolvillage-1.cloudfunctions.net/api/student/code/$code";
-    var response  = await http.get(url);
+    var response  = await http.get(Uri.parse(url));
     print(response.body);
     return response.body;
   }

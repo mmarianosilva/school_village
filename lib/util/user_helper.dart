@@ -8,7 +8,7 @@ import 'analytics_helper.dart';
 
 class UserHelper {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   static final Future<SharedPreferences> _prefsFuture =
       SharedPreferences.getInstance();
   static SharedPreferences _prefs;
@@ -17,7 +17,7 @@ class UserHelper {
   static Map<String, String> positiveIncidents;
   static Map<String, String> negativeIncidents;
 
-  static Future<AuthResult> signIn({email: String, password: String}) async {
+  static Future<UserCredential> signIn({email: String, password: String}) async {
     if (_prefs == null) {
       _prefs = await _prefsFuture;
     }
@@ -27,8 +27,8 @@ class UserHelper {
         email: email.trim().toLowerCase(), password: password);
   }
 
-  static Future<FirebaseUser> getUser() async {
-    FirebaseUser user = await _auth.currentUser();
+  static Future<User> getUser() async {
+    User user = await _auth.currentUser;
     if (user == null) {
       if (_prefs == null) {
         _prefs = await _prefsFuture;
@@ -43,7 +43,7 @@ class UserHelper {
       }
       await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      return _auth.currentUser();
+      return _auth.currentUser;
     }
     AnalyticsHelper.setUserId(user.uid);
     return user;
@@ -60,20 +60,18 @@ class UserHelper {
   }
 
   static getSchools() async {
-    final FirebaseUser currentUser = await getUser();
+    final User currentUser = await getUser();
     if (currentUser == null) {
       return null;
     }
     String userPath = "/users/${currentUser.uid}";
     print(currentUser);
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot = await userRef.get();
 
     List<dynamic> schools = [];
     Iterable<dynamic> keys = userSnapshot.data()['associatedSchools'].keys;
-    setIsOwner(userSnapshot.data()['owner'] != null && userSnapshot.data()['owner'] == true
-        ? true
-        : false);
+    setIsOwner(((userSnapshot.data()['owner'] ?? null) != null) ? true : false);
     for (int i = 0; i < keys.length; i++) {
       schools.add({
         "ref": "schools/${keys.elementAt(i).toString().trim()}",
@@ -88,7 +86,7 @@ class UserHelper {
       String selectedSchool = await getSelectedSchoolID();
 
       DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
-      DocumentSnapshot schoolSnapshot = await schoolRef.get();
+      DocumentSnapshot<Map<String, dynamic>> schoolSnapshot = await schoolRef.get();
 
       var items = schoolSnapshot.data()["incidents"];
 
@@ -101,7 +99,7 @@ class UserHelper {
     final String selectedSchool = await getSelectedSchoolID();
     print(selectedSchool);
     DocumentReference schoolRef = FirebaseFirestore.instance.doc(selectedSchool);
-    DocumentSnapshot schoolSnapshot = await schoolRef.get();
+    DocumentSnapshot<Map<String, dynamic>>  schoolSnapshot = await schoolRef.get();
     List<dynamic> groups = [];
     Iterable<dynamic> keys = schoolSnapshot.data()['groups'].keys;
     for (int i = 0; i < keys.length; i++) {
@@ -177,7 +175,7 @@ class UserHelper {
   }
 
   static updateTopicSubscription() async {
-    final FirebaseUser currentUser = await getUser();
+    final User currentUser = await getUser();
     if (currentUser == null) {
       return null;
     }
@@ -252,11 +250,11 @@ class UserHelper {
     return location;
   }
 
-  static String getDisplayName([DocumentSnapshot snapshot]) {
+  static String getDisplayName([DocumentSnapshot<Map<String, dynamic>> snapshot]) {
     return "${snapshot.data()["firstName"]} ${snapshot.data()["lastName"]} ${snapshot.data()["room"] != null && snapshot.data()["room"].isNotEmpty ? ' (${snapshot.data()["room"]})' : ''}";
   }
 
-  static String getRoomNumber([DocumentSnapshot snapshot]) {
+  static String getRoomNumber([DocumentSnapshot<Map<String, dynamic>> snapshot]) {
     return snapshot.data()["room"];
   }
 }
