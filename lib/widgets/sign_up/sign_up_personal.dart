@@ -21,6 +21,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   bool _agreed = false;
   bool _isBoater = true;
   bool _isVendor = false;
+  bool _isLoading = false;
   String _error;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -28,9 +29,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController =
-      MaskedTextController(mask: "(000) 000-0000");
-  final TextEditingController _newPhoneController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
@@ -53,7 +52,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   bool _validatePhoneNumber() {
-    return _newPhoneController.text
+    return _phoneController.text
             .replaceAll("(", "")
             .replaceAll(")", "")
             .replaceAll(" ", "")
@@ -63,6 +62,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   Future<void> _onNextPressed() async {
+    setState(() {
+      _isLoading = true;
+    });
     setState(() {
       _error = null;
     });
@@ -115,25 +117,33 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
     final email = _emailController.text;
     final password = _passwordController.text;
+    String uid = "";
     try {
-      final auth = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      if (auth.user != null) {
-        try {
-          await auth.user.sendEmailVerification();
-        } catch (e) {
-          print("An error occured while trying to send email verification");
-          print(e.message);
+      final user = await FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        final auth = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        if (auth.user != null) {
+          uid = auth.user.uid;
+          try {
+            await auth.user.sendEmailVerification();
+          } catch (e) {
+            print("An error occured while trying to send email verification");
+            print(e.message);
+          }
+          final sharedPreferences = await SharedPreferences.getInstance();
+          sharedPreferences.setString("email", email.trim().toLowerCase());
+          sharedPreferences.setString("password", password);
         }
-        final sharedPreferences = await SharedPreferences.getInstance();
-        sharedPreferences.setString("email", email.trim().toLowerCase());
-        sharedPreferences.setString("password", password);
+      } else {
+        uid = user.uid;
       }
+
       final data = <String, dynamic>{
         "email": email,
         "firstName": _firstNameController.text,
         "lastName": _lastNameController.text,
-        "phone": _newPhoneController.text
+        "phone": _phoneController.text
             .replaceAll("(", "")
             .replaceAll(")", "")
             .replaceAll(" ", "")
@@ -142,9 +152,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       data["vendor"] = _isVendor ?? false;
       await FirebaseFirestore.instance
           .collection("users")
-          .doc(auth.user.uid)
+          .doc(uid)
           .set(data);
-
+      setState(() {
+        _isLoading = false;
+      });
       if (_isBoater) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => SignUpBoat(userData: data)));
@@ -156,45 +168,20 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       if (e.code == 'weak-password') {
         setState(() {
           _error = "Password does not meet the security criteria";
+          _isLoading = false;
         });
       } else if (e.code == 'email-already-in-use') {
         setState(() {
           _error = "This email has already been registered";
+          _isLoading = false;
         });
       }
     }
   }
 
-  void _onPhoneInputChanged() {
-    // print("CHECK 1");
-    //_phoneController..selection = TextSelection.collapsed(offset: _phoneController.text.length);
-
-    //_phoneController.text = text;
-
-    // _validatePhoneNumber();
-    // if (_validatePhoneNumber()) {
-    //   print("CHECK 2");
-    //   //FocusScope.of(context).unfocus();
-    // }
-    //Fix X
-    TextSelection previousSelection = _phoneController.selection;
-    _phoneController.selection = previousSelection;
-    //Fix Y
-    var cursorPos = _phoneController.selection;
-
-    // _phoneController.text = _phoneController.text ?? '';
-    //
-    // if (cursorPos.start > _phoneController.text.length) {
-    //   cursorPos = new TextSelection.fromPosition(
-    //       new TextPosition(offset: _phoneController.text.length));
-    // }
-    // _phoneController.selection = cursorPos;
-  }
-
   @override
   void initState() {
     super.initState();
-    //_phoneController.addListener(_onPhoneInputChanged);
   }
 
   @override
@@ -287,12 +274,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8.0),
                         child: SignUpTextField(
-                         // inputFormatter: MaskedInputFormatter('(###) ###-####'),
+                          // inputFormatter: MaskedInputFormatter('(###) ###-####'),
 
-                          controller: _newPhoneController,
+                          controller: _phoneController,
                           hint: localize("Phone"),
-                          textInputType:
-                              TextInputType.phone,
+                          textInputType: TextInputType.phone,
                           inputFormatter: MaskedInputFormatter("(###)###-####"),
                         ),
                       ),
@@ -509,6 +495,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ],
                       ),
                     ),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : const SizedBox(),
             ],
           ),
           resizeToAvoidBottomInset: false,
@@ -523,8 +512,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
   @override
   void dispose() {
-    _newPhoneController.dispose();
-    // _phoneController.removeListener(_onPhoneInputChanged);
+    _phoneController.dispose();
     super.dispose();
   }
 }

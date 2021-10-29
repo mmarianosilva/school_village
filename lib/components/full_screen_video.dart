@@ -1,4 +1,4 @@
-//import 'package:awsome_video_player/awsome_video_player.dart';
+
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -52,25 +52,5 @@ class _VideoAppState extends State<FullScreenVideoView> {
     return VideoPlayer(controller);
   }
 
-  Widget oldPlayer() {
-    // Center(
-    //     child: AwsomeVideoPlayer(
-    //       url,
-    //       playOptions: VideoPlayOptions(
-    //         autoplay: false,
-    //         allowScrubbing: true,
-    //       ),
-    //       onplay: (VideoPlayerValue value) {
-    //         setState(() {
-    //           _isPlaying = true;
-    //         });
-    //       },
-    //       onpause: (VideoPlayerValue value) {
-    //         setState(() {
-    //           _isPlaying = false;
-    //         });
-    //       },
-    //     )
-    // )
-  }
+
 }
