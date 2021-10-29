@@ -21,6 +21,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   bool _agreed = false;
   bool _isBoater = true;
   bool _isVendor = false;
+  bool _isLoading = false;
   String _error;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -61,6 +62,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   Future<void> _onNextPressed() async {
+    setState(() {
+      _isLoading = true;
+    });
     setState(() {
       _error = null;
     });
@@ -113,20 +117,28 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
     final email = _emailController.text;
     final password = _passwordController.text;
+    String uid = "";
     try {
-      final auth = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      if (auth.user != null) {
-        try {
-          await auth.user.sendEmailVerification();
-        } catch (e) {
-          print("An error occured while trying to send email verification");
-          print(e.message);
+      final user = await FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        final auth = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        if (auth.user != null) {
+          uid = auth.user.uid;
+          try {
+            await auth.user.sendEmailVerification();
+          } catch (e) {
+            print("An error occured while trying to send email verification");
+            print(e.message);
+          }
+          final sharedPreferences = await SharedPreferences.getInstance();
+          sharedPreferences.setString("email", email.trim().toLowerCase());
+          sharedPreferences.setString("password", password);
         }
-        final sharedPreferences = await SharedPreferences.getInstance();
-        sharedPreferences.setString("email", email.trim().toLowerCase());
-        sharedPreferences.setString("password", password);
+      } else {
+        uid = user.uid;
       }
+
       final data = <String, dynamic>{
         "email": email,
         "firstName": _firstNameController.text,
@@ -140,9 +152,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       data["vendor"] = _isVendor ?? false;
       await FirebaseFirestore.instance
           .collection("users")
-          .doc(auth.user.uid)
+          .doc(uid)
           .set(data);
-
+      setState(() {
+        _isLoading = false;
+      });
       if (_isBoater) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => SignUpBoat(userData: data)));
@@ -154,16 +168,16 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       if (e.code == 'weak-password') {
         setState(() {
           _error = "Password does not meet the security criteria";
+          _isLoading = false;
         });
       } else if (e.code == 'email-already-in-use') {
         setState(() {
           _error = "This email has already been registered";
+          _isLoading = false;
         });
       }
     }
   }
-
-
 
   @override
   void initState() {
@@ -260,12 +274,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 8.0),
                         child: SignUpTextField(
-                         // inputFormatter: MaskedInputFormatter('(###) ###-####'),
+                          // inputFormatter: MaskedInputFormatter('(###) ###-####'),
 
                           controller: _phoneController,
                           hint: localize("Phone"),
-                          textInputType:
-                              TextInputType.phone,
+                          textInputType: TextInputType.phone,
                           inputFormatter: MaskedInputFormatter("(###)###-####"),
                         ),
                       ),
@@ -482,6 +495,9 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         ],
                       ),
                     ),
+              _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : const SizedBox(),
             ],
           ),
           resizeToAvoidBottomInset: false,
