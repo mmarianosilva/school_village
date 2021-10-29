@@ -28,9 +28,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
       TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController =
-      MaskedTextController(mask: "(000) 000-0000");
-  final TextEditingController _newPhoneController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
@@ -53,7 +51,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   }
 
   bool _validatePhoneNumber() {
-    return _newPhoneController.text
+    return _phoneController.text
             .replaceAll("(", "")
             .replaceAll(")", "")
             .replaceAll(" ", "")
@@ -133,7 +131,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         "email": email,
         "firstName": _firstNameController.text,
         "lastName": _lastNameController.text,
-        "phone": _newPhoneController.text
+        "phone": _phoneController.text
             .replaceAll("(", "")
             .replaceAll(")", "")
             .replaceAll(" ", "")
@@ -165,36 +163,11 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
   }
 
-  void _onPhoneInputChanged() {
-    // print("CHECK 1");
-    //_phoneController..selection = TextSelection.collapsed(offset: _phoneController.text.length);
 
-    //_phoneController.text = text;
-
-    // _validatePhoneNumber();
-    // if (_validatePhoneNumber()) {
-    //   print("CHECK 2");
-    //   //FocusScope.of(context).unfocus();
-    // }
-    //Fix X
-    TextSelection previousSelection = _phoneController.selection;
-    _phoneController.selection = previousSelection;
-    //Fix Y
-    var cursorPos = _phoneController.selection;
-
-    // _phoneController.text = _phoneController.text ?? '';
-    //
-    // if (cursorPos.start > _phoneController.text.length) {
-    //   cursorPos = new TextSelection.fromPosition(
-    //       new TextPosition(offset: _phoneController.text.length));
-    // }
-    // _phoneController.selection = cursorPos;
-  }
 
   @override
   void initState() {
     super.initState();
-    //_phoneController.addListener(_onPhoneInputChanged);
   }
 
   @override
@@ -289,7 +262,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
                         child: SignUpTextField(
                          // inputFormatter: MaskedInputFormatter('(###) ###-####'),
 
-                          controller: _newPhoneController,
+                          controller: _phoneController,
                           hint: localize("Phone"),
                           textInputType:
                               TextInputType.phone,
@@ -523,8 +496,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
   @override
   void dispose() {
-    _newPhoneController.dispose();
-    // _phoneController.removeListener(_onPhoneInputChanged);
+    _phoneController.dispose();
     super.dispose();
   }
 }
