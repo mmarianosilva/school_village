@@ -56,6 +56,9 @@ class Splash extends StatelessWidget {
   Future<bool> versionCheck(context) async {
     final appInfo =
         await FirebaseFirestore.instance.collection("app_info").get();
+    if(appInfo.docs.isEmpty){
+      return true;
+    }
     final appData = appInfo.docs.first;
     Version versionInfo =
         appData != null ? Version.fromMap(appData.data()) : null;
