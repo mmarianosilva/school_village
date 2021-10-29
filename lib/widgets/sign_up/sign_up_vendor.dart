@@ -72,7 +72,12 @@ class _SignUpVendorState extends State<SignUpVendor> {
             .length ==
         10;
   }
-
+  @override
+  void dispose() {
+    _officePhoneController.dispose();
+    _mobilePhoneController.dispose();
+    super.dispose();
+  }
   bool _verifyEmail() {
     return Constants.emailRegEx.hasMatch(_companyEmailController.text);
   }
