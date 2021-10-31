@@ -325,33 +325,35 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return SizedBox();
   }
 
-  _buildDocumentOption(DocumentSnapshot snapshot, index) {
+  _buildDocumentOption(DocumentSnapshot<Map<String,dynamic>> snapshot, index) {
+    final value = 5;
+    //print("Doc data is  index is $index \n" );
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot["documents"][index - 4]["type"] == "pdf") {
+        if (snapshot["documents"][index - value]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot["documents"][index - 4]["connectedFiles"] != null
-                  ? snapshot["documents"][index - 4]["connectedFiles"]
+              snapshot["documents"][index - value]["connectedFiles"] != null
+                  ? snapshot["documents"][index - value]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(context, snapshot["documents"][index - 4]["location"],
-              snapshot["documents"][index - 4]["title"],
+          _showPDF(context, snapshot["documents"][index - value]["location"],
+              snapshot["documents"][index - value]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot["documents"][index - 4]["type"] == "linked-pdf") {
+        } else if (snapshot["documents"][index - value]["type"] == "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot["documents"][index - 4]["location"],
+            snapshot["documents"][index - value]["location"],
           );
         } else {
-          _launchURL(snapshot["documents"][index - 4]["location"]);
+          _launchURL(snapshot["documents"][index - value]["location"]);
         }
       },
       onLongPress: () {
-        if (snapshot["documents"][index - 4]["type"] == "pdf") {
-        } else if (snapshot["documents"][index - 4]["type"] == "linked-pdf") {}
+        if (snapshot["documents"][index - value]["type"] == "pdf") {
+        } else if (snapshot["documents"][index - value]["type"] == "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -363,7 +365,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot["documents"][index - 4]["icon"],
+                          url: snapshot["documents"][index - value]["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -384,7 +386,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot["documents"][index - 4]["title"],
+                snapshot["documents"][index - value]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -974,7 +976,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                   //                                     Temporary.updateRole(accessRole)
                                   //                                         .contains(role)
                                   //Removed above since we're upgrading
-                                  //debugPrint("Print this");
+                                  //debugPrint("Print ${snapshot["title"]}");
                                   return true;
                                 }
                               }
@@ -983,8 +985,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             .toList()
                             .cast<DocumentSnapshot>()
                         : null;
-                final int documentCount =
+                final  documentCount =
                     documents != null ? documents.length : 0;
+                //print("Documents length is $documentCount");
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
@@ -1023,9 +1026,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             // if (index == 4) {
                             //   return _buildRollCallRequest();
                             // }
-                            if (index == documentCount + 4) {
-                              return _buildMessagesOption(model);
-                            }
+                            // if (index == documentCount + 5) {
+                            //   return _buildMessagesOption(model);
+                            // }
                             if (index == documentCount + 5) {
                               return _buildNotificationsOption(model);
                             }
