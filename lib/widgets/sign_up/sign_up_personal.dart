@@ -30,7 +30,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-
+  MaskedInputFormatter formatter;
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
   }
@@ -182,6 +182,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   @override
   void initState() {
     super.initState();
+    // MaskedInputFormatter formatter = MaskedInputFormatter("(###)###-####");
+    // formatter.allowedCharMatcher = new RegExp(r'^\d*\.?\d*$');
   }
 
   @override
@@ -278,8 +280,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
                           controller: _phoneController,
                           hint: localize("Phone"),
-                          textInputType: TextInputType.phone,
-                          inputFormatter: MaskedInputFormatter("(###)###-####"),
+                          textInputType: TextInputType.numberWithOptions(signed: true),
+                          inputFormatter: MaskedInputFormatter("(###)###-####", allowedCharMatcher: RegExp(r'[0-9]')),
                         ),
                       ),
                       Padding(
