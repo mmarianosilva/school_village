@@ -29,12 +29,15 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
     // First we find vendors that are listed in this district
     //Then we add thir listed categories in a set
     //Now we filter those categories to remove categories without vendorCount or if they're deleted
+    print("Check 1");
     var uniqueCategories = <dynamic>{};
     final vendorsList = (await FirebaseFirestore.instance
             .collection('vendors')
             .where('districts', arrayContainsAny: [localDistrict]).get())
         .docs;
+    print("Check 2");
     if (vendorsList.isNotEmpty) {
+      print("Check 3");
       vendorsList
           .removeWhere((element) => (element.data()['deleted'] ?? false));
       vendorsList.forEach((element) {
@@ -47,23 +50,26 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
             .get();
         categories.add(VendorCategory.fromDocument(document: vendorCat));
       }
+      print("Check 4");
       categories.removeWhere((category) {
         return (category.deleted ?? false) || (category.vendorsCount == 0);
       });
       categories.sort((item1, item2) => item1.name.compareTo(item2.name));
       final indexOfSpecialOffers =
           categories.indexWhere((item) => item.name == "SPECIAL OFFERS");
+      print("Check 5");
       if (indexOfSpecialOffers != -1) {
         final specialOffer = categories[indexOfSpecialOffers];
         categories.removeAt(indexOfSpecialOffers);
         categories.insert(0, specialOffer);
       }
-      setState(() {
-        isLoading = false;
-      });
-
+      print("Check 6");
+      print("Check 7");
       //print("Length 2 ${vendorsList.length}");
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -89,14 +95,23 @@ class _VendorCategoryListState extends State<VendorCategoryList> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemBuilder: _buildVendorListItem,
-              itemCount: categories.length,
-            ),
+          : categories.length == 0
+              ? Center(
+                  child: Text("No Vendors Found!!"),
+                )
+              : ListView.builder(
+                  itemBuilder: _buildVendorListItem,
+                  itemCount: categories.length,
+                ),
     );
   }
 
   Widget _buildVendorListItem(BuildContext context, int index) {
+    if (categories.length == 0) {
+      return Center(
+        child: Text("No Vendors Found!!"),
+      );
+    }
     final item = categories[index];
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
