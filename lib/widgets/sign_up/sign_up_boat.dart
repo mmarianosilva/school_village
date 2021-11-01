@@ -42,7 +42,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
   final TextEditingController _descriptionController = TextEditingController();
 
   Future<void> _onNextPressed() async {
-    if (selectedMarina == null) {
+    if (selectedMarina.isEmpty) {
       return;
     }
     final boatLocation = <String, dynamic>{};
