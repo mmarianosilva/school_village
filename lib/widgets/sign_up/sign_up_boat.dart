@@ -24,6 +24,7 @@ class SignUpBoat extends StatefulWidget {
 }
 
 class _SignUpBoatState extends State<SignUpBoat> {
+  String _error;
   BoatLocation _boatLocation = BoatLocation.dockSlip;
   final List<Map<String, dynamic>> marinas = <Map<String, dynamic>>[];
   final Map<String, dynamic> selectedMarina = <String, dynamic>{};
@@ -43,8 +44,14 @@ class _SignUpBoatState extends State<SignUpBoat> {
 
   Future<void> _onNextPressed() async {
     if (selectedMarina.isEmpty) {
+      setState(() {
+        _error = 'Please Select Your Home Marina';
+      });
       return;
     }
+    setState(() {
+      _error = '';
+    });
     final boatLocation = <String, dynamic>{};
     switch (_boatLocation) {
       case BoatLocation.dockSlip:
@@ -609,6 +616,22 @@ class _SignUpBoatState extends State<SignUpBoat> {
                     ],
                   ),
                   const SizedBox(height: 8.0),
+                  SizedBox(
+                    height: 40.0,
+                    child: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        _error ?? '',
+                        maxLines: 2,
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
