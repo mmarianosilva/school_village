@@ -340,7 +340,7 @@ class _HomeState extends State<Home>
       debugPrint('Retrieved channelInformation information');
       debugPrint(data.data.toString());
       TalkAroundChannel channel;
-      if (data["direct"] ?? false) {
+      if (data.data()["direct"] ?? false) {
         Stream<TalkAroundUser> membersStream =
             Stream.fromIterable(data.data()["members"])
                 .asyncMap((userId) async {
