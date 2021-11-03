@@ -286,7 +286,8 @@ class _IncidentManagementState extends State<IncidentManagement>
                 InfoWindow(title: message.author, snippet: message.message)));
       }
     }
-
+    final ids = Set();
+    _fullList.retainWhere((x) => ids.add(x.id));
     setState(() {
       _messages = _fullList;
     });
