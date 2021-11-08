@@ -25,9 +25,10 @@ dependencies:
   sentry: 6.0.0
   device_info: ^2.0.2
   scoped_model: ^1.1.0
-  audioplayers: ^0.20.0
+  audioplayers: ^0.20.1
   intl: 0.17.0
   image_picker: ^0.8.4
+  chewie_audio: ^1.2.0
   photo_view: 0.4.0
   package_info: ^2.0.2
   video_player: ^2.1.15

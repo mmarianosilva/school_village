@@ -32,7 +32,7 @@ class _BroadcastState extends State<Broadcast> {
   final customAlertController = TextEditingController();
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     print("User ID");
     print(user.uid);
     _email = user.email;
@@ -40,12 +40,12 @@ class _BroadcastState extends State<Broadcast> {
     _schoolName = await UserHelper.getSchoolName();
     _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     _user.get().then((user) {
-      _userSnapshot = user;
+      _userSnapshot = user ;
       _userId = user.id;
       setState(() {
         name =
-        "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
-        phone = _userSnapshot.data()['phone'];
+        "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}";
+        phone = _userSnapshot['phone'];
         isLoaded = true;
       });
       print(name);
