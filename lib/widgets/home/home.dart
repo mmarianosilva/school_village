@@ -95,7 +95,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
 
   Future playAlarm() async {
     final role = await UserHelper.getSelectedSchoolRole();
-    if ((role == 'school_security' || role == 'school_admin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
+    if ((role == 'security' || role == 'admin' || role == 'district') && ((await SharedPreferences.getInstance()).getInt(Constants.lastAmberAlertTimestampKey) ?? 0) > DateTime.now().millisecondsSinceEpoch - 3600000) {
       return playMessageAlert();
     }
     if (!Platform.isIOS) {
@@ -250,7 +250,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver, DashboardScope
       return _showBroadcastDialog(message);
     } else if (message["type"] == "hotline") {
       String role = await UserHelper.getSelectedSchoolRole();
-      if (role == 'school_student' || role == 'school_family') {
+      if (role == 'student' || role == 'family') {
         return true;
       }
       playMessageAlert();

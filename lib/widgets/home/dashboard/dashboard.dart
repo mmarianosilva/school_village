@@ -380,9 +380,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentReport() {
-    if (role == 'school_student' ||
-        role == 'school_family' ||
-        role == 'pd-fire-ems') {
+    if (role == 'student' ||
+        role == 'family' ||
+        role == 'pd_fire_ems') {
       return SizedBox();
     }
 
@@ -428,9 +428,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildIncidentList() {
-    if (role == 'school_student' ||
-        role == 'school_family' ||
-        role == 'pd-fire-ems') {
+    if (role == 'student' ||
+        role == 'family' ||
+        role == 'pd_fire_ems') {
       return SizedBox();
     }
 
@@ -476,8 +476,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildHotlineMessages() {
-    if (role != 'school_admin' &&
-        role != 'school_security' &&
+    if (role != 'admin' &&
+        role != 'security' &&
         role != 'district') {
       return SizedBox();
     }
@@ -520,7 +520,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildAlertButton() {
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'student' || role == 'family') {
       return SizedBox(
         height: 48.0,
       );
@@ -549,7 +549,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            if (role == 'school_admin' || role == 'district') ...[
+            if (role == 'admin' || role == 'district') ...[
               Text(
                 localize('Schoolwide roll call').toUpperCase(),
                 style: TextStyle(
@@ -798,7 +798,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildRollCallRequest() {
-    if (role == 'school_student' || role == 'school_family') {
+    if (role == 'student' || role == 'family') {
       return const SizedBox();
     }
     return GestureDetector(

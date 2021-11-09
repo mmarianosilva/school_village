@@ -1,8 +1,8 @@
-const String family = "school_family";
-const String student = "school_student";
-const String admin = "school_admin";
-const String security = "school_security";
-const String staff = "school_staff";
+const String family = "family";
+const String student = "student";
+const String admin = "admin";
+const String security = "security";
+const String staff = "staff";
 const String district = "district";
 const String pdFireEms = "pd-fire-ems";
 

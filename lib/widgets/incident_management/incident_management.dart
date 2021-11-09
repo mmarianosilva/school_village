@@ -142,8 +142,8 @@ class _IncidentManagementState extends State<IncidentManagement>
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-                editable: role == 'school_admin' ||
-                    role == 'school_security' ||
+                editable: role == 'admin' ||
+                    role == 'security' ||
                     role == 'pd_fire_ems' ||
                     role == 'district',
               )),
@@ -351,7 +351,7 @@ class _IncidentManagementState extends State<IncidentManagement>
     Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
         .where("roles",
-            arrayContainsAny: [role, "school_security", "school_admin"]);
+            arrayContainsAny: [role, "security", "admin"]);
     QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.docs.forEach((channelDocument) {
@@ -441,7 +441,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   List<Widget> _buildStopAlertItems() {
-    if (role == 'school_security' || role == 'school_admin') {
+    if (role == 'security' || role == 'admin') {
       return [
         Spacer(),
         Container(
