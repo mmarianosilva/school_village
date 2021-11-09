@@ -81,7 +81,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
     CollectionReference alerts =
-    FirebaseFirestore.instance.collection("${schoolId}/notifications");
+        FirebaseFirestore.instance.collection("${schoolId}/notifications");
     _alertSubscription = alerts
         .orderBy("createdAt", descending: true)
         .snapshots()
@@ -96,17 +96,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           (await alerts.orderBy("endedAt", descending: true).limit(1).get())
               .docs;
       final DocumentSnapshot latestResolved =
-      lastAlert.isNotEmpty ? lastAlert.first : null;
+          lastAlert.isNotEmpty ? lastAlert.first : null;
       final Timestamp lastResolvedTimestamp = latestResolved != null
           ? latestResolved["endedAt"]
           : Timestamp.fromMillisecondsSinceEpoch(0);
       final latestAlert = result.docs.lastWhere(
-              (DocumentSnapshot snapshot) =>
-          snapshot["createdAt"] >
+          (DocumentSnapshot snapshot) =>
+              snapshot["createdAt"] >
               lastResolvedTimestamp.millisecondsSinceEpoch,
           orElse: () => null);
-      SchoolAlert alert =
-      latestAlert != null ? SchoolAlert.fromMap(latestAlert.id, latestAlert.reference.path, latestAlert.data()) : null;
+      SchoolAlert alert = latestAlert != null
+          ? SchoolAlert.fromMap(
+              latestAlert.id, latestAlert.reference.path, latestAlert.data())
+          : null;
       if (this.alertInProgress != alert) {
         this.setState(() {
           this.alertInProgress = alert;
@@ -226,11 +228,11 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Support",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Support",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               const Icon(Icons.chevron_right, color: Colors.grey),
             ],
           ),
@@ -238,10 +240,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         const SizedBox(height: 14.0),
         Container(
           height: 0.5,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: MediaQuery.of(context).size.width,
           color: Colors.grey,
         )
       ],
@@ -276,22 +275,19 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                     SizedBox(width: 12.0),
                     Expanded(
                         child: Text(
-                          "Alert Log",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontSize: 18.0,
-                              color: SVColors.dashboardItemFontColor),
-                        )),
+                      "Alert Log",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          color: SVColors.dashboardItemFontColor),
+                    )),
                     const Icon(Icons.chevron_right, color: Colors.grey)
                   ],
                 ),
                 const SizedBox(height: 14.0),
                 Container(
                   height: 0.5,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
+                  width: MediaQuery.of(context).size.width,
                   color: Colors.grey,
                 )
               ],
@@ -311,12 +307,12 @@ class _DashboardState extends State<Dashboard> with RouteAware {
       onTap: () {
         if (documents[index - 4]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-          documents[index - 4]["connectedFiles"] != null
-              ? documents[index - 4]["connectedFiles"]
-              .map<Map<String, dynamic>>(
-                  (untyped) => Map<String, dynamic>.from(untyped))
-              .toList()
-              : null;
+              documents[index - 4]["connectedFiles"] != null
+                  ? documents[index - 4]["connectedFiles"]
+                      .map<Map<String, dynamic>>(
+                          (untyped) => Map<String, dynamic>.from(untyped))
+                      .toList()
+                  : null;
           _showPDF(context, documents[index - 4]["location"],
               documents[index - 4]["title"],
               connectedFiles: connectedFiles);
@@ -330,8 +326,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         }
       },
       onLongPress: () {
-        if (documents[index - 4]["type"] == "pdf") {} else
-        if (documents[index - 4]["type"] == "linked-pdf") {}
+        if (documents[index - 4]["type"] == "pdf") {
+        } else if (documents[index - 4]["type"] == "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -346,10 +342,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                           url: documents[index - 4]["icon"], context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
-                        print(" SnapShot hasdata ${snapshot
-                            .hasData} and isdatanull ${snapshot.data !=
-                            null} and connstate is ${snapshot
-                            .connectionState} ");
+                        print(
+                            " SnapShot hasdata ${snapshot.hasData} and isdatanull ${snapshot.data != null} and connstate is ${snapshot.connectionState} ");
                         if (snapshot.data == null ||
                             snapshot.data.lengthSync() == 0) {
                           return Image.asset('assets/images/logo.png');
@@ -362,21 +356,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    documents[index - 4]["title"],
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                documents[index - 4]["title"],
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           )
         ],
@@ -417,21 +408,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Incident Report Form",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Incident Report Form",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           ),
         ],
@@ -468,21 +456,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Incident Report Log",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Incident Report Log",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           ),
         ],
@@ -515,21 +500,18 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                    "Anonymous Hotline Log",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 18.0, color: SVColors.dashboardItemFontColor),
-                  )),
+                "Anonymous Hotline Log",
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                    fontSize: 18.0, color: SVColors.dashboardItemFontColor),
+              )),
               const Icon(Icons.chevron_right, color: Colors.grey)
             ],
           ),
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           ),
         ],
@@ -545,275 +527,272 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     }
     return GestureDetector(
       child:
-      Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
+          Image.asset('assets/images/alert.png', width: 120.0, height: 120.0),
       onTap: sendAlert,
     );
   }
 
   Future<bool> _displayRollCallDialog() async {
     return showDialog<bool>(
-      builder: (context) =>
-          AlertDialog(
-            title: Text(
-              localize('Start a Roll Call?'),
-              style: TextStyle(
+      builder: (context) => AlertDialog(
+        title: Text(
+          localize('Start a Roll Call?'),
+          style: TextStyle(
+              color: Color(0xff111010),
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.48),
+          textAlign: TextAlign.center,
+        ),
+        titlePadding: EdgeInsets.only(top: 8.0),
+        contentPadding: EdgeInsets.zero,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            if (role == 'school_admin' || role == 'district') ...[
+              Text(
+                localize('Schoolwide roll call').toUpperCase(),
+                style: TextStyle(
+                  color: Color(0xff810317),
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  height: 24.0 / 18.0,
+                  letterSpacing: 0.64,
+                ),
+              ),
+              Text(
+                localize('Select the Recipient'),
+                style: TextStyle(
                   color: Color(0xff111010),
                   fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.48),
-              textAlign: TextAlign.center,
-            ),
-            titlePadding: EdgeInsets.only(top: 8.0),
-            contentPadding: EdgeInsets.zero,
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                if (role == 'school_admin' || role == 'district') ...[
+                  letterSpacing: -0.48,
+                ),
+              ),
+              Row(
+                children: [
+                  Radio(
+                    activeColor: Color(0xff810317),
+                    onChanged: (value) {
+                      setState(() {
+                        rollCallAll = !value;
+                      });
+                    },
+                    groupValue: rollCallAll,
+                    value: !rollCallAll,
+                  ),
                   Text(
-                    localize('Schoolwide roll call').toUpperCase(),
+                    localize('Staff').toUpperCase(),
                     style: TextStyle(
-                      color: Color(0xff810317),
-                      fontSize: 18.0,
+                      color: Color(0xff881037),
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
-                      height: 24.0 / 18.0,
-                      letterSpacing: 0.64,
+                      letterSpacing: 1.16,
                     ),
+                  ),
+                  const Spacer(),
+                  Radio(
+                    activeColor: Color(0xff810317),
+                    onChanged: (value) {
+                      setState(() {
+                        rollCallAll = value;
+                      });
+                    },
+                    groupValue: rollCallAll,
+                    value: rollCallAll,
                   ),
                   Text(
-                    localize('Select the Recipient'),
+                    localize('All').toUpperCase(),
                     style: TextStyle(
-                      color: Color(0xff111010),
-                      fontSize: 20.0,
-                      letterSpacing: -0.48,
+                      color: Color(0xff881037),
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.16,
                     ),
                   ),
-                  Row(
-                    children: [
-                      Radio(
-                        activeColor: Color(0xff810317),
-                        onChanged: (value) {
-                          setState(() {
-                            rollCallAll = !value;
-                          });
-                        },
-                        groupValue: rollCallAll,
-                        value: !rollCallAll,
-                      ),
-                      Text(
-                        localize('Staff').toUpperCase(),
-                        style: TextStyle(
-                          color: Color(0xff881037),
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.16,
+                  const SizedBox(width: 16.0),
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: MaterialButton(
+                      child: Container(
+                        height: 60.0,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: Color(0xff48484a),
                         ),
-                      ),
-                      const Spacer(),
-                      Radio(
-                        activeColor: Color(0xff810317),
-                        onChanged: (value) {
-                          setState(() {
-                            rollCallAll = value;
-                          });
-                        },
-                        groupValue: rollCallAll,
-                        value: rollCallAll,
-                      ),
-                      Text(
-                        localize('All').toUpperCase(),
-                        style: TextStyle(
-                          color: Color(0xff881037),
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.16,
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: MaterialButton(
-                          child: Container(
-                            height: 60.0,
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: Color(0xff48484a),
-                            ),
-                            child: Center(
-                              child: Text(
-                                localize('Cancel').toUpperCase(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17.0,
-                                  height: 22.0 / 17.0,
-                                  letterSpacing: -0.41,
-                                ),
-                              ),
+                        child: Center(
+                          child: Text(
+                            localize('Cancel').toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17.0,
+                              height: 22.0 / 17.0,
+                              letterSpacing: -0.41,
                             ),
                           ),
-                          onPressed: () => Navigator.of(context).pop(false),
                         ),
                       ),
-                      Expanded(
-                        child: MaterialButton(
-                          child: Container(
-                            height: 60.0,
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              color: Color(0xff48484a),
-                            ),
-                            child: Center(
-                              child: Text(
-                                localize('Send').toUpperCase(),
-                                style: TextStyle(
-                                  color: Color(0xff14c3ef),
-                                  fontSize: 17.0,
-                                  height: 22.0 / 17.0,
-                                  letterSpacing: -0.41,
-                                ),
-                              ),
+                      onPressed: () => Navigator.of(context).pop(false),
+                    ),
+                  ),
+                  Expanded(
+                    child: MaterialButton(
+                      child: Container(
+                        height: 60.0,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: Color(0xff48484a),
+                        ),
+                        child: Center(
+                          child: Text(
+                            localize('Send').toUpperCase(),
+                            style: TextStyle(
+                              color: Color(0xff14c3ef),
+                              fontSize: 17.0,
+                              height: 22.0 / 17.0,
+                              letterSpacing: -0.41,
                             ),
                           ),
-                          onPressed: () => Navigator.of(context).pop(true),
                         ),
                       ),
-                    ],
+                      onPressed: () => Navigator.of(context).pop(true),
+                    ),
                   ),
-                ] else
-                  const SizedBox(),
-                const SizedBox(height: 16.0),
-                Expanded(
-                  child: Container(
-                    color: Color(0xffe5e5ea),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+                ],
+              ),
+            ] else
+              const SizedBox(),
+            const SizedBox(height: 16.0),
+            Expanded(
+              child: Container(
+                color: Color(0xffe5e5ea),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      localize('GROUP or CLASS ROLL CALL'),
+                      style: TextStyle(
+                        color: Color(0xff810317),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.46,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    SearchDropdownField(),
+                    Row(
                       children: <Widget>[
-                        Text(
-                          localize('GROUP or CLASS ROLL CALL'),
-                          style: TextStyle(
-                            color: Color(0xff810317),
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.46,
+                        Radio(
+                          activeColor: Colors.black,
+                          groupValue: true,
+                          onChanged: (value) {},
+                          value: true,
+                        ),
+                        Expanded(
+                          child: Text(
+                            localize('Self-Reported Roll Call'),
                           ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        SearchDropdownField(),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                              activeColor: Colors.black,
-                              groupValue: true,
-                              onChanged: (value) {},
-                              value: true,
-                            ),
-                            Expanded(
-                              child: Text(
-                                localize('Self-Reported Roll Call'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                              activeColor: Colors.black,
-                              groupValue: true,
-                              onChanged: (value) {},
-                              value: false,
-                            ),
-                            Expanded(
-                              child: Text(
-                                localize('Manual Roll Call'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: MaterialButton(
-                                child: Container(
-                                  height: 60.0,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    color: Color(0xff48484a),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      localize('Cancel').toUpperCase(),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 17.0,
-                                        height: 22.0 / 17.0,
-                                        letterSpacing: -0.41,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                              ),
-                            ),
-                            Expanded(
-                              child: MaterialButton(
-                                child: Container(
-                                  height: 60.0,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    color: Color(0xff48484a),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      localize('Send').toUpperCase(),
-                                      style: TextStyle(
-                                        color: Color(0xff14c3ef),
-                                        fontSize: 17.0,
-                                        height: 22.0 / 17.0,
-                                        letterSpacing: -0.41,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () =>
-                                    Navigator.of(context).pop(true),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                MaterialButton(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                      color: Color(0xff48484a),
+                    Row(
+                      children: <Widget>[
+                        Radio(
+                          activeColor: Colors.black,
+                          groupValue: true,
+                          onChanged: (value) {},
+                          value: false,
+                        ),
+                        Expanded(
+                          child: Text(
+                            localize('Manual Roll Call'),
+                          ),
+                        ),
+                      ],
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: Text(
-                      localize('Roll call log').toUpperCase(),
-                      style: TextStyle(
-                        color: Color(0xff14c3ef),
-                        fontSize: 17.0,
-                        height: 22.0 / 17.0,
-                        letterSpacing: -0.41,
-                      ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: MaterialButton(
+                            child: Container(
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Color(0xff48484a),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  localize('Cancel').toUpperCase(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17.0,
+                                    height: 22.0 / 17.0,
+                                    letterSpacing: -0.41,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(false),
+                          ),
+                        ),
+                        Expanded(
+                          child: MaterialButton(
+                            child: Container(
+                              height: 60.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Color(0xff48484a),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  localize('Send').toUpperCase(),
+                                  style: TextStyle(
+                                    color: Color(0xff14c3ef),
+                                    fontSize: 17.0,
+                                    height: 22.0 / 17.0,
+                                    letterSpacing: -0.41,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.of(context).pop(true),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
+                  ],
                 ),
-                const SizedBox(height: 16.0),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 16.0),
+            MaterialButton(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Color(0xff48484a),
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0, vertical: 16.0),
+                child: Text(
+                  localize('Roll call log').toUpperCase(),
+                  style: TextStyle(
+                    color: Color(0xff14c3ef),
+                    fontSize: 17.0,
+                    height: 22.0 / 17.0,
+                    letterSpacing: -0.41,
+                  ),
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(height: 16.0),
+          ],
+        ),
+      ),
       context: context,
     );
   }
@@ -857,10 +836,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           )
         ],
@@ -900,10 +876,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
           const SizedBox(height: 14.0),
           Container(
             height: 0.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
+            width: MediaQuery.of(context).size.width,
             color: Colors.grey,
           )
         ],
@@ -930,26 +903,30 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         if (!isLoaded || !hasSchool) {
           return Material(
               child:
-              Text(localize("Please Select A School from Settings Tab")));
+                  Text(localize("Please Select A School from Settings Tab")));
         }
 
         return FutureBuilder(
             future: FirebaseFirestore.instance.doc(ref).get(),
             builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>>
+                    snapshot) {
               if (snapshot.hasData) {
+                print("Data is ${snapshot.data} and roles $role");
                 final List<Map<String, dynamic>> documents =
-                snapshot.data["documents"] != null
-                    ? snapshot.data
-                    ["documents"]
-                    .where((snapshot) =>
-                snapshot["accessRoles"] == null ||
-                    snapshot["accessRoles"].contains(role))
-                    .toList()
-                    .cast<Map<String, dynamic>>()
-                    : null;
+                    (snapshot.data.data()["documents"] ?? null) != null
+                        ? snapshot.data["documents"]
+                            .where((mSnap) {
+                              print("Access Roles ${mSnap["accessRoles"]}");
+                              return mSnap["accessRoles"] == null ||
+                                  mSnap["accessRoles"].contains(role);
+                            })
+                            .toList()
+                            .cast<Map<String, dynamic>>()
+                        : null;
+                print("docs is ${documents}");
                 final int documentCount =
-                documents != null ? documents.length : 0;
+                    documents != null ? documents.length : 0;
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
