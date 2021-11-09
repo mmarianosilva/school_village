@@ -55,7 +55,7 @@ class _ProgressImageState extends State<ProgressImage> {
   void initState() {
     super.initState();
     if (firebasePath != null) {
-      storage.ref().child(firebasePath).getDownloadURL().then((furl) {
+      storage.refFromURL(firebasePath).getDownloadURL().then((furl) {
         if (!isDisposed)
           setState(() {
             url = furl;
