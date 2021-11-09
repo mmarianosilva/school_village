@@ -83,7 +83,6 @@ class _DashboardState extends State<Dashboard> with RouteAware {
 
   _checkIfAlertIsInProgress() async {
     String schoolId = await UserHelper.getSelectedSchoolID();
-    print("Fatal Error $schoolId");
     if (schoolId == null) {
       return;
     }
@@ -106,15 +105,17 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         final DocumentSnapshot latestResolved =
             lastAlert.isNotEmpty ? lastAlert.first : null;
         final Timestamp lastResolvedTimestamp = latestResolved != null
-            ? latestResolved.data()["endedAt"]
+            ? latestResolved["endedAt"]
             : Timestamp.fromMillisecondsSinceEpoch(0);
         final latestAlert = result.docs.lastWhere(
             (DocumentSnapshot snapshot) =>
-                snapshot.data()["createdAt"] >
+                snapshot["createdAt"] >
                 lastResolvedTimestamp.millisecondsSinceEpoch,
             orElse: () => null);
-        SchoolAlert alert =
-            latestAlert != null ? SchoolAlert.fromMap(latestAlert) : null;
+        SchoolAlert alert = latestAlert != null
+            ? SchoolAlert.fromMap(
+                latestAlert.id, latestAlert.reference.path, latestAlert.data())
+            : null;
         if (this.alertInProgress != alert) {
           this.setState(() {
             this.alertInProgress = alert;
@@ -217,7 +218,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   openSettings() {
-    _launchURL("https://villagesafety.net/support_dashboard_vs");
+    _launchURL("https://marinavillage.app/support_dashboard_mv");
   }
 
   openNotifications() {
@@ -254,7 +255,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Support",
+                "Support & Tutorials",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -274,9 +275,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildNotificationsOption(model) {
-    if (role == 'boater' || role == 'vendor' || role == 'maintenance') {
-      return SizedBox();
-    }
+
     return FutureBuilder(
         future: model.getAlertGroups(ref.split("/")[1]),
         builder: (context, alertGroups) {
@@ -326,36 +325,35 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return SizedBox();
   }
 
-  _buildDocumentOption(DocumentSnapshot snapshot, index) {
+  _buildDocumentOption(DocumentSnapshot<Map<String,dynamic>> snapshot, index) {
+    final value = 5;
+    //print("Doc data is  index is $index \n" );
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
+        if (snapshot["documents"][index - value]["type"] == "pdf") {
           final List<Map<String, dynamic>> connectedFiles =
-              snapshot.data()["documents"][index - 4]["connectedFiles"] != null
-                  ? snapshot
-                      .data()["documents"][index - 4]["connectedFiles"]
+              snapshot["documents"][index - value]["connectedFiles"] != null
+                  ? snapshot["documents"][index - value]["connectedFiles"]
                       .map<Map<String, dynamic>>(
                           (untyped) => Map<String, dynamic>.from(untyped))
                       .toList()
                   : null;
-          _showPDF(context, snapshot.data()["documents"][index - 4]["location"],
-              snapshot.data()["documents"][index - 4]["title"],
+          _showPDF(context, snapshot["documents"][index - value]["location"],
+              snapshot["documents"][index - value]["title"],
               connectedFiles: connectedFiles);
-        } else if (snapshot.data()["documents"][index - 4]["type"] ==
-            "linked-pdf") {
+        } else if (snapshot["documents"][index - value]["type"] == "linked-pdf") {
           _showLinkedPDF(
             context,
-            snapshot.data()["documents"][index - 4]["location"],
+            snapshot["documents"][index - value]["location"],
           );
         } else {
-          _launchURL(snapshot.data()["documents"][index - 4]["location"]);
+          _launchURL(snapshot["documents"][index - value]["location"]);
         }
       },
       onLongPress: () {
-        if (snapshot.data()["documents"][index - 4]["type"] == "pdf") {
-        } else if (snapshot.data()["documents"][index - 4]["type"] ==
-            "linked-pdf") {}
+        if (snapshot["documents"][index - value]["type"] == "pdf") {
+        } else if (snapshot["documents"][index - value]["type"] == "linked-pdf") {}
       },
       child: Column(
         children: <Widget>[
@@ -367,7 +365,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 child: Center(
                   child: FutureBuilder(
                       future: FileHelper.getFileFromStorage(
-                          url: snapshot.data()["documents"][index - 4]["icon"],
+                          url: snapshot["documents"][index - value]["icon"],
                           context: context),
                       builder:
                           (BuildContext context, AsyncSnapshot<File> snapshot) {
@@ -388,7 +386,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                snapshot.data()["documents"][index - 4]["title"],
+                snapshot["documents"][index - value]["title"],
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -408,7 +406,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
   }
 
   _buildSecurityOptions() {
-    return HeaderButtons(role: role);
+    return HeaderButtons(role: role, alertInProgress: alertInProgress);
   }
 
   _buildIncidentReport() {
@@ -438,7 +436,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Form",
+                "Non-Emergent Incident Report",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -484,7 +482,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
               SizedBox(width: 12.0),
               Expanded(
                   child: Text(
-                "Incident Report Log",
+                "Incident Report Log/Followup",
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18.0, color: SVColors.dashboardItemFontColor),
@@ -570,21 +568,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             onTap: sendAlert,
           ),
           Expanded(
-            child: (role != 'boater' &&
-                        role != 'vendor' &&
-                        role != 'maintenance') &&
-                    alertInProgress != null
-                ? GestureDetector(
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/incident_management_icon.png',
-                        width: size,
-                        height: size,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    onTap: () => _openIncidentManagement(context))
-                : const SizedBox(width: size),
+            child:  const SizedBox(width: size),
           ),
         ],
       ),
@@ -976,9 +960,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
-                    snapshot.data.data()["documents"] != null
-                        ? snapshot.data
-                            .data()["documents"]
+                    snapshot.data["documents"] != null
+                        ? snapshot.data["documents"]
                             .where((snapshot) {
                               if (snapshot["accessRoles"] == null) {
                                 return true;
@@ -993,7 +976,7 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                                   //                                     Temporary.updateRole(accessRole)
                                   //                                         .contains(role)
                                   //Removed above since we're upgrading
-                                  //debugPrint("Print this");
+                                  //debugPrint("Print ${snapshot["title"]}");
                                   return true;
                                 }
                               }
@@ -1002,8 +985,9 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             .toList()
                             .cast<DocumentSnapshot>()
                         : null;
-                final int documentCount =
+                final  documentCount =
                     documents != null ? documents.length : 0;
+                //print("Documents length is $documentCount");
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                     return Center(
@@ -1036,27 +1020,28 @@ class _DashboardState extends State<Dashboard> with RouteAware {
                             if (index == 3) {
                               return _buildIncidentList();
                             }
+                            if (index == 4) {
+                              return _buildServiceProvidersOption();
+                            }
                             // if (index == 4) {
                             //   return _buildRollCallRequest();
                             // }
-                            if (index == documentCount + 4) {
-                              return _buildMessagesOption(model);
-                            }
+                            // if (index == documentCount + 5) {
+                            //   return _buildMessagesOption(model);
+                            // }
                             if (index == documentCount + 5) {
                               return _buildNotificationsOption(model);
                             }
+
                             if (index == documentCount + 6) {
-                              return _buildHotlineMessages();
-                            }
-                            if (index == documentCount + 7) {
                               return _buildSettingsOption();
                             }
-                            if (index == documentCount + 8) {
-                              return _buildServiceProvidersOption();
-                            }
+                            //if (index == documentCount + 7) {
+                             // return _buildServiceProvidersOption();
+                            //}
                             return _buildDocumentOption(snapshot.data, index);
                           },
-                          itemCount: documentCount + 9);
+                          itemCount: documentCount + 7);
                 }
               }
               return Center(

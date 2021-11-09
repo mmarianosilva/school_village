@@ -37,7 +37,7 @@ class _AlertState extends State<Alert> {
   BuildContext _scaffold;
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     print("User ID");
     print(user.uid);
     _email = user.email;
@@ -53,8 +53,8 @@ class _AlertState extends State<Alert> {
       _userId = user.id;
       setState(() {
         name =
-            "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}";
-        phone = "${_userSnapshot.data()['phone']}";
+            "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}";
+        phone = "${_userSnapshot['phone']}";
         isLoaded = true;
       });
       print(name);
@@ -90,7 +90,7 @@ class _AlertState extends State<Alert> {
                 onPressed: () {
                   Navigator.of(context).pop();
                   _sendAlert("other", "Alert!",
-                      "${customAlertController.text} at $_schoolName");
+                      "${customAlertController.text}");
                   customAlertController.text = "";
                 },
               )
@@ -281,30 +281,30 @@ class _AlertState extends State<Alert> {
               rd: "RD",
             ),
             serviceProvider: IntradoServiceProvider(
-                name: "OandMtech|amit",
+                name: "OandMtech",
                 contactUri: "tel:+19492741709",
                 textChatEnabled: true),
             deviceOwner: IntradoDeviceOwner(
                 name:
-                    "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}",
-                tel: "${_userSnapshot.data()['phone']}",
+                    "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}",
+                tel: "${_userSnapshot['phone']}",
                 environment: "Marina",
                 mobility: "Fixed"),
             eventTime: DateTime.now(),
           );
           final token =
-              (await (await FirebaseAuth.instance.currentUser()).getIdToken())
-                  .token;
-          final constructedUrl = "${incident[4]}/${incident[0]}/create-event";
+              (await (await FirebaseAuth.instance.currentUser).getIdToken());
           final response = await http.post(
-            constructedUrl,
+            Uri.parse("${incident[4]}/${incident[0]}/create-event"),
             body: intradoPayload.toXml(),
             encoding: Encoding.getByName("utf8"),
             headers: <String, String>{
               "Authorization": "Bearer $token",
             },
           );
-
+          //debugPrint(
+          //    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
+          //debugPrint("Intrado response is ${response.body}");
           Map<String, dynamic> parsedJson;
           try{
              parsedJson = json.decode(response.body);
@@ -378,7 +378,7 @@ class _AlertState extends State<Alert> {
       final lastResolved = await getLastResolved(result);
       if (lastResolved != null) {
         print("Last Resolved Data is ${lastResolved.data()}");
-        String dashboardUrl = lastResolved.data()['dashboardUrl'];
+        String dashboardUrl = lastResolved['dashboardUrl'];
         String token = dashboardUrl.split(baseurl)[1];
         final shortUrl = (await DynamicLinksService.createDynamicLink(baseurl+token,shortLinkDomain));
         return [token, false, baseurl,shortUrl,baseurlPackage[2]];
@@ -395,7 +395,7 @@ class _AlertState extends State<Alert> {
         FirebaseFirestore.instance.collection('$_schoolId/notifications');
     final DocumentReference document = collection.doc();
 
-    final String room = UserHelper.getRoomNumber(_userSnapshot);
+    //final String room = UserHelper.getRoomNumber(_userSnapshot);
 
     if (updateToken) {
       document.set(<String, dynamic>{
@@ -403,7 +403,7 @@ class _AlertState extends State<Alert> {
         'body': alertBody,
         'type': alertType,
         'createdById': _userId,
-        'createdBy': '$name${room != null ? ', Room $room' : ''}',
+        'createdBy': '$name',
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
@@ -415,7 +415,7 @@ class _AlertState extends State<Alert> {
         'body': alertBody,
         'type': alertType,
         'createdById': _userId,
-        'createdBy': '$name${room != null ? ', Room $room' : ''}',
+        'createdBy': '$name',
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'location': await _getLocation(),
         'reportedByPhone': phone,
@@ -549,7 +549,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("armed", "Armed Assailant Alert!",
-                                    "An Armed Assailant has been reported at $_schoolName");
+                                    "An Armed Assailant has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_armed.png',
@@ -562,7 +562,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("fight", "Fight Alert!",
-                                    "A fight has been reported at $_schoolName");
+                                    "A fight has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_fight.png',
@@ -575,7 +575,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("medical", "Medical Alert!",
-                                    "A medical emergency has been reported at $_schoolName");
+                                    "A medical emergency has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_medical.png',
@@ -593,7 +593,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("auto", "Auto Accident/Injury",
-                                    "A car accident has been reported at $_schoolName");
+                                    "A car accident has been reported");
                               },
                               child: Column(children: [
                                 Image.asset(
@@ -608,7 +608,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("explosion", "Explosion Alert!",
-                                    "An explosion has been reported at $_schoolName");
+                                    "An explosion has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_explosion.png',
@@ -621,7 +621,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("boat", "Boat Accident/Injury",
-                                    "A boat accident has been reported at $_schoolName");
+                                    "A boat accident has been reported");
                               },
                               child: Column(children: [
                                 Image.asset(
@@ -641,7 +641,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("fire", "Fire Alert!",
-                                    "A fire has been reported at $_schoolName");
+                                    "A fire has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_fire.png',
@@ -654,7 +654,7 @@ class _AlertState extends State<Alert> {
                           child: GestureDetector(
                               onTap: () {
                                 _sendAlert("intruder", "Intruder Alert!",
-                                    "An intruder has been reported at $_schoolName");
+                                    "An intruder has been reported");
                               },
                               child: Column(children: [
                                 Image.asset('assets/images/alert_intruder.png',

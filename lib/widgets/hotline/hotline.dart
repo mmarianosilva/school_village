@@ -76,7 +76,7 @@ class _HotlineState extends State<Hotline> {
                   text: 'YOU', style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      ' can make a difference in your school\'s safety. Here you can anonymously report:'),
+                  ' can make a difference in your school\'s safety. Here you can anonymously report:'),
             ],
           ),
         ),
@@ -88,7 +88,7 @@ class _HotlineState extends State<Hotline> {
             children: <TextSpan>[
               TextSpan(
                   text:
-                      '\nBULLYING\nTHREATS\nASSAULT\nSEXUAL HARRASSMENT\nSAFETY ISSUES',
+                  '\nBULLYING\nTHREATS\nASSAULT\nSEXUAL HARRASSMENT\nSAFETY ISSUES',
                   style: TextStyle(fontWeight: FontWeight.bold))
             ],
           ),
@@ -100,7 +100,7 @@ class _HotlineState extends State<Hotline> {
             children: <TextSpan>[
               TextSpan(
                   text:
-                      '\nAnonymously text a message below and tap SEND to make a report. This Hotline can also send photos.'),
+                  '\nAnonymously text a message below and tap SEND to make a report. This Hotline can also send photos.'),
               TextSpan(
                   text: '\n\nIF YOU',
                   style: TextStyle(fontWeight: FontWeight.bold)),
@@ -111,13 +111,13 @@ class _HotlineState extends State<Hotline> {
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      ' just include your phone number or email address in your text.'),
+                  ' just include your phone number or email address in your text.'),
               TextSpan(
                   text: ' — That is your choice.',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      '\n\nIf  you  or  someone  you  know  is  depressed  or  thinking  about suicide call 1-800-273-8255 now.\n\n'),
+                  '\n\nIf  you  or  someone  you  know  is  depressed  or  thinking  about suicide call 1-800-273-8255 now.\n\n'),
             ],
           ),
         )
@@ -137,7 +137,7 @@ class _HotlineState extends State<Hotline> {
                   text: 'USTED', style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      ' puede hacer una diferencia en la seguridad de su escuela. Aquí puede informar anónimamente:'),
+                  ' puede hacer una diferencia en la seguridad de su escuela. Aquí puede informar anónimamente:'),
             ],
           ),
         ),
@@ -149,7 +149,7 @@ class _HotlineState extends State<Hotline> {
             children: <TextSpan>[
               TextSpan(
                   text:
-                      '\nACOSO\nAMENAZAS\nASALTO\nHARRASSMENT SEXUAL \nPROBLEMAS DE SEGURIDAD',
+                  '\nACOSO\nAMENAZAS\nASALTO\nHARRASSMENT SEXUAL \nPROBLEMAS DE SEGURIDAD',
                   style: TextStyle(fontWeight: FontWeight.bold))
             ],
           ),
@@ -161,7 +161,7 @@ class _HotlineState extends State<Hotline> {
             children: <TextSpan>[
               TextSpan(
                   text:
-                      '\nAnónimamente envíe un mensaje de texto a continuación y toque ENVIAR para hacer un informe. Esta línea directa también puede enviar fotos.'),
+                  '\nAnónimamente envíe un mensaje de texto a continuación y toque ENVIAR para hacer un informe. Esta línea directa también puede enviar fotos.'),
               TextSpan(
                   text: '\n\nSI',
                   style: TextStyle(fontWeight: FontWeight.bold)),
@@ -173,13 +173,13 @@ class _HotlineState extends State<Hotline> {
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      ' simplemente incluya su número de teléfono o dirección de correo electrónico en su texto'),
+                  ' simplemente incluya su número de teléfono o dirección de correo electrónico en su texto'),
               TextSpan(
                   text: ' — Esa es su elección.',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text:
-                      '\n\nSi usted o alguien que conoce está deprimido o está pensando en suicidarse, llame al 1-800-273-8255 ahora.\n\n'),
+                  '\n\nSi usted o alguien que conoce está deprimido o está pensando en suicidarse, llame al 1-800-273-8255 ahora.\n\n'),
             ],
           ),
         )
@@ -200,23 +200,20 @@ class _HotlineState extends State<Hotline> {
     if (text.length < 1 && _selectedMedia == null) return;
     _saveMessage(text);
   }
-
   Future<String> _getUserId()async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     final _user = FirebaseFirestore.instance.doc('users/${user.uid}');
     final _userId = (await _user.get()).id;
     return _userId;
   }
-
   _saveMessage(message) async {
     final String hotlinePath = '$_schoolId/hotline';
-    CollectionReference collection =
-        FirebaseFirestore.instance.collection(hotlinePath);
+    CollectionReference collection = FirebaseFirestore.instance.collection(hotlinePath);
     final DocumentReference document = collection.doc();
+
     final String role = await UserHelper.getSelectedSchoolRole();
     final String schoolId = await UserHelper.getSelectedSchoolID();
     final String userId = await _getUserId();
-
     if (_selectedMedia != null) {
       setState(() {
         isLoaded = false;
@@ -226,21 +223,27 @@ class _HotlineState extends State<Hotline> {
           : _selectedMedia;
       final UploadFileUsecase uploadFileUsecase = UploadFileUsecase();
       uploadFileUsecase.uploadFile(
-          '$hotlinePath/${DateTime.now().millisecondsSinceEpoch.toString()}/${uploadFile.path.substring(uploadFile.parent.path.length + 1)}',
-          uploadFile, onComplete: (String url) {
-        document.set({
-          'body': message,
-          'createdById': userId,
-          'createdAt': DateTime.now().millisecondsSinceEpoch,
-          'createdBy': role,
-          'schoolId': schoolId,
-          'isVideo': _isVideo,
-          'media': url,
-        });
+          '$hotlinePath/${DateTime
+              .now()
+              .millisecondsSinceEpoch
+              .toString()}/${uploadFile.path.substring(
+              uploadFile.parent.path.length + 1)}',
+          uploadFile,
+      onComplete: (String url) {
+            document.set({
+              'body': message,
+              'createdById': userId,
+              'createdAt': DateTime
+                  .now()
+                  .millisecondsSinceEpoch,
+              'createdBy': role,
+              'schoolId': schoolId,
+              'isVideo': _isVideo,
+              'media': url,
+            });
       });
       widget._scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text(
-            'Your file is being uploaded in the background. This can take a long time'),
+        content: Text('Your file is being uploaded in the background. This can take a long time'),
       ));
       setState(() {
         isLoaded = true;
@@ -249,7 +252,9 @@ class _HotlineState extends State<Hotline> {
       document.set({
         'body': message,
         'createdById': userId,
-        'createdAt': DateTime.now().millisecondsSinceEpoch,
+        'createdAt': DateTime
+            .now()
+            .millisecondsSinceEpoch,
         'createdBy': await UserHelper.getSelectedSchoolRole(),
         'schoolId': await UserHelper.getSelectedSchoolID(),
       });
@@ -277,6 +282,7 @@ class _HotlineState extends State<Hotline> {
             );
           });
     }
+
   }
 
   _buildPreviewBox() {
@@ -289,9 +295,10 @@ class _HotlineState extends State<Hotline> {
         children: <Widget>[
           Expanded(
             child: FutureBuilder(
-              future: _isVideo
-                  ? VideoHelper.thumbnailPath(_selectedMedia)
-                      .then((path) => File(path))
+              future:
+              _isVideo
+                  ? VideoHelper.thumbnailPath(_selectedMedia).then((path) =>
+                  File(path))
                   : Future.value(_selectedMedia),
               builder: (BuildContext _, AsyncSnapshot<File> snapshot) {
                 if (snapshot.hasData) {
@@ -344,7 +351,7 @@ class _HotlineState extends State<Hotline> {
             fillColor: Colors.grey.shade800,
             border: const OutlineInputBorder(
                 borderRadius:
-                    const BorderRadius.all(const Radius.circular(12.0)),
+                const BorderRadius.all(const Radius.circular(12.0)),
                 borderSide: const BorderSide(color: Colors.white)),
             suffixIcon: IconButton(
                 icon: Icon(Icons.send),
@@ -371,8 +378,8 @@ class _HotlineState extends State<Hotline> {
               icon: Icon(Icons.photo_camera, color: Colors.black54, size: 32.0),
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
-                    SelectImageUsecase();
-                File image = await selectImageUsecase.takeImage();
+                SelectImageUsecase();
+                File image = File((await selectImageUsecase.takeImage()).path);
                 if (image != null) {
                   setState(() {
                     _selectedMedia = image;
@@ -391,8 +398,8 @@ class _HotlineState extends State<Hotline> {
               icon: Icon(Icons.videocam, color: Colors.black54, size: 32.0),
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
-                    SelectImageUsecase();
-                File video = await selectImageUsecase.selectVideo();
+                SelectImageUsecase();
+                File video = File((await selectImageUsecase.selectVideo()).path);
                 if (video != null) {
                   setState(() {
                     isLoaded = false;
@@ -417,8 +424,8 @@ class _HotlineState extends State<Hotline> {
               icon: Icon(Icons.photo, color: Colors.black54, size: 32.0),
               onPressed: () async {
                 final SelectImageUsecase selectImageUsecase =
-                    SelectImageUsecase();
-                File image = await selectImageUsecase.selectImage();
+                SelectImageUsecase();
+                File image = File((await selectImageUsecase.selectImage()).path);
                 if (image != null) {
                   setState(() {
                     _selectedMedia = image;
@@ -447,8 +454,8 @@ class _HotlineState extends State<Hotline> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(localize("English"),
-                    style: TextStyle(color: Colors.white)),
+                Text(
+                    localize("English"), style: TextStyle(color: Colors.white)),
                 Switch(
                     value: !isEnglish,
                     activeColor: Colors.grey.shade300,
@@ -486,11 +493,19 @@ class _HotlineState extends State<Hotline> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           padding: EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColorDark,
+            color: Theme
+                .of(context)
+                .primaryColorDark,
             image: DecorationImage(
                 image: AssetImage("assets/images/hotline_bg.png"),
                 fit: BoxFit.cover,
@@ -500,8 +515,8 @@ class _HotlineState extends State<Hotline> {
           child: isLoaded
               ? _buildContent()
               : Center(
-                  child: CircularProgressIndicator(),
-                ) /* add child content content here */,
+            child: CircularProgressIndicator(),
+          ) /* add child content content here */,
         ));
   }
 }

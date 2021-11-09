@@ -29,7 +29,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   static FirebaseStorage storage = FirebaseStorage.instance;
-  FirebaseUser _user;
+  User _user;
   String _userId;
   String name = '';
   String _schoolId = '';
@@ -54,20 +54,19 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
     var schoolId = (await UserHelper.getSelectedSchoolID()).split("/")[1];
     _userRef = FirebaseFirestore.instance.doc("users/${_user.uid}");
     _userRef.get().then((user) {
-      var keys = user.data()["associatedSchools"][schoolId]["groups"].keys;
+      var keys = user["associatedSchools"][schoolId]["groups"].keys;
       List<String> groups = List<String>();
       for (int i = 0; i < keys.length; i++) {
-        if (user.data()["associatedSchools"][schoolId]["groups"]
-                [keys.elementAt(i)] ==
+        if (user["associatedSchools"][schoolId]["groups"][keys.elementAt(i)] ==
             true) {
           groups.add(keys.elementAt(i));
         }
       }
       setState(() {
         _userId = user.id;
-        name = "${user.data()['firstName']} ${user.data()['lastName']}";
+        name = "${user['firstName']} ${user['lastName']}";
         _schoolId = schoolId;
-        phone = '${user.data()['phone']}';
+        phone = '${user['phone']}';
         _groups = groups;
         isLoaded = true;
         _handleMessageCollection();
@@ -93,11 +92,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleMessageMapInsert(shot) {
-    // if (!belongsToGroup(shot.data()['groups'].keys)) {
-    //   return;
-    // }
     var day = _convertDateToKey(shot.data()['createdAt']);
-
     var messages = messageMap[day];
     var message = MessageHolder(null, shot);
     if (messages == null) {
@@ -150,11 +145,12 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _handleDocumentChanges(documentChanges) {
+
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
-        _handleMessageMapInsert(change.document);
-      }
-    });
+        _handleMessageMapInsert(change.doc);
+        }
+      });
   }
 
   _getScreen() {
@@ -202,15 +198,18 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
             final DocumentSnapshot document = messageList[index].message;
 
             return BroadcastMessage(
-              text: document.data()['body'],
-              name: "${document.data()['createdBy']}",
-              timestamp: document.data()['createdAt'] is Timestamp
-                  ? document.data()['createdAt']
-                  : Timestamp.fromMillisecondsSinceEpoch(
-                      document.data()['createdAt']),
-              imageUrl: document.data()['image'],
+              text: document['body'],
+              name: "${document['createdBy']}",
+              timestamp: document['createdAt'] is Timestamp
+                  ? document['createdAt']
+                  : Timestamp.fromMillisecondsSinceEpoch(document['createdAt']),
+              imageUrl: ((document.data() as Map<String, dynamic>) == null)
+                  ? null
+                  : (document.data() as Map<String, dynamic>)['image'],
               message: document,
-              isVideo: document.data()['isVideo'] ?? false,
+              isVideo: ((document.data() as Map<String, dynamic>) == null)
+                  ? false
+                  : (document.data() as Map<String, dynamic>)['isVideo'],
             );
           });
     }
@@ -288,20 +287,20 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendBroadcasts(image, alertBody, isVideo) {
-    if (role == 'district' ) {
-      List<DocumentSnapshot> selectedSchool =
-          selectGroups.key.currentState.selectedSchools;
-      if (selectedSchool != null) {
-
-        selectGroups.key.currentState.selectedSchools.forEach((schoolDocument) {
-          _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
-        });
-      } else {
-        _saveBroadcast(image, alertBody, isVideo);
-      }
-    } else {
-      _saveBroadcast(image, alertBody, isVideo);
-    }
+    // if (role == 'district') {
+    //   List<DocumentSnapshot> selectedSchools =
+    //       selectGroups.key.currentState.selectedSchools;
+    //   if (selectedSchools!= null) {
+    //     selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
+    //       _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
+    //     });
+    //   } else {
+    //     _saveBroadcast(image, alertBody, isVideo);
+    //   }
+    // } else {
+    //   _saveBroadcast(image, alertBody, isVideo);
+    // }
+    _saveBroadcast(image, alertBody, isVideo);
   }
 
   _showLoading() {}
@@ -328,7 +327,6 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           : type;
 
       path = path + "." + type;
-      print(path);
       await uploadFile(path, image);
       _hideLoading();
     }
@@ -376,9 +374,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
           leading: BackButton(color: Colors.grey.shade800),
         ),
         body: Column(children: [
-          _editable
-              ? selectGroups
-              : SizedBox(),
+          _editable ? selectGroups : SizedBox(),
           Expanded(
             child: Container(color: Colors.white, child: _getScreen()),
           ),

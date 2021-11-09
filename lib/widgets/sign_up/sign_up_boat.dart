@@ -24,6 +24,7 @@ class SignUpBoat extends StatefulWidget {
 }
 
 class _SignUpBoatState extends State<SignUpBoat> {
+  String _error;
   BoatLocation _boatLocation = BoatLocation.dockSlip;
   final List<Map<String, dynamic>> marinas = <Map<String, dynamic>>[];
   final Map<String, dynamic> selectedMarina = <String, dynamic>{};
@@ -42,9 +43,15 @@ class _SignUpBoatState extends State<SignUpBoat> {
   final TextEditingController _descriptionController = TextEditingController();
 
   Future<void> _onNextPressed() async {
-    if (selectedMarina == null) {
+    if (selectedMarina.isEmpty) {
+      setState(() {
+        _error = 'Please Select Your Home Marina';
+      });
       return;
     }
+    setState(() {
+      _error = '';
+    });
     final boatLocation = <String, dynamic>{};
     switch (_boatLocation) {
       case BoatLocation.dockSlip:
@@ -64,7 +71,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
         boatLocation["description"] = _descriptionController.text;
         break;
     }
-    final user = await FirebaseAuth.instance.currentUser();
+    final user = await FirebaseAuth.instance.currentUser;
     final document = FirebaseFirestore.instance.doc("users/${user.uid}");
     await document.set(
       {
@@ -75,9 +82,7 @@ class _SignUpBoatState extends State<SignUpBoat> {
             },
             "allowed": true,
             "groups": <String, bool>{},
-            "role": (widget.userData["vendor"])
-                ? "vendor"
-                : "boater",
+            "role": (widget.userData["vendor"]) ? "vendor" : "boater",
           }
         },
         "boatName": _boatNameController.text,
@@ -101,7 +106,11 @@ class _SignUpBoatState extends State<SignUpBoat> {
   }
 
   void _getMarinaList() {
-    FirebaseFirestore.instance.collection("schools").get().then((docs) {
+    FirebaseFirestore.instance
+        .collection("schools")
+        .orderBy('name')
+        .get()
+        .then((docs) {
       marinas.clear();
       marinas.addAll(docs.docs
           .map((snapshot) => snapshot.data()..addAll({"id": snapshot.id})));
@@ -191,32 +200,45 @@ class _SignUpBoatState extends State<SignUpBoat> {
                                             onTap: () {
                                               Navigator.of(context).pop(item);
                                             },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 4.0,
-                                                vertical: 8.0,
-                                              ),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.circle,
-                                                    color: Color(0xff023280),
-                                                    size: 8.0,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                //Text(localize("Send to: ")),
+                                                //getGroupDropDown(),
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: SizedBox(
+                                                    height: 32,
+                                                    width: 5,
                                                   ),
-                                                  const SizedBox(width: 8.0),
-                                                  Text(
+                                                ),
+                                                const Icon(
+                                                  Icons.circle,
+                                                  color: Color(0xff023280),
+                                                  size: 8.0,
+                                                ),
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: SizedBox(
+                                                    height: 32,
+                                                    width: 5,
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  flex: 8,
+                                                  child: Text(
                                                     item["name"],
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                       color: Color(0xff023280),
                                                       fontSize: 16.0,
                                                       letterSpacing: 0.91,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           );
                                         },
@@ -594,6 +616,22 @@ class _SignUpBoatState extends State<SignUpBoat> {
                     ],
                   ),
                   const SizedBox(height: 8.0),
+                  SizedBox(
+                    height: 40.0,
+                    child: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        _error ?? '',
+                        maxLines: 2,
+                        style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

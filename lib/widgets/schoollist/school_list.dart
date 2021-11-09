@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,8 @@ class _SchoolListState extends State<SchoolList> {
   QueryDocumentSnapshot _selectedHarbor;
   DocumentSnapshot userSnapshot;
   QueryDocumentSnapshot _selectedRegion;
+  int marinasLength = 0;
+  bool isLoading = true;
 
   String _searchQuery = "";
   @override
@@ -32,7 +36,6 @@ class _SchoolListState extends State<SchoolList> {
     super.dispose();
   }
   selectSchool({schoolId: String, role: String, schoolName: String}) {
-    print("Selectedxid = $schoolId");
     PdfHandler.deletePdfFiles();
     UserHelper.setSelectedSchool(
         schoolId: schoolId, schoolName: schoolName, schoolRole: role);
@@ -41,6 +44,8 @@ class _SchoolListState extends State<SchoolList> {
 
   @override
   void initState() {
+
+    super.initState();
     UserHelper.getRegionData().then((regionData) {
       regions = regionData.regions;
       harbors = regionData.harbors;
@@ -48,10 +53,16 @@ class _SchoolListState extends State<SchoolList> {
       regionObjects = regionData.regionObjects;
       userSnapshot = regionData.userSnapshot;
       marinaObjects = regionData.marinaObjects;
-      //print("Check Stuff $harborObjects and $regionObjects" );
-      setState(() {});
+      marinasLength = regionData.marinasLength;
     });
-    super.initState();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      if(marinaObjects.length>0 && marinaObjects.length>=(marinasLength)){
+        t.cancel();
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
   }
 
   @override
@@ -73,7 +84,7 @@ class _SchoolListState extends State<SchoolList> {
             setState(() {
               _regionSearchKey = newValue;
               regionObjects.forEach((element) {
-                String name = element.data()['name'];
+                String name = element['name'];
                 if (name == newValue) {
                   _selectedRegion = element;
                   //_regionSearchKey = newValue;
@@ -97,7 +108,7 @@ class _SchoolListState extends State<SchoolList> {
             setState(() {
               _harborSearchKey = newValue;
               harborObjects.forEach((element) {
-                String name = element.data()['name'];
+                String name = element['name'];
                 if (name == newValue) {
                   _selectedHarbor = element;
                 }
@@ -186,7 +197,9 @@ class _SchoolListState extends State<SchoolList> {
           ),
           preferredSize: Size(3, 250),
         ),
-        body: FutureBuilder(
+        body: isLoading?Center(
+          child: CircularProgressIndicator(),
+        ):FutureBuilder(
             future: UserHelper.getFilteredSchools(
                 _searchQuery,
                 _regionSearchKey,
@@ -196,19 +209,22 @@ class _SchoolListState extends State<SchoolList> {
             builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return Text(localize('Loading...'));
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 case ConnectionState.waiting:
-                  return Text(localize('Loading...'));
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 default:
                   if (snapshot.hasError)
                     return Text('Error: ${snapshot.error}');
                   else if (snapshot.hasData) {
                     return ListView.builder(
                       padding: EdgeInsets.all(22.0),
-//                    itemExtent: 20.0,
                       itemBuilder: (BuildContext context, int index) {
                         final data = snapshot.data[index];
-                        if (data == null)
+                        if (data == null || !data.toString().contains('name')|| !data.toString().contains('schoolId')|| !data.toString().contains('role'))
                           return Container(
                             height: 0,
                             width: 0,

@@ -33,7 +33,7 @@ class Vendor {
           deleted: data['deleted'],
         );
 
-  Vendor.fromDocument(DocumentSnapshot document)
+  Vendor.fromDocument(DocumentSnapshot<Map<String,dynamic>> document)
       : this(
           id: document.id,
           name: document.data()['name'],

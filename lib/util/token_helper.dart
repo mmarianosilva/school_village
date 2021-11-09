@@ -10,15 +10,15 @@ import 'package:device_info/device_info.dart';
 class TokenHelper {
   static saveToken() async {
     print("Saving token");
-    final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
     final String token = await _firebaseMessaging.getToken();
     print("Fcm token is $token");
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     String userPath = "/users/${user.uid}";
     print('User path /users/${user.uid}');
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
-    DocumentSnapshot userSnapshot = await userRef.get();
-    if (userSnapshot.data()['devices'] != null &&
+    DocumentSnapshot<Map<String,dynamic>> userSnapshot = await userRef.get();
+    if ((userSnapshot.data()['devices'] ?? null)!=null &&
         userSnapshot.data()['devices'].keys.contains(token)) {
       print("Not adding Token to user");
       (await SharedPreferences.getInstance()).setString("fcmToken", token);
@@ -33,7 +33,7 @@ class TokenHelper {
     String userPath = "/users/$userId";
     DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
 
-    DocumentSnapshot userSnapshot = await userRef.get();
+    DocumentSnapshot<Map<String,dynamic>> userSnapshot = await userRef.get();
     Map<String, dynamic> devices = Map<String, dynamic>.from(userSnapshot.data()['devices']);
 
     print(devices);

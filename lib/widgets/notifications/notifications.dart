@@ -38,9 +38,19 @@ class _NotificationsState extends State<Notifications> {
         .orderBy('createdAt', descending: true)
         .limit(25);
     ref.get().then((querySnapshot) {
-      notifications.addAll(querySnapshot.docs
-          .map((document) => SchoolAlert.fromMap(document)));
+      try {
+        notifications.addAll(querySnapshot.docs.map((document) {
+          return SchoolAlert.fromMap(
+              document.id, document.reference.path, document.data());
+        }));
+      } on Exception catch (e) {
+        print("Exception found $e");
+      } catch (error, stackTrace) {
+        print("Error found $error and stacktrace is $stackTrace");
+      }
+
       setState(() {
+        print("Calling setsatet is ${notifications.length}");
         isLoaded = true;
         _alerts = notifications;
       });
@@ -91,7 +101,8 @@ class _NotificationsState extends State<Notifications> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => NotificationDetail(
-                                    notification: alert, title: localize('Notification')),
+                                    notification: alert,
+                                    title: localize('Notification')),
                               ),
                             );
                           },
@@ -106,7 +117,8 @@ class _NotificationsState extends State<Notifications> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => NotificationDetail(
-                                notification: alert, title: localize('Notification')),
+                                notification: alert,
+                                title: localize('Notification')),
                           ),
                         );
                       },
@@ -141,25 +153,28 @@ class _NotificationsState extends State<Notifications> {
           body: !isLoaded
               ? Text(localize("Loading.."))
               : Stack(
-                children: <Widget>[
-                  _buildList(),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: IgnorePointer(
-                      child: Container(
-                        height: 96.0,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Color.fromARGB(0, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
+                  children: <Widget>[
+                    _buildList(),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: IgnorePointer(
+                        child: Container(
+                          height: 96.0,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color.fromARGB(0, 255, 255, 255),
+                                Color.fromARGB(255, 255, 255, 255)
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              ));
+                    )
+                  ],
+                ));
     });
   }
 }

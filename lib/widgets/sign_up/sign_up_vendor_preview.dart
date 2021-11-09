@@ -60,7 +60,7 @@ class _SignUpVendorPreviewState extends State<SignUpVendorPreview> {
       "cover_url": photoUrl,
       "owners": [
         FirebaseFirestore.instance
-            .doc("users/${(await FirebaseAuth.instance.currentUser()).uid}")
+            .doc("users/${(await FirebaseAuth.instance.currentUser).uid}")
       ],
     });
 
@@ -356,7 +356,9 @@ class _SignUpVendorPreviewState extends State<SignUpVendorPreview> {
                 Container(
                   color: Color(0xff48484a),
                   child: FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     child: Text(
                       localize("Back").toUpperCase(),
                       style: TextStyle(color: Colors.white),

@@ -34,7 +34,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
   bool _isLoading = false;
 
   void getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     final schoolId = await UserHelper.getSelectedSchoolID();
     final schoolRole = await UserHelper.getSelectedSchoolRole();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
@@ -51,7 +51,6 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     /* This _channelListSubscription shows up as the List of Channels User is a part of Example (Admin/Security)
     resolved by querying for the messages of this school/marina that this user's role is contained in'
     Also as a special case the "911 channel is removed from above list if this user wasnt the creator of it" */
-    print("_schoolRole $_schoolRole and $_schoolId");
     _channelListSubscription = _firestore
         .collection("$_schoolId/messages")
         .where("roles", arrayContains: _schoolRole)
@@ -59,19 +58,18 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         .listen((snapshot) async {
       List<DocumentSnapshot> documentList = snapshot.docs;
       documentList.removeWhere((element) {
-        //print("Guess ChannelName ${element.data()['name']}");
-        return (element.data()['name'] == "911 TalkAround Channel") &&
-            ((element.data()['createdById'] != _userSnapshot.id) ||
-                (element.data()['isActive'] == false));
+        return (element['name'] == "911 TalkAround Channel") &&
+            ((element['createdById'] != _userSnapshot.id) ||
+                (element['isActive'] == false));
       });
       Iterable<DocumentSnapshot> channels = documentList;
+
       List<Future<TalkAroundChannel>> processedChannels =
           channels.map((channel) async {
         return TalkAroundChannel.fromMapAndUsers(channel, null);
       }).toList();
       List<TalkAroundChannel> retrievedChannels =
           await Future.wait(processedChannels);
-      //print("RETR Channels ${retrievedChannels.length} and userref ${_userSnapshot.reference} and userid ${ _userSnapshot.id}");
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -82,7 +80,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
     });
     if (_schoolRole != "school_admin" &&
         _schoolRole != "admin" &&
-        _schoolRole != "district" ) {
+        _schoolRole != "district") {
       // For the non elite/admin users  _messageListSubscription is the list of groups(1 on 1) that our user is a member of
       _messageListSubscription = _firestore
           .collection("$_schoolId/messages")
@@ -96,14 +94,12 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             List<Future<TalkAroundChannel>> processedGroupMessages =
                 groupMessages.map((channel) async {
               Stream<TalkAroundUser> members =
-                  Stream.fromIterable(channel.data()["members"])
-                      .asyncMap((id) async {
+                  Stream.fromIterable(channel["members"]).asyncMap((id) async {
                 final DocumentSnapshot user = await id.get();
                 TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                     user,
-                    user.data()["associatedSchools"][escapedSchoolId] != null
-                        ? user.data()["associatedSchools"][escapedSchoolId]
-                            ["role"]
+                    user["associatedSchools"][escapedSchoolId] != null
+                        ? user["associatedSchools"][escapedSchoolId]["role"]
                         : "");
                 return member;
               });
@@ -126,8 +122,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                 _groupMessages = retrievedGroupMessages
                     .where((channel) => channel.isClass)
                     .toList()
-                      ..sort(
-                          (item1, item2) => item1.name.compareTo(item2.name));
+                  ..sort((item1, item2) => item1.name.compareTo(item2.name));
               });
             }
           });
@@ -140,22 +135,24 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
         final String escapedSchoolId = _schoolId.substring("schools/".length);
         List<DocumentSnapshot> documentList = snapshot.docs;
         Iterable<DocumentSnapshot> groupMessages = documentList.toList()
-          ..removeWhere((chatroom) =>
-              !(chatroom.data()["class"] ?? false) &&
-              !(chatroom.data()["members"] != null &&
-                  chatroom
-                      .data()["members"]
-                      .contains(_userSnapshot.reference)));
+          ..removeWhere((chatroom) {
+            final data = chatroom.data() as Map<String, dynamic>;
+            return !(((data["class"] ?? null) != null)
+                    ? data['class']
+                    : false) &&
+                !(((data["members"] ?? null) != null)
+                    ? data["members"].contains(_userSnapshot.reference)
+                    : false);
+          });
         List<Future<TalkAroundChannel>> processedGroupMessages =
             groupMessages.map((channel) async {
           Stream<TalkAroundUser> members =
-              Stream.fromIterable(channel.data()["members"])
-                  .asyncMap((id) async {
+              Stream.fromIterable(channel["members"]).asyncMap((id) async {
             final DocumentSnapshot user = await id.get();
             TalkAroundUser member = TalkAroundUser.fromMapAndGroup(
                 user,
-                user.data()["associatedSchools"][escapedSchoolId] != null
-                    ? user.data()["associatedSchools"][escapedSchoolId]["role"]
+                user["associatedSchools"][escapedSchoolId] != null
+                    ? user["associatedSchools"][escapedSchoolId]["role"]
                     : "");
             return member;
           });
@@ -178,7 +175,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
             _groupMessages = retrievedGroupMessages
                 .where((channel) => channel.isClass)
                 .toList()
-                  ..sort((item1, item2) => item1.name.compareTo(item2.name));
+              ..sort((item1, item2) => item1.name.compareTo(item2.name));
           });
         }
       });
@@ -325,8 +322,7 @@ class _TalkAroundHomeState extends State<TalkAroundHome> {
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16.0, vertical: 8.0),
-                                    child: Text(
-                                        localize("Group").toUpperCase(),
+                                    child: Text(localize("Group").toUpperCase(),
                                         style: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 199, 199, 204)),

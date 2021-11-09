@@ -38,7 +38,7 @@ class _ContactState extends State<Contact> {
     var phone = phoneController.text.trim().toLowerCase();
 
     var url = "https://us-central1-schoolvillage-1.cloudfunctions.net/api/contact";
-    http.post(url, body: {
+    http.post(Uri.parse(url), body: {
       'email': email,
       'firstName': fName,
       'lastName': lName,

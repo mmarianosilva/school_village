@@ -23,7 +23,6 @@ class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _checkedPolicy = false;
-  int _selectedRadioTile = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String title = "MarinaVillage";
   FocusNode emailFocusNode = FocusNode();
@@ -45,19 +44,11 @@ class _LoginState extends State<Login> {
     return false;
   }
 
-  proceed(DocumentSnapshot userSnapshot) async {
-    if (userSnapshot.data() != null &&
-        userSnapshot.data()["associatedSchools"] is Map<String, dynamic> &&
-        (userSnapshot.data()["associatedSchools"] as Map<String, dynamic>)
-            .isNotEmpty) {
+  proceed(DocumentSnapshot<Map<String, dynamic>> userSnapshot) async {
       await checkIfOnlyOneSchool();
       FileHelper.downloadRequiredDocuments();
       AnalyticsHelper.logLogin();
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
-    } else {
-      await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    }
   }
 
   RegExp emailExp = new RegExp(
@@ -283,7 +274,6 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              const SizedBox(height: 72.0),
 
             ],
           ),

@@ -28,22 +28,22 @@ class _SelectGroupsState extends State<SelectGroups> {
   final textSize = 14.0;
   int numOfRows = 1;
   bool amberAlert = false;
-
   final Function(bool) onToneSelectedCallback;
   Map<String, bool> allMarinas = Map();
   List<DocumentSnapshot> schoolSnapshots;
   List<DocumentSnapshot> selectedSchools;
 
   _SelectGroupsState(this.onToneSelectedCallback);
-
   String truncateString(String data, int length) {
     return (data.length >= length) ? '${data.substring(0, length)}...' : data;
   }
 
   String getRecipients() {
     if (allMarinas['All'] == true) {
+      print(" All is on");
       return 'Send to: All';
     } else {
+      print(" All is not on");
       String x = '';
       allMarinas.forEach((key, value) {
         if (value == true) {
@@ -57,7 +57,6 @@ class _SelectGroupsState extends State<SelectGroups> {
       return 'Send to: ${x}';
     }
   }
-
   getGroups() async {
     var schoolGroups = await UserHelper.getSchoolAllGroups();
     var role = await UserHelper.getSelectedSchoolRole();
@@ -73,14 +72,13 @@ class _SelectGroupsState extends State<SelectGroups> {
       setState(() {
         schoolSnapshots = unwrappedSchools;
         allMarinas = _districtSchools();
-
         if (allMarinas['All'] == true) {
           selectedSchools = schoolSnapshots;
         } else {
           selectedSchools = schoolSnapshots.where((element) {
             return (element != null) &&
                 (element.data() != null) &&
-                (allMarinas[element.data()["name"]] == true);
+                (allMarinas[(element.data() as Map<String,dynamic>)["name"]] == true);
           }).toList();
         }
         _isLoading = false;
@@ -89,7 +87,7 @@ class _SelectGroupsState extends State<SelectGroups> {
 
     setState(() {
       groups.addAll(schoolGroups);
-      _isLoading = (role == 'district') &&
+      _isLoading = (role == 'district' ) &&
           schoolSnapshots == null;
     });
   }
@@ -97,17 +95,11 @@ class _SelectGroupsState extends State<SelectGroups> {
   Map<String, bool> _districtSchools() {
     List<String> _schools = List<String>();
     _schools.add("All");
-    // schoolSnapshots.removeWhere((element) {
-    //   return
-    // });
     schoolSnapshots.forEach((element) {
       if (element != null && element.data() != null) {
-        _schools.add(element.data()["name"]);
+        _schools.add((element.data() as Map<String, dynamic>)['name']);
       }
     });
-    // _schools.addAll(schoolSnapshots.map((item) {
-    //   return item.data()["name"];
-    // }));
 
     return Map<String, bool>.fromIterable(_schools,
         key: (e) => e, value: (e) => true);
@@ -126,15 +118,18 @@ class _SelectGroupsState extends State<SelectGroups> {
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      getGroups();
+      //Uncomment When adding Groups back
+      //getGroups();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: Text(localize('Loading...')))
-        : _getList();
+    //uncomment when adding groups
+    // return _isLoading
+    //     ? Center(child: Text(localize('Loading...')))
+    //     : _getList();
+    return _getToneSelector();
   }
 
   Future<Map<String, bool>> _chooseMarinas() async {
@@ -161,7 +156,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                           selectedSchools = schoolSnapshots.where((element) {
                             return (element != null) &&
                                 (element.data() != null) &&
-                                (allMarinas[element.data()["name"]] == true);
+                                (allMarinas[(element.data() as Map<String,dynamic>)["name"]] == true);
                           }).toList();
                         }
                       });
@@ -184,6 +179,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                         title: Text(_key),
                         checkColor: Colors.white,
                         onChanged: (val) {
+                          print("value changing $_key and $val");
                           setState(() {
                             allMarinas[_key] = val;
                             if (_key == "All" && val == true) {
@@ -203,8 +199,76 @@ class _SelectGroupsState extends State<SelectGroups> {
             },
           );
         });
+  }_getToneSelector(){
+    return Container(
+      color: SVColors.colorFromHex('#e5e5ea'),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(localize("Alert tone:")),
+            SizedBox(
+              height: checkBoxHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    activeColor: Colors.red,
+                    checkColor: Colors.white,
+                    value: amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        amberAlert = !amberAlert;
+                      });
+                    },
+                    child: Text(
+                      localize("Amber"),
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: checkBoxHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    value: !amberAlert,
+                    onChanged: (value) {
+                      setState(() {
+                        amberAlert = !value;
+                      });
+                      onToneSelectedCallback(amberAlert);
+                    },
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        amberAlert = !amberAlert;
+                      });
+                    },
+                    child: Text(localize("2-Tone")),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ]),
+    );
   }
-
   _getList() {
     List<String> names = List();
     for (var dataVal in groups) {
@@ -322,13 +386,15 @@ class _SelectGroupsState extends State<SelectGroups> {
         schoolSnapshots != null
             ? Container(
                 height: 50,
-                decoration: BoxDecoration(color: Colors.blue, boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, blurRadius: 4, offset: Offset(0, 2))
-                ]),
+          decoration: BoxDecoration(color: Colors.blue, boxShadow: [
+            BoxShadow(
+                color: Colors.grey, blurRadius: 4, offset: Offset(0, 2))
+          ]),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
+                    //Text(localize("Send to: ")),
+                    //getGroupDropDown(),
                     Flexible(
                       flex: 1,
                       child: SizedBox(
@@ -345,7 +411,7 @@ class _SelectGroupsState extends State<SelectGroups> {
                           },
                           child: new Text(truncateString(getRecipients(), 40)),
                         )),
-                    //Flexible(flex: 3, child: getGroupDropDown()),
+
                   ],
                 ),
               )

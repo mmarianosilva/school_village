@@ -4,8 +4,10 @@ import 'package:async/async.dart' show StreamGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import 'package:school_village/util/date_formatter.dart';
 import 'package:school_village/util/pdf_handler.dart';
@@ -42,6 +44,7 @@ class _IncidentManagementState extends State<IncidentManagement>
   GoogleMapController _mapController;
   DocumentSnapshot _userSnapshot;
   bool _isLoading = true;
+  String _closestAddress;
   String _schoolId = '';
   String _schoolAddress = '';
   Map<String, bool> _broadcastGroupData;
@@ -83,8 +86,11 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   void _onSop() async {
-    DocumentSnapshot schoolData =
+    DocumentSnapshot<Map<String, dynamic>> schoolData =
         await FirebaseFirestore.instance.doc(_schoolId).get();
+    if (schoolData.data()['sop'] == null) {
+      return;
+    }
     if (schoolData.data()["sop"][alert.type] != null) {
       PdfHandler.showPdfFile(
           context,
@@ -142,43 +148,48 @@ class _IncidentManagementState extends State<IncidentManagement>
       context,
       MaterialPageRoute(
           builder: (context) => BroadcastMessaging(
-                editable: role == 'school_admin' || role == 'admin' ||
-                    role == 'school_security' || role == 'security' ||
+                editable: role == 'school_admin' ||
+                    role == 'admin' ||
+                    role == 'school_security' ||
+                    role == 'security' ||
                     role == 'pd_fire_ems' ||
-                    role == 'district' ,
+                    role == 'district',
               )),
     );
   }
 
-  void onMessagesChanged(List<DocumentChange> snapshot) async {
-    if (snapshot.isEmpty) {
+  void onMessagesChanged(List<DocumentChange> docChanges) async {
+    if (docChanges.isEmpty) {
       return;
     }
-    if (snapshot.first.doc.reference.parent.path ==
+    if (docChanges.first.doc.reference.parent.path ==
         FirebaseFirestore.instance
             .collection('$_schoolId/notifications')
             .path) {
-      List<TalkAroundMessage> newList = snapshot.map((data) {
+      List<TalkAroundMessage> newList = docChanges.map((data) {
         return TalkAroundMessage(
-            data.doc.data()["title"],
+            data.doc["title"],
             data.doc.id,
             "",
-            data.doc.data()["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
-            data.doc.data()["createdBy"],
-            data.doc.data()["createdById"],
-            data.doc.data()["reportedByPhone"],
-            data.doc.data()["location"]["latitude"],
-            data.doc.data()["location"]["longitude"]);
+            data.doc["body"],
+            DateTime.fromMillisecondsSinceEpoch(data.doc["createdAt"]),
+            data.doc["createdBy"],
+            data.doc["createdById"],
+            data.doc["reportedByPhone"],
+            data.doc["location"]["latitude"],
+            data.doc["location"]["longitude"]);
       }).toList();
       _fullList.addAll(newList);
-    } else if (snapshot.first.doc.reference.parent.path ==
+    } else if (docChanges.first.doc.reference.parent.path ==
         FirebaseFirestore.instance.collection('$_schoolId/broadcasts').path) {
-      snapshot.removeWhere((item) {
-        Map<String, bool> targetGroups = item.doc.data()['groups'] != null
-            ? Map<String, bool>.from(item.doc.data()['groups'])
-            : null;
-        if (targetGroups == null) {
+      docChanges.removeWhere((item) {
+        Map<String, bool> targetGroups =
+            ((item.doc.data() as Map<String, dynamic>)['groups'] ?? null) !=
+                    null
+                ? Map<String, bool>.from(
+                    (item.doc.data() as Map<String, dynamic>)['groups'])
+                : Map();
+        if (targetGroups.isEmpty) {
           return false;
         }
         for (String key in targetGroups.keys) {
@@ -190,38 +201,43 @@ class _IncidentManagementState extends State<IncidentManagement>
         }
         return true;
       });
-      List<TalkAroundMessage> newList = snapshot.map((data) {
+      List<TalkAroundMessage> newList = docChanges.map((data) {
         String channel = "";
-        Map<String, bool> broadcastGroup = data.doc.data()["groups"] != null
-            ? Map<String, bool>.from(data.doc.data()["groups"])
-            : null;
-        if (broadcastGroup != null) {
+        Map<String, bool> broadcastGroup =
+            ((data.doc.data() as Map<String, dynamic>)['groups'] ?? null) !=
+                    null
+                ? Map<String, bool>.from(
+                    (data.doc.data() as Map<String, dynamic>)['groups'])
+                : Map();
+        if (broadcastGroup.isNotEmpty) {
           for (String key in broadcastGroup.keys) {
             if (broadcastGroup[key]) {
               channel += "$key, ";
             }
           }
-        channel = channel.substring(0, channel.length - 2);
+          channel = channel.substring(0, channel.length - 2);
         } else {
           channel = "All";
         }
+
         return TalkAroundMessage(
             "Broadcast Message",
             data.doc.id,
             channel,
-            data.doc.data()["body"],
-            DateTime.fromMillisecondsSinceEpoch(data.doc.data()["createdAt"]),
-            data.doc.data()["createdBy"],
-            data.doc.data()["createdById"],
-            data.doc.data()["reportedByPhone"],
+            (data.doc.data() as Map<String, dynamic>)["body"],
+            DateTime.fromMillisecondsSinceEpoch(
+                (data.doc.data() as Map<String, dynamic>)["createdAt"]),
+            (data.doc.data() as Map<String, dynamic>)["createdBy"],
+            (data.doc.data() as Map<String, dynamic>)["createdById"],
+            (data.doc.data() as Map<String, dynamic>)["reportedByPhone"],
             null,
             null);
       }).toList();
       _fullList.addAll(newList);
     } else {
       List<TalkAroundMessage> newList =
-          await Future.wait(snapshot.map((data) async {
-        final DocumentSnapshot channelSnapshot =
+          await Future.wait(docChanges.map((data) async {
+        final DocumentSnapshot<Map<String, dynamic>> channelSnapshot =
             await data.doc.reference.parent.parent.get();
         final TalkAroundChannel channel =
             TalkAroundChannel.fromMapAndUsers(channelSnapshot, []);
@@ -229,18 +245,21 @@ class _IncidentManagementState extends State<IncidentManagement>
           "Channel Message",
           data.doc.id,
           channel.groupConversationName(
-              "${_userSnapshot.data()['firstName']} ${_userSnapshot.data()['lastName']}"),
-          data.doc.data()["body"],
+              "${_userSnapshot['firstName']} ${_userSnapshot['lastName']}"),
+          (data.doc.data() as Map<String, dynamic>)["body"],
           DateTime.fromMicrosecondsSinceEpoch(
-              data.doc.data()["timestamp"].microsecondsSinceEpoch),
-          data.doc.data()["author"],
-          data.doc.data()["authorId"],
-          data.doc.data()["reportedByPhone"],
-          data.doc.data()["location"] != null
-              ? data.doc.data()["location"]["latitude"]
+              (data.doc.data() as Map<String, dynamic>)["timestamp"]
+                  .microsecondsSinceEpoch),
+          (data.doc.data() as Map<String, dynamic>)["author"],
+          (data.doc.data() as Map<String, dynamic>)["authorId"],
+          (data.doc.data() as Map<String, dynamic>)["reportedByPhone"],
+          (data.doc.data() as Map<String, dynamic>)["location"] != null
+              ? (data.doc.data() as Map<String, dynamic>)["location"]
+                  ["latitude"]
               : null,
-          data.doc.data()["location"] != null
-              ? data.doc.data()["location"]["longitude"]
+          (data.doc.data() as Map<String, dynamic>)["location"] != null
+              ? (data.doc.data() as Map<String, dynamic>)["location"]
+                  ["longitude"]
               : null,
         );
       }).toList());
@@ -267,22 +286,26 @@ class _IncidentManagementState extends State<IncidentManagement>
                 InfoWindow(title: message.author, snippet: message.message)));
       }
     }
+    final ids = Set();
+    _fullList.retainWhere((x) => ids.add(x.id));
     setState(() {
       _messages = _fullList;
     });
   }
 
   getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     if (schoolId != null) {
-      DocumentSnapshot schoolDocument =
+      DocumentSnapshot<Map<String, dynamic>> schoolSnapshot =
           await FirebaseFirestore.instance.doc(schoolId).get();
-      if (schoolDocument.data()["documents"] != null) {
-        _mapData = _getMapData(schoolDocument);
+      if (schoolSnapshot.data()["documents"] != null) {
+        _mapData = _getMapData(schoolSnapshot);
       }
-      _schoolAddress = schoolDocument.data()['address'];
+      _schoolAddress = schoolSnapshot.data()['address'];
     }
+    _closestAddress = await _getLocationAddressNative(
+        alert.location.latitude, alert.location.longitude);
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
         _userSnapshot = user;
@@ -297,13 +320,13 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   Map<String, dynamic> _getMapData(DocumentSnapshot snapshot) {
-    final List<Map<String, dynamic>> documents = snapshot
-        .data()["documents"]
+    final List<Map<String, dynamic>> documents = snapshot["documents"]
         .map<Map<String, dynamic>>(
             (untyped) => Map<String, dynamic>.from(untyped))
         .toList();
-    final Map<String, dynamic> map = documents
-        .firstWhere((document) => document["category"] == "MAP", orElse: () => null);
+    final Map<String, dynamic> map = documents.firstWhere(
+        (document) => document["category"] == "MAP",
+        orElse: () => null);
     return map;
   }
 
@@ -342,7 +365,8 @@ class _IncidentManagementState extends State<IncidentManagement>
               null,
               null,
               null));
-          final alert = SchoolAlert.fromMap(snapshot);
+          final alert = SchoolAlert.fromMap(
+              snapshot.id, snapshot.reference.path, snapshot.data());
           setState(() {
             this.alert = alert;
           });
@@ -351,8 +375,13 @@ class _IncidentManagementState extends State<IncidentManagement>
     }
     Query userMessageChannels = FirebaseFirestore.instance
         .collection('$_schoolId/messages')
-        .where("roles",
-            arrayContainsAny: [role, "school_security", "school_admin", "security", "admin"]);
+        .where("roles", arrayContainsAny: [
+      role,
+      "school_security",
+      "school_admin",
+      "security",
+      "admin"
+    ]);
     QuerySnapshot messageChannels = await userMessageChannels.get();
     StreamGroup<QuerySnapshot> messageStreamGroup = StreamGroup();
     messageChannels.docs.forEach((channelDocument) {
@@ -442,7 +471,11 @@ class _IncidentManagementState extends State<IncidentManagement>
   }
 
   List<Widget> _buildStopAlertItems() {
-    if (role == 'school_security' || role == 'school_admin' || role == 'district' || role == 'security' || role == 'admin' ) {
+    if (role == 'school_security' ||
+        role == 'school_admin' ||
+        role == 'district' ||
+        role == 'security' ||
+        role == 'admin') {
       return [
         Spacer(),
         Container(
@@ -457,8 +490,35 @@ class _IncidentManagementState extends State<IncidentManagement>
 
   @override
   void initState() {
-    getUserDetails();
+    try {
+      getUserDetails();
+    } catch (error, stacktrace) {
+      print("Error is $error and stack is $stacktrace");
+    }
+    //getUserDetails();
     super.initState();
+  }
+
+  Future<String> _getLocationAddressNative(
+      double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+
+      Placemark placeMark = placemarks[0];
+      String name = placeMark.name;
+      String subLocality = placeMark.subLocality;
+      String locality = placeMark.locality;
+      String administrativeArea = placeMark.administrativeArea;
+      String postalCode = placeMark.postalCode;
+      String country = placeMark.country;
+      String address =
+          "${name}, ${subLocality}, ${locality}, ${administrativeArea} ${postalCode}, ${country}";
+
+      return address;
+    } catch (error, stacktrace) {
+      return null;
+    }
   }
 
   @override
@@ -503,16 +563,26 @@ class _IncidentManagementState extends State<IncidentManagement>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 4.0),
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text("${alert.title}",
-                                        style: TextStyle(
-                                            fontSize: 18.0,
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold)),
-                                    Expanded(
-                                        child: Text(
-                                            "${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}",
-                                            textAlign: TextAlign.end))
+                                    RichText(
+                                      text: TextSpan(
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                                style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                text:
+                                                    "\n${dateFormatter.format(alert.timestamp)} ${timeFormatter.format(alert.timestamp)}"),
+                                          ],
+                                          text: "${alert.title}",
+                                          style: TextStyle(
+                                              fontSize: 18.0,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -545,64 +615,34 @@ class _IncidentManagementState extends State<IncidentManagement>
                               horizontal: 16.0,
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      launch(
-                                          "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(_schoolAddress)}");
-                                    },
-                                    child: Text(
-                                      "${_schoolAddress}",
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        color: Color.fromARGB(255, 11, 48, 224),
-                                        fontSize: 14.0,
-                                      ),
+                                GestureDetector(
+                                  onTap: () {
+                                    String destination =
+                                        "${alert.location.latitude},${alert.location.longitude}";
+                                    launch(
+                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(destination)}");
+                                  },
+                                  child: Text(
+                                    "Directions",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Color.fromARGB(255, 11, 48, 224),
+                                      fontSize: 14.0,
                                     ),
                                   ),
                                 ),
-                                _mapData != null
-                                    ? GestureDetector(
-                                        onTap: _onSchoolMap,
-                                        child: const Icon(
-                                          Icons.map,
-                                          color: Colors.black,
-                                        ),
-                                      )
-                                    : const SizedBox(),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(localize("911 Callback: "),
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12.0)),
-                                Text(alert.createdBy,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(fontSize: 12.0)),
                                 GestureDetector(
-                                  onTap: () => showContactDialog(context,
-                                      alert.createdBy, alert.reportedByPhone),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0),
-                                    child: Text(
-                                      alert.reportedByPhoneFormatted,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        color: Color.fromARGB(255, 11, 48, 224),
-                                      ),
-                                    ),
+                                  onTap: () {
+                                    String destination =
+                                        "${alert.location.latitude},${alert.location.longitude}";
+                                    launch(
+                                        "https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(destination)}");
+                                  },
+                                  child: const Icon(
+                                    Icons.pin_drop,
+                                    color: Colors.red,
                                   ),
                                 )
                               ],
@@ -637,6 +677,35 @@ class _IncidentManagementState extends State<IncidentManagement>
                                   ),
                                 )
                               ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: RichText(maxLines:5,
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black,
+                                          fontSize: 12.0),
+                                      text: _closestAddress != null
+                                          ? _closestAddress
+                                          : "",
+                                    ),
+                                  ],
+
+                                  text:
+                                  (_closestAddress != null
+                                      ? localize("Closest Address: ")
+                                      : ""),
+                                  style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ],

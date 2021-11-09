@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_formatter/formatters/masked_input_formatter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor.dart';
@@ -46,8 +47,8 @@ class _SignUpVendorState extends State<SignUpVendor> {
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
   final _zipCodeController = TextEditingController();
-  final _mobilePhoneController = MaskedTextController(mask: "(000) 000-0000");
-  final _officePhoneController = MaskedTextController(mask: "(000) 000-0000");
+  final _mobilePhoneController = TextEditingController();
+  final _officePhoneController = TextEditingController();
   final _primaryContactNameController = TextEditingController();
   final _primaryContactPositionController = TextEditingController();
   final _aboutUsController = TextEditingController();
@@ -71,7 +72,12 @@ class _SignUpVendorState extends State<SignUpVendor> {
             .length ==
         10;
   }
-
+  @override
+  void dispose() {
+    _officePhoneController.dispose();
+    _mobilePhoneController.dispose();
+    super.dispose();
+  }
   bool _verifyEmail() {
     return Constants.emailRegEx.hasMatch(_companyEmailController.text);
   }
@@ -85,13 +91,28 @@ class _SignUpVendorState extends State<SignUpVendor> {
     super.initState();
     _primaryContactNameController.text =
         "${widget.userData["firstName"] ?? ""} ${widget.userData["lastName"] ?? ""}";
-    _mobilePhoneController.text = "${widget.userData["phone"] ?? ""}";
+    _mobilePhoneController.text =
+        "${_preMaskString(widget.userData["phone"]) ?? ""}";
     _companyEmailController.text = "${widget.userData["email"] ?? ""}";
     _getVendorCategories();
   }
 
+  String _preMaskString(String text) {
+    String formattedPhoneNumber = "(" +
+        text.substring(0, 3) +
+        ")" +
+        text.substring(3, 6) +
+        "-" +
+        text.substring(6, text.length);
+    return formattedPhoneNumber;
+  }
+
   void _getVendorCategories() {
-    FirebaseFirestore.instance.collection("services").get().then((snapshot) {
+    FirebaseFirestore.instance
+        .collection("services")
+        .orderBy('name')
+        .get()
+        .then((snapshot) {
       _categories.clear();
       _categories.addAll(snapshot.docs.map((doc) =>
           _SelectedCategory(VendorCategory.fromDocument(document: doc))));
@@ -149,7 +170,10 @@ class _SignUpVendorState extends State<SignUpVendor> {
       MaterialPageRoute(
         builder: (context) => SignUpVendorPreview(
           vendor: vendor,
-          categories: _categories.where((item) => item.selected).map((item) => item.category).toList(),
+          categories: _categories
+              .where((item) => item.selected)
+              .map((item) => item.category)
+              .toList(),
           coverPhoto: _selectedPhoto,
         ),
       ),
@@ -501,7 +525,8 @@ class _SignUpVendorState extends State<SignUpVendor> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 8.0),
                         child: Text(
                           localize(
                               "You must input and select the primary phone number"),
@@ -525,11 +550,17 @@ class _SignUpVendorState extends State<SignUpVendor> {
                                   SignUpTextField(
                                     controller: _mobilePhoneController,
                                     hint: localize("Phone-Mobile"),
+                                    textInputType: TextInputType.phone,
+                                    inputFormatter:
+                                        MaskedInputFormatter("(###)###-####"),
                                   ),
                                   const SizedBox(height: 8.0),
                                   SignUpTextField(
                                     controller: _officePhoneController,
                                     hint: localize("Phone-Office"),
+                                    textInputType: TextInputType.phone,
+                                    inputFormatter:
+                                        MaskedInputFormatter("(###)###-####"),
                                   ),
                                 ],
                               ),
@@ -629,7 +660,9 @@ class _SignUpVendorState extends State<SignUpVendor> {
                     Container(
                       color: Color(0xff48484a),
                       child: FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                         child: Text(
                           localize("Back").toUpperCase(),
                           style: TextStyle(color: Colors.white),

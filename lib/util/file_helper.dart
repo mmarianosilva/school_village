@@ -41,11 +41,13 @@ class FileHelper {
     if (schoolId == null || role == null) {
       return;
     }
-    final DocumentSnapshot school = await firestore.doc(schoolId).get();
-    if (school.data()["documents"] == null) {
+    final DocumentSnapshot<Map<String, dynamic>> school = await firestore.doc(schoolId).get();
+    Map<String, dynamic> data = school.data();
+    var value = data['documents'] ?? null;
+    if ( value == null) {
       return;
     }
-    final List<Map<String, dynamic>> documents = (school.data()["documents"]
+    final List<Map<String, dynamic>> documents = (data["documents"]
             .cast<Map<String, dynamic>>())
         .where((Map<String, dynamic> item) =>
             item["accessRoles"] == null || item["accessRoles"].contains(role))
@@ -60,13 +62,7 @@ class FileHelper {
   static Future<void> _downloadDocument(Map<String, dynamic> document) async {
     if (document["type"] == "pdf") {
       final List<Map<String, dynamic>> connectedFiles =
-      document["connectedFiles"] !=
-          null
-          ? document["connectedFiles"]
-          .map<Map<String, dynamic>>(
-              (untyped) => Map<String, dynamic>.from(untyped))
-          .toList()
-          : null;
+      ((document["connectedFiles"]??null)!=null) ? document["connectedFiles"].map<Map<String, dynamic>>((untyped) => Map<String, dynamic>.from(untyped)).toList() : null;
       if (connectedFiles != null) {
         final String root = document["name"] ?? document["title"];
         await PdfHandler.preparePdfFromUrl(document["location"], document["name"] ?? document["title"], parent: root);
@@ -84,8 +80,7 @@ class FileHelper {
   static Stream<TaskSnapshot> downloadStorageDocument(Map<String, dynamic> document) {
     if (document["type"] == "pdf") {
       final List<Map<String, dynamic>> connectedFiles =
-      document["connectedFiles"] !=
-          null
+      document["connectedFiles"]
           ? document["connectedFiles"]
           .map<Map<String, dynamic>>(
               (untyped) => Map<String, dynamic>.from(untyped))

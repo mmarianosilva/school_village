@@ -9,6 +9,7 @@ class VendorCategory {
     this.name,
     this.icon,
     this.deleted,
+    this.vendorsCount,
   });
 
   VendorCategory.fromMap({Map<String, dynamic> data})
@@ -19,16 +20,18 @@ class VendorCategory {
           deleted: (data['deleted'] as bool) ?? false,
         );
 
-  VendorCategory.fromDocument({DocumentSnapshot document})
+  VendorCategory.fromDocument({DocumentSnapshot<Map<String, dynamic>> document})
       : this(
           id: document.id,
           name: (document.data()['name'] as String).capitalize,
           icon: document.data()['icon'] as String,
-          deleted: (document.data()['deleted'] as bool) ?? false,
+          deleted: (((document.data()['deleted'] ?? null)) != null) ?? false,
+          vendorsCount: (document.data()['vendorsCount'] ?? 0),
         );
 
   final String id;
   final String name;
   final String icon;
   final bool deleted;
+  final int vendorsCount;
 }

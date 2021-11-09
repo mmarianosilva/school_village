@@ -31,7 +31,7 @@ class TalkAroundMessaging extends StatefulWidget {
 class _TalkAroundMessagingState extends State<TalkAroundMessaging>
     with TickerProviderStateMixin {
   final TalkAroundChannel channel;
-  DocumentSnapshot _userSnapshot;
+  DocumentSnapshot<Map<String, dynamic>> _userSnapshot;
   String _schoolId;
   bool isLoading = true;
   bool isVideo = false;
@@ -44,7 +44,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
   _TalkAroundMessagingState(this.channel);
 
   void _getUserDetails() async {
-    FirebaseUser user = await UserHelper.getUser();
+    User user = await UserHelper.getUser();
     var schoolId = await UserHelper.getSelectedSchoolID();
     FirebaseFirestore.instance.doc('users/${user.uid}').get().then((user) {
       setState(() {
@@ -57,6 +57,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   String _buildChannelName() {
     print("Channel Details ${channel.id}");
+
     if (!channel.direct) {
       return "#${channel.name}";
     }
@@ -144,7 +145,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onTakePhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.takeImage();
+    final File photo = File((await selectImageUsecase.takeImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -152,7 +153,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectPhoto() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File photo = await selectImageUsecase.selectImage();
+    final File photo = File((await selectImageUsecase.selectImage()).path);
     setState(() {
       selectedImage = photo;
     });
@@ -160,7 +161,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   void _onSelectVideo() async {
     FocusScope.of(context).requestFocus(FocusNode());
-    final File video = await selectImageUsecase.selectVideo();
+    final File video = File((await selectImageUsecase.selectVideo()).path);
     if (video != null) {
       setState(() {
         sending = true;
@@ -206,7 +207,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
             "location": currentLocation,
             "timestamp": FieldValue.serverTimestamp(),
             "body": input,
-            "phone": _userSnapshot.data()["phone"]
+            "phone": _userSnapshot.data()["phone"] ?? ''
           };
           try {
             FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -265,7 +266,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
         // "location": await UserHelper.getLocation(),
         "timestamp": FieldValue.serverTimestamp(),
         "body": messageInputController.text,
-        "phone": _userSnapshot.data()["phone"]
+        "phone": _userSnapshot.data()["phone"] ?? ''
       };
       try {
         FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -277,14 +278,13 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
               .set({"timestamp": FieldValue.serverTimestamp()},
                   SetOptions(merge: true));
         });
-        if(isIntrado()){
-         await sendIntradoMsg(messageInputController.text);
+        if (isIntrado()) {
+          await sendIntradoMsg(messageInputController.text);
         }
         messageInputController.clear();
       } on Exception catch (ex) {
-        print("$ex");
+        print("New Exception $ex");
       }
-
     }
     setState(() {
       selectedImage = null;
@@ -295,32 +295,71 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
 
   sendIntradoMsg(String msg) async {
     final baseurlPackage = await UserHelper.getPackageDependentDetails();
-    final intradoPayload = IntradoMessage(session:channel.id,message: msg,messageId: '2' );
+    final intradoPayload =
+        IntradoMessage(session: channel.id, message: msg, messageId: '2');
     final token =
-    (await (await FirebaseAuth
-        .instance
-        .currentUser())
-        .getIdToken())
-        .token;
+        (await (await FirebaseAuth.instance.currentUser).getIdToken());
     final response = await http.post(
-    "${baseurlPackage[2]}/send-message",
-    body: intradoPayload.toXml(),
-    encoding:
-    Encoding.getByName("utf8"),
-    headers: <String, String>{
-    "Authorization": "Bearer $token",
-    },
+      Uri.parse(
+          "${baseurlPackage[2]}/send-message"),
+      body: intradoPayload.toXml(),
+      encoding: Encoding.getByName("utf8"),
+      headers: <String, String>{
+        "Authorization": "Bearer $token",
+      },
     );
-    print(
-    "Body Submitted is ${intradoPayload.toXml()} and token is $token");
-    print(
-    "Intrado response is ${response.body}");
+    print("Body Submitted is ${intradoPayload.toXml()} and token is $token");
+    print("Intrado response is ${response.body}");
   }
 
   @override
   void initState() {
     _getUserDetails();
     super.initState();
+  }
+
+  List<Widget> getWidgets() {
+    return (widget.channel.isClass ?? false) &&
+            ((_userSnapshot != null &&
+                    (_userSnapshot.data()["associatedSchools"][
+                                    "${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "school_admin" ||
+                        _userSnapshot.data()["associatedSchools"][
+                                    "${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "district" ||
+                        _userSnapshot.data()["associatedSchools"]
+                                    ["${_schoolId.substring("schools/".length)}"]
+                                ["role"] ==
+                            "admin")) ||
+                (widget.channel.admin.id ==
+                    FirebaseFirestore.instance
+                        .doc("users/${_userSnapshot?.id ?? "a"}")))
+        ? [
+            FlatButton(
+              onPressed: () =>
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => TalkAroundCreateClass(
+                            group: widget.channel,
+                          ))),
+              child: Text(localize('Edit').toUpperCase(),
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 20, 195, 239), fontSize: 16.0),
+                  textAlign: TextAlign.end),
+            )
+          ]
+        : [];
+  }
+
+  Widget getChat() {
+    return Chat(
+      conversation: "$_schoolId/messages/${channel.id}",
+      showLocation: channel.showLocation,
+      showInput: false,
+      user: _userSnapshot,
+      reverseInput: true,
+    );
   }
 
   @override
@@ -344,37 +383,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
               ],
             ),
           ),
-          actions: (widget.channel.isClass ?? false) &&
-                  ((_userSnapshot != null &&
-                          (_userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "school_admin" ||
-                              _userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "district" ||
-                              _userSnapshot.data()["associatedSchools"]
-                                          ["${_schoolId.substring("schools/".length)}"]
-                                      ["role"] ==
-                                  "admin" ))||
-                      (widget.channel.admin.id ==
-                          FirebaseFirestore.instance.doc("users/${_userSnapshot?.id ?? "a"}")))
-              ? [
-                  FlatButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => TalkAroundCreateClass(
-                                  group: widget.channel,
-                                ))),
-                    child: Text(localize('Edit').toUpperCase(),
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 20, 195, 239),
-                            fontSize: 16.0),
-                        textAlign: TextAlign.end),
-                  )
-                ]
-              : [],
+          actions: getWidgets(),
         ),
         body: Builder(builder: (context) {
           if (isLoading) {
@@ -393,13 +402,7 @@ class _TalkAroundMessagingState extends State<TalkAroundMessaging>
                   child: Column(
                     children: <Widget>[
                       Expanded(
-                        child: Chat(
-                          conversation: "$_schoolId/messages/${channel.id}",
-                          showLocation: channel.showLocation,
-                          showInput: false,
-                          user: _userSnapshot,
-                          reverseInput: true,
-                        ),
+                        child: getChat(),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
