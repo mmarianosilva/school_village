@@ -39,7 +39,7 @@ class ImageViewScreen extends StatelessWidget {
       ),
       // loadingChild: Text(localize("Loading", context),
       //     style: TextStyle(color: Colors.white)),
-      minScale: PhotoViewScaleState.covering,
+      minScale: PhotoViewComputedScale.covered,
     );
   }
 }
