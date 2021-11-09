@@ -33,8 +33,12 @@ class ImageViewScreen extends StatelessWidget {
   Widget picView(BuildContext context) {
     return PhotoView(
       imageProvider: NetworkImage(imageAddress),
-      loadingChild: Text(localize("Loading", context),
-          style: TextStyle(color: Colors.white)),
+      loadingBuilder: (context, event) => Center(
+        child: Text(localize("Loading", context),
+            style: TextStyle(color: Colors.white)),
+      ),
+      // loadingChild: Text(localize("Loading", context),
+      //     style: TextStyle(color: Colors.white)),
       minScale: PhotoViewScaleState.covering,
     );
   }
