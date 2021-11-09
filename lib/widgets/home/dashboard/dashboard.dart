@@ -957,34 +957,29 @@ class _DashboardState extends State<Dashboard> with RouteAware {
         return FutureBuilder(
             future: FirebaseFirestore.instance.doc(ref).get(),
             builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
               if (snapshot.hasData) {
                 final List<DocumentSnapshot> documents =
-                    snapshot.data["documents"] != null
-                        ? snapshot.data["documents"]
-                            .where((snapshot) {
-                              if (snapshot["accessRoles"] == null) {
-                                return true;
-                              }
-                              final accessRoles =
-                                  (snapshot["accessRoles"] as List)
-                                      .cast<String>();
-                              //debugPrint("Access roles are $accessRoles");
-                              for (final accessRole in accessRoles) {
-                                if (accessRole.contains(role)) {
-                                  //||
-                                  //                                     Temporary.updateRole(accessRole)
-                                  //                                         .contains(role)
-                                  //Removed above since we're upgrading
-                                  //debugPrint("Print ${snapshot["title"]}");
-                                  return true;
-                                }
-                              }
-                              return false;
-                            })
-                            .toList()
-                            .cast<DocumentSnapshot>()
-                        : null;
+                (snapshot.data.data()["documents"] ?? null) != null
+                    ? snapshot.data.data()["documents"]
+                    .where((mSnapshot) {
+                  if (mSnapshot["accessRoles"] == null) {
+                    return true;
+                  }
+                  final accessRoles =
+                  (mSnapshot["accessRoles"] as List)
+                      .cast<String>();
+                  //debugPrint("Access roles are $accessRoles");
+                  for (final accessRole in accessRoles) {
+                    if (accessRole.contains(role)) {
+                      return true;
+                    }
+                  }
+                  return false;
+                })
+                    .toList()
+                    .cast<DocumentSnapshot>()
+                    : null;
                 final  documentCount =
                     documents != null ? documents.length : 0;
                 //print("Documents length is $documentCount");
