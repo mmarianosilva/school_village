@@ -959,26 +959,15 @@ class _DashboardState extends State<Dashboard> with RouteAware {
             builder: (BuildContext context,
                 AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
               if (snapshot.hasData) {
-                final List<DocumentSnapshot> documents =
+                final List<Map<String, dynamic>> documents =
                 (snapshot.data.data()["documents"] ?? null) != null
-                    ? snapshot.data.data()["documents"]
-                    .where((mSnapshot) {
-                  if (mSnapshot["accessRoles"] == null) {
-                    return true;
-                  }
-                  final accessRoles =
-                  (mSnapshot["accessRoles"] as List)
-                      .cast<String>();
-                  //debugPrint("Access roles are $accessRoles");
-                  for (final accessRole in accessRoles) {
-                    if (accessRole.contains(role)) {
-                      return true;
-                    }
-                  }
-                  return false;
+                    ? snapshot.data["documents"]
+                    .where((mSnap) {
+                  return mSnap["accessRoles"] == null ||
+                      mSnap["accessRoles"].contains(role);
                 })
                     .toList()
-                    .cast<DocumentSnapshot>()
+                    .cast<Map<String, dynamic>>()
                     : null;
                 final  documentCount =
                     documents != null ? documents.length : 0;
