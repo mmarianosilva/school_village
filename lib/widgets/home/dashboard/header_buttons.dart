@@ -45,7 +45,7 @@ class HeaderButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> widgets = List();
 
-    if (role == 'school_security') {
+    if (role == 'security') {
       widgets.add(GestureDetector(
         child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),
@@ -77,7 +77,7 @@ class HeaderButtons extends StatelessWidget {
         child: Image.asset('assets/images/broadcast_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openBroadcast(context, true),
       ));
-    } else if (role == 'school_staff') {
+    } else if (role == 'staff') {
       widgets.add(GestureDetector(
         child: Image.asset('assets/images/group_message_btn.png', width: iconSize, height: iconSize, fit: BoxFit.fill),
         onTap: () => _openMessaging(context),

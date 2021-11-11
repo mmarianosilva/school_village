@@ -249,11 +249,11 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendMessage(File image, text, isVideo) {
-    // if (selectGroups.key.currentState.selectedGroups.length < 1) {
-    //   showErrorDialog(
-    //       localize("Please select group to send the broadcast message"));
-    //   return;
-    // }
+     if (selectGroups.key.currentState.selectedGroups.length < 1) {
+       showErrorDialog(
+           localize("Please select group to send the broadcast message"));
+       return;
+     }
 
     if (text.length < 8) {
       showErrorDialog(localize("Text length should be at least 8 characters"));
@@ -290,20 +290,20 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
   }
 
   _sendBroadcasts(image, alertBody, isVideo) {
-    // if (role == 'district') {
-    //   DocumentSnapshot selectedSchool =
-    //       selectGroups.key.currentState.selectedSchool;
-    //   if (selectedSchool == null) {
-    //     selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
-    //       _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
-    //     });
-    //   } else {
-    //     _saveBroadcast(image, alertBody, isVideo, selectedSchool.id);
-    //   }
-    // } else {
-    //   _saveBroadcast(image, alertBody, isVideo);
-    // }
-    _saveBroadcast(image, alertBody, isVideo);
+     if (role == 'district') {
+       DocumentSnapshot selectedSchool =
+           selectGroups.key.currentState.selectedSchool;
+       if (selectedSchool == null) {
+        selectGroups.key.currentState.schoolSnapshots.forEach((schoolDocument) {
+           _saveBroadcast(image, alertBody, isVideo, schoolDocument.id);
+        });
+       } else {
+         _saveBroadcast(image, alertBody, isVideo, selectedSchool.id);
+       }
+     } else {
+       _saveBroadcast(image, alertBody, isVideo);
+     }
+   // _saveBroadcast(image, alertBody, isVideo);
   }
 
   _showLoading() {}
@@ -337,7 +337,7 @@ class _BroadcastMessagingState extends State<BroadcastMessaging> {
 
     document.set(<String, dynamic>{
       'body': alertBody,
-     // 'groups': selectGroups.key.currentState.selectedGroups,
+      'groups': selectGroups.key.currentState.selectedGroups,
       'createdById': _userId,
       'createdBy': name,
       'image': image == null ? null : path,
