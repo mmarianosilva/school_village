@@ -4,6 +4,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/searchable.dart';
 import 'package:school_village/model/user.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/permission_matrix.dart';
 import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/search/search_bar.dart';
 import 'package:school_village/widgets/search/search_dropdown_field.dart';
@@ -28,7 +29,7 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
   User _admin;
   bool _isLoading = true;
   String _schoolId;
-
+  String _role;
   @override
   void initState() {
     getUsers();
@@ -41,11 +42,20 @@ class _TalkAroundCreateClassState extends State<TalkAroundCreateClass> {
 
   Future<void> getUsers() async {
     _schoolId = await UserHelper.getSelectedSchoolID();
+    _role = await UserHelper.getSelectedSchoolRole();
     final escapedSchoolId = _schoolId.substring("schools/".length);
+    final List<String> talkAroundPermissions =
+    PermissionMatrix.getTalkAroundGroupPermissions(_role);
     final QuerySnapshot users = await FirebaseFirestore.instance
         .collection("users")
         .where("associatedSchools.$escapedSchoolId.allowed", isEqualTo: true)
         .get();
+    final List<DocumentSnapshot> modifiableUserList = [...users.docs];
+
+    modifiableUserList.removeWhere((userSnapshot) =>
+    userSnapshot["associatedSchools"][escapedSchoolId] == null ||
+        !talkAroundPermissions.contains(
+            userSnapshot["associatedSchools"][escapedSchoolId]["role"]));
     final Iterable<User> data = users.docs.map((QueryDocumentSnapshot doc) =>
         User.fromMapAndSchool(doc, escapedSchoolId));
     if (widget.group != null) {

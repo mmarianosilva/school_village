@@ -33,7 +33,7 @@ class User implements Searchable {
     data["firstName"],
     data["lastName"],
     data["phone"],
-    data["room"],
+    (data.data() as Map<String,dynamic>)["room"]??'',
     data["associatedSchools"][schoolId]["role"],
   );
 

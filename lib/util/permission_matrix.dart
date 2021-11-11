@@ -35,4 +35,24 @@ class PermissionMatrix {
         return [];
     }
   }
+  static List<String> getTalkAroundGroupPermissions(String role) {
+    switch (role) {
+      case family:
+        return _talkAroundFamily;
+      case student:
+        return _talkAroundStudents;
+      case admin:
+        return _talkAroundAdmin;
+      case security:
+        return _talkAroundSecurity;
+      case staff:
+        return _talkAroundStaff;
+      case district:
+        return _talkAroundDistrict;
+      case pdFireEms:
+        return _talkAroundPdFireEms;
+      default:
+        return [];
+    }
+  }
 }
