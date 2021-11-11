@@ -55,29 +55,28 @@ class _ProgressImageState extends State<ProgressImage> {
   void initState() {
     super.initState();
     if (firebasePath != null) {
-      storage.refFromURL(firebasePath).getDownloadURL().then((furl) {
-        if (!isDisposed)
-          setState(() {
-            url = furl;
-          });
-      });
-      // if (this.isVideo ?? false){
-      //   storage.ref().child(firebasePath).getDownloadURL().then((furl) {
-      //     if (!isDisposed)
+      print("Firebase Path = $firebasePath and url is $url");
+      // storage.refFromURL(firebasePath).getDownloadURL().then((furl) {
+      //   if (!isDisposed)
       //     setState(() {
       //       url = furl;
       //     });
-      //   });
-      // }
-      // else{
-      //   storage.refFromURL(firebasePath).getDownloadURL().then((furl) {
-      //     if (!isDisposed)
-      //       setState(() {
-      //         url = furl;
-      //       });
-      //   });
-      // }
-
+      // });
+      if(firebasePath.startsWith('gs://') || firebasePath.startsWith('http')){
+        storage.refFromURL(firebasePath).getDownloadURL().then((furl) {
+          if (!isDisposed)
+            setState(() {
+              url = furl;
+            });
+        });
+      }else{
+        storage.ref().child(firebasePath).getDownloadURL().then((furl) {
+          if (!isDisposed)
+            setState(() {
+              url = furl;
+            });
+        });
+      }
     }
   }
 

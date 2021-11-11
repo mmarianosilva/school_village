@@ -173,7 +173,7 @@ class _ChatState extends State<Chat> {
   _handleDocumentChanges(documentChanges) {
     documentChanges.forEach((change) {
       if (change.type == DocumentChangeType.added) {
-        _handleMessageMapInsert(change.document);
+        _handleMessageMapInsert(change.doc);
       } else if (change.type == DocumentChangeType.modified) {
 
       } else {
@@ -227,16 +227,16 @@ class _ChatState extends State<Chat> {
               );
             }
 
-            final DocumentSnapshot document = messageList[index].message;
+            final DocumentSnapshot<Map<String,dynamic>> document = messageList[index].message;
             return ChatMessage(
-              text: document['body'],
-              name: "${document['author']}",
-              phone: "${document['phone']}",
-              timestamp: document['timestamp'],
-              self: document['authorId'] == user.id,
-              location: widget.showLocation ? document['location'] : null,
-              imageUrl: document['image'],
-              isVideo: document['isVideo'],
+              text: document.data()['body'],
+              name: "${document.data()['author']}",
+              phone: "${document.data()['phone']}",
+              timestamp: document.data()['timestamp'],
+              self: document.data()['authorId'] == user.id,
+              location: widget.showLocation ? document.data()['location'] : null,
+              imageUrl: document.data()['image'],
+              isVideo: document.data()['isVideo'],
               message: document,
             );
           });
