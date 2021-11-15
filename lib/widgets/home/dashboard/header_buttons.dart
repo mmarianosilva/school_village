@@ -52,7 +52,7 @@ class HeaderButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> widgets = <Widget>[];
     final postAllowed = role == 'district' ||
-        role == 'maintenance' ||
+        role == 'pd_fire_ems' ||
         role == 'admin' ||
         role == 'security';
     widgets.add(GestureDetector(
