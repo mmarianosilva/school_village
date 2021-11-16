@@ -125,7 +125,28 @@ class _LoginState extends State<Login> {
         print(auth.user);
         DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
         userRef.get().then((userSnapshot) {
-          proceed(userSnapshot);
+          final Map<String,dynamic> _originalData = userSnapshot.data();
+          print("User data is ${userSnapshot.data()}");
+          String error = '';
+          if(_originalData['vendor']==true){
+            if(_originalData['account_status']!='reviewed'){
+              error = 'There is a problem with your account. Please contact Support.';
+              _scaffoldKey.currentState
+                  .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+              showErrorDialog(error);
+            }
+            if(!auth.user.emailVerified){
+              error = 'Please verify your registered email address.';
+              _scaffoldKey.currentState
+                  .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+              showErrorDialog(error);
+            }
+          }
+          if(error.isEmpty){
+
+            proceed(userSnapshot);
+          }
+
         });
       }
     }).catchError((error) {
