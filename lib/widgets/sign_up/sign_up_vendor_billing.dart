@@ -5,6 +5,7 @@ import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/model/vendor.dart';
 import 'package:school_village/widgets/home/home.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/widgets/login/login.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
 
 class SelectedHarbor {
@@ -56,7 +57,7 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
       SetOptions(merge: true),
     );
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => Home()),
+      MaterialPageRoute(builder: (context) => Login()),
       (route) => false,
     );
   }

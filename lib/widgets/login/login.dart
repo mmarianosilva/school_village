@@ -126,17 +126,24 @@ class _LoginState extends State<Login> {
         DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
         userRef.get().then((userSnapshot) {
           final Map<String,dynamic> _originalData = userSnapshot.data();
+          print("User data is ${userSnapshot.data()}");
           String error = '';
-          if(_originalData['role']=='vendor' ){
+          if(_originalData['vendor']==true){
             if(_originalData['account_status']!='reviewed'){
-              error = 'Your account was rejected. Please contact admin';
+              error = 'Your account was rejected due to illicit content. Please contact admin';
+              _scaffoldKey.currentState
+                  .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+              showErrorDialog(error);
             }
             if(!auth.user.emailVerified){
-              error = 'Kindly verify your email address';
+              error = 'Kindly verify your email address on your registered email address.';
+              _scaffoldKey.currentState
+                  .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+              showErrorDialog(error);
             }
           }
           if(error.isEmpty){
-            print("User data is ${userSnapshot.data()}");
+
             proceed(userSnapshot);
           }
 
