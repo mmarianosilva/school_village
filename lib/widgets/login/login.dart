@@ -125,7 +125,21 @@ class _LoginState extends State<Login> {
         print(auth.user);
         DocumentReference userRef = FirebaseFirestore.instance.doc(userPath);
         userRef.get().then((userSnapshot) {
-          proceed(userSnapshot);
+          final Map<String,dynamic> _originalData = userSnapshot.data();
+          String error = '';
+          if(_originalData['role']=='vendor' ){
+            if(_originalData['account_status']!='reviewed'){
+              error = 'Your account was rejected. Please contact admin';
+            }
+            if(!auth.user.emailVerified){
+              error = 'Kindly verify your email address';
+            }
+          }
+          if(error.isEmpty){
+            print("User data is ${userSnapshot.data()}");
+            proceed(userSnapshot);
+          }
+
         });
       }
     }).catchError((error) {
