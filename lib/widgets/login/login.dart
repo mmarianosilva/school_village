@@ -130,13 +130,13 @@ class _LoginState extends State<Login> {
           String error = '';
           if(_originalData['vendor']==true){
             if(_originalData['account_status']!='reviewed'){
-              error = 'Your account was rejected due to illicit content. Please contact admin';
+              error = 'There is a problem with your account. Please contact Support.';
               _scaffoldKey.currentState
                   .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
               showErrorDialog(error);
             }
             if(!auth.user.emailVerified){
-              error = 'Kindly verify your email address on your registered email address.';
+              error = 'Please verify your registered email address.';
               _scaffoldKey.currentState
                   .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
               showErrorDialog(error);
