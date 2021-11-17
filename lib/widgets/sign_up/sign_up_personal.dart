@@ -6,6 +6,7 @@ import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:school_village/components/base_appbar.dart';
 import 'package:school_village/util/constants.dart';
 import 'package:school_village/util/localizations/localization.dart';
+import 'package:school_village/util/user_helper.dart';
 import 'package:school_village/widgets/sign_up/sign_up_boat.dart';
 import 'package:school_village/widgets/sign_up/sign_up_text_field.dart';
 import 'package:school_village/widgets/sign_up/sign_up_vendor.dart';
@@ -31,6 +32,7 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   MaskedInputFormatter formatter;
+
   bool _validateEmail() {
     return Constants.emailRegEx.hasMatch(_emailController.text);
   }
@@ -117,6 +119,17 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
     }
     final email = _emailController.text;
     final password = _passwordController.text;
+    final data = <String, dynamic>{
+      "email": email,
+      "firstName": _firstNameController.text,
+      "lastName": _lastNameController.text,
+      "phone": _phoneController.text
+          .replaceAll("(", "")
+          .replaceAll(")", "")
+          .replaceAll(" ", "")
+          .replaceAll("-", ""),
+    };
+    data["vendor"] = _isVendor ?? false;
     String uid = "";
     try {
       final user = await FirebaseAuth.instance.currentUser;
@@ -139,31 +152,8 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
         uid = user.uid;
       }
 
-      final data = <String, dynamic>{
-        "email": email,
-        "firstName": _firstNameController.text,
-        "lastName": _lastNameController.text,
-        "phone": _phoneController.text
-            .replaceAll("(", "")
-            .replaceAll(")", "")
-            .replaceAll(" ", "")
-            .replaceAll("-", ""),
-      };
-      data["vendor"] = _isVendor ?? false;
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .set(data);
-      setState(() {
-        _isLoading = false;
-      });
-      if (_isBoater) {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SignUpBoat(userData: data)));
-      } else {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SignUpVendor(userData: data)));
-      }
+
+      updateUserAndNavigate(uid, data);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         setState(() {
@@ -176,6 +166,20 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> updateUserAndNavigate(uid,data) async {
+    await FirebaseFirestore.instance.collection("users").doc(uid).set(data);
+    setState(() {
+      _isLoading = false;
+    });
+    if (_isBoater) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => SignUpBoat(userData: data)));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => SignUpVendor(userData: data)));
     }
   }
 
@@ -280,8 +284,10 @@ class _SignUpPersonalState extends State<SignUpPersonal> {
 
                           controller: _phoneController,
                           hint: localize("Phone"),
-                          textInputType: TextInputType.numberWithOptions(signed: true),
-                          inputFormatter: MaskedInputFormatter("(###)###-####", allowedCharMatcher: RegExp(r'[0-9]')),
+                          textInputType:
+                              TextInputType.numberWithOptions(signed: true),
+                          inputFormatter: MaskedInputFormatter("(###)###-####",
+                              allowedCharMatcher: RegExp(r'[0-9]')),
                         ),
                       ),
                       Padding(
