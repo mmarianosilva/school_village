@@ -279,8 +279,8 @@ class _DashboardState extends State<Dashboard> with RouteAware {
     return FutureBuilder(
         future: model.getAlertGroups(ref.split("/")[1]),
         builder: (context, alertGroups) {
-          if (alertGroups.connectionState != ConnectionState.done ||
-              alertGroups.data.length == 0) {
+          if (alertGroups.connectionState != ConnectionState.done ||alertGroups.data==null||
+              alertGroups.data.length == 0 && role!='vendor') {
             return SizedBox();
           }
           return GestureDetector(
