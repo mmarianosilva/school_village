@@ -49,23 +49,51 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
   double get _computedPrice => _slipCount * 0.02;
 
   Future<void> _onNextPressed() async {
-
     await FirebaseFirestore.instance.doc(widget.vendor.id).set(
       <String, dynamic>{
         "districts": _selectedHarbors.map((item) => item.ref).toList(),
       },
       SetOptions(merge: true),
-    );
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => Login()),
-      (route) => false,
-    );
+    ).then((value) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(localize('Sign Up Complete')),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    Text(localize(
+                        'We have sent you an email which you must verify before you can login.'))
+                  ],
+                ),
+              ),
+              actions: [
+                FlatButton(
+                  child: Text(localize('Okay')),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => Login()),
+                          (route) => false,
+                    );
+                  },
+                )
+              ],
+            );
+          });
+    });
+
+
   }
 
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance.collection("districts").where('deleted',isNotEqualTo: true).get().then((snapshot) {
+    FirebaseFirestore.instance
+        .collection("districts")
+        .where('deleted', isNotEqualTo: true)
+        .get()
+        .then((snapshot) {
       _availableHarbors.clear();
       _availableHarbors.addAll(snapshot.docs.map((snapshot) =>
           SelectedHarbor(snapshot.reference, snapshot.data()["name"])));
@@ -79,16 +107,16 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
       return;
     }
     List<List<SelectedHarbor>> harborsCollection = [];
-    List<QuerySnapshot<Map<String,dynamic>>> mSchools=[];
+    List<QuerySnapshot<Map<String, dynamic>>> mSchools = [];
     for (var i = 0; i < _selectedHarbors.length; i += 10) {
-      harborsCollection.add(
-          _selectedHarbors.sublist(i, i + 10> _selectedHarbors.length ? _selectedHarbors.length : i + 10));
+      harborsCollection.add(_selectedHarbors.sublist(i,
+          i + 10 > _selectedHarbors.length ? _selectedHarbors.length : i + 10));
     }
-    for(var collection in harborsCollection){
+    for (var collection in harborsCollection) {
       final schools = await FirebaseFirestore.instance
           .collection("schools")
           .where("district",
-          whereIn: collection.map((snapshot) => snapshot.ref).toList())
+              whereIn: collection.map((snapshot) => snapshot.ref).toList())
           .get();
       mSchools.add(schools);
     }
@@ -102,12 +130,13 @@ class _SignUpVendorBillingState extends State<SignUpVendorBilling> {
           final district = snapshot.data()["district"] as DocumentReference;
           _selectedHarbors
               .firstWhere((item) => item.ref == district)
-              .addToSlipCount((((snapshot.data()["slipsCount"] ?? null) != null))&&(((snapshot.data()["slipsCount"] ?? null) != ''))
-              ? (snapshot.data()["slipsCount"])
-              : 0);
+              .addToSlipCount(
+                  (((snapshot.data()["slipsCount"] ?? null) != null)) &&
+                          (((snapshot.data()["slipsCount"] ?? null) != ''))
+                      ? (snapshot.data()["slipsCount"])
+                      : 0);
         }
       });
-
     });
     _slipCount = _selectedHarbors
         .map((item) => item.slipCount)

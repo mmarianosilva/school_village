@@ -128,6 +128,12 @@ class _LoginState extends State<Login> {
           final Map<String,dynamic> _originalData = userSnapshot.data();
           print("User data is ${userSnapshot.data()}");
           String error = '';
+          if(_originalData==null){
+            error = 'This user has been deleted';
+            _scaffoldKey.currentState
+                .hideCurrentSnackBar(reason: SnackBarClosedReason.timeout);
+            showErrorDialog(error);
+          }
           if(_originalData['vendor']==true){
             if(_originalData['account_status']!='reviewed'){
               error = 'There is a problem with your account. Please contact Support.';
